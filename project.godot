@@ -14,11 +14,6 @@ config/name="sw_chill_formal"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
-[display]
-
-window/size/viewport_width=1920
-window/size/viewport_height=1080
-
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/Godot-MToon-Shader/plugin.cfg", "res://addons/vrm/plugin.cfg")
