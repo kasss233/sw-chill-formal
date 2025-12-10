@@ -1,4 +1,4 @@
-class_name Task
+class_name SingleTask
 extends Control
 @onready var check_box=$HBoxContainer/CheckBox
 @onready var button =$HBoxContainer/Button

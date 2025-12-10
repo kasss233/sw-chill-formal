@@ -1,13 +1,13 @@
 [gd_scene load_steps=2 format=3 uid="uid://cvouwhk5wkiht"]
 
-[ext_resource type="Script" uid="uid://cbbq8dxfw3w2" path="res://scenes/ui/task_module/task/task.gd" id="1_4b3wh"]
+[ext_resource type="Script" uid="uid://cbbq8dxfw3w2" path="res://scenes/ui/task_module/single_task/single_task.gd" id="1_wj31m"]
 
-[node name="Task" type="Control"]
+[node name="SingleTask" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 247.0
 offset_bottom = 44.0
-script = ExtResource("1_4b3wh")
+script = ExtResource("1_wj31m")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 0
