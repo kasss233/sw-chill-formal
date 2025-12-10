@@ -1,5 +1,6 @@
 extends Control
 @onready var vbox=$FoldableContainer/ScrollContainer/VBoxContainer
+@onready var folder=$FoldableContainer
 signal music_changed(_name:String)
 func get_signal():
 	for c in vbox.get_children():
@@ -8,5 +9,6 @@ func get_signal():
 		
 func change_music(_name:String):
 	emit_signal("music_changed",_name)
+	folder.title=_name
 	
 	

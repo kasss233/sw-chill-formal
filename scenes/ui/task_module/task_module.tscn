@@ -21,7 +21,7 @@ task = ExtResource("2_2o8us")
 
 [node name="TaskBar" type="FoldableContainer" parent="."]
 layout_mode = 0
-offset_right = 103.0
+offset_right = 190.0
 offset_bottom = 40.0
 theme = SubResource("Theme_fdql3")
 folded = true
@@ -34,10 +34,9 @@ theme_override_constants/separation = 50
 
 [node name="AddButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 122.0
-offset_top = -3.0
-offset_right = 160.0
-offset_bottom = 37.0
+offset_left = 196.0
+offset_right = 234.0
+offset_bottom = 31.0
 text = "add"
 
 [connection signal="pressed" from="AddButton" to="." method="_on_add_button_pressed"]
