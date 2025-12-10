@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://cvouwhk5wkiht"]
+
+[ext_resource type="Script" uid="uid://cbbq8dxfw3w2" path="res://scenes/main/ui/task_module/single_task/single_task.gd" id="1_wj31m"]
+
+[node name="SingleTask" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 247.0
+offset_bottom = 44.0
+script = ExtResource("1_wj31m")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CheckBox" type="CheckBox" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="HBoxContainer"]
+layout_mode = 2
+theme_override_constants/minimum_character_width = 10
+text = "输入代办事项"
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "delete"
+
+[connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_button_pressed"]

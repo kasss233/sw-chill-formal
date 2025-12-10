@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://b68ebovhfcxrm"]
+
+[ext_resource type="Script" uid="uid://uj0salxxnqp5" path="res://scenes/main/ui/music_module/single_music/single_music.gd" id="1_f10aj"]
+
+[node name="SingleMusic" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_f10aj")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+offset_right = 152.0
+offset_bottom = 35.0
+text = "null"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
