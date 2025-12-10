@@ -1,0 +1,31 @@
+[gd_scene load_steps=2 format=3 uid="uid://do56ajkuwsf0t"]
+
+[ext_resource type="PackedScene" uid="uid://b68ebovhfcxrm" path="res://scenes/ui/music_module/single_music/single_music.tscn" id="1_rc66h"]
+
+[node name="MusicModule" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="FoldableContainer" type="FoldableContainer" parent="."]
+layout_mode = 1
+offset_right = 174.0
+offset_bottom = 183.0
+title = "current_music_name"
+title_position = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="FoldableContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FoldableContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 40
+
+[node name="SingleMusic3" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
+layout_mode = 2
+
+[node name="SingleMusic4" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
+layout_mode = 2
+
+[node name="SingleMusic5" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
+layout_mode = 2

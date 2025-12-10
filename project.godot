@@ -21,7 +21,11 @@ enabled=PackedStringArray("res://addons/Godot-MToon-Shader/plugin.cfg", "res://a
 [file_customization]
 
 folder_colors={
-"res://assets/": "yellow"
+"res://addons/": "purple",
+"res://assets/": "yellow",
+"res://scenes/": "blue",
+"res://scenes/main/": "red",
+"res://scripts/": "teal"
 }
 
 [rendering]
