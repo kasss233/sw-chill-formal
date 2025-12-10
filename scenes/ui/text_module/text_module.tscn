@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://dj6lebs2vj7kk"]
+
+[ext_resource type="Script" uid="uid://c3ekqbbtd8g17" path="res://scenes/ui/text_module/text_module.gd" id="1_i6uwv"]
+
+[node name="TextModule" type="Control"]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("1_i6uwv")
+
+[node name="TextEdit" type="TextEdit" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -87.5
+offset_top = -40.0
+offset_right = 87.5
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Enter" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 88.0
+offset_top = -40.0
+offset_right = 135.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "发送"
+
+[connection signal="pressed" from="Enter" to="." method="_on_enter_pressed"]

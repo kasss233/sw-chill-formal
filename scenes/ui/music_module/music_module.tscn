@@ -1,10 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://do56ajkuwsf0t"]
+[gd_scene load_steps=3 format=3 uid="uid://do56ajkuwsf0t"]
 
 [ext_resource type="PackedScene" uid="uid://b68ebovhfcxrm" path="res://scenes/ui/music_module/single_music/single_music.tscn" id="1_rc66h"]
+[ext_resource type="Script" uid="uid://b7qsxbprouywv" path="res://scenes/ui/music_module/music_module.gd" id="1_t37u8"]
 
 [node name="MusicModule" type="Control"]
 layout_mode = 3
 anchors_preset = 0
+script = ExtResource("1_t37u8")
 
 [node name="FoldableContainer" type="FoldableContainer" parent="."]
 layout_mode = 1
