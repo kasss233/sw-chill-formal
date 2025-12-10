@@ -2,12 +2,12 @@ extends Node3D
 @export var emotion_animation:AnimationPlayer
 @export var action_animation:AnimationPlayer
 @export var face:MeshInstance3D
-func saying():
+@export var animation_tree:AnimationTree
+@export var  typing:bool=false
+func start_saying():
 	emotion_animation.play("saying")
-func typing():
-	action_animation.play("Sitting/typing")
-func reset_emotion():
+func stop_saying():
 	emotion_animation.play("RESET")
-func stop_action():
-	action_animation.stop()
+func set_typing(_typing:bool):
+	typing=_typing
 	
