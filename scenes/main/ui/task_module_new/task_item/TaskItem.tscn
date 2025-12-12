@@ -1,0 +1,42 @@
+[gd_scene load_steps=2 format=3 uid="uid://behstljx3cp30"]
+
+[ext_resource type="Script" uid="uid://cqyqohlo4a7gr" path="res://scenes/main/ui/task_module_new/task_item/task_item.gd" id="1_v2s4w"]
+
+[node name="TaskItem" type="PanelContainer"]
+script = ExtResource("1_v2s4w")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="CompleteCheckBox" type="CheckBox" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+icon_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 18
+text = "任务文本"
+
+[node name="DueTimeLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Today 22:00"
+
+[node name="EditButton" type="Button" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Edit"
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/EditButton" to="." method="_on_edit_button_pressed"]
