@@ -39,4 +39,9 @@ text = "Today 22:00"
 layout_mode = 2
 text = "Edit"
 
+[node name="LongPressTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+
 [connection signal="pressed" from="MarginContainer/HBoxContainer/EditButton" to="." method="_on_edit_button_pressed"]
+[connection signal="timeout" from="LongPressTimer" to="." method="_on_long_press_timer_timeout"]
