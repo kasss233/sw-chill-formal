@@ -14,6 +14,10 @@ config/name="sw_chill_formal"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
+[display]
+
+window/stretch/aspect="expand"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/Godot-MToon-Shader/plugin.cfg", "res://addons/vrm/plugin.cfg")
@@ -27,6 +31,10 @@ folder_colors={
 "res://scenes/main/": "pink",
 "res://scripts/": "teal"
 }
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
 
 [rendering]
 
