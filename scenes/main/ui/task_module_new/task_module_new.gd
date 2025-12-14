@@ -1,8 +1,9 @@
 extends Control
 
 @export var task_item: PackedScene
-@onready var v_box_container: VBoxContainer = $PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer
-@onready var scroll_container: ScrollContainer = $PanelContainer/VBoxContainer/ScrollContainer
+@onready var scroll_container: ScrollContainer = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer
+@onready var v_box_container: VBoxContainer = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer
+
 
 # 拖拽相关变量
 var dragging_item: TaskItem = null

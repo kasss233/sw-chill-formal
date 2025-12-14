@@ -1,22 +1,38 @@
-[gd_scene load_steps=2 format=3 uid="uid://behstljx3cp30"]
+[gd_scene load_steps=5 format=3 uid="uid://behstljx3cp30"]
 
 [ext_resource type="Script" uid="uid://cqyqohlo4a7gr" path="res://scenes/main/ui/task_module_new/task_item/task_item.gd" id="1_v2s4w"]
+[ext_resource type="FontFile" uid="uid://chb0a8tdad8b8" path="res://assets/ui/fonts/SourceHanSansCN-Regular.otf" id="2_df075"]
+[ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://scenes/main/ui/themes/material.tres" id="2_kna65"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2s4w"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.81, 0.81, 0.81, 0.25882354)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+corner_detail = 5
 
 [node name="TaskItem" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_v2s4w")
 script = ExtResource("1_v2s4w")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_bottom = 5
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
 [node name="CompleteCheckBox" type="CheckBox" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
+theme = ExtResource("2_kna65")
 icon_alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
@@ -27,15 +43,18 @@ theme_override_constants/separation = 0
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 6
+theme_override_fonts/font = ExtResource("2_df075")
 theme_override_font_sizes/font_size = 18
 text = "任务文本"
 
 [node name="DueTimeLabel" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "Today 22:00"
 
 [node name="EditButton" type="Button" parent="MarginContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 text = "Edit"
 
