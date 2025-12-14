@@ -1,0 +1,45 @@
+[gd_resource type="Theme" load_steps=12 format=3 uid="uid://ctpnw50ym2lbi"]
+
+[ext_resource type="Texture2D" uid="uid://bmfjsnldvjmu4" path="res://assets/ui/icons/add_circle_24dp.svg" id="1_cqee6"]
+[ext_resource type="Texture2D" uid="uid://dh1kvtkfkfr13" path="res://assets/ui/icons/radio_button_unchecked_24dp.svg" id="2_cqee6"]
+[ext_resource type="Texture2D" uid="uid://wdqoanf2tctj" path="res://assets/ui/icons/check_circle_24dp.svg" id="2_m1yvo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m1yvo"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_m1yvo"]
+texture = ExtResource("1_cqee6")
+modulate_color = Color(18.892157, 18.892157, 18.892157, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cqee6"]
+texture = ExtResource("1_cqee6")
+modulate_color = Color(5.01444, 5.01444, 5.01444, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_v4eor"]
+texture = ExtResource("1_cqee6")
+modulate_color = Color(0, 0, 0, 0.36862746)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hg1it"]
+atlas = ExtResource("2_m1yvo")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5mtlt"]
+atlas = ExtResource("2_m1yvo")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dlwfx"]
+atlas = ExtResource("2_cqee6")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mtlt"]
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[resource]
+AddButton/base_type = &"Button"
+AddButton/styles/focus = SubResource("StyleBoxEmpty_m1yvo")
+AddButton/styles/hover = SubResource("StyleBoxTexture_m1yvo")
+AddButton/styles/normal = SubResource("StyleBoxTexture_cqee6")
+AddButton/styles/pressed = SubResource("StyleBoxTexture_v4eor")
+CheckBox/icons/checked = SubResource("AtlasTexture_hg1it")
+CheckBox/icons/radio_checked = SubResource("AtlasTexture_5mtlt")
+CheckBox/icons/unchecked = SubResource("AtlasTexture_dlwfx")
+CheckBox/styles/focus = SubResource("StyleBoxFlat_5mtlt")
