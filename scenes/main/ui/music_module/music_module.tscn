@@ -10,7 +10,7 @@ script = ExtResource("1_t37u8")
 
 [node name="FoldableContainer" type="FoldableContainer" parent="."]
 layout_mode = 1
-offset_right = 174.0
+offset_right = 218.0
 offset_bottom = 183.0
 title = "current_music_name"
 title_position = 1
@@ -25,9 +25,47 @@ theme_override_constants/separation = 40
 
 [node name="SingleMusic3" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
 layout_mode = 2
+music_name = "barradeen_bedtime_after_a_coffee"
 
 [node name="SingleMusic4" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
 layout_mode = 2
+music_name = "late_at_night"
 
 [node name="SingleMusic5" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
 layout_mode = 2
+music_name = "little_wishes"
+
+[node name="SingleMusic6" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
+layout_mode = 2
+music_name = "transcendence"
+
+[node name="SingleMusic7" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
+layout_mode = 2
+music_name = "when_i_was_a_boy"
+
+[node name="SingleMusic8" parent="FoldableContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_rc66h")]
+layout_mode = 2
+music_name = "wildflowers"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 254.0
+offset_top = 148.0
+offset_right = 286.0
+offset_bottom = 188.0
+
+[node name="LastButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "last"
+
+[node name="StatusButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "stop/start"
+
+[node name="NextButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "next"
+
+[connection signal="pressed" from="HBoxContainer/LastButton" to="." method="_on_last_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/StatusButton" to="." method="_on_status_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]

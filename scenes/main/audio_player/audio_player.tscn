@@ -1,6 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://fgixisam3qks"]
+[gd_scene load_steps=8 format=3 uid="uid://fgixisam3qks"]
 
 [ext_resource type="Script" uid="uid://d01r7nigbg8jk" path="res://scenes/main/audio_player/audio_player.gd" id="1_7i0mx"]
+[ext_resource type="AudioStream" uid="uid://1tebddn53oqf" path="res://assets/music/barradeen-bedtime-after-a-coffee(chosic.com).mp3" id="2_cqgow"]
+[ext_resource type="AudioStream" uid="uid://cogq7khbr3lpy" path="res://assets/music/Late-at-Night(chosic.com).mp3" id="3_40d6s"]
+[ext_resource type="AudioStream" uid="uid://cg8cjwv37sux6" path="res://assets/music/Little-Wishes-chosic.com_.mp3" id="4_erh1e"]
+[ext_resource type="AudioStream" uid="uid://ceahpv0iyxxq6" path="res://assets/music/Transcendence-chosic.com_.mp3" id="5_srx2n"]
+[ext_resource type="AudioStream" uid="uid://cosiiuj5ptqyo" path="res://assets/music/When-I-Was-A-Boy(chosic.com).mp3" id="6_y5dsm"]
+[ext_resource type="AudioStream" uid="uid://j6ug3y1vjp5l" path="res://assets/music/Wildflowers-chosic.com_.mp3" id="7_1jnqv"]
 
 [node name="AudioPlayer" type="Node"]
 script = ExtResource("1_7i0mx")
@@ -11,4 +17,20 @@ script = ExtResource("1_7i0mx")
 
 [node name="BGM" type="Node" parent="."]
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="BGM"]
+[node name="barradeen_bedtime_after_a_coffee" type="AudioStreamPlayer" parent="BGM"]
+stream = ExtResource("2_cqgow")
+
+[node name="late_at_night" type="AudioStreamPlayer" parent="BGM"]
+stream = ExtResource("3_40d6s")
+
+[node name="little_wishes" type="AudioStreamPlayer" parent="BGM"]
+stream = ExtResource("4_erh1e")
+
+[node name="transcendence" type="AudioStreamPlayer" parent="BGM"]
+stream = ExtResource("5_srx2n")
+
+[node name="when_i_was_a_boy" type="AudioStreamPlayer" parent="BGM"]
+stream = ExtResource("6_y5dsm")
+
+[node name="wildflowers" type="AudioStreamPlayer" parent="BGM"]
+stream = ExtResource("7_1jnqv")
