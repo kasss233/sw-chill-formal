@@ -2,6 +2,7 @@ class_name TaskItem
 extends PanelContainer
 
 signal edit_requested(id)
+signal content_changed(item: TaskItem)
 signal drag_started(item: TaskItem)
 signal drag_ended(item: TaskItem)
 
@@ -100,3 +101,8 @@ func _on_long_press_timer_timeout() -> void:
 	if is_pressing:
 		is_dragging = true
 		drag_started.emit(self)
+
+func _on_line_edit_text_changed(new_text: String) -> void:
+	print("[%s]Task title change to \"%s\"" %[self.name,new_text])
+	task_data.title = new_text
+	content_changed.emit(self)
