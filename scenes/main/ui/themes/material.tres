@@ -1,45 +1,104 @@
-[gd_resource type="Theme" load_steps=12 format=3 uid="uid://ctpnw50ym2lbi"]
+[gd_resource type="Theme" load_steps=21 format=3 uid="uid://ctpnw50ym2lbi"]
 
-[ext_resource type="Texture2D" uid="uid://bmfjsnldvjmu4" path="res://assets/ui/icons/add_circle_24dp.svg" id="1_cqee6"]
 [ext_resource type="Texture2D" uid="uid://dh1kvtkfkfr13" path="res://assets/ui/icons/radio_button_unchecked_24dp.svg" id="2_cqee6"]
-[ext_resource type="Texture2D" uid="uid://wdqoanf2tctj" path="res://assets/ui/icons/check_circle_24dp.svg" id="2_m1yvo"]
+[ext_resource type="Texture2D" uid="uid://wdqoanf2tctj" path="res://assets/ui/icons/check_circle_24dp.svg" id="3_377ow"]
+[ext_resource type="Texture2D" uid="uid://e6smhcqfsu8f" path="res://assets/ui/icons/close_24dp.svg" id="3_m1yvo"]
+[ext_resource type="StyleBox" uid="uid://d0x37xi8v5r6i" path="res://scenes/main/ui/themes/hover_style_box_flat.tres" id="3_v4eor"]
+[ext_resource type="StyleBox" uid="uid://cgj32oh58mq01" path="res://scenes/main/ui/themes/press_style_box_flat.tres" id="4_377ow"]
+[ext_resource type="FontFile" uid="uid://chb0a8tdad8b8" path="res://assets/ui/fonts/SourceHanSansCN-Regular.otf" id="5_377ow"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m1yvo"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v4eor"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_m1yvo"]
-texture = ExtResource("1_cqee6")
-modulate_color = Color(18.892157, 18.892157, 18.892157, 1)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l8ayg"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cqee6"]
-texture = ExtResource("1_cqee6")
-modulate_color = Color(5.01444, 5.01444, 5.01444, 1)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ckblt"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_v4eor"]
-texture = ExtResource("1_cqee6")
-modulate_color = Color(0, 0, 0, 0.36862746)
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_377ow"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_hg1it"]
-atlas = ExtResource("2_m1yvo")
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cqee6"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_5mtlt"]
-atlas = ExtResource("2_m1yvo")
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_377ow"]
+bg_color = Color(1, 1, 1, 0)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_dlwfx"]
-atlas = ExtResource("2_cqee6")
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rnd24"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mtlt"]
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pfbtc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bqx6e"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aj1iw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jsmyf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jsmyf"]
+bg_color = Color(0, 0, 0, 0.2)
+border_color = Color(0, 0, 0, 0)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m1yvo"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 0)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cqee6"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 0)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
 
 [resource]
-AddButton/base_type = &"Button"
-AddButton/styles/focus = SubResource("StyleBoxEmpty_m1yvo")
-AddButton/styles/hover = SubResource("StyleBoxTexture_m1yvo")
-AddButton/styles/normal = SubResource("StyleBoxTexture_cqee6")
-AddButton/styles/pressed = SubResource("StyleBoxTexture_v4eor")
-CheckBox/icons/checked = SubResource("AtlasTexture_hg1it")
-CheckBox/icons/radio_checked = SubResource("AtlasTexture_5mtlt")
-CheckBox/icons/unchecked = SubResource("AtlasTexture_dlwfx")
-CheckBox/styles/focus = SubResource("StyleBoxFlat_5mtlt")
+Button/styles/disabled = SubResource("StyleBoxEmpty_v4eor")
+Button/styles/focus = SubResource("StyleBoxEmpty_l8ayg")
+Button/styles/hover = ExtResource("3_v4eor")
+Button/styles/hover_pressed = SubResource("StyleBoxEmpty_ckblt")
+Button/styles/normal = SubResource("StyleBoxEmpty_377ow")
+Button/styles/pressed = ExtResource("4_377ow")
+CheckBox/icons/checked = ExtResource("3_377ow")
+CheckBox/icons/radio_checked = ExtResource("3_377ow")
+CheckBox/icons/radio_unchecked = ExtResource("2_cqee6")
+CheckBox/icons/unchecked = ExtResource("2_cqee6")
+CheckBox/styles/focus = SubResource("StyleBoxEmpty_cqee6")
+CheckBox/styles/hover = ExtResource("3_v4eor")
+CheckBox/styles/hover_pressed = ExtResource("4_377ow")
+CheckBox/styles/pressed = ExtResource("4_377ow")
+LineEdit/colors/font_uneditable_color = Color(1, 1, 1, 1)
+LineEdit/font_sizes/font_size = 18
+LineEdit/fonts/font = ExtResource("5_377ow")
+LineEdit/styles/focus = SubResource("StyleBoxFlat_377ow")
+LineEdit/styles/normal = SubResource("StyleBoxEmpty_rnd24")
+LineEdit/styles/read_only = SubResource("StyleBoxEmpty_pfbtc")
+MaterialButton/base_type = &"Button"
+MaterialButton/icons/icon = ExtResource("3_m1yvo")
+MaterialButton/styles/disabled = SubResource("StyleBoxEmpty_bqx6e")
+MaterialButton/styles/focus = ExtResource("3_v4eor")
+MaterialButton/styles/hover = ExtResource("3_v4eor")
+MaterialButton/styles/hover_mirrored = ExtResource("3_v4eor")
+MaterialButton/styles/hover_pressed = ExtResource("4_377ow")
+MaterialButton/styles/hover_pressed_mirrored = ExtResource("4_377ow")
+MaterialButton/styles/normal = SubResource("StyleBoxEmpty_aj1iw")
+MaterialButton/styles/pressed = ExtResource("4_377ow")
+MaterialCheckbox/base_type = &"Button"
+MaterialCheckbox/styles/focus = SubResource("StyleBoxEmpty_jsmyf")
+MaterialCheckbox/styles/hover = ExtResource("3_v4eor")
+MaterialCheckbox/styles/hover_mirrored = SubResource("StyleBoxFlat_jsmyf")
+MaterialCheckbox/styles/hover_pressed = SubResource("StyleBoxFlat_m1yvo")
+MaterialCheckbox/styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_m1yvo")
+MaterialCheckbox/styles/normal = SubResource("StyleBoxFlat_cqee6")
+MaterialCheckbox/styles/normal_mirrored = SubResource("StyleBoxFlat_cqee6")
+MaterialCheckbox/styles/pressed = ExtResource("4_377ow")

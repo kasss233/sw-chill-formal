@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bvu4dydb8q3mq"]
-
-[ext_resource type="Script" uid="uid://dchh7bgtcukww" path="res://scenes/main/ui/components/add_button.gd" id="1_f50ca"]
-
-[node name="Button" type="Button"]
-offset_right = 8.0
-offset_bottom = 8.0
-script = ExtResource("1_f50ca")

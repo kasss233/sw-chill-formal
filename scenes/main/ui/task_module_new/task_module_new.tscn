@@ -1,23 +1,45 @@
-[gd_scene load_steps=9 format=3 uid="uid://cshc06pyk77f"]
+[gd_scene load_steps=10 format=3 uid="uid://cshc06pyk77f"]
 
 [ext_resource type="PackedScene" uid="uid://behstljx3cp30" path="res://scenes/main/ui/task_module_new/task_item/TaskItem.tscn" id="1_d7dkk"]
 [ext_resource type="Script" uid="uid://ct3ivf1xpbpy1" path="res://scenes/main/ui/task_module_new/task_module_new.gd" id="1_u3ulj"]
 [ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://scenes/main/ui/themes/dark_gaussian_blur.gdshader" id="3_3d802"]
 [ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="3_u3ulj"]
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://scenes/main/ui/themes/material.tres" id="4_3e305"]
-[ext_resource type="Script" uid="uid://dchh7bgtcukww" path="res://scenes/main/ui/components/add_button.gd" id="5_wchbm"]
+[ext_resource type="Texture2D" uid="uid://cfgcvfh4qcsqw" path="res://assets/ui/icons/add_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="6_3d802"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wchbm"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3d802"]
 shader = ExtResource("3_3d802")
 shader_parameter/strength = 7.00000032924012
-shader_parameter/mix_percentage = 0.30000001425
+shader_parameter/mix_percentage = 0.35200001672
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u3ulj"]
-bg_color = Color(0, 0, 0, 0.41960785)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3d802"]
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
+corner_detail = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tadlp"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 12
+expand_margin_left = 1.0
+expand_margin_top = 1.0
+expand_margin_right = 1.0
+expand_margin_bottom = 1.0
 
 [node name="TaskModuleNew" type="Control"]
 layout_mode = 3
@@ -30,10 +52,14 @@ script = ExtResource("1_u3ulj")
 task_item = ExtResource("1_d7dkk")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-material = SubResource("ShaderMaterial_wchbm")
+material = SubResource("ShaderMaterial_3d802")
 clip_contents = true
 layout_mode = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_u3ulj")
+theme_override_styles/panel = SubResource("StyleBoxFlat_3d802")
+
+[node name="Panel" type="Panel" parent="PanelContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tadlp")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
 layout_mode = 2
@@ -42,6 +68,7 @@ theme_override_constants/separation = 0
 [node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 5
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer2"]
 custom_minimum_size = Vector2(200, 0)
@@ -64,19 +91,17 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 16
 
 [node name="AddButton" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer"]
-custom_minimum_size = Vector2(30, 0)
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
-size_flags_horizontal = 4
 theme = ExtResource("4_3e305")
-theme_type_variation = &"AddButton"
-script = ExtResource("5_wchbm")
-metadata/_custom_type_script = "uid://dchh7bgtcukww"
+icon = ExtResource("6_3d802")
+icon_alignment = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 16
+theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
+theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer"]
