@@ -96,4 +96,5 @@ icon_alignment = 1
 wait_time = 0.5
 one_shot = true
 
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="timeout" from="LongPressTimer" to="." method="_on_long_press_timer_timeout"]

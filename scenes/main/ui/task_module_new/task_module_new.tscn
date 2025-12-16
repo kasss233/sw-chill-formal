@@ -115,8 +115,4 @@ clip_contents = true
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 
-[node name="TaskItem" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_d7dkk")]
-clip_contents = true
-layout_mode = 2
-
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/AddButton" to="." method="_on_add_button_pressed"]
