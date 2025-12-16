@@ -7,10 +7,16 @@ layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_f10aj")
 
-[node name="Button" type="Button" parent="."]
-layout_mode = 1
-offset_right = 152.0
-offset_bottom = 35.0
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CheckBox" type="CheckBox" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+layout_mode = 2
 text = "null"
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_button_pressed"]
