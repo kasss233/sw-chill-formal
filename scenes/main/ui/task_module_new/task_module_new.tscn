@@ -2,9 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://behstljx3cp30" path="res://scenes/main/ui/task_module_new/task_item/TaskItem.tscn" id="1_d7dkk"]
 [ext_resource type="Script" uid="uid://ct3ivf1xpbpy1" path="res://scenes/main/ui/task_module_new/task_module_new.gd" id="1_u3ulj"]
-[ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://scenes/main/ui/themes/dark_gaussian_blur.gdshader" id="3_3d802"]
+[ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://assets/ui/themes/dark_gaussian_blur.gdshader" id="3_3d802"]
 [ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="3_u3ulj"]
-[ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://scenes/main/ui/themes/material.tres" id="4_3e305"]
+[ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="4_3e305"]
 [ext_resource type="Texture2D" uid="uid://cfgcvfh4qcsqw" path="res://assets/ui/icons/add_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="6_3d802"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3d802"]

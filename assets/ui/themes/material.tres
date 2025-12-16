@@ -1,10 +1,10 @@
-[gd_resource type="Theme" load_steps=21 format=3 uid="uid://ctpnw50ym2lbi"]
+[gd_resource type="Theme" load_steps=22 format=3 uid="uid://ctpnw50ym2lbi"]
 
 [ext_resource type="Texture2D" uid="uid://dh1kvtkfkfr13" path="res://assets/ui/icons/radio_button_unchecked_24dp.svg" id="2_cqee6"]
 [ext_resource type="Texture2D" uid="uid://wdqoanf2tctj" path="res://assets/ui/icons/check_circle_24dp.svg" id="3_377ow"]
 [ext_resource type="Texture2D" uid="uid://e6smhcqfsu8f" path="res://assets/ui/icons/close_24dp.svg" id="3_m1yvo"]
-[ext_resource type="StyleBox" uid="uid://d0x37xi8v5r6i" path="res://scenes/main/ui/themes/hover_style_box_flat.tres" id="3_v4eor"]
-[ext_resource type="StyleBox" uid="uid://cgj32oh58mq01" path="res://scenes/main/ui/themes/press_style_box_flat.tres" id="4_377ow"]
+[ext_resource type="StyleBox" uid="uid://d0x37xi8v5r6i" path="res://assets/ui/themes/hover_style_box_flat.tres" id="3_v4eor"]
+[ext_resource type="StyleBox" uid="uid://cgj32oh58mq01" path="res://assets/ui/themes/press_style_box_flat.tres" id="4_377ow"]
 [ext_resource type="FontFile" uid="uid://chb0a8tdad8b8" path="res://assets/ui/fonts/SourceHanSansCN-Regular.otf" id="5_377ow"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v4eor"]
@@ -16,6 +16,8 @@
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_377ow"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cqee6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xq26c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_377ow"]
 bg_color = Color(1, 1, 1, 0)
@@ -75,8 +77,8 @@ CheckBox/icons/radio_unchecked = ExtResource("2_cqee6")
 CheckBox/icons/unchecked = ExtResource("2_cqee6")
 CheckBox/styles/focus = SubResource("StyleBoxEmpty_cqee6")
 CheckBox/styles/hover = ExtResource("3_v4eor")
-CheckBox/styles/hover_pressed = ExtResource("4_377ow")
-CheckBox/styles/pressed = ExtResource("4_377ow")
+CheckBox/styles/hover_pressed = ExtResource("3_v4eor")
+CheckBox/styles/pressed = SubResource("StyleBoxEmpty_xq26c")
 LineEdit/colors/font_uneditable_color = Color(1, 1, 1, 1)
 LineEdit/font_sizes/font_size = 18
 LineEdit/fonts/font = ExtResource("5_377ow")
