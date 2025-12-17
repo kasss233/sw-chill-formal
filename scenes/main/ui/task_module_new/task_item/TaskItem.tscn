@@ -1,11 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://behstljx3cp30"]
+[gd_scene load_steps=9 format=3 uid="uid://behstljx3cp30"]
 
 [ext_resource type="Script" uid="uid://cqyqohlo4a7gr" path="res://scenes/main/ui/task_module_new/task_item/task_item.gd" id="1_v2s4w"]
 [ext_resource type="FontFile" uid="uid://chb0a8tdad8b8" path="res://assets/ui/fonts/SourceHanSansCN-Regular.otf" id="2_df075"]
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="2_kna65"]
-[ext_resource type="Texture2D" uid="uid://e6smhcqfsu8f" path="res://assets/ui/icons/close_24dp.svg" id="4_5mtlt"]
+[ext_resource type="Script" uid="uid://nsyheionnra0" path="res://scenes/main/ui/task_module_new/task_item/line_edit.gd" id="3_6axyk"]
 [ext_resource type="Texture2D" uid="uid://dxba6ufkchx8g" path="res://assets/ui/icons/alarm_24dp.svg" id="4_dlwfx"]
 [ext_resource type="Texture2D" uid="uid://b08g5eywa607" path="res://assets/ui/icons/delete_forever_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="5_hg1it"]
+[ext_resource type="Texture2D" uid="uid://bv5e8ulj7w13t" path="res://assets/ui/icons/check_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="6_hg1it"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2s4w"]
 content_margin_left = 0.0
@@ -51,6 +52,7 @@ layout_mode = 2
 mouse_filter = 2
 theme = ExtResource("2_kna65")
 text = "233"
+script = ExtResource("3_6axyk")
 
 [node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 visible = false
@@ -89,12 +91,15 @@ icon_alignment = 1
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 theme = ExtResource("2_kna65")
-icon = ExtResource("4_5mtlt")
+icon = ExtResource("6_hg1it")
 icon_alignment = 1
 
 [node name="LongPressTimer" type="Timer" parent="."]
 wait_time = 0.5
 one_shot = true
 
+[connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/CompleteCheckBox" to="." method="_on_complete_check_box_toggled"]
+[connection signal="editing_toggled" from="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit" to="." method="_on_line_edit_editing_toggled"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer2/DelButton" to="." method="_on_del_button_pressed"]
 [connection signal="timeout" from="LongPressTimer" to="." method="_on_long_press_timer_timeout"]

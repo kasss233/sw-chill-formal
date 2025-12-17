@@ -1,5 +1,6 @@
-[gd_resource type="Theme" load_steps=22 format=3 uid="uid://ctpnw50ym2lbi"]
+[gd_resource type="Theme" load_steps=23 format=3 uid="uid://ctpnw50ym2lbi"]
 
+[ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="1_wdfye"]
 [ext_resource type="Texture2D" uid="uid://dh1kvtkfkfr13" path="res://assets/ui/icons/radio_button_unchecked_24dp.svg" id="2_cqee6"]
 [ext_resource type="Texture2D" uid="uid://wdqoanf2tctj" path="res://assets/ui/icons/check_circle_24dp.svg" id="3_377ow"]
 [ext_resource type="Texture2D" uid="uid://e6smhcqfsu8f" path="res://assets/ui/icons/close_24dp.svg" id="3_m1yvo"]
@@ -65,6 +66,8 @@ corner_radius_bottom_right = 28
 corner_radius_bottom_left = 28
 
 [resource]
+Button/font_sizes/font_size = 11
+Button/fonts/font = ExtResource("1_wdfye")
 Button/styles/disabled = SubResource("StyleBoxEmpty_v4eor")
 Button/styles/focus = SubResource("StyleBoxEmpty_l8ayg")
 Button/styles/hover = ExtResource("3_v4eor")

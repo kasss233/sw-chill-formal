@@ -1,7 +1,9 @@
 class_name TaskItem
 extends PanelContainer
 
+signal state_changed(item: TaskItem)
 signal edit_requested(id)
+signal delete_requested(item: TaskItem)
 signal content_changed(item: TaskItem)
 signal drag_started(item: TaskItem)
 signal drag_ended(item: TaskItem)
@@ -48,25 +50,32 @@ func set_task(data: TaskData):
 	complete_check_box.button_pressed = task_data.is_completed
 
 func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				is_pressing = true
-				is_dragging = false
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			# 鼠标按下
+			is_pressing = true
+			is_dragging = false
+			
+			# 只有未完成的任务才启用拖拽计时器
+			if not task_data.is_completed:
 				long_press_timer.start()
-			else:
-				# 鼠标松开逻辑
-				if is_pressing and not is_dragging:
-					# 单击事件逻辑：根据当前是否在编辑来切换状态
-					if is_editing:
-						_disable_edit_mode() # 如果正在编辑，再次点击背景则退出
-					else:
-						_enable_edit_mode() # 如果没在编辑，点击则进入
-				
-				is_pressing = false
-				is_dragging = false
-				long_press_timer.stop()
+		else:
+			# 鼠标松开
+			if is_pressing and not is_dragging:
+				# 单击事件逻辑：根据当前是否在编辑来切换状态
+				if is_editing:
+					_disable_edit_mode() # 如果正在编辑，再次点击背景则退出
+				else:
+					_enable_edit_mode() # 如果没在编辑，点击则进入
+			
+			# 重置状态
+			if is_dragging and not task_data.is_completed:
 				drag_ended.emit(self)
+			
+			is_pressing = false
+			is_dragging = false
+			long_press_timer.stop()
+
 
 # 开启编辑模式
 func _enable_edit_mode() -> void:
@@ -106,3 +115,25 @@ func _on_line_edit_text_changed(new_text: String) -> void:
 	print("[%s]Task title change to \"%s\"" %[self.name,new_text])
 	task_data.title = new_text
 	content_changed.emit(self)
+
+
+func _on_line_edit_editing_toggled(toggled_on: bool) -> void:
+	var new_text = line_edit.text
+	if new_text == task_data.title:
+		return
+	print("[%s]Task title change to \"%s\"" %[self.name,new_text])
+	task_data.title = new_text
+	content_changed.emit(self)
+
+func _on_del_button_pressed() -> void:
+	delete_requested.emit(self)
+
+func _on_complete_check_box_toggled(toggled_on: bool) -> void:
+	task_data.is_completed = toggled_on
+	line_edit.is_completed = toggled_on
+	if toggled_on:
+		task_data.finish_timestamp = Time.get_unix_time_from_system()
+	else:
+		task_data.finish_timestamp = 0
+
+	state_changed.emit(self)

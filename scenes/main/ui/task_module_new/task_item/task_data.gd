@@ -4,6 +4,7 @@ extends RefCounted
 var id: int = 0
 var title: String = "新任务"
 var due_timestamp: int  = 0 # 使用 Unix 时间戳 
+var finish_timestamp: int = 0 #真实完成时间
 var is_completed: bool = false
 
 
