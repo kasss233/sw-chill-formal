@@ -49,7 +49,7 @@ func add_task(task: TaskData) -> void:
 	t.content_changed.connect(_on_task_item_content_changed)
 	t.delete_requested.connect(_on_item_delete_requested)
 	t.state_changed.connect(_on_task_state_changed)
-	print("[%s] Added a Task(id: %s title: %s)" % [self.name, task.id, task.title])
+	print("[%s]Added a Task(id: %s title: %s)" % [self.name, task.id, task.title])
 	_set_label_string()
 
 
@@ -164,7 +164,7 @@ func _on_item_delete_requested(item: TaskItem):
 		# 2. 移除 UI
 		finish_v_box_container.remove_child(item)
 		item.queue_free()
-		print("[%s] Deleted Finished Task at index %d" % [self.name, index])
+		print("[%s]Deleted Finished Task at index %d" % [self.name, index])
 		
 	else:
 		var index = item.get_index()
@@ -176,7 +176,7 @@ func _on_item_delete_requested(item: TaskItem):
 		v_box_container.remove_child(item)
 		item.queue_free()
 		
-		print("[%s] Deleted Task at index %d" % [self.name, index])
+		print("[%s]Deleted Task at index %d" % [self.name, index])
 		
 	_set_label_string()
 
@@ -191,6 +191,7 @@ func _on_task_state_changed(item: TaskItem):
 		finished_task_data_list.append(task_data)
 		v_box_container.remove_child(item)
 		finish_v_box_container.add_child(item)
+		print("[%s]Task(id: %s) marked as completed" % [self.name, task_data.id])
 	else:
 		finished_task_cnt -= 1
 		task_cnt += 1
@@ -200,6 +201,7 @@ func _on_task_state_changed(item: TaskItem):
 		tasks_data_list.append(task_data)
 		finish_v_box_container.remove_child(item)
 		v_box_container.add_child(item)
+		print("[%s]Task(id: %s) marked as not completed" % [self.name, task_data.id])
 	
 	_set_label_string()
 
