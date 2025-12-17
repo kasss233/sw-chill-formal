@@ -107,8 +107,10 @@ func _on_add_button_pressed() -> void:
 
 func _on_task_item_content_changed(item: TaskItem) -> void:
 	var index = item.get_index()
-	tasks_data_list[index] = item.task_data
-
+	if item.task_data.is_completed:
+		tasks_data_list[index] = item.task_data
+	else:
+		finished_task_data_list[index] = item.task_data
 
 # --- 拖拽逻辑实现 ---
 
