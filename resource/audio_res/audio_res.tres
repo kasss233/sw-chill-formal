@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="AudioRes" load_steps=15 format=3 uid="uid://dweygfwutymm5"]
+
+[ext_resource type="Script" uid="uid://c8gyw3w871pec" path="res://resource/audio_res/audio_item/audio_item.gd" id="1_v4rmg"]
+[ext_resource type="AudioStream" uid="uid://1tebddn53oqf" path="res://assets/music/barradeen-bedtime-after-a-coffee.mp3" id="2_05d4i"]
+[ext_resource type="AudioStream" uid="uid://cogq7khbr3lpy" path="res://assets/music/Late-at-Night.mp3" id="3_kmcbe"]
+[ext_resource type="Script" uid="uid://blvff4t3pyche" path="res://resource/audio_res/audio_res.gd" id="3_sropa"]
+[ext_resource type="AudioStream" uid="uid://cg8cjwv37sux6" path="res://assets/music/Little-Wishes.mp3" id="4_s3m1o"]
+[ext_resource type="AudioStream" uid="uid://ceahpv0iyxxq6" path="res://assets/music/Transcendence.mp3" id="5_sldgf"]
+[ext_resource type="AudioStream" uid="uid://cosiiuj5ptqyo" path="res://assets/music/When-I-Was-A-Boy.mp3" id="6_dukgh"]
+[ext_resource type="AudioStream" uid="uid://j6ug3y1vjp5l" path="res://assets/music/Wildflowers.mp3" id="7_ry46o"]
+
+[sub_resource type="Resource" id="Resource_abpj1"]
+script = ExtResource("1_v4rmg")
+name = "barradeen-bedtime-after-a-coffee"
+stream = ExtResource("2_05d4i")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
+[sub_resource type="Resource" id="Resource_l3kqj"]
+script = ExtResource("1_v4rmg")
+name = "Late-at-Night"
+stream = ExtResource("3_kmcbe")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
+[sub_resource type="Resource" id="Resource_kmcbe"]
+script = ExtResource("1_v4rmg")
+name = "Little-Wishes"
+stream = ExtResource("4_s3m1o")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
+[sub_resource type="Resource" id="Resource_d2rx6"]
+script = ExtResource("1_v4rmg")
+name = "Transcendence"
+stream = ExtResource("5_sldgf")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
+[sub_resource type="Resource" id="Resource_tsfuh"]
+script = ExtResource("1_v4rmg")
+name = "When-I-Was-A-Boy"
+stream = ExtResource("6_dukgh")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
+[sub_resource type="Resource" id="Resource_0gx6c"]
+script = ExtResource("1_v4rmg")
+name = "Wildflowers"
+stream = ExtResource("7_ry46o")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
+[resource]
+script = ExtResource("3_sropa")
+BGM = Array[ExtResource("1_v4rmg")]([SubResource("Resource_abpj1"), SubResource("Resource_l3kqj"), SubResource("Resource_kmcbe"), SubResource("Resource_d2rx6"), SubResource("Resource_tsfuh"), SubResource("Resource_0gx6c")])

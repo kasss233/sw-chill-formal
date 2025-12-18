@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="AudioItem" load_steps=2 format=3 uid="uid://ddyfdsy8xswpm"]
+
+[ext_resource type="Script" uid="uid://c8gyw3w871pec" path="res://resource/audio_res/audio_item/audio_item.gd" id="1_l4h50"]
+
+[resource]
+script = ExtResource("1_l4h50")
