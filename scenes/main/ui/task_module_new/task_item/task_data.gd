@@ -1,9 +1,10 @@
 class_name TaskData
 extends RefCounted
 
+#自增id
 var id: int = 0
 var title: String = "新任务"
-var due_timestamp: int  = 0 # 使用 Unix 时间戳 
+var due_timestamp: int  = 0 #使用 Unix 时间戳 
 var finish_timestamp: int = 0 #真实完成时间
 var is_completed: bool = false
 
@@ -14,8 +15,8 @@ func _init(p_id: int, p_title: String, p_timestamp: int, p_completed: bool = fal
 	self.due_timestamp = p_timestamp
 	self.is_completed = p_completed
 
-static func create_example():
-	return TaskData.new(114154,"新任务",Time.get_unix_time_from_system(),false)
+static func create_example(id:int):
+	return TaskData.new(id,"新任务",Time.get_unix_time_from_system(),false)
 
 func get_formatted_due_time() -> String:
 	if due_timestamp == 0:

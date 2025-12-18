@@ -1,7 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://behstljx3cp30"]
+[gd_scene load_steps=8 format=3 uid="uid://behstljx3cp30"]
 
 [ext_resource type="Script" uid="uid://cqyqohlo4a7gr" path="res://scenes/main/ui/task_module_new/task_item/task_item.gd" id="1_v2s4w"]
-[ext_resource type="FontFile" uid="uid://chb0a8tdad8b8" path="res://assets/ui/fonts/SourceHanSansCN-Regular.otf" id="2_df075"]
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="2_kna65"]
 [ext_resource type="Script" uid="uid://nsyheionnra0" path="res://scenes/main/ui/task_module_new/task_item/line_edit.gd" id="3_6axyk"]
 [ext_resource type="Texture2D" uid="uid://dxba6ufkchx8g" path="res://assets/ui/icons/alarm_24dp.svg" id="4_dlwfx"]
@@ -53,15 +52,6 @@ mouse_filter = 2
 theme = ExtResource("2_kna65")
 text = "233"
 script = ExtResource("3_6axyk")
-
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
-visible = false
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-size_flags_vertical = 6
-theme_override_fonts/font = ExtResource("2_df075")
-theme_override_font_sizes/font_size = 18
-text = "任务文本"
 
 [node name="DueTimeLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 visible = false
