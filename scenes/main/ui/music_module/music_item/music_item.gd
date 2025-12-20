@@ -1,6 +1,6 @@
 class_name MusicItem
 extends Control
-var music_name:String
+@export var music_name:String
 @onready var button=$HBoxContainer/Button
 signal music_changed(_name:String)
 func _ready() -> void:

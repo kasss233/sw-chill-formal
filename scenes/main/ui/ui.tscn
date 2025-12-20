@@ -1,4 +1,7 @@
-[gd_scene format=3 uid="uid://b8aqjm4e8p3u2"]
+[gd_scene load_steps=3 format=3 uid="uid://b8aqjm4e8p3u2"]
+
+[ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
+[ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -7,3 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_nf0va")
+
+[node name="MusicModule" parent="." instance=ExtResource("1_2q31f")]
+layout_mode = 1
