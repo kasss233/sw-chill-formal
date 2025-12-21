@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cshc06pyk77f"]
+[gd_scene load_steps=17 format=3 uid="uid://cshc06pyk77f"]
 
 [ext_resource type="PackedScene" uid="uid://behstljx3cp30" path="res://scenes/main/ui/task_module_new/task_item/TaskItem.tscn" id="1_d7dkk"]
 [ext_resource type="Script" uid="uid://ct3ivf1xpbpy1" path="res://scenes/main/ui/task_module_new/task_module_new.gd" id="1_u3ulj"]
@@ -6,8 +6,11 @@
 [ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="3_u3ulj"]
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="4_3e305"]
 [ext_resource type="Texture2D" uid="uid://cfgcvfh4qcsqw" path="res://assets/ui/icons/add_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="6_3d802"]
+[ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="7_pg22x"]
 [ext_resource type="Texture2D" uid="uid://4oxxvtk2mh1r" path="res://assets/ui/icons/stat_1_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="7_u826r"]
+[ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="8_05f80"]
 [ext_resource type="Texture2D" uid="uid://dcbc410pqtax5" path="res://assets/ui/icons/stat_minus_1_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="8_sqd3t"]
+[ext_resource type="Script" uid="uid://ft8rxsmymmhj" path="res://addons/ReorderableContainer/reorderable_vbox.gd" id="9_05f80"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_3d802"]
 shader = ExtResource("3_3d802")
@@ -42,6 +45,12 @@ expand_margin_left = 1.0
 expand_margin_top = 1.0
 expand_margin_right = 1.0
 expand_margin_bottom = 1.0
+
+[sub_resource type="Resource" id="Resource_68max"]
+script = ExtResource("8_05f80")
+
+[sub_resource type="Resource" id="Resource_ji0d4"]
+script = ExtResource("8_05f80")
 
 [node name="TaskModuleNew" type="Control"]
 layout_mode = 3
@@ -107,18 +116,28 @@ theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer"]
-custom_minimum_size = Vector2(0, 300)
+custom_minimum_size = Vector2(252, 400)
 layout_mode = 2
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 4
+script = ExtResource("7_pg22x")
+wheel_scroll_damper = SubResource("Resource_68max")
+dragging_scroll_damper = SubResource("Resource_ji0d4")
+metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer"]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2"]
-clip_contents = true
+[node name="VBoxContainer" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2" node_paths=PackedStringArray("scroll_container")]
+process_mode = 1
 layout_mode = 2
+script = ExtResource("9_05f80")
+hold_duration = 1.0
+separation = 5
+is_vertical = true
+scroll_container = NodePath("../..")
+metadata/_custom_type_script = "uid://ft8rxsmymmhj"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2"]
 clip_contents = true
@@ -127,6 +146,7 @@ layout_mode = 2
 [node name="FinishedCheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer2"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
+mouse_filter = 1
 theme = ExtResource("4_3e305")
 theme_override_icons/checked = ExtResource("7_u826r")
 theme_override_icons/unchecked = ExtResource("8_sqd3t")
@@ -136,4 +156,6 @@ text = "已完成"
 layout_mode = 2
 
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/AddButton" to="." method="_on_add_button_pressed"]
+[connection signal="reordered" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer" to="." method="_on_v_box_container_reordered"]
+[connection signal="sort_children" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer" to="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer" method="_on_sort_children"]
 [connection signal="toggled" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer2/FinishedCheckBox" to="." method="_on_finished_check_box_toggled"]

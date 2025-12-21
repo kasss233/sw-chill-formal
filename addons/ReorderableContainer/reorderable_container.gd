@@ -14,6 +14,12 @@ extends Container
 ## Emitted when children have been reordered.
 signal reordered(from: int, to: int)
 
+## Emitted when drag starts.
+signal drag_started(child: Control)
+
+## Emitted when drag ends.
+signal drag_ended(child: Control)
+
 ## Extend the drop zone length at the start and end of the container. 
 ## This will ensure that drop input is recognized even outside the container itself.
 const DROP_ZONE_EXTEND = 2000
@@ -85,6 +91,13 @@ var _is_hold := false
 var _current_duration := 0.0
 var _is_using_process := false
 
+# Store original mouse_filter settings during drag
+var _saved_mouse_filters: Dictionary = {}
+
+# Store original scroll settings for SmoothScrollContainer
+var _original_allow_horizontal_scroll := true
+var _original_allow_vertical_scroll := true
+
 
 func _ready():
 	if scroll_container == null and get_parent() is ScrollContainer:
@@ -92,6 +105,15 @@ func _ready():
 		
 	if scroll_container != null and scroll_container.has_method("handle_overdrag"):
 		_is_smooth_scroll = true
+		# Store original scroll settings
+		if scroll_container.has_method("get"):
+			_original_allow_horizontal_scroll = scroll_container.get("allow_horizontal_scroll")
+			_original_allow_vertical_scroll = scroll_container.get("allow_vertical_scroll")
+		# Connect signals to disable/enable scrolling during drag
+		if not drag_started.is_connected(_on_drag_started_disable_scroll):
+			drag_started.connect(_on_drag_started_disable_scroll)
+		if not drag_ended.is_connected(_on_drag_ended_enable_scroll):
+			drag_ended.connect(_on_drag_ended_enable_scroll)
 	
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_adjust_expected_child_rect()
@@ -109,12 +131,25 @@ func _gui_input(event):
 				_focus_child = child
 				_is_press = true
 			elif not event.is_pressed():
+				# Check if focused child is still valid and is still our child
+				if _focus_child != null and (not is_instance_valid(_focus_child) or _focus_child.get_parent() != self):
+					_focus_child = null
 				_is_press = false
 				_is_hold = false
 
 
 func _process(delta):
 	if Engine.is_editor_hint(): return	
+	
+	# Check if focused child is still valid and is still a child of this container
+	if _focus_child != null and (not is_instance_valid(_focus_child) or _focus_child.get_parent() != self):
+		_focus_child = null
+		_is_press = false
+		_is_hold = false
+		_current_duration = 0.0
+		_drop_zone_index = -1
+		_is_using_process = false
+		_saved_mouse_filters.clear()
 	
 	_handle_input(delta)
 	if _current_duration >= hold_duration != _is_hold:
@@ -145,28 +180,53 @@ func _handle_input(delta):
 
 
 func _on_start_dragging():
+	if _focus_child == null or not is_instance_valid(_focus_child) or _focus_child.get_parent() != self:
+		_focus_child = null
+		_is_press = false
+		_is_hold = false
+		return
+	
 	# Force _on_sort_children to use process update for linear interpolation
 	_is_using_process = true 
 	_focus_child.z_index = 1
 	# Workaround for SmoothScroll addon
 	if _is_smooth_scroll:
 		scroll_container.process_mode = Node.PROCESS_MODE_DISABLED
+	
+	# Save original mouse_filter states and set to IGNORE
+	_saved_mouse_filters.clear()
 	for child in _get_visible_children():
-		child.propagate_call("set_mouse_filter", [MOUSE_FILTER_IGNORE])
+		_save_and_set_mouse_filter(child, MOUSE_FILTER_IGNORE)
+	
+	drag_started.emit(_focus_child)
 
 
 func _on_stop_dragging():
+	if _focus_child == null or not is_instance_valid(_focus_child) or _focus_child.get_parent() != self:
+		_focus_child = null
+		_drop_zone_index = -1
+		_is_using_process = false
+		return
+	
 	_focus_child.z_index = 0
 	var focus_child_index := _focus_child.get_index()
+	var dragged_child = _focus_child
 	move_child(_focus_child, _drop_zone_index)
 	reordered.emit(focus_child_index, _drop_zone_index)
+	drag_ended.emit(dragged_child)
 	_focus_child = null
 	_drop_zone_index = -1
 	if _is_smooth_scroll:
 		scroll_container.pos = -Vector2(scroll_container.scroll_horizontal, scroll_container.scroll_vertical)
 		scroll_container.process_mode = Node.PROCESS_MODE_INHERIT
+	
+	# Restore original mouse_filter states
 	for child in _get_visible_children():
-		child.propagate_call("set_mouse_filter", [MOUSE_FILTER_PASS])	
+		_restore_mouse_filter(child)
+	_saved_mouse_filters.clear()
+	
+	# Note: _is_using_process will be set to false by _adjust_child_rect()
+	# once animation completes	
 
 
 func _on_node_added(node):
@@ -175,6 +235,11 @@ func _on_node_added(node):
 
 
 func _handle_dragging_child_pos(delta):
+	if _focus_child == null or not is_instance_valid(_focus_child) or _focus_child.get_parent() != self:
+		_focus_child = null
+		_is_hold = false
+		return
+	
 	if is_vertical:
 		var target_pos = get_local_mouse_position().y - (_focus_child.size.y / 2.0)
 		_focus_child.position.y = lerp(_focus_child.position.y, target_pos, delta * speed)
@@ -223,7 +288,13 @@ func _handle_auto_scroll(delta):
 
 
 func _on_sort_children(delta := -1.0):
+	# When using process mode for animation (during drag):
+	# - Signal-triggered calls (delta == -1.0) update target positions but don't apply them
+	# - The animation is handled by _process() calling this with a valid delta
+	# This allows animated response to: size changes, child additions, window resize, etc.
 	if _is_using_process and delta == -1.0:
+		_adjust_expected_child_rect()
+		_adjust_drop_zone_rect()
 		return
 	
 	_adjust_expected_child_rect()
@@ -239,13 +310,13 @@ func _adjust_expected_child_rect():
 		var child := children[i]
 		var min_size := child.get_combined_minimum_size()
 		if is_vertical:
-			if i == _drop_zone_index:
+			if i == _drop_zone_index and _focus_child != null and is_instance_valid(_focus_child):
 				end_point += _focus_child.size.y + separation
 			
 			_expect_child_rect.append(Rect2(Vector2(0, end_point), Vector2(size.x, min_size.y)))
 			end_point += min_size.y + separation
 		else:
-			if i == _drop_zone_index:
+			if i == _drop_zone_index and _focus_child != null and is_instance_valid(_focus_child):
 				end_point += _focus_child.size.x + separation
 			
 			_expect_child_rect.append(Rect2(Vector2(end_point, 0), Vector2(min_size.x, size.y)))
@@ -265,23 +336,26 @@ func _adjust_child_rect(delta: float = -1.0):
 			continue
 		
 		if _is_using_process:
-			is_animating = true
-			child.position = lerp(child.position, _expect_child_rect[i].position, delta * speed)
-			child.size = _expect_child_rect[i].size
-			if (child.position - _expect_child_rect[i].position).length() <= 1.0:
+			var distance = (child.position - _expect_child_rect[i].position).length()
+			if distance > 0.5:  # More lenient threshold for animation completion
+				is_animating = true
+				child.position = lerp(child.position, _expect_child_rect[i].position, delta * speed)
+			else:
+				# Close enough, snap to final position
 				child.position = _expect_child_rect[i].position
+			child.size = _expect_child_rect[i].size
 		else:
 			child.position = _expect_child_rect[i].position
 			child.size = _expect_child_rect[i].size
 	
 	var last_child := children[-1]
 	if is_vertical:
-		if _is_using_process and _drop_zone_index == children.size():
+		if _is_using_process and _drop_zone_index == children.size() and _focus_child != null and is_instance_valid(_focus_child):
 			custom_minimum_size.y = _expect_child_rect[-1].end.y + _focus_child.size.y + separation
 		elif not _is_using_process:
 			custom_minimum_size.y = last_child.get_rect().end.y
 	else:
-		if _is_using_process and _drop_zone_index == children.size():
+		if _is_using_process and _drop_zone_index == children.size() and _focus_child != null and is_instance_valid(_focus_child):
 			custom_minimum_size.x = _expect_child_rect[-1].end.x + _focus_child.size.x + separation
 		elif not _is_using_process:
 			custom_minimum_size.x = last_child.get_rect().end.x
@@ -340,7 +414,7 @@ func _get_visible_children() -> Array[Control]:
 		var child := _child as Control
 		if not child.visible:
 			continue
-		if child == _focus_child and _is_hold:
+		if child == _focus_child and _is_hold and is_instance_valid(_focus_child):
 			continue
 		
 		visible_control.append(child)
@@ -350,3 +424,39 @@ func _get_visible_children() -> Array[Control]:
 func _print_debug(val):
 	if is_debugging:
 		print(val)
+
+
+## Recursively save mouse_filter state and set to new value
+func _save_and_set_mouse_filter(node: Node, new_filter: int) -> void:
+	if node is Control:
+		var control = node as Control
+		_saved_mouse_filters[control] = control.mouse_filter
+		control.mouse_filter = new_filter
+	
+	for child in node.get_children():
+		_save_and_set_mouse_filter(child, new_filter)
+
+
+## Recursively restore mouse_filter state
+func _restore_mouse_filter(node: Node) -> void:
+	if node is Control:
+		var control = node as Control
+		if _saved_mouse_filters.has(control):
+			control.mouse_filter = _saved_mouse_filters[control]
+	
+	for child in node.get_children():
+		_restore_mouse_filter(child)
+
+
+## Called when drag starts to disable SmoothScrollContainer scrolling
+func _on_drag_started_disable_scroll(child: Control):
+	if _is_smooth_scroll and scroll_container != null:
+		scroll_container.set("allow_horizontal_scroll", false)
+		scroll_container.set("allow_vertical_scroll", false)
+
+
+## Called when drag ends to restore SmoothScrollContainer scrolling
+func _on_drag_ended_enable_scroll(child: Control):
+	if _is_smooth_scroll and scroll_container != null:
+		scroll_container.set("allow_horizontal_scroll", _original_allow_horizontal_scroll)
+		scroll_container.set("allow_vertical_scroll", _original_allow_vertical_scroll)

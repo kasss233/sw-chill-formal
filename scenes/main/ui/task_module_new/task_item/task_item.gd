@@ -14,7 +14,7 @@ signal drag_ended(item: TaskItem)
 @onready var h_box_container_2: HBoxContainer = $MarginContainer/VBoxContainer/HBoxContainer2
 @onready var close_button: Button = $MarginContainer/VBoxContainer/HBoxContainer2/CloseButton
 
-@onready var long_press_timer: Timer = $LongPressTimer
+#@onready var long_press_timer: Timer = $LongPressTimer
 
 var is_pressing: bool = false
 var is_dragging: bool = false
@@ -53,10 +53,7 @@ func _gui_input(event: InputEvent) -> void:
 			# 鼠标按下
 			is_pressing = true
 			is_dragging = false
-			
-			# 只有未完成的任务才启用拖拽计时器
-			if not task_data.is_completed:
-				long_press_timer.start()
+		
 		else:
 			# 鼠标松开
 			if is_pressing and not is_dragging:
@@ -72,7 +69,6 @@ func _gui_input(event: InputEvent) -> void:
 			
 			is_pressing = false
 			is_dragging = false
-			long_press_timer.stop()
 
 
 # 开启编辑模式

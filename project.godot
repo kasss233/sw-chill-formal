@@ -14,13 +14,17 @@ config/name="sw_chill_formal"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GuiTransitions="*res://addons/simple-gui-transitions/singleton.gd"
+
 [display]
 
 window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/Godot-MToon-Shader/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/vrm/plugin.cfg")
+enabled=PackedStringArray("res://addons/Godot-MToon-Shader/plugin.cfg", "res://addons/ReorderableContainer/plugin.cfg", "res://addons/SmoothScroll/plugin.cfg", "res://addons/markdownlabel/plugin.cfg", "res://addons/simple-gui-transitions/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/vrm/plugin.cfg")
 
 [file_customization]
 
@@ -31,6 +35,18 @@ folder_colors={
 "res://scenes/main/": "pink",
 "res://scripts/": "teal"
 }
+
+[gui_transitions]
+
+config/default/auto_start=true
+config/default/fade_layout=true
+config/default/center_pivot=true
+config/default/duration=0.5
+config/default/delay=0.5
+config/default/transition_type="QUAD"
+config/default/ease_type="IN_OUT"
+config/default/animation_enter=4
+config/default/animation_leave=4
 
 [input_devices]
 
