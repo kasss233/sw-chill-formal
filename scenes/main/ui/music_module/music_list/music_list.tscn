@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://gh3p734runtb"]
 
 [ext_resource type="Script" uid="uid://1c2sf52bgyc2" path="res://scenes/main/ui/music_module/music_list/music_list.gd" id="1_ys5r8"]
-[ext_resource type="PackedScene" uid="uid://b68ebovhfcxrm" path="res://scenes/main/ui/music_module/music_item/music_item.tscn" id="2_l8xbh"]
+[ext_resource type="PackedScene" uid="uid://b68ebovhfcxrm" path="res://scenes/main/ui/music_module/music_list/music_item/music_item.tscn" id="2_l8xbh"]
 
 [node name="MusicList" type="Control"]
 layout_mode = 3

@@ -1,5 +1,6 @@
 extends Control
 @export var music_list_scene:PackedScene
+@export var option_board:PackedScene
 @export var audio_res:AudioRes
 @onready var tab_container=$FoldableContainer/TabContainer
 @onready var folder=$FoldableContainer
@@ -8,7 +9,18 @@ signal music_status_changed
 var current_list:int=0
 func _ready() -> void:
 	setup_music()
-	get_signal()
+
+
+func get_music_list_names()->Array:
+	var names:Array=[]
+	for child in tab_container.get_children():
+		if child is MusicList:
+			names.append(child.name)
+	return names
+
+
+
+
 func setup_music()->void:
 	add_music_list("全部音乐")
 	add_music_list("收藏")
@@ -20,19 +32,22 @@ func add_music_list(_name:String):
 	var music_list_instance=music_list_scene.instantiate() as MusicList
 	music_list_instance.name=_name
 	tab_container.add_child(music_list_instance)
+	music_list_instance.music_changed.connect(change_music)
+	music_list_instance.music_favoured.connect(favour_music)
+	music_list_instance.music_moved.connect(move_music)
+	music_list_instance.music_options_requested.connect(request_options)
 func add_music(_list_name:String,_music_name:String):
 	var target_list=tab_container.get_node(_list_name) as MusicList
 	if target_list:
 		target_list.add_music(_music_name)
-func get_signal() -> void:
-	for child in tab_container.get_children():
-		if child is MusicList:
-			child.music_changed.connect(change_music)
-
 func change_music(_name:String) -> void:
 	print("[Music Module] Changing music to: %s" % _name)
 	music_changed.emit(_name)
 	folder.title = _name
+func favour_music(_name:String):
+	add_music("收藏",_name)
+func move_music(_name:String):
+	pass
 
 
 func _on_last_button_pressed() -> void:
@@ -52,3 +67,12 @@ func _on_next_button_pressed() -> void:
 
 func _on_tab_container_tab_changed(tab: int) -> void:
 	current_list=tab
+func request_options(music_name:String,list_name:String):
+	var option_board_instance=option_board.instantiate() as MusicOptionBoard
+	add_child(option_board_instance)
+	option_board_instance.set_music_name(music_name)
+	var list_names=get_music_list_names()
+	for _name in list_names:
+		option_board_instance.add_option(_name)
+		print("[Music Module] Added option for option_board: %s" % _name)
+	print("[Music Module] Options requested for music: %s in list: %s" % [music_name,list_name])

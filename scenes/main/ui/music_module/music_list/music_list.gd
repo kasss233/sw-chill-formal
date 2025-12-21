@@ -5,6 +5,9 @@ class_name MusicList
 var current_playing_index:int=-1
 var current_playing_name:String=""
 signal music_changed(_name:String)
+signal music_favoured(_name:String)
+signal music_moved(_name:String)
+signal music_options_requested(music_name:String,list_name:String)
 func get_music_count()->int:
 	return vbox.get_child_count()
 func get_playing_index()->int:
@@ -12,10 +15,19 @@ func get_playing_index()->int:
 func set_music_list_name(_name:String):
 	self.name=_name
 func add_music(_name:String):
+	if _name=="":
+		print("MusicList.add_music: empty name")
+		return
+	elif vbox.has_node(_name):
+		print("MusicList.add_music: name already exists")
+		return
 	var m=music_item.instantiate() as MusicItem
 	m.set_music_name(_name)
 	vbox.add_child(m)
 	m.music_changed.connect(change_music)
+	m.music_favoured.connect(favour_music)
+	#m.music_moved.connect(move_music)
+	m.music_options_requested.connect(request_options)
 func remove_music(_name:String):
 	for child in vbox.get_children():
 		if child is MusicItem:
@@ -52,3 +64,9 @@ func change_music(_name:String):
 			if child.get_music_name()==_name:
 				current_playing_index=i
 				return
+func favour_music(_name:String):
+	emit_signal("music_favoured",_name)
+func move_music(_name:String):
+	emit_signal("music_moved",_name)
+func request_options(_name:String):
+	emit_signal("music_options_requested",_name,self.name)

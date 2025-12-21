@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://do56ajkuwsf0t"]
+[gd_scene load_steps=6 format=3 uid="uid://do56ajkuwsf0t"]
 
 [ext_resource type="Script" uid="uid://b7qsxbprouywv" path="res://scenes/main/ui/music_module/music_module.gd" id="1_t37u8"]
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
+[ext_resource type="PackedScene" uid="uid://cxdwb75116e2w" path="res://scenes/main/ui/music_module/music_option_board/music_option_board.tscn" id="4_cfhda"]
 [ext_resource type="PackedScene" uid="uid://gh3p734runtb" path="res://scenes/main/ui/music_module/music_list/music_list.tscn" id="4_x6s46"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_au6hm"]
@@ -15,6 +16,7 @@ anchor_bottom = 1.0
 grow_vertical = 0
 script = ExtResource("1_t37u8")
 music_list_scene = ExtResource("4_x6s46")
+option_board = ExtResource("4_cfhda")
 audio_res = ExtResource("2_jnxsf")
 
 [node name="FoldableContainer" type="FoldableContainer" parent="."]
@@ -23,7 +25,7 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_top = -472.0
-offset_right = 535.0
+offset_right = 556.0
 grow_vertical = 0
 title = "current_music_name"
 title_position = 1

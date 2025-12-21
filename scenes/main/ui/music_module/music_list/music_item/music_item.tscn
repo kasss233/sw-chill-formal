@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://b68ebovhfcxrm"]
+
+[ext_resource type="Script" uid="uid://uj0salxxnqp5" path="res://scenes/main/ui/music_module/music_list/music_item/music_item.gd" id="1_f10aj"]
+
+[node name="MusicItem" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_f10aj")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 164.0
+offset_bottom = 44.0
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "null"
+
+[node name="FavourButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "收藏"
+
+[node name="OptionButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "option
+"
+
+[connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/FavourButton" to="." method="_on_favour_pressed"]
+[connection signal="pressed" from="HBoxContainer/OptionButton" to="." method="_on_option_button_pressed"]
