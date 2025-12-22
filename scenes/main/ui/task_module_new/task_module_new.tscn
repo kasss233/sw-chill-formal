@@ -132,13 +132,14 @@ process_mode = 1
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 script = ExtResource("9_05f80")
+hold_duration = 0.3
 separation = 5
 is_vertical = true
 scroll_container = NodePath("..")
 metadata/_custom_type_script = "uid://ft8rxsmymmhj"
 
 [node name="FinishedCheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(230, 0)
 layout_mode = 2
 mouse_filter = 1
 theme = ExtResource("4_3e305")
