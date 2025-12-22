@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://cshc06pyk77f"]
+[gd_scene load_steps=16 format=3 uid="uid://cshc06pyk77f"]
 
 [ext_resource type="PackedScene" uid="uid://behstljx3cp30" path="res://scenes/main/ui/task_module_new/task_item/TaskItem.tscn" id="1_d7dkk"]
 [ext_resource type="Script" uid="uid://ct3ivf1xpbpy1" path="res://scenes/main/ui/task_module_new/task_module_new.gd" id="1_u3ulj"]
@@ -16,14 +16,6 @@
 shader = ExtResource("3_3d802")
 shader_parameter/strength = 7.00000032924012
 shader_parameter/mix_percentage = 0.35200001672
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3d802"]
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-corner_detail = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tadlp"]
 content_margin_left = 0.0
@@ -66,7 +58,7 @@ task_item = ExtResource("1_d7dkk")
 material = SubResource("ShaderMaterial_3d802")
 clip_contents = true
 layout_mode = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_3d802")
+theme = ExtResource("4_3e305")
 
 [node name="Panel" type="Panel" parent="PanelContainer"]
 layout_mode = 2

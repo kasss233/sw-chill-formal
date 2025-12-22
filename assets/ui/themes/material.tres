@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=23 format=3 uid="uid://ctpnw50ym2lbi"]
+[gd_resource type="Theme" load_steps=24 format=3 uid="uid://ctpnw50ym2lbi"]
 
 [ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="1_wdfye"]
 [ext_resource type="Texture2D" uid="uid://dh1kvtkfkfr13" path="res://assets/ui/icons/radio_button_unchecked_24dp.svg" id="2_cqee6"]
@@ -7,6 +7,7 @@
 [ext_resource type="StyleBox" uid="uid://d0x37xi8v5r6i" path="res://assets/ui/themes/hover_style_box_flat.tres" id="3_v4eor"]
 [ext_resource type="StyleBox" uid="uid://cgj32oh58mq01" path="res://assets/ui/themes/press_style_box_flat.tres" id="4_377ow"]
 [ext_resource type="FontFile" uid="uid://chb0a8tdad8b8" path="res://assets/ui/fonts/SourceHanSansCN-Regular.otf" id="5_377ow"]
+[ext_resource type="StyleBox" uid="uid://cbcowdy5ofxqb" path="res://assets/ui/themes/panel_style_box_flat.tres" id="8_copep"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v4eor"]
 
@@ -66,7 +67,7 @@ corner_radius_bottom_right = 28
 corner_radius_bottom_left = 28
 
 [resource]
-Button/font_sizes/font_size = 11
+Button/font_sizes/font_size = 14
 Button/fonts/font = ExtResource("1_wdfye")
 Button/styles/disabled = SubResource("StyleBoxEmpty_v4eor")
 Button/styles/focus = SubResource("StyleBoxEmpty_l8ayg")
@@ -82,6 +83,7 @@ CheckBox/styles/focus = SubResource("StyleBoxEmpty_cqee6")
 CheckBox/styles/hover = ExtResource("3_v4eor")
 CheckBox/styles/hover_pressed = ExtResource("3_v4eor")
 CheckBox/styles/pressed = SubResource("StyleBoxEmpty_xq26c")
+Label/fonts/font = ExtResource("5_377ow")
 LineEdit/colors/font_uneditable_color = Color(1, 1, 1, 1)
 LineEdit/font_sizes/font_size = 18
 LineEdit/fonts/font = ExtResource("5_377ow")
@@ -107,3 +109,4 @@ MaterialCheckbox/styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_m1yvo
 MaterialCheckbox/styles/normal = SubResource("StyleBoxFlat_cqee6")
 MaterialCheckbox/styles/normal_mirrored = SubResource("StyleBoxFlat_cqee6")
 MaterialCheckbox/styles/pressed = ExtResource("4_377ow")
+PanelContainer/styles/panel = ExtResource("8_copep")
