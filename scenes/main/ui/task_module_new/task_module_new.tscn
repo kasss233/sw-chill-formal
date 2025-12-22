@@ -127,25 +127,17 @@ hide_scrollbar_over_time = true
 scrollbar_hide_time = 3.0
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer"]
-custom_minimum_size = Vector2(0, 300)
-layout_mode = 2
-
-[node name="VBoxContainer" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2" node_paths=PackedStringArray("scroll_container")]
+[node name="VBoxContainer" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer" node_paths=PackedStringArray("scroll_container")]
 process_mode = 1
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 script = ExtResource("9_05f80")
-hold_duration = 1.0
 separation = 5
 is_vertical = true
-scroll_container = NodePath("../..")
+scroll_container = NodePath("..")
 metadata/_custom_type_script = "uid://ft8rxsmymmhj"
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2"]
-clip_contents = true
-layout_mode = 2
-
-[node name="FinishedCheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer2"]
+[node name="FinishedCheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 mouse_filter = 1
@@ -154,10 +146,7 @@ theme_override_icons/checked = ExtResource("7_u826r")
 theme_override_icons/unchecked = ExtResource("8_sqd3t")
 text = "已完成"
 
-[node name="FinishVBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer2"]
-layout_mode = 2
-
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer/AddButton" to="." method="_on_add_button_pressed"]
-[connection signal="reordered" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer" to="." method="_on_v_box_container_reordered"]
-[connection signal="sort_children" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer" to="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer" method="_on_sort_children"]
-[connection signal="toggled" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer2/VBoxContainer2/FinishedCheckBox" to="." method="_on_finished_check_box_toggled"]
+[connection signal="reordered" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer" to="." method="_on_v_box_container_reordered"]
+[connection signal="sort_children" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer" to="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer" method="_on_sort_children"]
+[connection signal="toggled" from="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer/FinishedCheckBox" to="." method="_on_finished_check_box_toggled"]

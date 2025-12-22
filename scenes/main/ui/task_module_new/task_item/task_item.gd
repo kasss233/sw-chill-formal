@@ -29,6 +29,10 @@ func _ready() -> void:
 	# 初始化关闭编辑模式
 	_disable_edit_mode() 
 	
+	# 阻止 CheckBox 的点击事件传递到父容器
+	if complete_check_box:
+		complete_check_box.mouse_filter = Control.MOUSE_FILTER_STOP
+	
 	# 连接关闭按钮信号
 	if close_button:
 		close_button.pressed.connect(_on_close_button_pressed)
