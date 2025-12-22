@@ -460,3 +460,148 @@ func _on_drag_ended_enable_scroll(child: Control):
 	if _is_smooth_scroll and scroll_container != null:
 		scroll_container.set("allow_horizontal_scroll", _original_allow_horizontal_scroll)
 		scroll_container.set("allow_vertical_scroll", _original_allow_vertical_scroll)
+
+
+## Programmatically reorder a child from one index to another.
+## This achieves the same result as manual drag-and-drop but through code.
+## [br][br]
+## [param from_index]: The current index of the child to move (0-based, among visible children).
+## [param to_index]: The target index to move the child to (0-based).
+## [param animate]: If [code]true[/code], the reordering will be animated. Default is [code]true[/code].
+## [br][br]
+## Returns [code]true[/code] if the reorder was successful, [code]false[/code] otherwise.
+func reorder_child_by_index(from_index: int, to_index: int, animate: bool = true) -> bool:
+	# Get children without excluding any (since we're not dragging)
+	var children: Array[Control] = []
+	for _child in get_children():
+		var c := _child as Control
+		if c != null and c.visible:
+			children.append(c)
+	
+	# Validate indices
+	if from_index < 0 or from_index >= children.size():
+		push_warning("ReorderableContainer: from_index %d is out of range (0-%d)" % [from_index, children.size() - 1])
+		return false
+	if to_index < 0 or to_index > children.size():
+		push_warning("ReorderableContainer: to_index %d is out of range (0-%d)" % [to_index, children.size()])
+		return false
+	if from_index == to_index:
+		return true  # No change needed
+	
+	var child := children[from_index]
+	
+	if animate:
+		# Enable process mode for animation
+		_is_using_process = true
+	
+	# Use the Node's move_child method (not Container's)
+	(self as Node).move_child(child, to_index)
+	reordered.emit(from_index, to_index)
+	
+	if not animate:
+		_on_sort_children()
+	
+	return true
+
+
+## Programmatically reorder a specific child control to a new index.
+## [br][br]
+## [param child]: The child control to move.
+## [param to_index]: The target index to move the child to (0-based).
+## [param animate]: If [code]true[/code], the reordering will be animated. Default is [code]true[/code].
+## [br][br]
+## Returns [code]true[/code] if the reorder was successful, [code]false[/code] otherwise.
+func reorder_child_to(child: Control, to_index: int, animate: bool = true) -> bool:
+	if child == null or not is_instance_valid(child) or child.get_parent() != self:
+		push_warning("ReorderableContainer: Invalid child control")
+		return false
+	
+	# Get children without excluding any
+	var children: Array[Control] = []
+	for _child in get_children():
+		var c := _child as Control
+		if c != null and c.visible:
+			children.append(c)
+	
+	var from_index := children.find(child)
+	
+	if from_index == -1:
+		push_warning("ReorderableContainer: Child not found among visible children")
+		return false
+	
+	return reorder_child_by_index(from_index, to_index, animate)
+
+
+## Swap two children at the given indices.
+## [br][br]
+## [param index_a]: The index of the first child (0-based, among visible children).
+## [param index_b]: The index of the second child (0-based, among visible children).
+## [param animate]: If [code]true[/code], the swap will be animated. Default is [code]true[/code].
+## [br][br]
+## Returns [code]true[/code] if the swap was successful, [code]false[/code] otherwise.
+func swap_children_at(index_a: int, index_b: int, animate: bool = true) -> bool:
+	# Get children without excluding any
+	var children: Array[Control] = []
+	for _child in get_children():
+		var c := _child as Control
+		if c != null and c.visible:
+			children.append(c)
+	
+	# Validate indices
+	if index_a < 0 or index_a >= children.size():
+		push_warning("ReorderableContainer: index_a %d is out of range (0-%d)" % [index_a, children.size() - 1])
+		return false
+	if index_b < 0 or index_b >= children.size():
+		push_warning("ReorderableContainer: index_b %d is out of range (0-%d)" % [index_b, children.size() - 1])
+		return false
+	if index_a == index_b:
+		return true  # No change needed
+	
+	# Ensure index_a < index_b for consistent behavior
+	if index_a > index_b:
+		var temp := index_a
+		index_a = index_b
+		index_b = temp
+	
+	var child_a := children[index_a]
+	var child_b := children[index_b]
+	
+	if animate:
+		_is_using_process = true
+	
+	# Move child_b to index_a first, then child_a to index_b
+	(self as Node).move_child(child_b, index_a)
+	(self as Node).move_child(child_a, index_b)
+	
+	reordered.emit(index_a, index_b)
+	
+	if not animate:
+		_on_sort_children()
+	
+	return true
+
+
+## Move a child to the first position (index 0).
+## [br][br]
+## [param child]: The child control to move to the beginning.
+## [param animate]: If [code]true[/code], the movement will be animated. Default is [code]true[/code].
+## [br][br]
+## Returns [code]true[/code] if successful, [code]false[/code] otherwise.
+func move_child_to_front(child: Control, animate: bool = true) -> bool:
+	return reorder_child_to(child, 0, animate)
+
+
+## Move a child to the last position.
+## [br][br]
+## [param child]: The child control to move to the end.
+## [param animate]: If [code]true[/code], the movement will be animated. Default is [code]true[/code].
+## [br][br]
+## Returns [code]true[/code] if successful, [code]false[/code] otherwise.
+func move_child_to_back(child: Control, animate: bool = true) -> bool:
+	# Get children without excluding any
+	var children: Array[Control] = []
+	for _child in get_children():
+		var c := _child as Control
+		if c != null and c.visible:
+			children.append(c)
+	return reorder_child_to(child, children.size(), animate)
