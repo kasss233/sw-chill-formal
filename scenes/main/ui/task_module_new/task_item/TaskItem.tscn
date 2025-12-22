@@ -85,6 +85,9 @@ theme = ExtResource("2_kna65")
 icon = ExtResource("6_hg1it")
 icon_alignment = 1
 
+[node name="LongPressTimer" type="Timer" parent="."]
+wait_time = 0.5
+
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/CompleteCheckBox" to="." method="_on_complete_check_box_toggled"]
 [connection signal="editing_toggled" from="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit" to="." method="_on_line_edit_editing_toggled"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]

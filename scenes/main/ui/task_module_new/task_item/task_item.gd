@@ -14,7 +14,7 @@ signal drag_ended(item: TaskItem)
 @onready var h_box_container_2: HBoxContainer = $MarginContainer/VBoxContainer/HBoxContainer2
 @onready var close_button: Button = $MarginContainer/VBoxContainer/HBoxContainer2/CloseButton
 
-#@onready var long_press_timer: Timer = $LongPressTimer
+@onready var long_press_timer: Timer = $LongPressTimer
 
 var is_pressing: bool = false
 var is_dragging: bool = false
@@ -32,6 +32,10 @@ func _ready() -> void:
 	# 连接关闭按钮信号
 	if close_button:
 		close_button.pressed.connect(_on_close_button_pressed)
+	
+	# 连接长按定时器信号
+	if long_press_timer:
+		long_press_timer.timeout.connect(_on_long_press_timer_timeout)
 
 func set_task(data: TaskData):
 	self.task_data = data
@@ -53,9 +57,16 @@ func _gui_input(event: InputEvent) -> void:
 			# 鼠标按下
 			is_pressing = true
 			is_dragging = false
+			# 启动长按定时器
+			if long_press_timer:
+				long_press_timer.start()
 		
 		else:
 			# 鼠标松开
+			# 停止长按定时器
+			if long_press_timer:
+				long_press_timer.stop()
+			
 			if is_pressing and not is_dragging:
 				# 单击事件逻辑：根据当前是否在编辑来切换状态
 				if is_editing:

@@ -123,6 +123,8 @@ vertical_scroll_mode = 4
 script = ExtResource("7_pg22x")
 wheel_scroll_damper = SubResource("Resource_68max")
 dragging_scroll_damper = SubResource("Resource_ji0d4")
+hide_scrollbar_over_time = true
+scrollbar_hide_time = 3.0
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer"]
