@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://vono11rha05n"]
+
+[ext_resource type="Script" uid="uid://7xupisoryagf" path="res://scenes/main/ui/components/date_picker/date_picker.gd" id="1_37ynt"]
+[ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="2_calendar"]
+
+[node name="DatePicker" type="Button"]
+custom_minimum_size = Vector2(150, 36)
+theme = ExtResource("2_calendar")
+text = "选择日期"
+script = ExtResource("1_37ynt")

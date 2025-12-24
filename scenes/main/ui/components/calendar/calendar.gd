@@ -2,6 +2,10 @@ extends Control
 
 # 日历控件 - 使用 calendar_library 插件
 
+# 信号
+signal date_selected(year: int, month: int, day: int)
+signal cancelled
+
 # 节点引用
 @onready var prev_month_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/PrevMonthButton
 @onready var next_month_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/NextMonthButton
@@ -10,6 +14,9 @@ extends Control
 @onready var month_label = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Label
 @onready var year_label = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Label2
 @onready var grid_container = $PanelContainer/MarginContainer/VBoxContainer/GridContainer
+@onready var action_container = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3
+@onready var cancel_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/Button
+@onready var confirm_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/Button2
 
 # 日历库实例
 var calendar: Calendar
@@ -55,6 +62,12 @@ func _ready():
 	# 连接所有日期按钮
 	for i in range(day_buttons.size()):
 		day_buttons[i].pressed.connect(_on_day_button_pressed.bind(i))
+	
+	# 连接确认和取消按钮
+	if cancel_button:
+		cancel_button.pressed.connect(_on_cancel_pressed)
+	if confirm_button:
+		confirm_button.pressed.connect(_on_confirm_pressed)
 	
 	# 刷新显示
 	_update_calendar()
@@ -163,10 +176,7 @@ func _on_day_button_pressed(button_index: int):
 					current_month = day_data.month
 				
 				_update_calendar()
-				
-				# 发出信号（可选）
-				# emit_signal("date_selected", selected_date)
-				print("选中日期: %d年%d月%d日" % [selected_date["year"], selected_date["month"], selected_date["day"]])
+
 
 func get_selected_date() -> Dictionary:
 	"""获取当前选中的日期"""
@@ -182,3 +192,17 @@ func set_date(year: int, month: int, day: int):
 		"day": day
 	}
 	_update_calendar()
+
+func show_action_buttons(show: bool):
+	"""显示或隐藏确认/取消按钮"""
+	if action_container:
+		action_container.visible = show
+
+func _on_confirm_pressed():
+	"""确认按钮被点击"""
+	if selected_date.has("year"):
+		date_selected.emit(selected_date["year"], selected_date["month"], selected_date["day"])
+
+func _on_cancel_pressed():
+	"""取消按钮被点击"""
+	cancelled.emit()
