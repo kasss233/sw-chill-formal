@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://6fuhdgrxtkgs"]
+[gd_scene load_steps=9 format=3 uid="uid://6fuhdgrxtkgs"]
 
+[ext_resource type="Script" uid="uid://cc4wq7u5rva1w" path="res://scenes/main/ui/components/calendar/calendar.gd" id="1_ia4ai"]
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="1_sd8s4"]
 [ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://assets/ui/themes/dark_gaussian_blur.gdshader" id="1_yjhai"]
 [ext_resource type="Texture2D" uid="uid://bx6ivfn3lppxd" path="res://assets/ui/icons/keyboard_arrow_left_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" id="2_lonb1"]
@@ -12,13 +13,14 @@ shader = ExtResource("1_yjhai")
 shader_parameter/strength = 3.3
 shader_parameter/mix_percentage = 0.3
 
-[node name="Control" type="Control"]
+[node name="Calendar" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_ia4ai")
 metadata/_edit_vertical_guides_ = [12.0, 348.0, 360.0]
 metadata/_edit_horizontal_guides_ = [23.0]
 
@@ -137,7 +139,7 @@ layout_mode = 2
 theme_override_constants/h_separation = 9
 columns = 7
 
-[node name="Button" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
+[node name="Button1" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/GridContainer"]
 custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
 theme = ExtResource("1_sd8s4")
