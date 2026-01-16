@@ -15,21 +15,30 @@ signal music_status_changed()
 @export var option_board_scene: PackedScene
 ## 音乐资源
 @export var audio_res: AudioRes
-
+## icon 
+@export var play_icon:Texture
+@export var pause_icon:Texture
 # --- 节点引用 ---
 ## 列表 Tab 容器，管理多个音乐列表
-@onready var tab_container: TabContainer = $FoldableContainer/TabContainer
-## 折叠容器
-@onready var folder: Control = $FoldableContainer
-
+@onready var tab_container: TabContainer =$TabPanel/TabContainer
+@onready var label=$VBoxContainer/Label
+@onready var status_button=$VBoxContainer/HBoxContainer/StatusButton
+@onready var tab_panel=$TabPanel
 # --- 成员变量 ---
 ## 当前选中的音乐列表索引
 var current_list_index: int = 0
 ## 是否弹出了选项面板
 var option_board_opened: bool = false
+## 当前的icon
+var is_playing: bool=false
 func _ready() -> void:
 	_setup_initial_music()
 
+func _process(delta):
+	if is_playing:
+		status_button.icon= play_icon
+	else:
+		status_button.icon= pause_icon
 # --- 内部处理函数 ---
 ## 初始化默认列表并加载音乐
 func _setup_initial_music() -> void:
@@ -64,8 +73,8 @@ func add_music(p_list_name: String, p_music_name: String) -> void:
 func change_music(p_name: String) -> void:
 	print("[Music Module] Changing music to: %s" % p_name)
 	music_changed.emit(p_name)
-	if folder:
-		folder.set("title", p_name)
+	is_playing = true
+	label.text=p_name
 ## 检查指定音乐是否已存在于某个列表中
 func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
 	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
@@ -118,7 +127,6 @@ func get_all_lists_music_names() -> Dictionary:
 	return result
 
 
-
 # --- 信号回调 ---
 ## 播放上一首
 func _on_last_button_pressed() -> void:
@@ -126,10 +134,13 @@ func _on_last_button_pressed() -> void:
 		var current_list = tab_container.get_child(current_list_index) as MusicList
 		if current_list:
 			current_list.play_last_music()
+			is_playing = true
+
 
 ## 播放/暂停
 func _on_status_button_pressed() -> void:
 	music_status_changed.emit()
+	is_playing = not is_playing
 	print("[Music Module] music_status_changed emitted")
 
 ## 播放下一首
@@ -138,6 +149,7 @@ func _on_next_button_pressed() -> void:
 		var current_list = tab_container.get_child(current_list_index) as MusicList
 		if current_list:
 			current_list.play_next_music()
+			is_playing = true
 
 ## 切换 Tab 列表
 func _on_tab_container_tab_changed(p_tab_index: int) -> void:
@@ -180,3 +192,6 @@ func _on_music_option_changed(p_list_name: String, p_music_name: String, p_toggl
 		var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
 		if target_list:
 			target_list.remove_music(p_music_name)
+
+func _on_tab_button_pressed() -> void:
+	tab_panel.visible=not tab_panel.visible
