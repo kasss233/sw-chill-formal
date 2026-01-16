@@ -18,12 +18,19 @@ signal music_status_changed()
 ## icon 
 @export var play_icon:Texture
 @export var pause_icon:Texture
+##顺序播放icon
+@export var order_icon:Texture
+##随机播放icon
+@export var random_icon:Texture
+##单曲循环icon
+@export var single_icon:Texture
 # --- 节点引用 ---
 ## 列表 Tab 容器，管理多个音乐列表
 @onready var tab_container: TabContainer =$TabPanel/TabContainer
 @onready var label=$VBoxContainer/Label
 @onready var status_button=$VBoxContainer/HBoxContainer/StatusButton
 @onready var tab_panel=$TabPanel
+@onready var mode_button=$VBoxContainer/HBoxContainer/ModeButton
 # --- 成员变量 ---
 ## 当前选中的音乐列表索引
 var current_list_index: int = 0
@@ -31,14 +38,11 @@ var current_list_index: int = 0
 var option_board_opened: bool = false
 ## 当前的icon
 var is_playing: bool=false
+## 播放下一首的选择方式
+var next_play_mode: int = 0 # 0: 顺序播放, 1: 随机播放, 2: 单曲循环
 func _ready() -> void:
 	_setup_initial_music()
 
-func _process(delta):
-	if is_playing:
-		status_button.icon= play_icon
-	else:
-		status_button.icon= pause_icon
 # --- 内部处理函数 ---
 ## 初始化默认列表并加载音乐
 func _setup_initial_music() -> void:
@@ -61,7 +65,7 @@ func add_music_list(p_name: String) -> void:
 	music_list_instance.name = p_name
 	tab_container.add_child(music_list_instance)
 	# 连接列表信号
-	music_list_instance.music_changed.connect(change_music)
+	music_list_instance.music_changed.connect(_on_music_changed)
 	music_list_instance.music_options_requested.connect(_on_music_options_requested)
 ## 向指定音乐列表添加一首音乐
 func add_music(p_list_name: String, p_music_name: String) -> void:
@@ -69,22 +73,14 @@ func add_music(p_list_name: String, p_music_name: String) -> void:
 	if target_list:
 		target_list.add_music(p_music_name)
 
-## 更换当前播放的音乐，更新 UI 并发出信号
-func change_music(p_name: String) -> void:
-	print("[Music Module] Changing music to: %s" % p_name)
-	music_changed.emit(p_name)
-	is_playing = true
-	label.text=p_name
-## 检查指定音乐是否已存在于某个列表中
-func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
-	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
-	if target_list:
-		for i in range(target_list.get_music_count()):
-			var child = target_list.vbox.get_child(i)
-			if child is MusicItem and child.get_music_name() == p_music_name:
-				return true
-	return false
 
+
+## 获得当前列表
+func get_current_list() -> MusicList:
+	if tab_container.get_child_count() > current_list_index:
+		var current_list = tab_container.get_child(current_list_index) as MusicList
+		return current_list
+	return null
 ## 获取当前所有音乐列表的名称
 func get_music_list_names() -> Array[String]:
 	var names: Array[String] = []
@@ -125,31 +121,58 @@ func get_all_lists_music_names() -> Dictionary:
 					music_names.append(music_item.get_music_name())
 			result[child.name] = music_names
 	return result
-
+## 播放下一首，在结束时调用
+func play_next_music() -> void:
+	var current_list = get_current_list()
+	if not current_list:
+		return
+	if next_play_mode==0:
+		current_list.play_next_music()
+	elif next_play_mode==1:
+		current_list.play_random_music()
+	elif next_play_mode==2:
+		current_list.play_single_music()
+	change_play_status(true)
 
 # --- 信号回调 ---
+## 更换当前播放的音乐，更新 UI 并发出信号
+func _on_music_changed(p_name: String) -> void:
+	print("[Music Module] Changing music to: %s" % p_name)
+	music_changed.emit(p_name)
+	change_play_status(true)
+	label.text=p_name
 ## 播放上一首
 func _on_last_button_pressed() -> void:
-	if tab_container.get_child_count() > current_list_index:
-		var current_list = tab_container.get_child(current_list_index) as MusicList
-		if current_list:
-			current_list.play_last_music()
-			is_playing = true
+	var current_list = get_current_list()
+	if current_list:
+		match next_play_mode:
+			0:
+				current_list.play_last_music()
+			1:
+				current_list.play_random_music()
+			2:
+				current_list.play_last_music()
+		change_play_status(true)
 
 
 ## 播放/暂停
 func _on_status_button_pressed() -> void:
 	music_status_changed.emit()
-	is_playing = not is_playing
+	change_play_status(not is_playing)
 	print("[Music Module] music_status_changed emitted")
 
 ## 播放下一首
 func _on_next_button_pressed() -> void:
-	if tab_container.get_child_count() > current_list_index:
-		var current_list = tab_container.get_child(current_list_index) as MusicList
-		if current_list:
-			current_list.play_next_music()
-			is_playing = true
+	var current_list = get_current_list()
+	if current_list:
+		match next_play_mode:
+			0:
+				current_list.play_next_music()
+			1:
+				current_list.play_random_music()
+			2:
+				current_list.play_next_music()#单曲循环切换按顺序播放下一首
+		change_play_status(true)
 
 ## 切换 Tab 列表
 func _on_tab_container_tab_changed(p_tab_index: int) -> void:
@@ -195,3 +218,32 @@ func _on_music_option_changed(p_list_name: String, p_music_name: String, p_toggl
 
 func _on_tab_button_pressed() -> void:
 	tab_panel.visible=not tab_panel.visible
+
+
+func _on_mode_button_pressed() -> void:
+	next_play_mode = (next_play_mode + 1) % 3
+	match next_play_mode:
+		0:
+			mode_button.icon= order_icon
+		1:
+			mode_button.icon= random_icon
+		2:
+			mode_button.icon= single_icon
+#----辅助函数
+##切换播放状态
+func change_play_status(_is_playing: bool) -> void:
+	is_playing = _is_playing
+	match is_playing:
+		true:
+			status_button.icon= play_icon
+		false:
+			status_button.icon= pause_icon
+## 检查指定音乐是否已存在于某个列表中
+func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
+	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	if target_list:
+		for i in range(target_list.get_music_count()):
+			var child = target_list.vbox.get_child(i)
+			if child is MusicItem and child.get_music_name() == p_music_name:
+				return true
+	return false

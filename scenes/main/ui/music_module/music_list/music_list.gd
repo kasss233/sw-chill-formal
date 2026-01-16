@@ -31,7 +31,9 @@ func get_music_count() -> int:
 ## 获取当前正在播放的索引
 func get_playing_index() -> int:
 	return current_playing_index
-
+## 获取当前正在播放的音乐名称
+func get_playing_name() -> String:
+	return current_playing_name
 ## 设置音乐列表的名称
 func set_music_list_name(p_name: String) -> void:
 	self.name = p_name
@@ -98,7 +100,17 @@ func play_last_music() -> void:
 		
 	var last_index = (current_playing_index - 1 + vbox.get_child_count()) % vbox.get_child_count()
 	play_music(last_index)
-
+## 随机播放下一首，保证不跟当前重复
+func play_random_music() -> void:
+	if get_music_count() == 0:
+		return
+	var random_index = randi() % get_music_count()
+	while random_index == current_playing_index and get_music_count() > 1:
+		random_index = randi() % get_music_count()
+	play_music(random_index)
+func play_single_music() -> void:
+	if current_playing_index != -1:
+		play_music(current_playing_index)
 # --- 信号回调 ---
 func _on_music_changed(p_name: String) -> void:
 	music_changed.emit(p_name)

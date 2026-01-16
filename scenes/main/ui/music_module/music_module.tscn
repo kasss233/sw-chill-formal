@@ -4,12 +4,26 @@
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
 [ext_resource type="PackedScene" uid="uid://cxdwb75116e2w" path="res://scenes/main/ui/music_module/music_option_board/music_option_board.tscn" id="4_cfhda"]
 [ext_resource type="PackedScene" uid="uid://gh3p734runtb" path="res://scenes/main/ui/music_module/music_list/music_list.tscn" id="4_x6s46"]
-[ext_resource type="Texture2D" uid="uid://dkxl6yvlkiavr" path="res://assets/ui/White-Icon/MediumArrow-Left.png" id="5_cbgf6"]
-[ext_resource type="Texture2D" uid="uid://dsxjvowxlcu2d" path="res://assets/ui/White-Icon/Play.png" id="5_cw51c"]
-[ext_resource type="Texture2D" uid="uid://3c88m203v2qt" path="res://assets/ui/White-Icon/Pause.png" id="6_cbgf6"]
-[ext_resource type="Texture2D" uid="uid://ckgdw6l8oigv" path="res://assets/ui/White-Icon/MediumArrow-Right.png" id="7_ahnt5"]
+[ext_resource type="Texture2D" uid="uid://d2gv2oruwkppb" path="res://assets/ui/music_icons/pause.png" id="5_t8g72"]
+[ext_resource type="Texture2D" uid="uid://cemlmm3ekg8i0" path="res://assets/ui/music_icons/play.png" id="6_fkviu"]
 [ext_resource type="FontFile" uid="uid://dpolhfxfwsb0k" path="res://assets/ui/fonts/HyliaSerifBeta-Regular.otf" id="7_t8g72"]
-[ext_resource type="Texture2D" uid="uid://c15v4thmy3d12" path="res://assets/ui/White-Icon/Music-On.png" id="8_fkviu"]
+[ext_resource type="Texture2D" uid="uid://inu448nffxae" path="res://assets/ui/music_icons/playlist.png" id="8_57bae"]
+[ext_resource type="Theme" uid="uid://vrneiie86tq7" path="res://assets/ui/themes/music_buttons.tres" id="8_hggt5"]
+[ext_resource type="Texture2D" uid="uid://bdgvjcmlqi7as" path="res://assets/ui/music_icons/shuffle.png" id="8_n0dq4"]
+[ext_resource type="Texture2D" uid="uid://dc20dfobocl8k" path="res://assets/ui/music_icons/repeat-once.png" id="9_0xa2x"]
+[ext_resource type="Texture2D" uid="uid://dk2cicj2ymt7w" path="res://assets/ui/music_icons/back.png" id="9_hggt5"]
+[ext_resource type="Texture2D" uid="uid://cyd0djnagiovw" path="res://assets/ui/music_icons/repeat.png" id="10_0xa2x"]
+[ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://assets/ui/themes/dark_gaussian_blur.gdshader" id="10_5sru0"]
+[ext_resource type="StyleBox" uid="uid://cbcowdy5ofxqb" path="res://assets/ui/themes/panel_style_box_flat.tres" id="10_hycke"]
+[ext_resource type="Texture2D" uid="uid://vnqy1d2oqkl7" path="res://assets/ui/music_icons/next.png" id="10_n0dq4"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2p7cx"]
+shader = ExtResource("10_5sru0")
+shader_parameter/strength = 3.3
+shader_parameter/mix_percentage = 0.3
+
+[sub_resource type="Theme" id="Theme_hycke"]
+PanelContainer/styles/panel = ExtResource("10_hycke")
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_au6hm"]
 content_margin_right = 482.0
@@ -19,27 +33,6 @@ content_margin_right = 482.0
 [sub_resource type="LabelSettings" id="LabelSettings_n0dq4"]
 font = ExtResource("7_t8g72")
 font_size = 40
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ahnt5"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jgat6"]
-
-[sub_resource type="Theme" id="Theme_jgat6"]
-Button/styles/focus = SubResource("StyleBoxEmpty_ahnt5")
-Button/styles/hover = SubResource("StyleBoxEmpty_jgat6")
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_57bae"]
-
-[sub_resource type="Theme" id="Theme_n0dq4"]
-Button/styles/focus = SubResource("StyleBoxEmpty_57bae")
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t8g72"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fkviu"]
-
-[sub_resource type="Theme" id="Theme_57bae"]
-Button/styles/focus = SubResource("StyleBoxEmpty_t8g72")
-Button/styles/hover = SubResource("StyleBoxEmpty_fkviu")
 
 [node name="MusicModule" type="Control"]
 layout_mode = 3
@@ -51,21 +44,24 @@ script = ExtResource("1_t37u8")
 music_list_scene = ExtResource("4_x6s46")
 option_board_scene = ExtResource("4_cfhda")
 audio_res = ExtResource("2_jnxsf")
-play_icon = ExtResource("6_cbgf6")
-pause_icon = ExtResource("5_cw51c")
+play_icon = ExtResource("5_t8g72")
+pause_icon = ExtResource("6_fkviu")
+order_icon = ExtResource("10_0xa2x")
+random_icon = ExtResource("8_n0dq4")
+single_icon = ExtResource("9_0xa2x")
 
 [node name="TabPanel" type="PanelContainer" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_2p7cx")
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -650.0
+offset_top = -590.0
 offset_right = 482.0
-offset_bottom = -114.0
+offset_bottom = -124.0
 grow_vertical = 0
-
-[node name="Panel" type="Panel" parent="TabPanel"]
-layout_mode = 2
+theme = SubResource("Theme_hycke")
 
 [node name="TabContainer" type="TabContainer" parent="TabPanel"]
 layout_mode = 2
@@ -74,9 +70,9 @@ tab_alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 4.0
-offset_top = -122.0
-offset_right = 305.0
+offset_left = 3.0
+offset_top = -136.0
+offset_right = 431.0
 offset_bottom = -5.0
 
 [node name="Label" type="Label" parent="VBoxContainer"]
@@ -90,29 +86,37 @@ layout_mode = 2
 
 [node name="TabButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-icon = ExtResource("8_fkviu")
+theme = ExtResource("8_hggt5")
+icon = ExtResource("8_57bae")
+flat = true
+
+[node name="ModeButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("8_hggt5")
+icon = ExtResource("10_0xa2x")
 flat = true
 
 [node name="LastButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme = SubResource("Theme_jgat6")
-icon = ExtResource("5_cbgf6")
+theme = ExtResource("8_hggt5")
+icon = ExtResource("9_hggt5")
 flat = true
 
 [node name="StatusButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme = SubResource("Theme_n0dq4")
-icon = ExtResource("5_cw51c")
+theme = ExtResource("8_hggt5")
+icon = ExtResource("6_fkviu")
 flat = true
 
 [node name="NextButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme = SubResource("Theme_57bae")
-icon = ExtResource("7_ahnt5")
+theme = ExtResource("8_hggt5")
+icon = ExtResource("10_n0dq4")
 flat = true
 
 [connection signal="tab_changed" from="TabPanel/TabContainer" to="." method="_on_tab_container_tab_changed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/TabButton" to="." method="_on_tab_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/ModeButton" to="." method="_on_mode_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LastButton" to="." method="_on_last_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/StatusButton" to="." method="_on_status_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]

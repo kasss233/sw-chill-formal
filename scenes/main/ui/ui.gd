@@ -39,7 +39,10 @@ func add_music(p_list_name: String, p_music_name: String) -> void:
 func change_music(p_name: String) -> void:
 	if music_module:
 		music_module.change_music(p_name)
-
+## 播放下一首音乐
+func play_next_music() -> void:
+	if music_module:
+		music_module.play_next_music()
 ## 检查指定音乐是否已存在于某个列表中
 func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
 	if music_module:

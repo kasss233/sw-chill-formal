@@ -43,6 +43,7 @@ func _init_audio_players() -> void:
 		var audio = AudioStreamPlayer.new()
 		audio.name = item.name
 		audio.stream = item.stream
+		audio.finished.connect(_on_music_finished)
 		bgm_container.add_child(audio)
 		print("[AudioPlayer] Loaded BGM: %s" % item.name)
 
@@ -105,3 +106,5 @@ func _on_music_changed(p_name: String) -> void:
 
 func _on_music_status_changed() -> void:
 	toggle_bgm_playback()
+func _on_music_finished() -> void:
+	ui.play_next_music()

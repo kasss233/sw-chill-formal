@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://vrneiie86tq7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ahnt5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jgat6"]
+
+[resource]
+Button/constants/icon_max_width = 50
+Button/styles/focus = SubResource("StyleBoxEmpty_ahnt5")
+Button/styles/hover = SubResource("StyleBoxEmpty_jgat6")
