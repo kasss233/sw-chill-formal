@@ -11,7 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ys5r8")
-music_item = ExtResource("2_l8xbh")
+music_item_scene = ExtResource("2_l8xbh")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 0

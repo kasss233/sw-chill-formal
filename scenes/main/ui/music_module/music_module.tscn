@@ -16,7 +16,7 @@ anchor_bottom = 1.0
 grow_vertical = 0
 script = ExtResource("1_t37u8")
 music_list_scene = ExtResource("4_x6s46")
-option_board = ExtResource("4_cfhda")
+option_board_scene = ExtResource("4_cfhda")
 audio_res = ExtResource("2_jnxsf")
 
 [node name="FoldableContainer" type="FoldableContainer" parent="."]

@@ -31,11 +31,6 @@ layout_mode = 2
 layout_mode = 2
 text = "current_music_name"
 
-[node name="DeleteButton" type="Button" parent="VBoxContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 4
-text = "删除"
-
 [node name="CloseButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "关闭

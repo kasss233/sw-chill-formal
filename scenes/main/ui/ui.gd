@@ -1,24 +1,78 @@
-extends Control
 class_name UI
-@onready var music_module=$MusicModule
+extends Control
 
-signal music_changed(_name:String)
-signal music_status_changed
+## 主 UI 控制器，负责协调各模块信号并与全局服务层（如 AudioPlayer）交互
+
+# --- 信号 ---
+## 当音乐切换时发出
+signal music_changed(p_name: String)
+## 当播放状态（播放/暂停）切换时发出
+signal music_status_changed()
+
+# --- 节点引用 ---
+## 音乐管理模块
+@onready var music_module: Control = $MusicModule
+
+# --- 内置函数 ---
 func _ready() -> void:
-	get_signal()
-func get_signal():
-	music_module.music_changed.connect(change_music)
-	music_module.music_status_changed.connect(change_music_status)
-	
-	
-	
-func change_music(_name:String):
-	music_changed.emit(_name)
-	print("[UI] Changing music to: %s" % _name)
-	
-func change_music_status():
+	_connect_signals()
+
+# --- 内部处理函数 ---
+## 连接各子模块信号
+func _connect_signals() -> void:
+	if music_module:
+		music_module.music_changed.connect(_on_music_changed)
+		music_module.music_status_changed.connect(_on_music_status_changed)
+
+# --- 公有 API (音乐模块包装) ---
+## 添加一个新的音乐列表
+func add_music_list(p_name: String) -> void:
+	if music_module:
+		music_module.add_music_list(p_name)
+
+## 向指定音乐列表添加一首音乐
+func add_music(p_list_name: String, p_music_name: String) -> void:
+	if music_module:
+		music_module.add_music(p_list_name, p_music_name)
+
+## 更换当前播放的音乐
+func change_music(p_name: String) -> void:
+	if music_module:
+		music_module.change_music(p_name)
+
+## 检查指定音乐是否已存在于某个列表中
+func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
+	if music_module:
+		return music_module.is_music_in_list(p_list_name, p_music_name)
+	return false
+
+## 获取当前所有音乐列表的名称
+func get_music_list_names() -> Array[String]:
+	if music_module:
+		return music_module.get_music_list_names()
+	return []
+
+## 获取当前列表中的所有音乐名称
+func get_current_list_music_names() -> Array[String]:
+	if music_module:
+		return music_module.get_current_list_music_names()
+	return []
+
+## 获取指定列表中的音乐名称
+func get_list_music_names(p_list_name: String) -> Array[String]:
+	if music_module:
+		return music_module.get_list_music_names(p_list_name)
+	return []
+
+## 获取所有列表及其对应的音乐名称映射
+func get_all_lists_music_names() -> Dictionary:
+	if music_module:
+		return music_module.get_all_lists_music_names()
+	return {}
+
+# --- 信号转发回调 ---
+func _on_music_changed(p_name: String) -> void:
+	music_changed.emit(p_name)
+
+func _on_music_status_changed() -> void:
 	music_status_changed.emit()
-	print("[UI] Music status changed")
-	
-	
-	
