@@ -27,10 +27,10 @@ signal music_status_changed()
 # --- 节点引用 ---
 ## 列表 Tab 容器，管理多个音乐列表
 @onready var tab_container: TabContainer =$TabPanel/TabContainer
-@onready var label=$VBoxContainer/Label
-@onready var status_button=$VBoxContainer/HBoxContainer/StatusButton
+@onready var label=$PanelContainer/VBoxContainer/Label
+@onready var status_button=$PanelContainer/VBoxContainer/HBoxContainer/StatusButton
 @onready var tab_panel=$TabPanel
-@onready var mode_button=$VBoxContainer/HBoxContainer/ModeButton
+@onready var mode_button=$PanelContainer/VBoxContainer/HBoxContainer/ModeButton
 # --- 成员变量 ---
 ## 当前选中的音乐列表索引
 var current_list_index: int = 0

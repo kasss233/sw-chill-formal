@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://do56ajkuwsf0t"]
+[gd_scene load_steps=27 format=3 uid="uid://do56ajkuwsf0t"]
 
 [ext_resource type="Script" uid="uid://b7qsxbprouywv" path="res://scenes/main/ui/music_module/music_module.gd" id="1_t37u8"]
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
@@ -12,34 +12,48 @@
 [ext_resource type="Theme" uid="uid://vrneiie86tq7" path="res://assets/ui/themes/music_buttons.tres" id="8_hggt5"]
 [ext_resource type="Texture2D" uid="uid://baqcqrlontxyr" path="res://assets/ui/music_icons/repeat_one_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="9_ss7lu"]
 [ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://assets/ui/themes/dark_gaussian_blur.gdshader" id="10_5sru0"]
+[ext_resource type="StyleBox" uid="uid://cbcowdy5ofxqb" path="res://assets/ui/themes/panel_style_box_flat.tres" id="11_5sru0"]
 [ext_resource type="Texture2D" uid="uid://xa7jb02fiadl" path="res://assets/ui/music_icons/playlist_play_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="13_gopd7"]
 [ext_resource type="Texture2D" uid="uid://b6fkrv0egmeyf" path="res://assets/ui/music_icons/skip_previous_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="14_ddwy2"]
 [ext_resource type="Texture2D" uid="uid://x21401o38ejx" path="res://assets/ui/music_icons/skip_next_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="15_n2uom"]
 [ext_resource type="Texture2D" uid="uid://cvgte37i3ry7r" path="res://assets/ui/music_icons/add_circle_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48 (3).svg" id="16_hycke"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_2p7cx"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5sru0"]
 shader = ExtResource("10_5sru0")
 shader_parameter/strength = 3.3
 shader_parameter/mix_percentage = 0.3
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xa2x"]
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 30
-corner_radius_top_right = 30
-corner_radius_bottom_right = 30
-corner_radius_bottom_left = 30
+[sub_resource type="Theme" id="Theme_5sru0"]
+PanelContainer/styles/panel = ExtResource("11_5sru0")
 
-[sub_resource type="Theme" id="Theme_hycke"]
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_0xa2x")
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2p7cx"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_au6hm"]
-content_margin_right = 482.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2p7cx"]
+bg_color = Color(0.6843351, 0.4171, 0.97, 0)
+
+[sub_resource type="Theme" id="Theme_ss7lu"]
+TabContainer/constants/tab_separation = 10
+TabContainer/styles/panel = SubResource("StyleBoxEmpty_2p7cx")
+TabContainer/styles/tab_disabled = SubResource("StyleBoxFlat_2p7cx")
+TabContainer/styles/tab_focus = SubResource("StyleBoxFlat_2p7cx")
+TabContainer/styles/tab_hovered = SubResource("StyleBoxFlat_2p7cx")
+TabContainer/styles/tab_selected = SubResource("StyleBoxFlat_2p7cx")
+TabContainer/styles/tab_unselected = SubResource("StyleBoxFlat_2p7cx")
+TabContainer/styles/tabbar_background = SubResource("StyleBoxFlat_2p7cx")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ss7lu"]
+shader = ExtResource("10_5sru0")
+shader_parameter/strength = 3.3
+shader_parameter/mix_percentage = 0.3
+
+[sub_resource type="Theme" id="Theme_gopd7"]
+PanelContainer/styles/panel = ExtResource("11_5sru0")
 
 [sub_resource type="Theme" id="Theme_hggt5"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_n0dq4"]
 font = ExtResource("7_t8g72")
-font_size = 30
+font_size = 25
 
 [node name="MusicModule" type="Control"]
 layout_mode = 3
@@ -58,78 +72,81 @@ random_icon = ExtResource("8_2p7cx")
 single_icon = ExtResource("9_ss7lu")
 
 [node name="TabPanel" type="PanelContainer" parent="."]
-material = SubResource("ShaderMaterial_2p7cx")
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -590.0
-offset_right = 482.0
-offset_bottom = -124.0
-grow_vertical = 0
-theme = SubResource("Theme_hycke")
+material = SubResource("ShaderMaterial_5sru0")
+layout_mode = 0
+offset_left = 2.0
+offset_top = -550.0
+offset_right = 367.0
+offset_bottom = -167.0
+theme = SubResource("Theme_5sru0")
 
 [node name="TabContainer" type="TabContainer" parent="TabPanel"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_au6hm")
+theme = SubResource("Theme_ss7lu")
 tab_alignment = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_ss7lu")
 layout_mode = 0
-offset_left = 3.0
-offset_top = -136.0
-offset_right = 431.0
-offset_bottom = -5.0
+offset_left = 2.0
+offset_top = -111.0
+offset_right = 262.0
+offset_bottom = -30.0
+theme = SubResource("Theme_gopd7")
 
-[node name="Label" type="Label" parent="VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 theme = SubResource("Theme_hggt5")
 text = "no playing music"
 label_settings = SubResource("LabelSettings_n0dq4")
+text_overrun_behavior = 4
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="TabButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="TabButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
 icon = ExtResource("13_gopd7")
 flat = true
 
-[node name="ModeButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="ModeButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
 icon = ExtResource("7_5sru0")
 flat = true
 
-[node name="LastButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="LastButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
 icon = ExtResource("14_ddwy2")
 flat = true
 
-[node name="StatusButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="StatusButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
 icon = ExtResource("6_hycke")
 flat = true
 
-[node name="NextButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="NextButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
 icon = ExtResource("15_n2uom")
 flat = true
 
-[node name="AddButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="AddButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
 icon = ExtResource("16_hycke")
 flat = true
 
 [connection signal="tab_changed" from="TabPanel/TabContainer" to="." method="_on_tab_container_tab_changed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/TabButton" to="." method="_on_tab_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/ModeButton" to="." method="_on_mode_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/LastButton" to="." method="_on_last_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/StatusButton" to="." method="_on_status_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/AddButton" to="." method="_on_add_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/TabButton" to="." method="_on_tab_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ModeButton" to="." method="_on_mode_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/LastButton" to="." method="_on_last_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/StatusButton" to="." method="_on_status_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/AddButton" to="." method="_on_add_button_pressed"]
