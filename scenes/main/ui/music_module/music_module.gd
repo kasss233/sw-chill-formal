@@ -204,6 +204,11 @@ func _on_music_options_requested(p_music_name: String, p_list_name: String) -> v
 	# 实例化选项面板
 	var option_board_instance = option_board_scene.instantiate() as MusicOptionBoard
 	add_child(option_board_instance)
+	
+	# 设置为顶级节点并居中
+	option_board_instance.set_as_top_level(true)
+	option_board_instance.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	
 	# 设置当前音乐名称
 	option_board_instance.set_music_name(p_music_name)
 	# 连接选项改变信号
@@ -288,6 +293,7 @@ func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
 		return
 	if target_list:
 		target_list.remove_music(p_music_name)
+
 #----辅助函数
 ##切换播放状态
 func change_play_status(_is_playing: bool) -> void:
