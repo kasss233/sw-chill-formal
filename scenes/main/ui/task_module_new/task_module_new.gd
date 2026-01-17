@@ -325,7 +325,7 @@ func _on_v_box_container_reordered(from: int, to: int) -> void:
 		
 		# 更新任务数据和UI
 		item.task_data = moved_task
-		item.complete_check_box.set_pressed_no_signal(should_be_completed)
+		item.complete_check_box.set_checked_no_signal(should_be_completed)
 		item.line_edit.is_completed = should_be_completed
 		
 		# 重新连接信号
