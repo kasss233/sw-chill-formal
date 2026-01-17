@@ -112,6 +112,7 @@ func play_random_music() -> void:
 func play_single_music() -> void:
 	if current_playing_index != -1:
 		play_music(current_playing_index)
+
 # --- 信号回调 ---
 func _on_music_changed(p_name: String) -> void:
 	music_changed.emit(p_name)

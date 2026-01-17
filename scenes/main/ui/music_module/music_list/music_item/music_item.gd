@@ -34,7 +34,8 @@ func get_music_name() -> String:
 ## 触发播放逻辑
 func play_music() -> void:
 	music_changed.emit(music_name)
-
+func remove_music() -> void:
+	music_removed.emit(music_name)
 # --- 信号回调 ---
 func _on_button_pressed() -> void:
 	play_music()
@@ -44,4 +45,4 @@ func _on_option_button_pressed() -> void:
 
 
 func _on_remove_button_pressed() -> void:
-	music_removed.emit(music_name)
+	remove_music()

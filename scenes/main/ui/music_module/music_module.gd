@@ -73,7 +73,22 @@ func add_music(p_list_name: String, p_music_name: String) -> void:
 	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
 	if target_list:
 		target_list.add_music(p_music_name)
-
+## 从指定音乐列表移除一首音乐,如果是全部音乐列表，则从每个列表中删除，并从资源中删除
+func remove_music(p_list_name: String, p_music_name: String) -> void:
+	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	#如果列表是全部音乐，则从每个列表中删除，并从资源中删除
+	if p_list_name=="全部音乐":
+		#从所有列表中移除该音乐
+		for child in tab_container.get_children():
+			if child is MusicList:
+				child.remove_music(p_music_name)
+		#从资源中移除该音乐
+		var item = audio_res.get_bgm_item_by_name(p_music_name)
+		if item:
+			audio_res.remove_bgm(p_music_name)
+		return
+	if target_list:
+		target_list.remove_music(p_music_name)
 
 
 ## 获得当前列表

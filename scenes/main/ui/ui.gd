@@ -39,6 +39,10 @@ func add_music(p_list_name: String, p_music_name: String) -> void:
 func change_music(p_name: String) -> void:
 	if music_module:
 		music_module.change_music(p_name)
+## 删除音乐
+func remove_music(p_music_name: String,p_list_name: String) -> void:
+	if music_module:
+		music_module.remove_music(p_music_name,p_list_name)
 ## 播放下一首音乐
 func play_next_music() -> void:
 	if music_module:
