@@ -27,10 +27,13 @@ signal music_status_changed()
 # --- 节点引用 ---
 ## 列表 Tab 容器，管理多个音乐列表
 @onready var tab_container: TabContainer =$TabPanel/TabContainer
-@onready var label=$PanelContainer/VBoxContainer/Label
+#@onready var label=$PanelContainer/VBoxContainer/Label
 @onready var status_button=$PanelContainer/VBoxContainer/HBoxContainer/StatusButton
 @onready var tab_panel=$TabPanel
 @onready var mode_button=$PanelContainer/VBoxContainer/HBoxContainer/ModeButton
+@onready var tab_button: MaterialButton = $PanelContainer/VBoxContainer/HBoxContainer/TabButton
+
+
 # --- 成员变量 ---
 ## 当前选中的音乐列表索引
 var current_list_index: int = 0
@@ -148,15 +151,14 @@ func play_next_music() -> void:
 		current_list.play_random_music()
 	elif next_play_mode==2:
 		current_list.play_single_music()
-	change_play_status(true)
 
 # --- 信号回调 ---
 ## 更换当前播放的音乐，更新 UI 并发出信号
 func _on_music_changed(p_name: String) -> void:
 	print("[Music Module] Changing music to: %s" % p_name)
 	music_changed.emit(p_name)
-	change_play_status(true)
-	label.text=p_name
+	#label.text=p_name
+	tab_button.text = p_name
 ## 播放上一首
 func _on_last_button_pressed() -> void:
 	var current_list = get_current_list()
@@ -168,13 +170,11 @@ func _on_last_button_pressed() -> void:
 				current_list.play_random_music()
 			2:
 				current_list.play_last_music()
-		change_play_status(true)
 
 
 ## 播放/暂停
 func _on_status_button_pressed() -> void:
 	music_status_changed.emit()
-	change_play_status(not is_playing)
 	print("[Music Module] music_status_changed emitted")
 
 ## 播放下一首
@@ -188,7 +188,6 @@ func _on_next_button_pressed() -> void:
 				current_list.play_random_music()
 			2:
 				current_list.play_next_music()#单曲循环切换按顺序播放下一首
-		change_play_status(true)
 
 ## 切换 Tab 列表
 func _on_tab_container_tab_changed(p_tab_index: int) -> void:
@@ -295,14 +294,7 @@ func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
 		target_list.remove_music(p_music_name)
 
 #----辅助函数
-##切换播放状态
-func change_play_status(_is_playing: bool) -> void:
-	is_playing = _is_playing
-	match is_playing:
-		true:
-			status_button.icon= play_icon
-		false:
-			status_button.icon= pause_icon
+	
 ## 检查指定音乐是否已存在于某个列表中
 func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
 	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList

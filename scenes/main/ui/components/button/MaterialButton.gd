@@ -83,6 +83,55 @@ enum IconLayoutMode {
 		padding_vertical = value
 		_update_layout()
 
+## 是否裁剪超出的文字
+@export var clip_button_text: bool = false:
+	set(value):
+		clip_button_text = value
+		clip_text = value
+		_update_layout()
+
+## 文字超出时的行为 (需要启用 clip_button_text)
+@export var text_overrun: TextServer.OverrunBehavior = TextServer.OVERRUN_NO_TRIMMING:
+	set(value):
+		text_overrun = value
+		text_overrun_behavior = value
+		_update_layout()
+
+@export_group("文字滚动")
+
+## 是否启用文字滚动效果 (当文字超出时自动滚动)
+@export var enable_text_scroll: bool = false:
+	set(value):
+		enable_text_scroll = value
+		_setup_scroll_label()
+		_update_scroll()
+
+## 滚动速度 (像素/秒)
+@export_range(0, 200, 5) var scroll_speed: float = 50.0
+
+## 滚动前的等待时间 (秒)
+@export_range(0.0, 5.0, 0.1) var scroll_delay: float = 1.0
+
+## 滚动到末尾后的等待时间 (秒)
+@export_range(0.0, 5.0, 0.1) var scroll_end_delay: float = 1.0
+
+## 文字间隔 (用于循环滚动时的间距)
+@export_range(0, 200, 5) var scroll_gap: float = 50.0
+
+## 滚动模式
+@export_enum("来回滚动", "循环滚动") var scroll_mode: int = 1:
+	set(value):
+		scroll_mode = value
+		if is_inside_tree() and enable_text_scroll:
+			_update_scroll()
+
+## 循环滚动时重复显示的文字数量 (2-5份，数量越多循环越流畅)
+@export_range(2, 5, 1) var scroll_repeat_count: int = 3:
+	set(value):
+		scroll_repeat_count = value
+		if is_inside_tree() and enable_text_scroll and scroll_mode == 1:
+			_update_scroll()
+
 # 内部节点
 var _icon_texture_rect: TextureRect
 var _ripple_panel: ColorRect
@@ -91,6 +140,13 @@ var _ripple_fade_tween: Tween    # 淡出动画
 var _ripple_material: ShaderMaterial
 var _click_position: Vector2 = Vector2.ZERO
 var _updating: bool = false  # 防止循环调用
+
+# 文字滚动相关
+var _scroll_label: Label
+var _scroll_container: Control
+var _scroll_tween: Tween
+var _text_width: float = 0.0
+var _is_scrolling: bool = false
 
 # Material Design尺寸定义 (dp)
 const SIZE_MAP = {
@@ -103,6 +159,7 @@ const SIZE_MAP = {
 
 func _ready() -> void:
 	_setup_button()
+	_setup_scroll_label()
 	_update_button_style()
 	_update_icon()
 	_update_layout()
@@ -113,12 +170,21 @@ func _ready() -> void:
 			button_down.connect(_on_button_down)
 		if not button_up.is_connected(_on_button_up):
 			button_up.connect(_on_button_up)
+	
+	# 延迟启动滚动检测
+	if enable_text_scroll:
+		await get_tree().process_frame
+		_update_scroll()
 
 func _setup_button() -> void:
 	# 设置基础属性
 	clip_contents = true
 	focus_mode = Control.FOCUS_ALL
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	
+	# 应用文字裁剪设置
+	clip_text = clip_button_text
+	text_overrun_behavior = text_overrun
 	
 	# 创建涟漪效果层 (先创建，确保在图标下面)
 	if enable_ripple and not _ripple_panel:
@@ -265,8 +331,8 @@ func _update_layout() -> void:
 				# 图标 + 文字:图标在左侧，垂直居中
 				icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 				
-				# 重置最小宽度 (如果有必要)
-				if custom_minimum_size.x > 0:
+				# 重置最小宽度 (如果有必要，但启用clip_text时保留宽度)
+				if custom_minimum_size.x > 0 and not clip_button_text:
 					custom_minimum_size.x = 0
 				
 				var button_height = custom_minimum_size.y
@@ -332,7 +398,9 @@ func _update_layout() -> void:
 	else:
 		# 只有文字:恢复长方形按钮
 		alignment = HORIZONTAL_ALIGNMENT_CENTER
-		custom_minimum_size.x = 0  # 重置宽度限制
+		# 启用clip_text时保留宽度，否则重置
+		if not clip_button_text:
+			custom_minimum_size.x = 0
 		
 		# 重置边距和圆角
 		var size_config = SIZE_MAP.get(button_size, SIZE_MAP[ButtonSize.STANDARD36])
@@ -459,6 +527,10 @@ func _notification(what: int) -> void:
 		if _ripple_material:
 			_ripple_material.set_shader_parameter("button_size", size)
 			# corner_radius 在 _update_layout 中已经处理
+		# 尺寸改变时更新滚动
+		if enable_text_scroll:
+			_update_scroll_container_rect()
+			_update_scroll()
 
 # 公共方法:方便的设置方法
 func set_material_style(size: ButtonSize, icon_tex: Texture2D = null, label: String = "") -> void:
@@ -512,3 +584,213 @@ func set_text_style(text_color: Color = Color(0.4, 0.6, 1.0)) -> void:
 	_create_stylebox("pressed", Color(text_color.r, text_color.g, text_color.b, 0.12), radius)
 	
 	add_theme_color_override("font_color", text_color)
+
+# ==================== 文字滚动相关 ====================
+
+func _setup_scroll_label() -> void:
+	if not is_inside_tree():
+		return
+	
+	if enable_text_scroll:
+		# 隐藏按钮自带的文字
+		add_theme_color_override("font_color", Color.TRANSPARENT)
+		
+		# 创建裁剪容器
+		if not _scroll_container:
+			_scroll_container = Control.new()
+			_scroll_container.name = "ScrollContainer"
+			_scroll_container.clip_contents = true
+			_scroll_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			add_child(_scroll_container)
+		
+		# 创建滚动文字标签
+		if not _scroll_label:
+			_scroll_label = Label.new()
+			_scroll_label.name = "ScrollLabel"
+			_scroll_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_scroll_container.add_child(_scroll_label)
+		
+		# 同步字体设置
+		_sync_label_theme()
+		_scroll_label.text = text
+		
+		# 更新容器位置
+		_update_scroll_container_rect()
+	else:
+		# 恢复按钮文字颜色
+		remove_theme_color_override("font_color")
+		
+		# 停止滚动
+		_stop_scroll()
+		
+		# 移除滚动标签
+		if _scroll_label:
+			_scroll_label.queue_free()
+			_scroll_label = null
+		if _scroll_container:
+			_scroll_container.queue_free()
+			_scroll_container = null
+
+func _sync_label_theme() -> void:
+	if not _scroll_label:
+		return
+	
+	# 从按钮复制字体设置
+	var font = get_theme_font("font")
+	var font_size = get_theme_font_size("font_size")
+	var font_color = get_theme_color("font_color")
+	
+	if font:
+		_scroll_label.add_theme_font_override("font", font)
+	if font_size > 0:
+		_scroll_label.add_theme_font_size_override("font_size", font_size)
+	
+	# 使用原本的字体颜色（不是透明的）
+	_scroll_label.add_theme_color_override("font_color", font_color if font_color.a > 0 else Color.WHITE)
+
+func _update_scroll_container_rect() -> void:
+	if not _scroll_container:
+		return
+	
+	var has_icon = button_icon != null
+	var content_left = padding_horizontal
+	var content_right = padding_horizontal
+	
+	# 如果有图标在左侧，调整左边距
+	if has_icon and icon_layout_mode == IconLayoutMode.ICON_LEFT:
+		content_left = padding_horizontal + icon_size + icon_text_gap
+	
+	# 计算容器区域
+	var container_x = content_left
+	var container_width = size.x - content_left - content_right
+	var container_height = size.y - padding_vertical * 2
+	
+	_scroll_container.position = Vector2(container_x, padding_vertical)
+	_scroll_container.size = Vector2(container_width, container_height)
+	
+	# 更新标签位置（垂直居中）
+	if _scroll_label:
+		_scroll_label.position.y = (container_height - _scroll_label.size.y) / 2.0
+
+func _update_scroll() -> void:
+	if not is_inside_tree() or not enable_text_scroll or not _scroll_label:
+		return
+	
+	# 更新容器位置
+	_update_scroll_container_rect()
+	
+	# 设置文字内容（循环模式下需要重复显示）
+	var is_loop_mode = (scroll_mode == 1)
+	if is_loop_mode:
+		# 循环滚动：显示文字的多份拷贝，用空格隔开
+		var gap_count = int(scroll_gap / 4)  # 粗略估算空格数
+		var gap_text = ""
+		for i in gap_count:
+			gap_text += " "
+		
+		# 根据 scroll_repeat_count 重复文字
+		var repeated_text = ""
+		for i in scroll_repeat_count:
+			repeated_text += text
+			if i < scroll_repeat_count - 1:
+				repeated_text += gap_text
+		_scroll_label.text = repeated_text
+	else:
+		_scroll_label.text = text
+	
+	await get_tree().process_frame  # 等待一帧让Label更新尺寸
+	
+	if not _scroll_label:
+		return
+	
+	# 计算单个文字的宽度
+	if is_loop_mode:
+		# 临时设置单个文字来测量宽度
+		var original_text = _scroll_label.text
+		_scroll_label.text = text
+		await get_tree().process_frame
+		_text_width = _scroll_label.size.x
+		_scroll_label.text = original_text
+		await get_tree().process_frame
+	else:
+		_text_width = _scroll_label.size.x
+	
+	var container_width = _scroll_container.size.x if _scroll_container else 0.0
+	
+	# 重置位置
+	_scroll_label.position.x = 0
+	
+	# 如果文字超出容器，开始滚动
+	if _text_width > container_width and container_width > 0:
+		_start_scroll()
+	else:
+		_stop_scroll()
+
+func _start_scroll() -> void:
+	if _is_scrolling:
+		return
+	
+	_is_scrolling = true
+	_do_scroll_animation()
+
+func _stop_scroll() -> void:
+	_is_scrolling = false
+	if _scroll_tween and _scroll_tween.is_valid():
+		_scroll_tween.kill()
+		_scroll_tween = null
+	
+	if _scroll_label:
+		_scroll_label.position.x = 0
+
+func _do_scroll_animation() -> void:
+	if not _is_scrolling or not _scroll_label or not _scroll_container:
+		return
+	
+	var container_width = _scroll_container.size.x
+	var scroll_distance = _text_width - container_width
+	
+	if scroll_distance <= 0:
+		_stop_scroll()
+		return
+	
+	# 停止之前的动画
+	if _scroll_tween and _scroll_tween.is_valid():
+		_scroll_tween.kill()
+	
+	_scroll_tween = create_tween()
+	_scroll_tween.set_loops()  # 无限循环
+	
+	var is_loop_mode = (scroll_mode == 1)
+	if is_loop_mode:
+		# 循环滚动模式：无缝循环
+		# 文字已经重复显示，只需要滚动到第一份文字完全消失的位置，然后瞬间重置
+		var total_distance = _text_width + scroll_gap
+		var duration = total_distance / scroll_speed
+		
+		# 等待 -> 从0滚动到-(文字宽度+间隔) -> 瞬间重置到0
+		_scroll_tween.tween_interval(scroll_delay)
+		_scroll_tween.tween_property(_scroll_label, "position:x", -total_distance, duration).set_trans(Tween.TRANS_LINEAR)
+		_scroll_tween.tween_callback(func(): 
+			if _scroll_label:
+				_scroll_label.position.x = 0
+		)
+	else:
+		# 来回滚动模式
+		var duration = scroll_distance / scroll_speed
+		
+		# 等待 -> 滚动到末尾 -> 等待 -> 滚动回开头
+		_scroll_tween.tween_interval(scroll_delay)
+		_scroll_tween.tween_property(_scroll_label, "position:x", -scroll_distance, duration).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		_scroll_tween.tween_interval(scroll_end_delay)
+		_scroll_tween.tween_property(_scroll_label, "position:x", 0.0, duration).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+
+# 重写 text 属性的 setter 以支持滚动更新
+func _set(property: StringName, value: Variant) -> bool:
+	if property == "text":
+		# 调用父类设置
+		text = value
+		# 更新滚动
+		if enable_text_scroll and _scroll_label and is_inside_tree():
+			call_deferred("_update_scroll")
+		return false  # 返回 false 让父类也处理
+	return false
