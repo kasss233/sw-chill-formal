@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://do56ajkuwsf0t"]
+[gd_scene load_steps=23 format=3 uid="uid://do56ajkuwsf0t"]
 
 [ext_resource type="Script" uid="uid://b7qsxbprouywv" path="res://scenes/main/ui/music_module/music_module.gd" id="1_t37u8"]
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://xa7jb02fiadl" path="res://assets/ui/music_icons/playlist_play_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="13_gopd7"]
 [ext_resource type="Texture2D" uid="uid://b6fkrv0egmeyf" path="res://assets/ui/music_icons/skip_previous_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="14_ddwy2"]
 [ext_resource type="Texture2D" uid="uid://x21401o38ejx" path="res://assets/ui/music_icons/skip_next_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="15_n2uom"]
+[ext_resource type="Texture2D" uid="uid://cvgte37i3ry7r" path="res://assets/ui/music_icons/add_circle_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48 (3).svg" id="16_hycke"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2p7cx"]
 shader = ExtResource("10_5sru0")
@@ -57,7 +58,6 @@ random_icon = ExtResource("8_2p7cx")
 single_icon = ExtResource("9_ss7lu")
 
 [node name="TabPanel" type="PanelContainer" parent="."]
-visible = false
 material = SubResource("ShaderMaterial_2p7cx")
 layout_mode = 1
 anchors_preset = 2
@@ -120,9 +120,16 @@ theme = ExtResource("8_hggt5")
 icon = ExtResource("15_n2uom")
 flat = true
 
+[node name="AddButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("8_hggt5")
+icon = ExtResource("16_hycke")
+flat = true
+
 [connection signal="tab_changed" from="TabPanel/TabContainer" to="." method="_on_tab_container_tab_changed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/TabButton" to="." method="_on_tab_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/ModeButton" to="." method="_on_mode_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LastButton" to="." method="_on_last_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/StatusButton" to="." method="_on_status_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/AddButton" to="." method="_on_add_button_pressed"]

@@ -32,21 +32,12 @@ func _init_audio_players() -> void:
 		
 	# 加载音效
 	for item in audio_res.sound_effect:
-		var audio = AudioStreamPlayer.new()
-		audio.name = item.name
-		audio.stream = item.stream
-		sound_effect_container.add_child(audio)
-		print("[AudioPlayer] Loaded sound effect: %s" % item.name)
+		add_sound_effect_from_resource(item)
 		
 	# 加载背景音乐
 	for item in audio_res.BGM:
-		var audio = AudioStreamPlayer.new()
-		audio.name = item.name
-		audio.stream = item.stream
-		audio.finished.connect(_on_music_finished)
-		bgm_container.add_child(audio)
-		print("[AudioPlayer] Loaded BGM: %s" % item.name)
-
+		add_bgm_from_resource(item)
+	audio_res.bgm_added.connect(_on_bgm_added)
 ## 连接来自 UI 的播放控制信号
 func _connect_ui_signals() -> void:
 	if ui:
@@ -108,3 +99,22 @@ func _on_music_status_changed() -> void:
 	toggle_bgm_playback()
 func _on_music_finished() -> void:
 	ui.play_next_music()
+func _on_bgm_added(_name: String) -> void:
+	var item = audio_res.get_bgm_item_by_name(_name)
+	if item:
+		add_bgm_from_resource(item)
+
+## ---辅助函数---
+func add_bgm_from_resource(audio_item:AudioItem):
+	var audio = AudioStreamPlayer.new()
+	audio.name = audio_item.name
+	audio.stream = audio_item.stream
+	audio.finished.connect(_on_music_finished)
+	bgm_container.add_child(audio)
+	print("[AudioPlayer] Added BGM from resource: %s" % audio_item.name)
+func add_sound_effect_from_resource(audio_item:AudioItem):
+	var audio = AudioStreamPlayer.new()
+	audio.name = audio_item.name
+	audio.stream = audio_item.stream
+	sound_effect_container.add_child(audio)
+	print("[AudioPlayer] Added sound effect from resource: %s" % audio_item.name)

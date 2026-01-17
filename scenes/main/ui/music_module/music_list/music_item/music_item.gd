@@ -8,7 +8,8 @@ extends Control
 signal music_changed(p_name: String)
 ## 当点击选项按钮时发出，传递音乐名称
 signal music_options_requested(p_name: String)
-
+## 当点击删除按钮时发出，传递音乐名称
+signal music_removed(p_name: String)
 # --- 导出变量/节点引用 ---
 ## 音乐名称
 @export var music_name: String
@@ -40,3 +41,7 @@ func _on_button_pressed() -> void:
 
 func _on_option_button_pressed() -> void:
 	music_options_requested.emit(music_name)
+
+
+func _on_remove_button_pressed() -> void:
+	music_removed.emit(music_name)

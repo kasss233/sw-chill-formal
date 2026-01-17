@@ -54,7 +54,7 @@ func _setup_initial_music() -> void:
 		for item in audio_res.BGM:
 			all_music_list.add_music(item.name)
 			print("[Music Module] Loaded music item: %s" % item.name)
-
+	audio_res.bgm_added.connect(_on_bgm_added)
 # --- 公有 API ---
 ## 添加一个新的音乐列表
 func add_music_list(p_name: String) -> void:
@@ -67,6 +67,7 @@ func add_music_list(p_name: String) -> void:
 	# 连接列表信号
 	music_list_instance.music_changed.connect(_on_music_changed)
 	music_list_instance.music_options_requested.connect(_on_music_options_requested)
+	music_list_instance.music_remove_requested.connect(_on_music_removed.bind(p_name))
 ## 向指定音乐列表添加一首音乐
 func add_music(p_list_name: String, p_music_name: String) -> void:
 	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
@@ -229,6 +230,49 @@ func _on_mode_button_pressed() -> void:
 			mode_button.icon= random_icon
 		2:
 			mode_button.icon= single_icon
+			
+func _on_add_button_pressed() -> void:
+	var file_dialog = FileDialog.new()
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	file_dialog.display_mode= FileDialog.DISPLAY_LIST
+	file_dialog.filters = ["*.ogg ; OGG Audio", "*.wav ; WAV Audio", "*.mp3 ; MP3 Audio"]
+	file_dialog.files_selected.connect(_on_files_selected)
+	add_child(file_dialog)
+	file_dialog.popup_centered()
+func _on_files_selected(p_files: Array) -> void:
+	for file_path in p_files:
+		var file = FileAccess.open(file_path, FileAccess.READ)
+		if file:
+			var music_name = file.get_path().get_file().get_basename()
+			audio_res.add_bgm(music_name, file_path)
+##当有新的 BGM 被添加到资源时的回调
+func _on_bgm_added(_name: String) -> void:
+	var all_music_list = tab_container.get_node_or_null("全部音乐") as MusicList
+	if all_music_list:
+		all_music_list.add_music(_name)
+## 当请求删除特定音乐时的回调
+func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
+	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	#如果列表是全部音乐，则弹出确认对话框
+	if p_list_name=="全部音乐":
+		var confirm_dialog = ConfirmationDialog.new()
+		confirm_dialog.dialog_text="确定要删除音乐%s吗？这将彻底移除该音乐。" % p_music_name
+		confirm_dialog.confirmed.connect(func():
+			#从所有列表中移除该音乐
+			for child in tab_container.get_children():
+				if child is MusicList:
+					child.remove_music(p_music_name)
+			#从资源中移除该音乐
+			var item = audio_res.get_bgm_item_by_name(p_music_name)
+			if item:
+				audio_res.remove_bgm(p_music_name)
+		)
+		add_child(confirm_dialog)
+		confirm_dialog.popup_centered()
+		return
+	if target_list:
+		target_list.remove_music(p_music_name)
 #----辅助函数
 ##切换播放状态
 func change_play_status(_is_playing: bool) -> void:

@@ -1,9 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://b68ebovhfcxrm"]
+[gd_scene load_steps=12 format=3 uid="uid://b68ebovhfcxrm"]
 
 [ext_resource type="Script" uid="uid://uj0salxxnqp5" path="res://scenes/main/ui/music_module/music_list/music_item/music_item.gd" id="1_f10aj"]
 [ext_resource type="FontFile" uid="uid://dpolhfxfwsb0k" path="res://assets/ui/fonts/HyliaSerifBeta-Regular.otf" id="2_xpfs7"]
 [ext_resource type="Theme" uid="uid://bqs6ja1ljq7qc" path="res://assets/ui/themes/easybutton.tres" id="3_wb3qj"]
 [ext_resource type="Texture2D" uid="uid://cvgte37i3ry7r" path="res://assets/ui/music_icons/add_circle_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48 (3).svg" id="3_xpfs7"]
+[ext_resource type="Texture2D" uid="uid://cgeqypbnt0ug4" path="res://assets/ui/icons/cancel_24dp.svg" id="5_d6c2u"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wb3qj"]
 content_margin_left = 4.0
@@ -75,5 +76,12 @@ theme_override_constants/icon_max_width = 20
 icon = ExtResource("3_xpfs7")
 flat = true
 
+[node name="RemoveButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("3_wb3qj")
+icon = ExtResource("5_d6c2u")
+flat = true
+
 [connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/OptionButton" to="." method="_on_option_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/RemoveButton" to="." method="_on_remove_button_pressed"]

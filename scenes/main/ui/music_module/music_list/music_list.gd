@@ -10,7 +10,8 @@ signal music_changed(p_name: String)
 signal music_favoured(p_name: String)
 ## 当请求显示特定音乐的选项菜单时发出
 signal music_options_requested(music_name: String, list_name: String)
-
+## 当请求删除特定音乐时发出
+signal music_remove_requested(music_name: String)
 # --- 导出项与节点引用 ---
 ## 音乐列表项场景
 @export var music_item_scene: PackedScene
@@ -57,7 +58,7 @@ func add_music(p_name: String) -> void:
 	# 连接信号
 	m.music_changed.connect(_on_music_changed)
 	m.music_options_requested.connect(_on_music_options_requested)
-
+	m.music_removed.connect(_on_music_removed)
 ## 从列表中移除一首音乐
 func remove_music(p_name: String) -> void:
 	for child in vbox.get_children():
@@ -123,3 +124,6 @@ func _on_music_changed(p_name: String) -> void:
 
 func _on_music_options_requested(p_name: String) -> void:
 	music_options_requested.emit(p_name, self.name)
+
+func _on_music_removed(p_name: String) -> void:
+	music_remove_requested.emit(p_name)
