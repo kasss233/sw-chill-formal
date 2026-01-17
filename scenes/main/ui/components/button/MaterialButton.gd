@@ -592,8 +592,13 @@ func _setup_scroll_label() -> void:
 		return
 	
 	if enable_text_scroll:
-		# 隐藏按钮自带的文字
+		# 隐藏按钮自带的文字（所有状态）
 		add_theme_color_override("font_color", Color.TRANSPARENT)
+		add_theme_color_override("font_hover_color", Color.TRANSPARENT)
+		add_theme_color_override("font_pressed_color", Color.TRANSPARENT)
+		add_theme_color_override("font_focus_color", Color.TRANSPARENT)
+		add_theme_color_override("font_disabled_color", Color.TRANSPARENT)
+		add_theme_color_override("font_outline_color", Color.TRANSPARENT)
 		
 		# 创建裁剪容器
 		if not _scroll_container:
@@ -617,8 +622,13 @@ func _setup_scroll_label() -> void:
 		# 更新容器位置
 		_update_scroll_container_rect()
 	else:
-		# 恢复按钮文字颜色
+		# 恢复按钮文字颜色（移除所有覆盖）
 		remove_theme_color_override("font_color")
+		remove_theme_color_override("font_hover_color")
+		remove_theme_color_override("font_pressed_color")
+		remove_theme_color_override("font_focus_color")
+		remove_theme_color_override("font_disabled_color")
+		remove_theme_color_override("font_outline_color")
 		
 		# 停止滚动
 		_stop_scroll()
