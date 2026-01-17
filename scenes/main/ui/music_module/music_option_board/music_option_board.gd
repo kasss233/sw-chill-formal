@@ -14,9 +14,9 @@ signal board_closed()
 
 # --- 节点引用 ---
 ## 选项容器
-@onready var vbox: VBoxContainer = $VBoxContainer
+@onready var vbox: VBoxContainer =$PanelContainer/VBoxContainer
 ## 标题标签（显示当前操作的音乐名）
-@onready var title_label: Label = $VBoxContainer/HBoxContainer/Label
+@onready var title_label: Label = $PanelContainer/VBoxContainer/HBoxContainer2/Label
 
 # --- 公有 API ---
 ## 设置当前操作的音乐名称

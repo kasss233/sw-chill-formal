@@ -1,6 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://v6iy44md1r4i"]
+[gd_scene load_steps=6 format=3 uid="uid://v6iy44md1r4i"]
 
 [ext_resource type="Script" uid="uid://d134p80w63xx7" path="res://scenes/main/ui/music_module/music_option_board/music_option_item/music_option_item.gd" id="1_3ax4r"]
+[ext_resource type="Texture2D" uid="uid://do5k1eix63y7d" path="res://assets/ui/music_icons/check_box_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48 (1).svg" id="2_kaqxx"]
+[ext_resource type="Texture2D" uid="uid://cpmv2uikr77tq" path="res://assets/ui/music_icons/check_box_outline_blank_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="3_ug4ij"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ug4ij"]
+
+[sub_resource type="Theme" id="Theme_ug4ij"]
+CheckBox/constants/icon_max_width = 20
+CheckBox/icons/checked = ExtResource("2_kaqxx")
+CheckBox/icons/checked_disabled = ExtResource("2_kaqxx")
+CheckBox/icons/unchecked = ExtResource("3_ug4ij")
+CheckBox/styles/focus = SubResource("StyleBoxEmpty_ug4ij")
 
 [node name="MusicOptionItem" type="Control"]
 layout_mode = 3
@@ -13,13 +24,15 @@ script = ExtResource("1_3ax4r")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_right = 33.0
+offset_bottom = 28.0
 
 [node name="CheckBox" type="CheckBox" parent="HBoxContainer"]
 layout_mode = 2
+theme = SubResource("Theme_ug4ij")
 
 [node name="Label" type="Label" parent="HBoxContainer"]
 layout_mode = 2
+text = "music_name"
 
 [connection signal="toggled" from="HBoxContainer/CheckBox" to="." method="_on_check_box_toggled"]

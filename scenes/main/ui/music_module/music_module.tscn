@@ -4,26 +4,32 @@
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
 [ext_resource type="PackedScene" uid="uid://cxdwb75116e2w" path="res://scenes/main/ui/music_module/music_option_board/music_option_board.tscn" id="4_cfhda"]
 [ext_resource type="PackedScene" uid="uid://gh3p734runtb" path="res://scenes/main/ui/music_module/music_list/music_list.tscn" id="4_x6s46"]
-[ext_resource type="Texture2D" uid="uid://d2gv2oruwkppb" path="res://assets/ui/music_icons/pause.png" id="5_t8g72"]
-[ext_resource type="Texture2D" uid="uid://cemlmm3ekg8i0" path="res://assets/ui/music_icons/play.png" id="6_fkviu"]
+[ext_resource type="Texture2D" uid="uid://tjapaqv7cja7" path="res://assets/ui/music_icons/pause_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="5_0xa2x"]
+[ext_resource type="Texture2D" uid="uid://cm2nqosp7mnap" path="res://assets/ui/music_icons/play_arrow_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="6_hycke"]
+[ext_resource type="Texture2D" uid="uid://de10r3xqer81s" path="res://assets/ui/music_icons/repeat_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="7_5sru0"]
 [ext_resource type="FontFile" uid="uid://dpolhfxfwsb0k" path="res://assets/ui/fonts/HyliaSerifBeta-Regular.otf" id="7_t8g72"]
-[ext_resource type="Texture2D" uid="uid://inu448nffxae" path="res://assets/ui/music_icons/playlist.png" id="8_57bae"]
+[ext_resource type="Texture2D" uid="uid://cllehb5o2ohcp" path="res://assets/ui/music_icons/shuffle_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="8_2p7cx"]
 [ext_resource type="Theme" uid="uid://vrneiie86tq7" path="res://assets/ui/themes/music_buttons.tres" id="8_hggt5"]
-[ext_resource type="Texture2D" uid="uid://bdgvjcmlqi7as" path="res://assets/ui/music_icons/shuffle.png" id="8_n0dq4"]
-[ext_resource type="Texture2D" uid="uid://dc20dfobocl8k" path="res://assets/ui/music_icons/repeat-once.png" id="9_0xa2x"]
-[ext_resource type="Texture2D" uid="uid://dk2cicj2ymt7w" path="res://assets/ui/music_icons/back.png" id="9_hggt5"]
-[ext_resource type="Texture2D" uid="uid://cyd0djnagiovw" path="res://assets/ui/music_icons/repeat.png" id="10_0xa2x"]
+[ext_resource type="Texture2D" uid="uid://baqcqrlontxyr" path="res://assets/ui/music_icons/repeat_one_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="9_ss7lu"]
 [ext_resource type="Shader" uid="uid://cp2pljceouuqp" path="res://assets/ui/themes/dark_gaussian_blur.gdshader" id="10_5sru0"]
-[ext_resource type="StyleBox" uid="uid://cbcowdy5ofxqb" path="res://assets/ui/themes/panel_style_box_flat.tres" id="10_hycke"]
-[ext_resource type="Texture2D" uid="uid://vnqy1d2oqkl7" path="res://assets/ui/music_icons/next.png" id="10_n0dq4"]
+[ext_resource type="Texture2D" uid="uid://xa7jb02fiadl" path="res://assets/ui/music_icons/playlist_play_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="13_gopd7"]
+[ext_resource type="Texture2D" uid="uid://b6fkrv0egmeyf" path="res://assets/ui/music_icons/skip_previous_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="14_ddwy2"]
+[ext_resource type="Texture2D" uid="uid://x21401o38ejx" path="res://assets/ui/music_icons/skip_next_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="15_n2uom"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_2p7cx"]
 shader = ExtResource("10_5sru0")
 shader_parameter/strength = 3.3
 shader_parameter/mix_percentage = 0.3
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xa2x"]
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
 [sub_resource type="Theme" id="Theme_hycke"]
-PanelContainer/styles/panel = ExtResource("10_hycke")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_0xa2x")
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_au6hm"]
 content_margin_right = 482.0
@@ -32,7 +38,7 @@ content_margin_right = 482.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_n0dq4"]
 font = ExtResource("7_t8g72")
-font_size = 40
+font_size = 30
 
 [node name="MusicModule" type="Control"]
 layout_mode = 3
@@ -44,11 +50,11 @@ script = ExtResource("1_t37u8")
 music_list_scene = ExtResource("4_x6s46")
 option_board_scene = ExtResource("4_cfhda")
 audio_res = ExtResource("2_jnxsf")
-play_icon = ExtResource("5_t8g72")
-pause_icon = ExtResource("6_fkviu")
-order_icon = ExtResource("10_0xa2x")
-random_icon = ExtResource("8_n0dq4")
-single_icon = ExtResource("9_0xa2x")
+play_icon = ExtResource("5_0xa2x")
+pause_icon = ExtResource("6_hycke")
+order_icon = ExtResource("7_5sru0")
+random_icon = ExtResource("8_2p7cx")
+single_icon = ExtResource("9_ss7lu")
 
 [node name="TabPanel" type="PanelContainer" parent="."]
 visible = false
@@ -87,31 +93,31 @@ layout_mode = 2
 [node name="TabButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
-icon = ExtResource("8_57bae")
+icon = ExtResource("13_gopd7")
 flat = true
 
 [node name="ModeButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
-icon = ExtResource("10_0xa2x")
+icon = ExtResource("7_5sru0")
 flat = true
 
 [node name="LastButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
-icon = ExtResource("9_hggt5")
+icon = ExtResource("14_ddwy2")
 flat = true
 
 [node name="StatusButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
-icon = ExtResource("6_fkviu")
+icon = ExtResource("6_hycke")
 flat = true
 
 [node name="NextButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("8_hggt5")
-icon = ExtResource("10_n0dq4")
+icon = ExtResource("15_n2uom")
 flat = true
 
 [connection signal="tab_changed" from="TabPanel/TabContainer" to="." method="_on_tab_container_tab_changed"]
