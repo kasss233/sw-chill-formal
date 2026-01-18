@@ -15,6 +15,13 @@ enum MenuSize {
 	COMFORTABLE  ## 舒适尺寸
 }
 
+## 编辑器配置的菜单项
+@export var editor_items: Array[MaterialMenuItemConfig] = []:
+	set(value):
+		editor_items = value
+		if Engine.is_editor_hint() and is_inside_tree():
+			_rebuild_from_editor_items()
+
 ## 菜单尺寸
 @export var menu_size: MenuSize = MenuSize.STANDARD:
 	set(value):
@@ -111,6 +118,11 @@ enum MenuSize {
 ## 子菜单箭头图标
 @export var default_submenu_arrow: Texture2D
 
+## 编辑器菜单项信号连接配置
+## 格式: 每个元素为 "节点路径::方法名" 的形式
+## 例如: [".:_on_menu_item_pressed", "../SomeNode:handle_menu"]
+@export var editor_signal_connections: Array[String] = []
+
 # 内部节点
 var _items_container: VBoxContainer
 var _show_tween: Tween
@@ -138,6 +150,10 @@ func _ready() -> void:
 		visible = false
 		modulate.a = 0
 	
+	# 从编辑器配置创建菜单项
+	if editor_items.size() > 0:
+		_rebuild_from_editor_items()
+	
 	# 收集已有的子节点作为菜单项
 	_collect_existing_items()
 
@@ -160,6 +176,7 @@ func _ensure_container() -> void:
 		_items_container = VBoxContainer.new()
 		_items_container.name = "ItemsContainer"
 		_items_container.add_theme_constant_override("separation", 0)
+		_items_container.mouse_filter = Control.MOUSE_FILTER_PASS
 		add_child(_items_container)
 	
 	# 查找或创建子菜单延迟显示定时器
@@ -334,6 +351,14 @@ func show_menu(at_position: Vector2 = Vector2.ZERO) -> void:
 	if at_position != Vector2.ZERO:
 		global_position = at_position
 	
+	# 设置高层级，确保菜单在所有元素之上
+	z_index = 1000
+	
+	# 将菜单移到父节点的最后，确保在所有兄弟节点之上渲染
+	var parent = get_parent()
+	if parent:
+		parent.move_child(self, parent.get_child_count() - 1)
+	
 	# 确保菜单在屏幕内
 	_clamp_to_screen()
 	
@@ -465,6 +490,9 @@ func _show_submenu(item: MaterialMenuItem) -> void:
 			item.submenu.get_parent().remove_child(item.submenu)
 		get_parent().add_child(item.submenu)
 	
+	# 子菜单层级应该比父菜单更高
+	item.submenu.z_index = z_index + 1
+	
 	# 在菜单项右侧显示子菜单
 	var submenu_pos = item.global_position + Vector2(size.x - padding, 0)
 	item.submenu.show_menu(submenu_pos)
@@ -504,6 +532,100 @@ func _collect_existing_items() -> void:
 		elif child is MaterialMenuSeparator:
 			if child not in _items:
 				_items.append(child)
+
+## 从编辑器配置重建菜单项
+func _rebuild_from_editor_items() -> void:
+	if not _items_container:
+		return
+	
+	# 清除现有的编辑器生成的项（标记为编辑器项）
+	for item in _items:
+		if is_instance_valid(item) and item.has_meta("from_editor"):
+			item.queue_free()
+	_items.clear()
+	
+	# 从配置数组创建菜单项
+	for item_config in editor_items:
+		if not item_config:
+			continue
+		
+		var item: Control = null
+		
+		if item_config.type == MaterialMenuItemConfig.ItemType.SEPARATOR:
+			# 添加分隔线
+			item = MaterialMenuSeparator.new()
+		else:
+			# 添加普通菜单项
+			var menu_item = MaterialMenuItem.new()
+			
+			menu_item.set_item(item_config.text, item_config.icon, item_config.shortcut)
+			menu_item.item_height = _get_item_height()
+			menu_item.hover_color = hover_color
+			menu_item.ripple_color = ripple_color
+			
+			# 设置可选中
+			if item_config.type == MaterialMenuItemConfig.ItemType.CHECKABLE:
+				var check_tex = default_check_icon if default_check_icon else preload("res://assets/ui/icons/check_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg")
+				menu_item.set_checkable(item_config.is_checked, check_tex)
+			
+			# 设置禁用状态
+			if item_config.is_disabled:
+				menu_item.disabled = true
+			
+			# 连接信号
+			var index = _items.size()
+			menu_item.pressed.connect(_on_item_pressed.bind(index))
+			menu_item.hovered.connect(_on_item_hovered.bind(menu_item))
+			
+			item = menu_item
+		
+		if item:
+			item.set_meta("from_editor", true)
+			_items_container.add_child(item)
+			_items.append(item)
+	
+	# 连接编辑器配置的信号
+	_connect_editor_signals()
+
+## 连接编辑器配置的信号
+func _connect_editor_signals() -> void:
+	if editor_signal_connections.is_empty():
+		return
+	
+	for connection_str in editor_signal_connections:
+		if connection_str.is_empty():
+			continue
+		
+		# 解析格式: "节点路径::方法名"
+		var parts = connection_str.split("::")
+		if parts.size() != 2:
+			push_warning("MaterialMenu: 无效的信号连接格式: %s，应为 '节点路径::方法名'" % connection_str)
+			continue
+		
+		var node_path = parts[0].strip_edges()
+		var method_name = parts[1].strip_edges()
+		
+		if node_path.is_empty() or method_name.is_empty():
+			push_warning("MaterialMenu: 信号连接配置不完整: %s" % connection_str)
+			continue
+		
+		# 获取目标节点
+		var target_node = get_node_or_null(node_path)
+		if not target_node:
+			push_warning("MaterialMenu: 找不到目标节点: %s" % node_path)
+			continue
+		
+		# 检查方法是否存在
+		if not target_node.has_method(method_name):
+			push_warning("MaterialMenu: 目标节点 %s 没有方法: %s" % [node_path, method_name])
+			continue
+		
+		# 连接信号（避免重复连接）
+		if not item_pressed.is_connected(target_node.get(method_name)):
+			var callable = Callable(target_node, method_name)
+			if not item_pressed.is_connected(callable):
+				item_pressed.connect(callable)
+				print("MaterialMenu: 已连接信号 item_pressed 到 %s::%s" % [node_path, method_name])
 
 ## 在编辑器中节点树变化时重新收集
 func _notification(what: int) -> void:

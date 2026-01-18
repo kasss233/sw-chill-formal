@@ -75,9 +75,11 @@ func create_menu() -> MaterialMenu:
 		menu = MaterialMenu.new()
 		menu.name = "DropdownMenu"
 		
-		# 添加到场景树
+		# 添加到按钮自身作为子节点
 		if is_inside_tree():
-			get_tree().current_scene.add_child(menu)
+			add_child(menu)
+			# 设置为顶层节点，确保 global_position 正确工作
+			menu.set_as_top_level(true)
 	
 	return menu
 
