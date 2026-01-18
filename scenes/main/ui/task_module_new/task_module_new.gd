@@ -32,7 +32,7 @@ func _ready() -> void:
 #============API==============
 func add_task(task: TaskData) -> void:
 	# 创建任务项
-	var t = task_item.instantiate() as TaskItem
+	var t = task_item.instantiate() as InnerPanel
 	
 	# 设置初始状态为不可见（用于动画）
 	t.modulate.a = 0.0
@@ -98,7 +98,7 @@ func remove_task(id: int) -> void:
 			var ui_index = _get_ui_index_for_task(i)
 			if ui_index >= 0 and ui_index < v_box_container.get_child_count():
 				var item = v_box_container.get_child(ui_index)
-				if item is TaskItem:
+				if item.has_method("set_task"):
 					v_box_container.remove_child(item)
 					item.queue_free()
 			
@@ -164,7 +164,7 @@ func mark_task_as_completed(id: int) -> void:
 			finished_task_cnt += 1
 			separator_index -= 1
 			
-			if item is TaskItem:
+			if item.has_method("set_task"):
 				item.set_task(task_data)
 			
 			_update_ui()
@@ -196,7 +196,7 @@ func mark_task_as_uncompleted(id: int) -> void:
 			task_cnt += 1
 			separator_index += 1
 			
-			if item is TaskItem:
+			if item.has_method("set_task"):
 				item.set_task(task_data)
 			
 			_update_ui()
@@ -271,11 +271,11 @@ func _on_v_box_container_reordered(from: int, to: int) -> void:
 		return
 	
 	# 获取被移动的任务项
-	if not (child is TaskItem):
+	if not child.has_method("set_task"):
 		_is_programmatic_reorder = false
 		return
 	
-	var item = child as TaskItem
+	var item = child
 	var task_data = item.task_data
 	
 	# 检查 task_data 是否有效
@@ -358,14 +358,14 @@ func _on_add_button_pressed() -> void:
 	add_task(TaskData.create_example(task_id))
 	task_id += 1
 
-func _on_task_item_content_changed(item: TaskItem) -> void:
+func _on_task_item_content_changed(item: InnerPanel) -> void:
 	# 查找并更新对应的任务数据
 	for i in range(all_tasks_data_list.size()):
 		if all_tasks_data_list[i].id == item.task_data.id:
 			all_tasks_data_list[i] = item.task_data
 			break
 
-func _on_item_delete_requested(item: TaskItem):
+func _on_item_delete_requested(item: InnerPanel):
 	var task_data = item.task_data
 	var ui_index = item.get_index()
 	
@@ -395,7 +395,7 @@ func _on_item_delete_requested(item: TaskItem):
 		_update_separator_position()
 		print("[%s]Deleted Task(id: %s) at ui_index %d" % [self.name, task_data.id, ui_index])
 
-func _on_task_state_changed(item: TaskItem):
+func _on_task_state_changed(item: InnerPanel):
 	var task_data = item.task_data
 	var ui_index = item.get_index()
 	
@@ -473,5 +473,5 @@ func _on_separator_toggled(toggled_on: bool) -> void:
 	# 控制已完成任务的可见性
 	for i in range(separator_index + 1, v_box_container.get_child_count()):
 		var child = v_box_container.get_child(i)
-		if child is TaskItem:
+		if child.has_method("set_task"):
 			child.visible = toggled_on

@@ -12,6 +12,8 @@ signal music_favoured(p_name: String)
 signal music_options_requested(music_name: String, list_name: String)
 ## 当请求删除特定音乐时发出
 signal music_remove_requested(music_name: String)
+## 当音乐分类改变时发出
+signal music_category_changed(music_name: String, category: String, checked: bool)
 # --- 导出项与节点引用 ---
 ## 音乐列表项场景
 @export var music_item_scene: PackedScene
@@ -59,6 +61,7 @@ func add_music(p_name: String) -> void:
 	m.music_changed.connect(_on_music_changed)
 	m.music_options_requested.connect(_on_music_options_requested)
 	m.music_removed.connect(_on_music_removed)
+	m.music_category_changed.connect(_on_music_category_changed)
 ## 从列表中移除一首音乐
 func remove_music(p_name: String) -> void:
 	for child in vbox.get_children():
@@ -113,6 +116,20 @@ func play_single_music() -> void:
 	if current_playing_index != -1:
 		play_music(current_playing_index)
 
+## 设置指定音乐的分类勾选状态
+func set_music_category_checked(p_music_name: String, category: String, checked: bool) -> void:
+	for child in vbox.get_children():
+		if child is MusicItem and child.get_music_name() == p_music_name:
+			child.set_category_checked(category, checked)
+			return
+
+## 获取指定音乐的分类勾选状态
+func get_music_category_checked(p_music_name: String, category: String) -> bool:
+	for child in vbox.get_children():
+		if child is MusicItem and child.get_music_name() == p_music_name:
+			return child.get_category_checked(category)
+	return false
+
 # --- 信号回调 ---
 func _on_music_changed(p_name: String) -> void:
 	music_changed.emit(p_name)
@@ -128,3 +145,6 @@ func _on_music_options_requested(p_name: String) -> void:
 
 func _on_music_removed(p_name: String) -> void:
 	music_remove_requested.emit(p_name)
+
+func _on_music_category_changed(p_name: String, category: String, checked: bool) -> void:
+	music_category_changed.emit(p_name, category, checked)

@@ -4,3 +4,4 @@
 /scenes/main/ui/test/
 .idea/
 .vscode/
+*.tmp

@@ -1,12 +1,12 @@
-class_name TaskItem
-extends PanelContainer
+@tool
+extends InnerPanel
 
-signal state_changed(item: TaskItem)
+signal state_changed(item: InnerPanel)
 signal edit_requested(id)
-signal delete_requested(item: TaskItem)
-signal content_changed(item: TaskItem)
-signal drag_started(item: TaskItem)
-signal drag_ended(item: TaskItem)
+signal delete_requested(item: InnerPanel)
+signal content_changed(item: InnerPanel)
+signal drag_started(item: InnerPanel)
+signal drag_ended(item: InnerPanel)
 
 @onready var complete_check_box: CheckBox = $MarginContainer/VBoxContainer/HBoxContainer/CompleteCheckBox
 @onready var due_time_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/DueTimeLabel
@@ -23,6 +23,8 @@ var is_editing: bool = false # 新增：用于判断当前状态
 var task_data: TaskData
 
 func _ready() -> void:
+	super._ready()  # 调用父类 InnerPanel 的 _ready()，确保 shader 初始化
+	
 	# 初始状态设置
 	mouse_filter = Control.MOUSE_FILTER_PASS 
 	
