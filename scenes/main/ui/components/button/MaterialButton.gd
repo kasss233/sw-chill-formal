@@ -18,6 +18,12 @@ enum IconLayoutMode {
 	ICON_TOP      ## 图标在上
 }
 
+enum ContentAlignment {
+	ALIGN_LEFT,   ## 靠左对齐
+	ALIGN_CENTER, ## 居中对齐 (默认)
+	ALIGN_RIGHT   ## 靠右对齐
+}
+
 ## 按钮尺寸
 @export var button_size: ButtonSize = ButtonSize.STANDARD36:
 	set(value):
@@ -46,6 +52,19 @@ enum IconLayoutMode {
 @export var icon_layout_mode: IconLayoutMode = IconLayoutMode.ICON_LEFT:
 	set(value):
 		icon_layout_mode = value
+		_update_button_style()
+		_update_layout()
+
+## 内容对齐方式 (图标+文字整体的位置)
+@export var content_alignment: ContentAlignment = ContentAlignment.ALIGN_CENTER:
+	set(value):
+		content_alignment = value
+		_update_layout()
+
+## 按钮最小宽度 (0 表示自动)
+@export_range(0, 500, 1) var min_width: int = 0:
+	set(value):
+		min_width = value
 		_update_button_style()
 		_update_layout()
 
@@ -234,6 +253,10 @@ func _update_button_style() -> void:
 	else:
 		custom_minimum_size.y = size_config["height"]
 	
+	# 设置最小宽度
+	if min_width > 0:
+		custom_minimum_size.x = min_width
+	
 	# 直接设置变量，不触发 setter
 	if icon_size == 20:  # 默认值,自动调整
 		icon_size = size_config["icon"]
@@ -297,21 +320,29 @@ func _update_layout() -> void:
 	if has_icon:
 		if has_text:
 			if icon_layout_mode == IconLayoutMode.ICON_TOP:
-				# 图标 + 文字:图标在上方，水平居中
-				icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				
+				# 图标 + 文字:图标在上方
 				# 确保有宽度
 				var current_width = size.x
 				if current_width <= 0:
 					current_width = custom_minimum_size.x
 				
-				_icon_texture_rect.position = Vector2(
-					(current_width - icon_size) / 2.0,
-					padding_vertical
-				)
+				# 根据内容对齐方式设置图标位置
+				var icon_x: float
+				match content_alignment:
+					ContentAlignment.ALIGN_LEFT:
+						icon_x = padding_horizontal
+						icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+						alignment = HORIZONTAL_ALIGNMENT_LEFT
+					ContentAlignment.ALIGN_RIGHT:
+						icon_x = current_width - padding_horizontal - icon_size
+						icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+						alignment = HORIZONTAL_ALIGNMENT_RIGHT
+					_: # ALIGN_CENTER
+						icon_x = (current_width - icon_size) / 2.0
+						icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+						alignment = HORIZONTAL_ALIGNMENT_CENTER
 				
-				# 调整文字对齐
-				alignment = HORIZONTAL_ALIGNMENT_CENTER
+				_icon_texture_rect.position = Vector2(icon_x, padding_vertical)
 				
 				# 确保有宽度以容纳图标
 				var min_width_for_icon = padding_horizontal * 2 + icon_size
@@ -329,30 +360,58 @@ func _update_layout() -> void:
 						style.content_margin_bottom = padding_vertical
 			else:
 				# 图标 + 文字:图标在左侧，垂直居中
-				icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-				
-				# 重置最小宽度 (如果有必要，但启用clip_text时保留宽度)
-				if custom_minimum_size.x > 0 and not clip_button_text:
+				# 重置最小宽度 (如果没有设置min_width且没有启用clip_text)
+				if min_width == 0 and not clip_button_text:
 					custom_minimum_size.x = 0
 				
 				var button_height = custom_minimum_size.y
 				if button_height == 0: button_height = size.y
 				
+				var current_width = size.x
+				if current_width <= 0:
+					current_width = custom_minimum_size.x
+				
+				# 计算内容总宽度 (图标 + 间隔 + 预估文字宽度)
+				var content_width = icon_size + icon_text_gap
+				
+				# 根据内容对齐方式设置位置
+				var icon_x: float
+				var margin_left: float
+				var margin_right: float
+				
+				match content_alignment:
+					ContentAlignment.ALIGN_LEFT:
+						icon_x = padding_horizontal
+						margin_left = padding_horizontal + icon_size + icon_text_gap
+						margin_right = padding_horizontal
+						icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+						alignment = HORIZONTAL_ALIGNMENT_LEFT
+					ContentAlignment.ALIGN_RIGHT:
+						# 图标在文字左边，整体靠右
+						icon_x = current_width - padding_horizontal - icon_size
+						margin_left = padding_horizontal
+						margin_right = padding_horizontal + icon_size + icon_text_gap
+						icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+						alignment = HORIZONTAL_ALIGNMENT_RIGHT
+					_: # ALIGN_CENTER
+						icon_x = padding_horizontal
+						margin_left = padding_horizontal + icon_size + icon_text_gap
+						margin_right = padding_horizontal
+						icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+						alignment = HORIZONTAL_ALIGNMENT_CENTER
+				
 				_icon_texture_rect.position = Vector2(
-					padding_horizontal, 
+					icon_x, 
 					(button_height - icon_size) / 2.0  # 垂直居中
 				)
 				
-				# 调整文字对齐
-				alignment = HORIZONTAL_ALIGNMENT_CENTER
-				
-				# 通过修改样式的左边距来为图标腾出空间
+				# 通过修改样式的边距来调整文字位置
 				for state in ["normal", "hover", "pressed", "focus", "disabled"]:
 					var style = get_theme_stylebox(state)
 					if style is StyleBoxFlat:
-						style.content_margin_left = padding_horizontal + icon_size + icon_text_gap
+						style.content_margin_left = margin_left
 						style.content_margin_top = padding_vertical
-						style.content_margin_right = padding_horizontal
+						style.content_margin_right = margin_right
 						style.content_margin_bottom = padding_vertical
 			
 			# 同步更新涟漪效果的圆角（图标+文字时使用正常圆角）
@@ -361,16 +420,36 @@ func _update_layout() -> void:
 				var radius = corner_radius if corner_radius >= 0 else size_config["corner"]
 				_ripple_material.set_shader_parameter("corner_radius", float(radius))
 		else:
-			# 只有图标:设为圆形按钮
-			alignment = HORIZONTAL_ALIGNMENT_CENTER
+			# 只有图标
 			var button_height = custom_minimum_size.y
+			var button_width = button_height
 			
-			# 设置按钮为正方形（圆形按钮）
-			custom_minimum_size.x = button_height
+			# 如果设置了最小宽度，使用最小宽度
+			if min_width > 0:
+				button_width = max(min_width, button_height)
+				custom_minimum_size.x = button_width
+			else:
+				# 设置按钮为正方形（圆形按钮）
+				custom_minimum_size.x = button_height
+				button_width = button_height
 			
-			# 图标居中
+			var current_width = size.x if size.x > 0 else button_width
+			
+			# 根据内容对齐方式设置图标位置
+			var icon_x: float
+			match content_alignment:
+				ContentAlignment.ALIGN_LEFT:
+					icon_x = padding_horizontal
+					alignment = HORIZONTAL_ALIGNMENT_LEFT
+				ContentAlignment.ALIGN_RIGHT:
+					icon_x = current_width - padding_horizontal - icon_size
+					alignment = HORIZONTAL_ALIGNMENT_RIGHT
+				_: # ALIGN_CENTER
+					icon_x = (current_width - icon_size) / 2.0
+					alignment = HORIZONTAL_ALIGNMENT_CENTER
+			
 			_icon_texture_rect.position = Vector2(
-				(button_height - icon_size) / 2.0,  # 水平居中
+				icon_x,
 				(button_height - icon_size) / 2.0   # 垂直居中
 			)
 			
@@ -397,9 +476,17 @@ func _update_layout() -> void:
 				_ripple_material.set_shader_parameter("corner_radius", float(radius))
 	else:
 		# 只有文字:恢复长方形按钮
-		alignment = HORIZONTAL_ALIGNMENT_CENTER
-		# 启用clip_text时保留宽度，否则重置
-		if not clip_button_text:
+		# 根据内容对齐方式设置文字对齐
+		match content_alignment:
+			ContentAlignment.ALIGN_LEFT:
+				alignment = HORIZONTAL_ALIGNMENT_LEFT
+			ContentAlignment.ALIGN_RIGHT:
+				alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			_: # ALIGN_CENTER
+				alignment = HORIZONTAL_ALIGNMENT_CENTER
+		
+		# 如果没有设置min_width且没有启用clip_text，重置宽度
+		if min_width == 0 and not clip_button_text:
 			custom_minimum_size.x = 0
 		
 		# 重置边距和圆角

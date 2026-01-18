@@ -39,6 +39,26 @@ extends PanelContainer
 		noise_texture = value
 		_update_shader_params()
 
+@export_group("Shadow")
+@export var shadow_color: Color = Color(0, 0, 0, 0.3):
+	set(value):
+		shadow_color = value
+		_update_shader_params()
+
+@export_range(0.0, 32.0) var shadow_size: float = 8.0:
+	set(value):
+		shadow_size = value
+		_update_shadow_padding()
+		_update_shader_params()
+
+@export var shadow_offset: Vector2 = Vector2(0, 4):
+	set(value):
+		shadow_offset = value
+		_update_shadow_padding()
+		_update_shader_params()
+
+var _shadow_padding: float = 0.0
+
 func _ready() -> void:
 	if not material:
 		material = ShaderMaterial.new()
@@ -54,10 +74,37 @@ func _ready() -> void:
 		noise_tex.height = 64
 		# We don't want to save this to disk, just use it
 		noise_texture = noise_tex
-		
+	
+	_update_shadow_padding()
 	connect("resized", _on_resized)
 	_on_resized()
 	_update_shader_params()
+
+func _update_shadow_padding() -> void:
+	# Calculate padding needed for shadow
+	_shadow_padding = shadow_size + max(abs(shadow_offset.x), abs(shadow_offset.y))
+	
+	# Apply padding as theme override for content margin
+	var style = get_theme_stylebox("panel")
+	if style:
+		var new_style = style.duplicate() as StyleBoxFlat
+		if new_style:
+			new_style.content_margin_left = _shadow_padding
+			new_style.content_margin_right = _shadow_padding
+			new_style.content_margin_top = _shadow_padding
+			new_style.content_margin_bottom = _shadow_padding
+			# Make the stylebox transparent (shader handles rendering)
+			new_style.bg_color = Color.TRANSPARENT
+			add_theme_stylebox_override("panel", new_style)
+	else:
+		# Create a new transparent stylebox with padding
+		var new_style = StyleBoxFlat.new()
+		new_style.bg_color = Color.TRANSPARENT
+		new_style.content_margin_left = _shadow_padding
+		new_style.content_margin_right = _shadow_padding
+		new_style.content_margin_top = _shadow_padding
+		new_style.content_margin_bottom = _shadow_padding
+		add_theme_stylebox_override("panel", new_style)
 
 func _on_resized() -> void:
 	if material:
@@ -72,4 +119,8 @@ func _update_shader_params() -> void:
 		material.set_shader_parameter("tint_color", tint_color)
 		material.set_shader_parameter("noise_amount", noise_amount)
 		material.set_shader_parameter("noise_texture", noise_texture)
+		material.set_shader_parameter("shadow_color", shadow_color)
+		material.set_shader_parameter("shadow_size", shadow_size)
+		material.set_shader_parameter("shadow_offset", shadow_offset)
+		material.set_shader_parameter("shadow_padding", _shadow_padding)
 		material.set_shader_parameter("size", size)

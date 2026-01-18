@@ -25,11 +25,16 @@ signal music_status_changed()
 ##单曲循环icon
 @export var single_icon:Texture
 # --- 节点引用 ---
-## 列表 Tab 容器，管理多个音乐列表
-@onready var tab_container: TabContainer =$TabPanel/TabContainer
+## 歌单面板
+@onready var frosted_panel: PanelContainer = $FrostedPanel
+## 歌单切换菜单按钮
+@onready var list_menu_button: MaterialMenuButton = $FrostedPanel/VBoxContainer/HBoxContainer/ListMenuButton
+## 添加菜单按钮（导入音乐/添加歌单）
+@onready var add_menu_button: MaterialMenuButton = $FrostedPanel/VBoxContainer/HBoxContainer/AddMenuButton
+## 音乐列表容器（用于存放所有 MusicList 实例，同时只显示一个）
+@onready var list_container: Control = $FrostedPanel/VBoxContainer/ListContainer
 #@onready var label=$PanelContainer/VBoxContainer/Label
 @onready var status_button=$PanelContainer/VBoxContainer/HBoxContainer/StatusButton
-@onready var tab_panel=$TabPanel
 @onready var mode_button=$PanelContainer/VBoxContainer/HBoxContainer/ModeButton
 @onready var tab_button: MaterialButton = $PanelContainer/VBoxContainer/HBoxContainer/TabButton
 
@@ -45,6 +50,8 @@ var is_playing: bool=false
 var next_play_mode: int = 0 # 0: 顺序播放, 1: 随机播放, 2: 单曲循环
 func _ready() -> void:
 	_setup_initial_music()
+	_setup_list_menu()
+	_setup_add_menu()
 
 # --- 内部处理函数 ---
 ## 初始化默认列表并加载音乐
@@ -52,12 +59,54 @@ func _setup_initial_music() -> void:
 	add_music_list("全部音乐")
 	add_music_list("收藏")
 	
-	var all_music_list = tab_container.get_node_or_null("全部音乐") as MusicList
+	var all_music_list = list_container.get_node_or_null("全部音乐") as MusicList
 	if all_music_list and audio_res:
 		for item in audio_res.BGM:
 			all_music_list.add_music(item.name)
 			print("[Music Module] Loaded music item: %s" % item.name)
 	audio_res.bgm_added.connect(_on_bgm_added)
+
+## 设置歌单切换菜单
+func _setup_list_menu() -> void:
+	if not list_menu_button:
+		return
+	# 连接菜单项点击信号
+	print("[%s]Setting up music list menu"%[name])
+	list_menu_button.menu_item_pressed.connect(_on_list_menu_item_pressed)
+	# 更新菜单项
+	_update_list_menu()
+
+## 设置添加菜单（导入音乐/添加歌单）
+func _setup_add_menu() -> void:
+	if not add_menu_button:
+		return
+	# 连接菜单项点击信号
+	add_menu_button.menu_item_pressed.connect(_on_add_menu_item_pressed)
+
+## 添加菜单项点击处理
+func _on_add_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
+	match p_index:
+		0:  # 导入音乐
+			_open_import_music_dialog()
+		1:  # 添加歌单
+			_open_add_playlist_dialog()
+
+## 打开导入音乐对话框
+func _open_import_music_dialog() -> void:
+	var file_dialog = FileDialog.new()
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	file_dialog.display_mode = FileDialog.DISPLAY_LIST
+	file_dialog.filters = ["*.ogg ; OGG Audio", "*.wav ; WAV Audio", "*.mp3 ; MP3 Audio"]
+	file_dialog.files_selected.connect(_on_files_selected)
+	add_child(file_dialog)
+	file_dialog.popup_centered()
+
+## 打开添加歌单对话框
+func _open_add_playlist_dialog() -> void:
+	# TODO: 实现添加歌单的逻辑
+	print("[Music Module] Add playlist requested")
+
 # --- 公有 API ---
 ## 添加一个新的音乐列表
 func add_music_list(p_name: String) -> void:
@@ -66,23 +115,35 @@ func add_music_list(p_name: String) -> void:
 		
 	var music_list_instance = music_list_scene.instantiate() as MusicList
 	music_list_instance.name = p_name
-	tab_container.add_child(music_list_instance)
+	list_container.add_child(music_list_instance)
 	# 连接列表信号
 	music_list_instance.music_changed.connect(_on_music_changed)
 	music_list_instance.music_options_requested.connect(_on_music_options_requested)
 	music_list_instance.music_remove_requested.connect(_on_music_removed.bind(p_name))
+	music_list_instance.music_category_changed.connect(_on_music_category_changed)
+	# 默认隐藏，只显示当前选中的列表
+	music_list_instance.visible = (list_container.get_child_count() == 1)
+	# 更新菜单按钮文本
+	if list_container.get_child_count() == 1:
+		list_menu_button.text = p_name
+		current_list_index = 0
+	# 更新菜单项
+	_update_list_menu()
 ## 向指定音乐列表添加一首音乐
 func add_music(p_list_name: String, p_music_name: String) -> void:
-	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	if target_list:
 		target_list.add_music(p_music_name)
+		# 如果是收藏列表，同步所有列表中该音乐的勾选状态
+		if p_list_name == "收藏":
+			_sync_music_category_state(p_music_name, p_list_name, true)
 ## 从指定音乐列表移除一首音乐,如果是全部音乐列表，则从每个列表中删除，并从资源中删除
 func remove_music(p_list_name: String, p_music_name: String) -> void:
-	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	#如果列表是全部音乐，则从每个列表中删除，并从资源中删除
 	if p_list_name=="全部音乐":
 		#从所有列表中移除该音乐
-		for child in tab_container.get_children():
+		for child in list_container.get_children():
 			if child is MusicList:
 				child.remove_music(p_music_name)
 		#从资源中移除该音乐
@@ -96,22 +157,22 @@ func remove_music(p_list_name: String, p_music_name: String) -> void:
 
 ## 获得当前列表
 func get_current_list() -> MusicList:
-	if tab_container.get_child_count() > current_list_index:
-		var current_list = tab_container.get_child(current_list_index) as MusicList
+	if list_container.get_child_count() > current_list_index:
+		var current_list = list_container.get_child(current_list_index) as MusicList
 		return current_list
 	return null
 ## 获取当前所有音乐列表的名称
 func get_music_list_names() -> Array[String]:
 	var names: Array[String] = []
-	for child in tab_container.get_children():
+	for child in list_container.get_children():
 		if child is MusicList:
 			names.append(child.name)
 	return names
 ## 获取当前列表中的所有音乐名称
 func get_current_list_music_names() -> Array[String]:
 	var names: Array[String] = []
-	if tab_container.get_child_count() > current_list_index:
-		var current_list = tab_container.get_child(current_list_index) as MusicList
+	if list_container.get_child_count() > current_list_index:
+		var current_list = list_container.get_child(current_list_index) as MusicList
 		if current_list:
 			for i in range(current_list.get_music_count()):
 				var child = current_list.vbox.get_child(i)
@@ -121,7 +182,7 @@ func get_current_list_music_names() -> Array[String]:
 ## 获取列表中的音乐名称
 func get_list_music_names(p_list_name: String) -> Array[String]:
 	var names: Array[String] = []
-	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	if target_list:
 		for i in range(target_list.get_music_count()):
 			var child = target_list.vbox.get_child(i)
@@ -131,7 +192,7 @@ func get_list_music_names(p_list_name: String) -> Array[String]:
 ## 获取所有列表的音乐名称
 func get_all_lists_music_names() -> Dictionary:
 	var result: Dictionary = {}
-	for child in tab_container.get_children():
+	for child in list_container.get_children():
 		if child is MusicList:
 			var music_names: Array[String] = []
 			for i in range(child.get_music_count()):
@@ -189,9 +250,35 @@ func _on_next_button_pressed() -> void:
 			2:
 				current_list.play_next_music()#单曲循环切换按顺序播放下一首
 
-## 切换 Tab 列表
-func _on_tab_container_tab_changed(p_tab_index: int) -> void:
-	current_list_index = p_tab_index
+## 当菜单选中一个歌单时的处理
+func _on_list_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
+	print("[%s]Switch music list to %d"%[self.name,p_index])
+	_switch_to_list(p_index)
+
+## 切换到指定索引的列表
+func _switch_to_list(p_index: int) -> void:
+	if p_index < 0 or p_index >= list_container.get_child_count():
+		return
+	# 隐藏所有列表
+	for child in list_container.get_children():
+		child.visible = false
+	# 显示选中的列表
+	var selected_list = list_container.get_child(p_index)
+	if selected_list:
+		selected_list.visible = true
+		current_list_index = p_index
+		list_menu_button.text = selected_list.name
+
+## 更新歌单切换菜单项
+func _update_list_menu() -> void:
+	if not list_menu_button:
+		return
+	# 清空并重建菜单
+	list_menu_button.clear_menu()
+	for child in list_container.get_children():
+		if child is MusicList:
+			list_menu_button.add_menu_item(child.name)
+			print("[%s]Added %s to music list menu"%[name,child.name])
 
 ## 当点击音乐项的选项按钮时，弹出选项面板
 func _on_music_options_requested(p_music_name: String, p_list_name: String) -> void:
@@ -232,12 +319,32 @@ func _on_music_option_changed(p_list_name: String, p_music_name: String, p_toggl
 	if p_toggled_on:
 		add_music(p_list_name, p_music_name)
 	else:
-		var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+		var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 		if target_list:
 			target_list.remove_music(p_music_name)
+	# 同步所有列表中该音乐的分类勾选状态
+	_sync_music_category_state(p_music_name, p_list_name, p_toggled_on)
+
+## 当音乐分类改变时的处理
+func _on_music_category_changed(p_music_name: String, category: String, checked: bool) -> void:
+	print("[Music Module] Category changed: %s -> %s (%s)" % [p_music_name, category, checked])
+	if checked:
+		add_music(category, p_music_name)
+	else:
+		var target_list = list_container.get_node_or_null(category) as MusicList
+		if target_list:
+			target_list.remove_music(p_music_name)
+	# 同步所有列表中该音乐的分类勾选状态
+	_sync_music_category_state(p_music_name, category, checked)
+
+## 同步所有列表中指定音乐的分类勾选状态
+func _sync_music_category_state(p_music_name: String, category: String, checked: bool) -> void:
+	for child in list_container.get_children():
+		if child is MusicList:
+			child.set_music_category_checked(p_music_name, category, checked)
 
 func _on_tab_button_pressed() -> void:
-	tab_panel.visible=not tab_panel.visible
+	frosted_panel.visible = not frosted_panel.visible
 
 
 func _on_mode_button_pressed() -> void:
@@ -251,14 +358,7 @@ func _on_mode_button_pressed() -> void:
 			mode_button.icon= single_icon
 			
 func _on_add_button_pressed() -> void:
-	var file_dialog = FileDialog.new()
-	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
-	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
-	file_dialog.display_mode= FileDialog.DISPLAY_LIST
-	file_dialog.filters = ["*.ogg ; OGG Audio", "*.wav ; WAV Audio", "*.mp3 ; MP3 Audio"]
-	file_dialog.files_selected.connect(_on_files_selected)
-	add_child(file_dialog)
-	file_dialog.popup_centered()
+	_open_import_music_dialog()
 func _on_files_selected(p_files: Array) -> void:
 	for file_path in p_files:
 		var file = FileAccess.open(file_path, FileAccess.READ)
@@ -267,19 +367,19 @@ func _on_files_selected(p_files: Array) -> void:
 			audio_res.add_bgm(music_name, file_path)
 ##当有新的 BGM 被添加到资源时的回调
 func _on_bgm_added(_name: String) -> void:
-	var all_music_list = tab_container.get_node_or_null("全部音乐") as MusicList
+	var all_music_list = list_container.get_node_or_null("全部音乐") as MusicList
 	if all_music_list:
 		all_music_list.add_music(_name)
 ## 当请求删除特定音乐时的回调
 func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
-	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	#如果列表是全部音乐，则弹出确认对话框
 	if p_list_name=="全部音乐":
 		var confirm_dialog = ConfirmationDialog.new()
 		confirm_dialog.dialog_text="确定要删除音乐%s吗？这将彻底移除该音乐。" % p_music_name
 		confirm_dialog.confirmed.connect(func():
 			#从所有列表中移除该音乐
-			for child in tab_container.get_children():
+			for child in list_container.get_children():
 				if child is MusicList:
 					child.remove_music(p_music_name)
 			#从资源中移除该音乐
@@ -297,7 +397,7 @@ func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
 	
 ## 检查指定音乐是否已存在于某个列表中
 func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
-	var target_list = tab_container.get_node_or_null(p_list_name) as MusicList
+	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	if target_list:
 		for i in range(target_list.get_music_count()):
 			var child = target_list.vbox.get_child(i)

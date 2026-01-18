@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://vc56r7lybae4"]
+
+[ext_resource type="Script" uid="uid://b8fb6e8gct783" path="res://scenes/test/clock/clock.gd" id="1_qnmn4"]
+[ext_resource type="FontFile" uid="uid://dpolhfxfwsb0k" path="res://assets/ui/fonts/HyliaSerifBeta-Regular.otf" id="2_re8ue"]
+
+[node name="Clock" type="Node3D"]
+script = ExtResource("1_qnmn4")
+
+[node name="Label3D" type="Label3D" parent="."]
+text = "null"
+font = ExtResource("2_re8ue")
+font_size = 30
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.2952459)
