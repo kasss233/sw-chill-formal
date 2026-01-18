@@ -446,8 +446,9 @@ func _on_button_down() -> void:
 	uv_center = uv_center.clamp(Vector2.ZERO, Vector2.ONE)
 	
 	# 设置宽高比以保持圆形
+	# 需要按照实际像素距离计算，所以直接使用 size 而不是比例
 	var aspect = size.x / size.y if size.y > 0 else 1.0
-	_ripple_material.set_shader_parameter("aspect_ratio", Vector2(1.0, aspect))
+	_ripple_material.set_shader_parameter("aspect_ratio", Vector2(aspect, 1.0))
 	_ripple_material.set_shader_parameter("ripple_center", uv_center)
 	
 	# 更新按钮尺寸和圆角参数到shader
@@ -472,7 +473,7 @@ func _on_button_down() -> void:
 	var corners = [Vector2.ZERO, Vector2(1, 0), Vector2(0, 1), Vector2.ONE]
 	var max_dist = 0.0
 	for corner in corners:
-		var dist = ((corner - uv_center) * Vector2(1.0, aspect)).length()
+		var dist = ((corner - uv_center) * Vector2(aspect, 1.0)).length()
 		max_dist = max(max_dist, dist)
 	
 	# 确保涟漪面板可见，但保持在图标下方

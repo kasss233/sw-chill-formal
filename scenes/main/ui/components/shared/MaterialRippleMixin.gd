@@ -84,17 +84,18 @@ func trigger_ripple(local_mouse_pos: Vector2) -> void:
 	uv_center = uv_center.clamp(Vector2.ZERO, Vector2.ONE)
 	
 	# 设置宽高比以保持圆形
+	# 需要按照实际像素距离计算，所以直接使用 size 而不是比例
 	var aspect = host_size.x / host_size.y if host_size.y > 0 else 1.0
-	ripple_material.set_shader_parameter("aspect_ratio", Vector2(1.0, aspect))
+	ripple_material.set_shader_parameter("aspect_ratio", Vector2(aspect, 1.0))
 	ripple_material.set_shader_parameter("ripple_center", uv_center)
 	ripple_material.set_shader_parameter("button_size", host_size)
 	ripple_material.set_shader_parameter("corner_radius", corner_radius)
 	
-	# 计算需要的最大半径
+	# 计算需要的最大半径（从点击位置到最远角落的距离）
 	var corners = [Vector2.ZERO, Vector2(1, 0), Vector2(0, 1), Vector2.ONE]
 	var max_dist = 0.0
 	for corner in corners:
-		var dist = ((corner - uv_center) * Vector2(1.0, aspect)).length()
+		var dist = ((corner - uv_center) * Vector2(aspect, 1.0)).length()
 		max_dist = max(max_dist, dist)
 	
 	# 确保涟漪面板可见并在最底层
