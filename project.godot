@@ -11,7 +11,6 @@ config_version=5
 [application]
 
 config/name="sw_chill_formal"
-run/main_scene="uid://c0v2307demd35"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
@@ -56,6 +55,5 @@ pointing/emulate_touch_from_mouse=true
 
 [rendering]
 
-renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
-anti_aliasing/quality/screen_space_aa=2
+anti_aliasing/quality/use_taa=true
