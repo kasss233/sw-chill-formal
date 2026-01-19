@@ -863,21 +863,28 @@ func _update_scroll() -> void:
 		var gap_width: float = scroll_gap  # 使用用户设置的间隔
 		if gap_width <= 0 and font:
 			gap_width = font.get_string_size(gap_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		if gap_width <= 0:
+			gap_width = 50.0  # 默认间隔
 		
-		# 计算需要的重复数量以确保无缝循环
+		# 计算单个段落宽度（文字+间隔）
 		var segment_width = _text_width + gap_width
 		if segment_width <= 0:
 			return
-		var min_repeats = ceili(container_width / segment_width) + 2  # +2 确保足够
+		
+		# 关键修复：需要足够多的重复来填满"容器宽度 + 一个段落宽度"
+		# 这样在任何滚动位置，容器内都有完整的文字
+		# 最小重复数 = ceil((容器宽度 + 段落宽度) / 段落宽度) + 1 (安全余量)
+		var min_repeats = ceili((container_width + segment_width) / segment_width) + 1
 		# 确保至少有用户设置的重复数量
 		var actual_repeats = maxi(scroll_repeat_count, min_repeats)
+		# 为了更平滑的效果，再多加几份
+		actual_repeats = maxi(actual_repeats, 4)
 		
 		# 构建重复文字（每份文字后都加间隔，确保循环无缝）
 		var repeated_text = ""
 		for i in actual_repeats:
 			repeated_text += text if text else ""
-			if gap_width > 0:
-				repeated_text += gap_text
+			repeated_text += gap_text
 		_scroll_label.text = repeated_text
 		
 		await get_tree().process_frame
@@ -885,9 +892,13 @@ func _update_scroll() -> void:
 		# 再次检查节点是否有效
 		if not is_inside_tree() or not _scroll_label:
 			return
+		
+		# 存储段落宽度供滚动使用
+		_segment_width = segment_width
 	
 	# 重置位置
 	_scroll_label.position.x = 0
+	_scroll_position = 0.0
 	
 	# 开始滚动
 	_start_scroll()
@@ -931,17 +942,18 @@ func _do_scroll_animation() -> void:
 	
 	if is_loop_mode:
 		# 循环滚动模式：使用 _process 实现真正的无缝滚动
-		var gap_width = _get_gap_pixel_width()
-		if gap_width <= 0:
-			gap_width = scroll_gap if scroll_gap > 0 else 50.0
-		_segment_width = _text_width + gap_width
+		# _segment_width 已经在 _update_scroll 中计算好了
+		if _segment_width <= 0:
+			var gap_width = _get_gap_pixel_width()
+			if gap_width <= 0:
+				gap_width = scroll_gap if scroll_gap > 0 else 50.0
+			_segment_width = _text_width + gap_width
 		
 		if _segment_width <= 0 or scroll_speed <= 0:
 			_stop_scroll()
 			return
 		
-		# 初始化滚动状态
-		_scroll_position = 0.0
+		# 初始化滚动状态（不重置 _scroll_position，保持连续性）
 		_scroll_wait_timer = scroll_delay
 		_scroll_state = 0  # 等待开始
 		set_process(true)
