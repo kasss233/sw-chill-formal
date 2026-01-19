@@ -1,0 +1,191 @@
+[gd_scene load_steps=22 format=3 uid="uid://y6qt40qr5w3x"]
+
+[ext_resource type="Script" uid="uid://d3co7oufy3jfy" path="res://scenes/main/ui/note_module/note/note.gd" id="1_0vjod"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_wuqb7"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_ei3ar"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_8mtc7"]
+[ext_resource type="Texture2D" uid="uid://c2p0fd4s5qo8l" path="res://assets/ui/icons/close_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_0vjod"]
+[ext_resource type="Texture2D" uid="uid://dumeuvinhlojt" path="res://assets/ui/icons/attach_file_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="6_v5ehv"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_8mtc7"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_0vjod"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_8mtc7")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v5ehv"]
+shader = ExtResource("1_wuqb7")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.03
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_0vjod")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(284, 325)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4r2bj"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wuqb7"]
+
+[sub_resource type="Theme" id="Theme_ei3ar"]
+LineEdit/styles/focus = SubResource("StyleBoxEmpty_wuqb7")
+LineEdit/styles/normal = SubResource("StyleBoxEmpty_wuqb7")
+LineEdit/styles/read_only = SubResource("StyleBoxEmpty_wuqb7")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8mtc7"]
+
+[sub_resource type="Theme" id="Theme_0vjod"]
+TextEdit/styles/focus = SubResource("StyleBoxEmpty_8mtc7")
+TextEdit/styles/normal = SubResource("StyleBoxEmpty_8mtc7")
+TextEdit/styles/read_only = SubResource("StyleBoxEmpty_8mtc7")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qt28a"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dkgla"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kwp8s"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f52k2"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u558q"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v5ehv"]
+
+[sub_resource type="Theme" id="Theme_4r2bj"]
+Button/styles/focus = SubResource("StyleBoxEmpty_v5ehv")
+Button/styles/hover = SubResource("StyleBoxEmpty_v5ehv")
+Button/styles/normal = SubResource("StyleBoxEmpty_v5ehv")
+Button/styles/pressed = SubResource("StyleBoxEmpty_v5ehv")
+
+[node name="Note" type="Control"]
+layout_mode = 3
+script = ExtResource("1_0vjod")
+
+[node name="FrostedPanel" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_v5ehv")
+layout_mode = 0
+offset_left = -141.0
+offset_top = -162.0
+offset_right = 143.0
+offset_bottom = 163.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_4r2bj")
+script = ExtResource("2_ei3ar")
+noise_texture = SubResource("NoiseTexture2D_0vjod")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = -125.0
+offset_top = -141.0
+offset_right = 92.0
+offset_bottom = -113.0
+size_flags_vertical = 0
+theme = SubResource("Theme_ei3ar")
+placeholder_text = "便签"
+
+[node name="TextEdit" type="TextEdit" parent="."]
+layout_mode = 0
+offset_left = -124.0
+offset_top = -114.0
+offset_right = 137.0
+offset_bottom = 149.0
+size_flags_vertical = 8
+theme = SubResource("Theme_0vjod")
+placeholder_text = "请输入文本"
+wrap_mode = 1
+
+[node name="CloseButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 0
+offset_left = 93.0
+offset_top = -145.0
+offset_right = 129.0
+offset_bottom = -109.0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_qt28a")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dkgla")
+theme_override_styles/hover = SubResource("StyleBoxFlat_kwp8s")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_f52k2")
+theme_override_styles/focus = SubResource("StyleBoxFlat_u558q")
+script = ExtResource("3_8mtc7")
+button_icon = ExtResource("4_0vjod")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="MoveButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = -13.0
+offset_top = -166.0
+offset_right = 11.0
+offset_bottom = -134.0
+theme = SubResource("Theme_4r2bj")
+icon = ExtResource("6_v5ehv")
+flat = true
+
+[connection signal="pressed" from="CloseButton" to="." method="_on_close_button_pressed"]
+[connection signal="button_down" from="MoveButton" to="." method="_on_move_button_button_down"]
+[connection signal="button_up" from="MoveButton" to="." method="_on_move_button_button_up"]
