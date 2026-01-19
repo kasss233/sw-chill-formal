@@ -1,35 +1,63 @@
-[gd_scene load_steps=17 format=3 uid="uid://bxk7j8nan4opq"]
+[gd_scene load_steps=31 format=3 uid="uid://bxk7j8nan4opq"]
 
 [ext_resource type="Script" uid="uid://b2k45kgxcbsaq" path="res://scenes/main/ui/components/switch/MaterialSwitch.gd" id="MaterialSwitchScript"]
 [ext_resource type="Script" uid="uid://dw4kjigygio0p" path="res://scenes/main/ui/components/switch/SwitchDemo.gd" id="SwitchDemoScript"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_fo0v3"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fo0v3"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_xr0uj"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_0w43y"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0w43y"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_im0wa"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_txlev"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_txlev"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_qsql4"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_m2ox7"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m2ox7"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_tvdrs"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_f2udc"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f2udc"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_02cdl"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_uqmci"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_uqmci"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_qhm5i"]
 
-[sub_resource type="ImageTexture" id="ImageTexture_ql8hd"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ql8hd"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_apw75"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_owdqu"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_1v67k"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n5afo"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_4gpmw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vv272"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_b0xia"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o85sg"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_mv5ck"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bnthb"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_o62x0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4i765"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_jeb0s"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_texwy"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_w68bo"]
 
 [node name="SwitchDemo" type="Control"]
 layout_mode = 3
@@ -73,38 +101,56 @@ theme_override_font_sizes/font_size = 18
 text = "基础开关"
 
 [node name="Switch1" type="CheckBox" parent="ScrollContainer/VBoxContainer/BasicSection"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_fo0v3")
-theme_override_icons/unchecked = SubResource("ImageTexture_fo0v3")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_fo0v3")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_fo0v3")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_fo0v3")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_fo0v3")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_fo0v3")
+theme_override_icons/checked = SubResource("ImageTexture_xr0uj")
+theme_override_icons/unchecked = SubResource("ImageTexture_xr0uj")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="Switch2" type="CheckBox" parent="ScrollContainer/VBoxContainer/BasicSection"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_xr0uj")
-theme_override_icons/unchecked = SubResource("ImageTexture_xr0uj")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_0w43y")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_0w43y")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_0w43y")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_0w43y")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_0w43y")
+theme_override_icons/checked = SubResource("ImageTexture_im0wa")
+theme_override_icons/unchecked = SubResource("ImageTexture_im0wa")
 button_pressed = true
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="Switch3" type="CheckBox" parent="ScrollContainer/VBoxContainer/BasicSection"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_0w43y")
-theme_override_icons/unchecked = SubResource("ImageTexture_0w43y")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_txlev")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_txlev")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_txlev")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_txlev")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_txlev")
+theme_override_icons/checked = SubResource("ImageTexture_qsql4")
+theme_override_icons/unchecked = SubResource("ImageTexture_qsql4")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
@@ -124,49 +170,73 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="SmallSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_im0wa")
-theme_override_icons/unchecked = SubResource("ImageTexture_im0wa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_m2ox7")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_m2ox7")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_m2ox7")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_m2ox7")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_m2ox7")
+theme_override_icons/checked = SubResource("ImageTexture_tvdrs")
+theme_override_icons/unchecked = SubResource("ImageTexture_tvdrs")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="StandardSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_txlev")
-theme_override_icons/unchecked = SubResource("ImageTexture_txlev")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_f2udc")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_f2udc")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_f2udc")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_f2udc")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_f2udc")
+theme_override_icons/checked = SubResource("ImageTexture_02cdl")
+theme_override_icons/unchecked = SubResource("ImageTexture_02cdl")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="MediumSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
-custom_minimum_size = Vector2(52, 32)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_qsql4")
-theme_override_icons/unchecked = SubResource("ImageTexture_qsql4")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_uqmci")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_uqmci")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_uqmci")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_uqmci")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_uqmci")
+theme_override_icons/checked = SubResource("ImageTexture_qhm5i")
+theme_override_icons/unchecked = SubResource("ImageTexture_qhm5i")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="LargeSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
-custom_minimum_size = Vector2(52, 36)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_m2ox7")
-theme_override_icons/unchecked = SubResource("ImageTexture_m2ox7")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ql8hd")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ql8hd")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ql8hd")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_ql8hd")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ql8hd")
+theme_override_icons/checked = SubResource("ImageTexture_apw75")
+theme_override_icons/unchecked = SubResource("ImageTexture_apw75")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
@@ -182,26 +252,38 @@ theme_override_font_sizes/font_size = 18
 text = "带标签的开关"
 
 [node name="WifiSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/LabelSection"]
-custom_minimum_size = Vector2(144, 28)
+custom_minimum_size = Vector2(140, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_tvdrs")
-theme_override_icons/unchecked = SubResource("ImageTexture_tvdrs")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_owdqu")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_owdqu")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_owdqu")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_owdqu")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_owdqu")
+theme_override_icons/checked = SubResource("ImageTexture_1v67k")
+theme_override_icons/unchecked = SubResource("ImageTexture_1v67k")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 label_text = "Wi-Fi"
 
 [node name="BluetoothSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/LabelSection"]
-custom_minimum_size = Vector2(144, 28)
+custom_minimum_size = Vector2(140, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_f2udc")
-theme_override_icons/unchecked = SubResource("ImageTexture_f2udc")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_n5afo")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_n5afo")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_n5afo")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_n5afo")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_n5afo")
+theme_override_icons/checked = SubResource("ImageTexture_4gpmw")
+theme_override_icons/unchecked = SubResource("ImageTexture_4gpmw")
 button_pressed = true
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
@@ -209,13 +291,19 @@ inactive_color = Color(0.5, 0.5, 0.5, 1)
 label_text = "蓝牙"
 
 [node name="DarkModeSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/LabelSection"]
-custom_minimum_size = Vector2(144, 28)
+custom_minimum_size = Vector2(140, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_02cdl")
-theme_override_icons/unchecked = SubResource("ImageTexture_02cdl")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_vv272")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_vv272")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_vv272")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_vv272")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vv272")
+theme_override_icons/checked = SubResource("ImageTexture_b0xia")
+theme_override_icons/unchecked = SubResource("ImageTexture_b0xia")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
@@ -239,37 +327,55 @@ layout_mode = 2
 theme_override_constants/separation = 24
 
 [node name="ColorSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/ColorSection/ColorSwitches"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_uqmci")
-theme_override_icons/unchecked = SubResource("ImageTexture_uqmci")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_o85sg")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_o85sg")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_o85sg")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_o85sg")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_o85sg")
+theme_override_icons/checked = SubResource("ImageTexture_mv5ck")
+theme_override_icons/unchecked = SubResource("ImageTexture_mv5ck")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.3, 0.7, 0.3, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="ColorSwitch2" type="CheckBox" parent="ScrollContainer/VBoxContainer/ColorSection/ColorSwitches"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_qhm5i")
-theme_override_icons/unchecked = SubResource("ImageTexture_qhm5i")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_bnthb")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_bnthb")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_bnthb")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_bnthb")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_bnthb")
+theme_override_icons/checked = SubResource("ImageTexture_o62x0")
+theme_override_icons/unchecked = SubResource("ImageTexture_o62x0")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.95, 0.5, 0.3, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
 
 [node name="ColorSwitch3" type="CheckBox" parent="ScrollContainer/VBoxContainer/ColorSection/ColorSwitches"]
-custom_minimum_size = Vector2(52, 28)
+custom_minimum_size = Vector2(48, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_ql8hd")
-theme_override_icons/unchecked = SubResource("ImageTexture_ql8hd")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_4i765")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_4i765")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_4i765")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_4i765")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_4i765")
+theme_override_icons/checked = SubResource("ImageTexture_jeb0s")
+theme_override_icons/unchecked = SubResource("ImageTexture_jeb0s")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.7, 0.3, 0.7, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
@@ -288,13 +394,19 @@ theme_override_font_sizes/font_size = 18
 text = "带图标的开关"
 
 [node name="IconSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/IconButtonSection"]
-custom_minimum_size = Vector2(144, 28)
+custom_minimum_size = Vector2(140, 26)
 layout_mode = 2
+focus_mode = 0
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_icons/checked = SubResource("ImageTexture_apw75")
-theme_override_icons/unchecked = SubResource("ImageTexture_apw75")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_texwy")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_texwy")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_texwy")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_texwy")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_texwy")
+theme_override_icons/checked = SubResource("ImageTexture_w68bo")
+theme_override_icons/unchecked = SubResource("ImageTexture_w68bo")
 script = ExtResource("MaterialSwitchScript")
 active_color = Color(0.35, 0.65, 0.95, 1)
 inactive_color = Color(0.5, 0.5, 0.5, 1)
