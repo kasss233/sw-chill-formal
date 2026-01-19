@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://7n1s558vaft6"
 path.s3tc="res://.godot/imported/ChatGPT Image 2025年12月14日 23_15_30.png-03444bdac9fe9da9c218463e09a4f736.s3tc.ctex"
+path.etc2="res://.godot/imported/ChatGPT Image 2025年12月14日 23_15_30.png-03444bdac9fe9da9c218463e09a4f736.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/others/ChatGPT Image 2025年12月14日 23_15_30.png"
-dest_files=["res://.godot/imported/ChatGPT Image 2025年12月14日 23_15_30.png-03444bdac9fe9da9c218463e09a4f736.s3tc.ctex"]
+dest_files=["res://.godot/imported/ChatGPT Image 2025年12月14日 23_15_30.png-03444bdac9fe9da9c218463e09a4f736.s3tc.ctex", "res://.godot/imported/ChatGPT Image 2025年12月14日 23_15_30.png-03444bdac9fe9da9c218463e09a4f736.etc2.ctex"]
 
 [params]
 

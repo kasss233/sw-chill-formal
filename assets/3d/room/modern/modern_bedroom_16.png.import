@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://kk8w6ooi5j58"
 path.s3tc="res://.godot/imported/modern_bedroom_16.png-9a75b873c63b87e535110d68c6f88206.s3tc.ctex"
+path.etc2="res://.godot/imported/modern_bedroom_16.png-9a75b873c63b87e535110d68c6f88206.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/3d/room/modern/modern_bedroom_16.png"
-dest_files=["res://.godot/imported/modern_bedroom_16.png-9a75b873c63b87e535110d68c6f88206.s3tc.ctex"]
+dest_files=["res://.godot/imported/modern_bedroom_16.png-9a75b873c63b87e535110d68c6f88206.s3tc.ctex", "res://.godot/imported/modern_bedroom_16.png-9a75b873c63b87e535110d68c6f88206.etc2.ctex"]
 
 [params]
 

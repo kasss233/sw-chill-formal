@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://y2knlx1mhhdd"
 path.s3tc="res://.godot/imported/cyberpunk_desk_16.jpg-78a476d51d778bbf90ed79bec398c38d.s3tc.ctex"
+path.etc2="res://.godot/imported/cyberpunk_desk_16.jpg-78a476d51d778bbf90ed79bec398c38d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/3d/desk/cyber/cyberpunk_desk_16.jpg"
-dest_files=["res://.godot/imported/cyberpunk_desk_16.jpg-78a476d51d778bbf90ed79bec398c38d.s3tc.ctex"]
+dest_files=["res://.godot/imported/cyberpunk_desk_16.jpg-78a476d51d778bbf90ed79bec398c38d.s3tc.ctex", "res://.godot/imported/cyberpunk_desk_16.jpg-78a476d51d778bbf90ed79bec398c38d.etc2.ctex"]
 
 [params]
 

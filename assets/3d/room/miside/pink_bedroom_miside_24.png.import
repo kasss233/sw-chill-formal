@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cfy2byn6hna5b"
 path.s3tc="res://.godot/imported/pink_bedroom_miside_24.png-099c08952cc2afaebce72b703ae105a4.s3tc.ctex"
+path.etc2="res://.godot/imported/pink_bedroom_miside_24.png-099c08952cc2afaebce72b703ae105a4.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/3d/room/miside/pink_bedroom_miside_24.png"
-dest_files=["res://.godot/imported/pink_bedroom_miside_24.png-099c08952cc2afaebce72b703ae105a4.s3tc.ctex"]
+dest_files=["res://.godot/imported/pink_bedroom_miside_24.png-099c08952cc2afaebce72b703ae105a4.s3tc.ctex", "res://.godot/imported/pink_bedroom_miside_24.png-099c08952cc2afaebce72b703ae105a4.etc2.ctex"]
 
 [params]
 
