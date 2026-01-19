@@ -130,6 +130,8 @@ var _active_submenu: MaterialMenu = null
 var _parent_menu: MaterialMenu = null
 var _submenu_timer: Timer
 var _hovered_item: MaterialMenuItem = null
+var _background_blocker: Control = null  # 全屏背景层，用于阻止事件穿透
+var _blocker_canvas_layer: CanvasLayer = null  # 背景层的 CanvasLayer
 
 # 菜单项列表
 var _items: Array[Control] = []
@@ -176,7 +178,7 @@ func _ensure_container() -> void:
 		_items_container = VBoxContainer.new()
 		_items_container.name = "ItemsContainer"
 		_items_container.add_theme_constant_override("separation", 0)
-		_items_container.mouse_filter = Control.MOUSE_FILTER_PASS
+		_items_container.mouse_filter = Control.MOUSE_FILTER_STOP
 		add_child(_items_container)
 	
 	# 查找或创建子菜单延迟显示定时器
@@ -231,7 +233,11 @@ func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 	
-	# 点击外部关闭
+	# 只有没有背景层时才需要在这里处理点击外部关闭
+	if _background_blocker:
+		return
+	
+	# 点击外部关闭（备用逻辑，当没有背景层时使用）
 	if close_on_click_outside and event is InputEventMouseButton:
 		var mb = event as InputEventMouseButton
 		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
@@ -347,6 +353,10 @@ func is_item_checked(index: int) -> bool:
 
 ## 显示菜单
 func show_menu(at_position: Vector2 = Vector2.ZERO) -> void:
+	# 只有根菜单（非子菜单）才创建背景层
+	if not _parent_menu:
+		_create_background_blocker()
+	
 	# 设置位置
 	if at_position != Vector2.ZERO:
 		global_position = at_position
@@ -385,6 +395,10 @@ func show_menu(at_position: Vector2 = Vector2.ZERO) -> void:
 func hide_menu() -> void:
 	# 先关闭子菜单
 	_close_active_submenu()
+	
+	# 移除背景层（只有根菜单才有）
+	if not _parent_menu:
+		_remove_background_blocker()
 	
 	# 停止之前的动画
 	if _show_tween and _show_tween.is_valid():
@@ -508,6 +522,87 @@ func _close_all_menus() -> void:
 		_parent_menu._close_all_menus()
 	else:
 		hide_menu()
+
+## 创建全屏背景层，用于阻止鼠标事件穿透到菜单下方
+func _create_background_blocker() -> void:
+	if _background_blocker:
+		return
+	
+	# 编辑器模式下不创建背景层
+	if Engine.is_editor_hint():
+		return
+	
+	# 使用 CanvasLayer 确保背景层覆盖整个屏幕
+	_blocker_canvas_layer = CanvasLayer.new()
+	_blocker_canvas_layer.name = "MenuBlockerCanvasLayer"
+	_blocker_canvas_layer.layer = 99  # 高层级，但低于菜单
+	get_tree().root.add_child(_blocker_canvas_layer)
+	
+	_background_blocker = Control.new()
+	_background_blocker.name = "MenuBackgroundBlocker"
+	_background_blocker.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_background_blocker.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# 点击背景层关闭菜单
+	_background_blocker.gui_input.connect(_on_background_blocker_input)
+	
+	_blocker_canvas_layer.add_child(_background_blocker)
+	
+	# 将菜单移到更高的 CanvasLayer
+	z_index = 0  # 重置 z_index，因为我们用 CanvasLayer 控制层级
+	if not get_parent() is CanvasLayer or get_parent().layer < 100:
+		# 如果菜单不在足够高的 CanvasLayer 中，创建一个
+		var menu_canvas = CanvasLayer.new()
+		menu_canvas.name = "MenuCanvasLayer"
+		menu_canvas.layer = 100
+		get_tree().root.add_child(menu_canvas)
+		
+		var old_parent = get_parent()
+		var old_global_pos = global_position
+		old_parent.remove_child(self)
+		menu_canvas.add_child(self)
+		global_position = old_global_pos
+		
+		# 保存原始父节点以便恢复
+		set_meta("_original_parent", old_parent)
+
+## 移除背景层
+func _remove_background_blocker() -> void:
+	# 恢复菜单到原始父节点
+	if has_meta("_original_parent"):
+		var original_parent = get_meta("_original_parent")
+		if is_instance_valid(original_parent):
+			var current_canvas = get_parent()
+			var old_global_pos = global_position
+			current_canvas.remove_child(self)
+			original_parent.add_child(self)
+			global_position = old_global_pos
+			
+			# 清理菜单的 CanvasLayer
+			if current_canvas is CanvasLayer and current_canvas.name == "MenuCanvasLayer":
+				current_canvas.queue_free()
+		remove_meta("_original_parent")
+	
+	if _background_blocker and is_instance_valid(_background_blocker):
+		_background_blocker.queue_free()
+		_background_blocker = null
+	
+	if _blocker_canvas_layer and is_instance_valid(_blocker_canvas_layer):
+		_blocker_canvas_layer.queue_free()
+		_blocker_canvas_layer = null
+
+## 处理背景层的输入事件
+func _on_background_blocker_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb = event as InputEventMouseButton
+		if mb.pressed:
+			# 点击背景层关闭菜单
+			if close_on_click_outside:
+				hide_menu()
+	elif event is InputEventMouseMotion:
+		# 消费鼠标移动事件，防止hover效果穿透
+		if _background_blocker and is_instance_valid(_background_blocker):
+			_background_blocker.accept_event()
 
 ## 收集编辑器中手动添加的子节点
 func _collect_existing_items() -> void:

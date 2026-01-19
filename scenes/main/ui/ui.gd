@@ -77,6 +77,16 @@ func get_all_lists_music_names() -> Dictionary:
 		return music_module.get_all_lists_music_names()
 	return {}
 
+## 根据名称切换到指定的歌单
+func switch_to_list_by_name(p_list_name: String) -> void:
+	if music_module:
+		music_module.switch_to_list_by_name(p_list_name)
+
+## 设置当前音乐显示（用于初始化时更新 UI）
+func set_current_music_display(p_music_name: String) -> void:
+	if music_module:
+		music_module.set_current_music_display(p_music_name)
+
 # --- 信号转发回调 ---
 func _on_music_changed(p_name: String) -> void:
 	music_changed.emit(p_name)

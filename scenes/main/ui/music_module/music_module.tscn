@@ -17,7 +17,6 @@
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="20_bihbd"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="21_4fln3"]
 [ext_resource type="Texture2D" uid="uid://b5s2vwqhagv8p" path="res://assets/ui/icons/skip_previous_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="21_50xrc"]
-[ext_resource type="Script" uid="uid://bkxpnxtj5fc1f" path="res://scenes/main/ui/components/checkbox/MaterialCheckBox.gd" id="22_4fln3"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="22_bj3ck"]
 [ext_resource type="Texture2D" uid="uid://bepyjk501lvcs" path="res://assets/ui/icons/pause_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="23_bj3ck"]
 [ext_resource type="Texture2D" uid="uid://ckk7hhsixem0q" path="res://assets/ui/icons/read_more_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="23_btupq"]
@@ -404,7 +403,7 @@ corner_radius_bottom_left = 18
 
 [sub_resource type="Resource" id="Resource_7pnhy"]
 script = ExtResource("22_bj3ck")
-state_name = "queue"
+state_name = "order"
 icon = ExtResource("23_btupq")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
@@ -425,7 +424,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -436,7 +435,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -447,7 +446,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -458,7 +457,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -475,7 +474,129 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btupq"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusr8"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lrjur"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u4qyi"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.12)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4mqkb"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ro2q1"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="Resource" id="Resource_60cfw"]
+script = ExtResource("22_bj3ck")
+state_name = "pause"
+icon = ExtResource("23_bj3ck")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_g0jrd"]
+script = ExtResource("22_bj3ck")
+state_name = "play"
+icon = ExtResource("24_btupq")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3dqc"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o5s7w"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e3b0t"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k7pvx"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0u8rr"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -608,6 +729,12 @@ script = ExtResource("1_t37u8")
 music_list_scene = ExtResource("4_x6s46")
 option_board_scene = ExtResource("4_cfhda")
 audio_res = ExtResource("2_jnxsf")
+play_icon = ExtResource("5_0xa2x")
+pause_icon = ExtResource("6_hycke")
+order_icon = ExtResource("7_5sru0")
+random_icon = ExtResource("8_2p7cx")
+single_icon = ExtResource("9_ss7lu")
+metadata/_edit_horizontal_guides_ = [279.0, 277.0]
 
 [node name="MaterialMenu" type="PanelContainer" parent="."]
 visible = false
@@ -665,6 +792,8 @@ clip_text = true
 script = ExtResource("12_btupq")
 popup_position = 2
 button_icon = ExtResource("13_50xrc")
+content_alignment = null
+min_width = null
 ripple_color = Color(0, 0, 0, 0)
 padding_horizontal = 14
 padding_vertical = 7
@@ -692,6 +821,8 @@ script = ExtResource("12_btupq")
 menu = NodePath("../../../../MaterialMenu")
 button_icon = ExtResource("14_bihbd")
 icon_size = 30
+content_alignment = null
+min_width = null
 ripple_color = Color(0, 0, 0, 0)
 padding_horizontal = 14
 padding_vertical = 7
@@ -720,6 +851,8 @@ clip_text = true
 script = ExtResource("12_btupq")
 button_icon = ExtResource("14_bihbd")
 icon_size = 28
+content_alignment = null
+min_width = null
 ripple_color = Color(0, 0, 0, 0)
 padding_horizontal = 14
 padding_vertical = 7
@@ -740,8 +873,8 @@ material = SubResource("ShaderMaterial_f0bs5")
 layout_mode = 0
 offset_left = 30.0
 offset_top = -82.0
-offset_right = 300.0
-offset_bottom = -45.0
+offset_right = 360.0
+offset_bottom = -21.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_d0an2")
 script = ExtResource("12_2p7cx")
 corner_radius = 20.0
@@ -773,19 +906,19 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_fbexl")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_peyev")
 theme_override_styles/focus = SubResource("StyleBoxFlat_tooop")
 text = "music name"
-text_overrun_behavior = 4
 clip_text = true
 script = ExtResource("16_ss7lu")
 button_icon = ExtResource("16_gopd7")
+content_alignment = null
+min_width = null
 corner_radius = 20
 padding_horizontal = 14
 padding_vertical = 7
 clip_button_text = true
-text_overrun = 4
 enable_text_scroll = true
 scroll_speed = 20.0
-scroll_delay = 0.0
-scroll_gap = 15.0
+scroll_end_delay = 0.0
+scroll_repeat_count = 2
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="ModeButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
@@ -818,32 +951,32 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_k1tl0")
 theme_override_styles/focus = SubResource("StyleBoxFlat_rqxsy")
 script = ExtResource("16_ss7lu")
 button_icon = ExtResource("21_50xrc")
+content_alignment = null
+min_width = null
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="StatusButton" type="CheckBox" parent="PanelContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(36, 36)
+[node name="StatusButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_jusr8")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_lrjur")
-theme_override_styles/hover = SubResource("StyleBoxFlat_4mqkb")
+theme_override_styles/normal = SubResource("StyleBoxFlat_btupq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_jusr8")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lrjur")
 theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_u4qyi")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ro2q1")
-theme_override_styles/focus = SubResource("StyleBoxFlat_60cfw")
-theme_override_constants/check_v_offset = 0
-theme_override_icons/checked = SubResource("ImageTexture_g0jrd")
-theme_override_icons/unchecked = SubResource("ImageTexture_g0jrd")
-theme_override_icons/checked_disabled = SubResource("ImageTexture_g0jrd")
-theme_override_icons/unchecked_disabled = SubResource("ImageTexture_g0jrd")
-alignment = 1
-script = ExtResource("22_4fln3")
-unchecked_icon = ExtResource("23_bj3ck")
-checked_icon = ExtResource("24_btupq")
-metadata/_custom_type_script = "uid://bkxpnxtj5fc1f"
+theme_override_styles/disabled = SubResource("StyleBoxFlat_4mqkb")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ro2q1")
+script = ExtResource("21_4fln3")
+states = Array[ExtResource("22_bj3ck")]([SubResource("Resource_60cfw"), SubResource("Resource_g0jrd")])
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="NextButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 clip_contents = true
@@ -857,13 +990,15 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_k7pvx")
 theme_override_styles/focus = SubResource("StyleBoxFlat_0u8rr")
 script = ExtResource("16_ss7lu")
 button_icon = ExtResource("25_00qru")
+content_alignment = null
+min_width = null
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [connection signal="pressed" from="FrostedPanel/VBoxContainer/HBoxContainer/AddButton" to="." method="_on_add_button_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/TabButton" to="." method="_on_tab_button_pressed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ModeButton" to="." method="_on_mode_button_pressed"]
+[connection signal="state_changed" from="PanelContainer/VBoxContainer/HBoxContainer/ModeButton" to="." method="_on_mode_button_state_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/LastButton" to="." method="_on_last_button_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/StatusButton" to="." method="_on_status_button_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/NextButton" to="." method="_on_next_button_pressed"]

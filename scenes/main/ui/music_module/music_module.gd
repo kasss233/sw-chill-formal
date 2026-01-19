@@ -43,6 +43,8 @@ func _ready() -> void:
 	_setup_initial_music()
 	_setup_list_menu()
 	_setup_add_menu()
+	_sync_play_status()
+
 # --- 内部处理函数 ---
 ## 初始化默认列表并加载音乐
 func _setup_initial_music() -> void:
@@ -158,6 +160,18 @@ func get_music_list_names() -> Array[String]:
 		if child is MusicList:
 			names.append(child.name)
 	return names
+
+## 根据名称切换到指定的歌单
+func switch_to_list_by_name(p_list_name: String) -> void:
+	for i in range(list_container.get_child_count()):
+		var child = list_container.get_child(i)
+		if child is MusicList and child.name == p_list_name:
+			_switch_to_list(i)
+			return
+
+## 设置当前音乐显示（用于初始化时更新 UI）
+func set_current_music_display(p_music_name: String) -> void:
+	tab_button.text = p_music_name
 ## 获取当前列表中的所有音乐名称
 func get_current_list_music_names() -> Array[String]:
 	var names: Array[String] = []
@@ -227,6 +241,18 @@ func _on_last_button_pressed() -> void:
 func _on_status_button_pressed() -> void:
 	music_status_changed.emit()
 	print("[Music Module] music_status_changed emitted")
+	# 延迟一帧后同步图标，确保 audio_player 状态已更新
+	await get_tree().process_frame
+	_sync_play_status()
+
+## 同步播放/暂停按钮图标
+func _sync_play_status() -> void:
+	if audio_player and audio_player.has_method("get_is_paused"):
+		is_playing = not audio_player.get_is_paused()
+	if is_playing:
+		status_button.set_state(0)
+	else:
+		status_button.set_state(1)
 
 ## 播放下一首
 func _on_next_button_pressed() -> void:

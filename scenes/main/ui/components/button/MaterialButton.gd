@@ -675,18 +675,19 @@ func set_text_style(text_color: Color = Color(0.4, 0.6, 1.0)) -> void:
 
 # ==================== 文字滚动相关 ====================
 
+# 保存原始字体颜色（用于滚动标签）
+var _original_font_color: Color = Color.WHITE
+
 func _setup_scroll_label() -> void:
 	if not is_inside_tree():
 		return
 	
 	if enable_text_scroll:
-		# 隐藏按钮自带的文字（所有状态）
-		add_theme_color_override("font_color", Color.TRANSPARENT)
-		add_theme_color_override("font_hover_color", Color.TRANSPARENT)
-		add_theme_color_override("font_pressed_color", Color.TRANSPARENT)
-		add_theme_color_override("font_focus_color", Color.TRANSPARENT)
-		add_theme_color_override("font_disabled_color", Color.TRANSPARENT)
-		add_theme_color_override("font_outline_color", Color.TRANSPARENT)
+		# 先获取原始字体颜色（在设置透明之前）
+		if not has_theme_color_override("font_color"):
+			_original_font_color = get_theme_color("font_color")
+			if _original_font_color.a <= 0:
+				_original_font_color = Color.WHITE
 		
 		# 创建裁剪容器
 		if not _scroll_container:
@@ -703,9 +704,17 @@ func _setup_scroll_label() -> void:
 			_scroll_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			_scroll_container.add_child(_scroll_label)
 		
-		# 同步字体设置
+		# 同步字体设置（使用保存的原始颜色）
 		_sync_label_theme()
 		_scroll_label.text = text
+		
+		# 隐藏按钮自带的文字（所有状态）
+		add_theme_color_override("font_color", Color.TRANSPARENT)
+		add_theme_color_override("font_hover_color", Color.TRANSPARENT)
+		add_theme_color_override("font_pressed_color", Color.TRANSPARENT)
+		add_theme_color_override("font_focus_color", Color.TRANSPARENT)
+		add_theme_color_override("font_disabled_color", Color.TRANSPARENT)
+		add_theme_color_override("font_outline_color", Color.TRANSPARENT)
 		
 		# 更新容器位置
 		_update_scroll_container_rect()
@@ -736,15 +745,14 @@ func _sync_label_theme() -> void:
 	# 从按钮复制字体设置
 	var font = get_theme_font("font")
 	var font_size = get_theme_font_size("font_size")
-	var font_color = get_theme_color("font_color")
 	
 	if font:
 		_scroll_label.add_theme_font_override("font", font)
 	if font_size > 0:
 		_scroll_label.add_theme_font_size_override("font_size", font_size)
 	
-	# 使用原本的字体颜色（不是透明的）
-	_scroll_label.add_theme_color_override("font_color", font_color if font_color.a > 0 else Color.WHITE)
+	# 使用保存的原始字体颜色
+	_scroll_label.add_theme_color_override("font_color", _original_font_color)
 
 func _update_scroll_container_rect() -> void:
 	if not _scroll_container:
@@ -760,15 +768,24 @@ func _update_scroll_container_rect() -> void:
 	
 	# 计算容器区域
 	var container_x = content_left
-	var container_width = size.x - content_left - content_right
-	var container_height = size.y - padding_vertical * 2
+	var actual_width = size.x if size.x > 0 else custom_minimum_size.x
+	var actual_height = size.y if size.y > 0 else custom_minimum_size.y
+	var container_width = max(0, actual_width - content_left - content_right)
+	var container_height = max(0, actual_height - padding_vertical * 2)
 	
 	_scroll_container.position = Vector2(container_x, padding_vertical)
 	_scroll_container.size = Vector2(container_width, container_height)
 	
 	# 更新标签位置（垂直居中）
 	if _scroll_label:
-		_scroll_label.position.y = (container_height - _scroll_label.size.y) / 2.0
+		var label_height = _scroll_label.size.y
+		if label_height <= 0:
+			# 如果标签还没有尺寸，使用字体高度估算
+			var font = _scroll_label.get_theme_font("font")
+			var font_size = _scroll_label.get_theme_font_size("font_size")
+			if font:
+				label_height = font.get_height(font_size)
+		_scroll_label.position.y = (container_height - label_height) / 2.0
 
 func _update_scroll() -> void:
 	if not is_inside_tree() or not enable_text_scroll or not _scroll_label:
@@ -777,52 +794,66 @@ func _update_scroll() -> void:
 	# 更新容器位置
 	_update_scroll_container_rect()
 	
-	# 设置文字内容（循环模式下需要重复显示）
-	var is_loop_mode = (scroll_mode == 1)
-	if is_loop_mode:
-		# 循环滚动：显示文字的多份拷贝，用空格隔开
-		var gap_count = int(scroll_gap / 4)  # 粗略估算空格数
-		var gap_text = ""
-		for i in gap_count:
-			gap_text += " "
-		
-		# 根据 scroll_repeat_count 重复文字
-		var repeated_text = ""
-		for i in scroll_repeat_count:
-			repeated_text += text
-			if i < scroll_repeat_count - 1:
-				repeated_text += gap_text
-		_scroll_label.text = repeated_text
-	else:
-		_scroll_label.text = text
+	var container_width = _scroll_container.size.x if _scroll_container else 0.0
+	if container_width <= 0:
+		return
 	
-	await get_tree().process_frame  # 等待一帧让Label更新尺寸
+	# 先测量单个文字的宽度
+	_scroll_label.text = text
+	await get_tree().process_frame
 	
 	if not _scroll_label:
 		return
 	
-	# 计算单个文字的宽度
-	if is_loop_mode:
-		# 临时设置单个文字来测量宽度
-		var original_text = _scroll_label.text
-		_scroll_label.text = text
-		await get_tree().process_frame
-		_text_width = _scroll_label.size.x
-		_scroll_label.text = original_text
-		await get_tree().process_frame
-	else:
-		_text_width = _scroll_label.size.x
+	_text_width = _scroll_label.size.x
 	
-	var container_width = _scroll_container.size.x if _scroll_container else 0.0
+	# 设置文字内容（循环模式下需要重复显示）
+	var is_loop_mode = (scroll_mode == 1)
+	
+	# 如果文字没有超出容器，不需要滚动
+	if _text_width <= container_width:
+		_scroll_label.position.x = 0
+		_stop_scroll()
+		return
+	
+	# 文字超出容器，需要滚动
+	if is_loop_mode:
+		# 循环滚动：使用固定像素间隔，确保无缝衔接
+		var gap_text = "   "  # 使用固定的空格间隔
+		var font = _scroll_label.get_theme_font("font")
+		var font_size = _scroll_label.get_theme_font_size("font_size")
+		var gap_width: float = 0.0
+		if font:
+			gap_width = font.get_string_size(gap_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		
+		# 计算需要的重复数量以确保无缝循环
+		# 滚动动画：从 position.x = 0 滚动到 position.x = -(text_width + gap_width)，然后重置到0
+		# 在滚动过程中的任意时刻，容器内都需要有完整的文字显示
+		# 当 position.x = -segment_width 时，第一份文字刚好完全滚出，第二份文字从位置0开始
+		# 所以需要确保从位置0开始有足够的文字填满容器
+		# 需要的份数 = ceil(container_width / segment_width) + 1（被滚出的那份）
+		var segment_width = _text_width + gap_width
+		var min_repeats = ceili(container_width / segment_width) + 2  # +2 确保足够
+		# 确保至少有用户设置的重复数量
+		var actual_repeats = max(scroll_repeat_count, min_repeats)
+		
+		# 构建重复文字（每份文字后都加间隔，确保循环无缝）
+		var repeated_text = ""
+		for i in actual_repeats:
+			repeated_text += text
+			repeated_text += gap_text
+		_scroll_label.text = repeated_text
+		
+		await get_tree().process_frame
+	
+	if not _scroll_label:
+		return
 	
 	# 重置位置
 	_scroll_label.position.x = 0
 	
-	# 如果文字超出容器，开始滚动
-	if _text_width > container_width and container_width > 0:
-		_start_scroll()
-	else:
-		_stop_scroll()
+	# 开始滚动
+	_start_scroll()
 
 func _start_scroll() -> void:
 	if _is_scrolling:
@@ -845,11 +876,7 @@ func _do_scroll_animation() -> void:
 		return
 	
 	var container_width = _scroll_container.size.x
-	var scroll_distance = _text_width - container_width
-	
-	if scroll_distance <= 0:
-		_stop_scroll()
-		return
+	var is_loop_mode = (scroll_mode == 1)
 	
 	# 停止之前的动画
 	if _scroll_tween and _scroll_tween.is_valid():
@@ -858,22 +885,26 @@ func _do_scroll_animation() -> void:
 	_scroll_tween = create_tween()
 	_scroll_tween.set_loops()  # 无限循环
 	
-	var is_loop_mode = (scroll_mode == 1)
 	if is_loop_mode:
 		# 循环滚动模式：无缝循环
-		# 文字已经重复显示，只需要滚动到第一份文字完全消失的位置，然后瞬间重置
-		var total_distance = _text_width + scroll_gap
-		var duration = total_distance / scroll_speed
+		# 计算单份文字+间隔的实际像素宽度
+		var single_segment_width = _text_width + _get_gap_pixel_width()
+		var duration = single_segment_width / scroll_speed
 		
-		# 等待 -> 从0滚动到-(文字宽度+间隔) -> 瞬间重置到0
+		# 等待 -> 从0滚动到-(单份文字+间隔) -> 瞬间重置到0
 		_scroll_tween.tween_interval(scroll_delay)
-		_scroll_tween.tween_property(_scroll_label, "position:x", -total_distance, duration).set_trans(Tween.TRANS_LINEAR)
+		_scroll_tween.tween_property(_scroll_label, "position:x", -single_segment_width, duration).set_trans(Tween.TRANS_LINEAR)
 		_scroll_tween.tween_callback(func(): 
 			if _scroll_label:
 				_scroll_label.position.x = 0
 		)
 	else:
 		# 来回滚动模式
+		var scroll_distance = _text_width - container_width
+		if scroll_distance <= 0:
+			_stop_scroll()
+			return
+		
 		var duration = scroll_distance / scroll_speed
 		
 		# 等待 -> 滚动到末尾 -> 等待 -> 滚动回开头
@@ -889,6 +920,21 @@ func _set(property: StringName, value: Variant) -> bool:
 		text = value
 		# 更新滚动
 		if enable_text_scroll and _scroll_label and is_inside_tree():
+			# 立即停止当前滚动并重置位置
+			_stop_scroll()
 			call_deferred("_update_scroll")
 		return false  # 返回 false 让父类也处理
 	return false
+
+# 计算间隔的实际像素宽度
+func _get_gap_pixel_width() -> float:
+	if not _scroll_label:
+		return 0.0
+	
+	# 使用与 _update_scroll 中相同的间隔文字
+	var gap_text = "   "
+	var font = _scroll_label.get_theme_font("font")
+	var font_size = _scroll_label.get_theme_font_size("font_size")
+	if font:
+		return font.get_string_size(gap_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+	return 0.0

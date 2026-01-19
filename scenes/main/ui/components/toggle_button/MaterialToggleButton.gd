@@ -615,3 +615,180 @@ func set_text_style(text_color: Color = Color(0.4, 0.6, 1.0)) -> void:
 	_create_stylebox("pressed", Color(text_color.r, text_color.g, text_color.b, 0.12), radius)
 	
 	add_theme_color_override("font_color", text_color)
+
+# ============ 状态查询 API ============
+
+## 获取指定索引的状态
+func get_state(index: int) -> ToggleButtonState:
+	if index >= 0 and index < states.size():
+		return states[index]
+	return null
+
+## 获取当前状态对象
+func get_current_state_data() -> ToggleButtonState:
+	return _get_current_state()
+
+## 获取当前状态索引
+func get_current_state_index() -> int:
+	return current_state
+
+## 检查是否是第一个状态
+func is_first_state() -> bool:
+	return current_state == 0
+
+## 检查是否是最后一个状态
+func is_last_state() -> bool:
+	return current_state == states.size() - 1
+
+## 通过标签查找状态索引，未找到返回 -1
+func find_state_by_label(label: String) -> int:
+	for i in states.size():
+		if states[i].label == label:
+			return i
+	return -1
+
+## 检查指定索引是否有效
+func is_valid_state(index: int) -> bool:
+	return index >= 0 and index < states.size()
+
+# ============ 状态操作 API ============
+
+## 设置当前状态 (触发信号)
+func set_state(index: int) -> void:
+	if is_valid_state(index):
+		current_state = index
+
+## 清空所有状态
+func clear_states() -> void:
+	states.clear()
+	current_state = 0
+	_update_state_display()
+
+## 更新指定索引的状态
+func update_state(index: int, new_state: ToggleButtonState) -> bool:
+	if is_valid_state(index):
+		states[index] = new_state
+		if index == current_state:
+			_update_state_display()
+		return true
+	return false
+
+## 在指定位置插入状态
+func insert_state(index: int, state: ToggleButtonState) -> bool:
+	if index >= 0 and index <= states.size():
+		states.insert(index, state)
+		if current_state >= index:
+			current_state += 1
+		_update_state_display()
+		return true
+	return false
+
+## 交换两个状态的位置
+func swap_states(index1: int, index2: int) -> bool:
+	if is_valid_state(index1) and is_valid_state(index2):
+		var temp = states[index1]
+		states[index1] = states[index2]
+		states[index2] = temp
+		_update_state_display()
+		return true
+	return false
+
+# ============ 状态导航 API ============
+
+## 切换到下一个状态
+func next_state() -> void:
+	if states.size() > 1:
+		current_state = (current_state + 1) % states.size()
+
+## 切换到上一个状态
+func previous_state() -> void:
+	if states.size() > 1:
+		current_state = (current_state - 1 + states.size()) % states.size()
+
+## 跳转到第一个状态
+func go_to_first_state() -> void:
+	current_state = 0
+
+## 跳转到最后一个状态
+func go_to_last_state() -> void:
+	if states.size() > 0:
+		current_state = states.size() - 1
+
+## 跳转到指定标签的状态
+func go_to_state_by_label(label: String) -> bool:
+	var index = find_state_by_label(label)
+	if index >= 0:
+		current_state = index
+		return true
+	return false
+
+# ============ 属性控制 API ============
+
+## 设置是否启用涟漪效果
+func set_ripple_enabled(enabled: bool) -> void:
+	enable_ripple = enabled
+	if enabled and not _ripple_mixin:
+		_ripple_mixin = MaterialRippleMixin.new()
+		_ripple_mixin.ripple_color = ripple_color
+		_ripple_mixin.setup(self)
+		if not button_down.is_connected(_on_button_down):
+			button_down.connect(_on_button_down)
+		if not button_up.is_connected(_on_button_up):
+			button_up.connect(_on_button_up)
+
+## 设置是否自动循环
+func set_auto_cycle(enabled: bool) -> void:
+	auto_cycle = enabled
+
+## 设置循环模式
+func set_cycle_mode(mode: CycleMode) -> void:
+	cycle_mode = mode
+	_ping_pong_direction = 1  # 重置 ping pong 方向
+
+## 设置按钮尺寸
+func set_button_size(size_enum: ButtonSize) -> void:
+	button_size = size_enum
+
+## 设置过渡动画时长
+func set_transition_duration(duration: float) -> void:
+	transition_duration = clampf(duration, 0.0, 1.0)
+
+# ============ 批量操作 API ============
+
+## 批量设置状态
+func set_states(new_states: Array[ToggleButtonState]) -> void:
+	states = new_states
+	current_state = clampi(current_state, 0, maxi(0, states.size() - 1))
+	_update_state_display()
+
+## 从配置数组创建状态 (icon, label, icon_color, text_color, bg_color)
+func setup_from_config(configs: Array) -> void:
+	states.clear()
+	for config in configs:
+		var state = ToggleButtonState.new()
+		if config.has("icon"):
+			state.icon = config["icon"]
+		if config.has("label"):
+			state.label = config["label"]
+		if config.has("icon_color"):
+			state.icon_color = config["icon_color"]
+		if config.has("text_color"):
+			state.text_color = config["text_color"]
+		if config.has("background_color"):
+			state.background_color = config["background_color"]
+		states.append(state)
+	current_state = 0
+	_update_state_display()
+
+## 获取所有状态的标签列表
+func get_all_labels() -> Array[String]:
+	var labels: Array[String] = []
+	for state in states:
+		labels.append(state.label)
+	return labels
+
+## 强制刷新显示
+func refresh() -> void:
+	_update_button_style()
+	_update_state_display()
+	_update_layout()
