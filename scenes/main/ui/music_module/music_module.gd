@@ -15,6 +15,17 @@ signal music_status_changed()
 @export var option_board_scene: PackedScene
 ## 音乐资源
 @export var audio_res: AudioRes
+## icon 
+@export var play_icon: Texture
+@export var pause_icon: Texture
+##顺序播放icon
+@export var order_icon: Texture
+##随机播放icon
+@export var random_icon: Texture
+##单曲循环icon
+@export var single_icon: Texture
+## 音频播放器引用（用于同步状态）
+@export var audio_player: Node
 # --- 节点引用 ---
 ## 歌单面板
 @onready var frosted_panel: PanelContainer = $FrostedPanel
@@ -235,7 +246,7 @@ func _on_last_button_pressed() -> void:
 				current_list.play_random_music()
 			2:
 				current_list.play_last_music()
-		status_button.set_checked_no_signal(false)
+
 
 ## 播放/暂停
 func _on_status_button_pressed() -> void:
@@ -265,8 +276,7 @@ func _on_next_button_pressed() -> void:
 				current_list.play_random_music()
 			2:
 				current_list.play_next_music() # 单曲循环切换按顺序播放下一首
-	#TODO:补充切换checkbox逻辑
-	status_button.set_checked_no_signal(false)
+
 ## 当菜单选中一个歌单时的处理
 func _on_list_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
 	print("[%s]Switch music list to %d" % [self.name, p_index])
@@ -366,6 +376,13 @@ func _on_tab_button_pressed() -> void:
 
 func _on_mode_button_pressed() -> void:
 	next_play_mode = (next_play_mode + 1) % 3
+	match next_play_mode:
+		0:
+			mode_button.icon = order_icon
+		1:
+			mode_button.icon = random_icon
+		2:
+			mode_button.icon = single_icon
 			
 func _on_add_button_pressed() -> void:
 	_open_import_music_dialog()

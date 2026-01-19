@@ -1,9 +1,14 @@
-[gd_scene load_steps=82 format=3 uid="uid://do56ajkuwsf0t"]
+[gd_scene load_steps=87 format=3 uid="uid://do56ajkuwsf0t"]
 
 [ext_resource type="Script" uid="uid://b7qsxbprouywv" path="res://scenes/main/ui/music_module/music_module.gd" id="1_t37u8"]
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
 [ext_resource type="PackedScene" uid="uid://cxdwb75116e2w" path="res://scenes/main/ui/music_module/music_option_board/music_option_board.tscn" id="4_cfhda"]
 [ext_resource type="PackedScene" uid="uid://gh3p734runtb" path="res://scenes/main/ui/music_module/music_list/music_list.tscn" id="4_x6s46"]
+[ext_resource type="Texture2D" uid="uid://tjapaqv7cja7" path="res://assets/ui/music_icons/pause_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="5_0xa2x"]
+[ext_resource type="Texture2D" uid="uid://cm2nqosp7mnap" path="res://assets/ui/music_icons/play_arrow_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="6_hycke"]
+[ext_resource type="Texture2D" uid="uid://de10r3xqer81s" path="res://assets/ui/music_icons/repeat_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="7_5sru0"]
+[ext_resource type="Texture2D" uid="uid://cllehb5o2ohcp" path="res://assets/ui/music_icons/shuffle_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="8_2p7cx"]
+[ext_resource type="Texture2D" uid="uid://baqcqrlontxyr" path="res://assets/ui/music_icons/repeat_one_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48.svg" id="9_ss7lu"]
 [ext_resource type="Script" uid="uid://c66rtlpmo48ps" path="res://scenes/main/ui/components/menu/MaterialMenu.gd" id="10_bj3ck"]
 [ext_resource type="Script" uid="uid://bpt2no6rofvg6" path="res://scenes/main/ui/components/menu/MaterialMenuItemConfig.gd" id="11_btupq"]
 [ext_resource type="Texture2D" uid="uid://dumeuvinhlojt" path="res://assets/ui/icons/attach_file_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="12_00qru"]
@@ -424,7 +429,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -435,7 +440,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -446,7 +451,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -457,7 +462,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -607,118 +612,6 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lrjur"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4mqkb"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.12)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u4qyi"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.12)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ro2q1"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.06)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_60cfw"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="ImageTexture" id="ImageTexture_g0jrd"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3dqc"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o5s7w"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e3b0t"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k7pvx"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0u8rr"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
 [node name="MusicModule" type="Control"]
 layout_mode = 3
 anchors_preset = 2
@@ -737,7 +630,6 @@ single_icon = ExtResource("9_ss7lu")
 metadata/_edit_horizontal_guides_ = [279.0, 277.0]
 
 [node name="MaterialMenu" type="PanelContainer" parent="."]
-visible = false
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 0
 offset_left = 452.0
@@ -750,7 +642,6 @@ editor_items = Array[ExtResource("11_btupq")]([SubResource("Resource_t1xwq"), Su
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="FrostedPanel" type="PanelContainer" parent="."]
-visible = false
 material = SubResource("ShaderMaterial_62hhh")
 layout_mode = 0
 offset_left = 2.0
