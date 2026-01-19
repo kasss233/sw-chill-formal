@@ -1,0 +1,301 @@
+[gd_scene load_steps=17 format=3 uid="uid://bxk7j8nan4opq"]
+
+[ext_resource type="Script" uid="uid://b2k45kgxcbsaq" path="res://scenes/main/ui/components/switch/MaterialSwitch.gd" id="MaterialSwitchScript"]
+[ext_resource type="Script" uid="uid://dw4kjigygio0p" path="res://scenes/main/ui/components/switch/SwitchDemo.gd" id="SwitchDemoScript"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_fo0v3"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_xr0uj"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_0w43y"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_im0wa"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_txlev"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_qsql4"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_m2ox7"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_tvdrs"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_f2udc"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_02cdl"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_uqmci"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_qhm5i"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_ql8hd"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_apw75"]
+
+[node name="SwitchDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("SwitchDemoScript")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "MaterialSwitch Demo 开关示例"
+
+[node name="HSeparator" type="HSeparator" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BasicSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BasicTitle" type="Label" parent="ScrollContainer/VBoxContainer/BasicSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "基础开关"
+
+[node name="Switch1" type="CheckBox" parent="ScrollContainer/VBoxContainer/BasicSection"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_fo0v3")
+theme_override_icons/unchecked = SubResource("ImageTexture_fo0v3")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="Switch2" type="CheckBox" parent="ScrollContainer/VBoxContainer/BasicSection"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_xr0uj")
+theme_override_icons/unchecked = SubResource("ImageTexture_xr0uj")
+button_pressed = true
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="Switch3" type="CheckBox" parent="ScrollContainer/VBoxContainer/BasicSection"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_0w43y")
+theme_override_icons/unchecked = SubResource("ImageTexture_0w43y")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="SizeSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SizeTitle" type="Label" parent="ScrollContainer/VBoxContainer/SizeSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "不同尺寸"
+
+[node name="SizeSwitches" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/SizeSection"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SmallSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_im0wa")
+theme_override_icons/unchecked = SubResource("ImageTexture_im0wa")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="StandardSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_txlev")
+theme_override_icons/unchecked = SubResource("ImageTexture_txlev")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="MediumSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
+custom_minimum_size = Vector2(52, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_qsql4")
+theme_override_icons/unchecked = SubResource("ImageTexture_qsql4")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="LargeSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/SizeSection/SizeSwitches"]
+custom_minimum_size = Vector2(52, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_m2ox7")
+theme_override_icons/unchecked = SubResource("ImageTexture_m2ox7")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="LabelSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LabelTitle" type="Label" parent="ScrollContainer/VBoxContainer/LabelSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "带标签的开关"
+
+[node name="WifiSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/LabelSection"]
+custom_minimum_size = Vector2(144, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_tvdrs")
+theme_override_icons/unchecked = SubResource("ImageTexture_tvdrs")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+label_text = "Wi-Fi"
+
+[node name="BluetoothSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/LabelSection"]
+custom_minimum_size = Vector2(144, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_f2udc")
+theme_override_icons/unchecked = SubResource("ImageTexture_f2udc")
+button_pressed = true
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+label_text = "蓝牙"
+
+[node name="DarkModeSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/LabelSection"]
+custom_minimum_size = Vector2(144, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_02cdl")
+theme_override_icons/unchecked = SubResource("ImageTexture_02cdl")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+label_text = "深色模式"
+
+[node name="VSeparator" type="VSeparator" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ColorSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ColorTitle" type="Label" parent="ScrollContainer/VBoxContainer/ColorSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "自定义颜色"
+
+[node name="ColorSwitches" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/ColorSection"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="ColorSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/ColorSection/ColorSwitches"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_uqmci")
+theme_override_icons/unchecked = SubResource("ImageTexture_uqmci")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.3, 0.7, 0.3, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="ColorSwitch2" type="CheckBox" parent="ScrollContainer/VBoxContainer/ColorSection/ColorSwitches"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_qhm5i")
+theme_override_icons/unchecked = SubResource("ImageTexture_qhm5i")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.95, 0.5, 0.3, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="ColorSwitch3" type="CheckBox" parent="ScrollContainer/VBoxContainer/ColorSection/ColorSwitches"]
+custom_minimum_size = Vector2(52, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_ql8hd")
+theme_override_icons/unchecked = SubResource("ImageTexture_ql8hd")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.7, 0.3, 0.7, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="VSeparator2" type="VSeparator" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="IconButtonSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="IconButtonTitle" type="Label" parent="ScrollContainer/VBoxContainer/IconButtonSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "带图标的开关"
+
+[node name="IconSwitch" type="CheckBox" parent="ScrollContainer/VBoxContainer/IconButtonSection"]
+custom_minimum_size = Vector2(144, 28)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_icons/checked = SubResource("ImageTexture_apw75")
+theme_override_icons/unchecked = SubResource("ImageTexture_apw75")
+script = ExtResource("MaterialSwitchScript")
+active_color = Color(0.35, 0.65, 0.95, 1)
+inactive_color = Color(0.5, 0.5, 0.5, 1)
+label_text = "通知"
