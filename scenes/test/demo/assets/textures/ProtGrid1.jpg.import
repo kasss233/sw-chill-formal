@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b2fgjtbqrhy3b"
 path.s3tc="res://.godot/imported/ProtGrid1.jpg-7eec33f6be994136af3966c5f45a14eb.s3tc.ctex"
+path.etc2="res://.godot/imported/ProtGrid1.jpg-7eec33f6be994136af3966c5f45a14eb.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://scenes/test/demo/assets/textures/ProtGrid1.jpg"
-dest_files=["res://.godot/imported/ProtGrid1.jpg-7eec33f6be994136af3966c5f45a14eb.s3tc.ctex"]
+dest_files=["res://.godot/imported/ProtGrid1.jpg-7eec33f6be994136af3966c5f45a14eb.s3tc.ctex", "res://.godot/imported/ProtGrid1.jpg-7eec33f6be994136af3966c5f45a14eb.etc2.ctex"]
 
 [params]
 

@@ -802,7 +802,6 @@ clip_button_text = true
 enable_text_scroll = true
 scroll_speed = 20.0
 scroll_end_delay = 0.0
-scroll_repeat_count = 2
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="ModeButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]

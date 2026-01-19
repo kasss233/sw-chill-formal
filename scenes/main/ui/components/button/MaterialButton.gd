@@ -166,6 +166,10 @@ var _scroll_container: Control
 var _scroll_tween: Tween
 var _text_width: float = 0.0
 var _is_scrolling: bool = false
+var _scroll_position: float = 0.0  # 当前滚动位置
+var _segment_width: float = 0.0   # 单个文字段+间隔的宽度
+var _scroll_wait_timer: float = 0.0  # 等待计时器
+var _scroll_state: int = 0  # 0: 等待开始, 1: 滚动中, 2: 等待结束（来回模式）, 3: 返回中（来回模式）
 
 # Material Design尺寸定义 (dp)
 const SIZE_MAP = {
@@ -177,6 +181,7 @@ const SIZE_MAP = {
 }
 
 func _ready() -> void:
+	set_process(false)  # 默认禁用 _process，只在需要滚动时启用
 	_setup_button()
 	_setup_scroll_label()
 	_update_button_style()
@@ -759,21 +764,41 @@ func _update_scroll_container_rect() -> void:
 		return
 	
 	var has_icon = button_icon != null
+	var has_text = text != null and text.length() > 0
 	var content_left = padding_horizontal
 	var content_right = padding_horizontal
 	
 	# 如果有图标在左侧，调整左边距
-	if has_icon and icon_layout_mode == IconLayoutMode.ICON_LEFT:
+	if has_icon and has_text and icon_layout_mode == IconLayoutMode.ICON_LEFT:
 		content_left = padding_horizontal + icon_size + icon_text_gap
 	
-	# 计算容器区域
+	# 如果是图标在上的布局，不需要调整水平边距
+	if has_icon and has_text and icon_layout_mode == IconLayoutMode.ICON_TOP:
+		content_left = padding_horizontal
+		content_right = padding_horizontal
+	
+	# 计算容器区域（确保尺寸至少为0）
 	var container_x = content_left
 	var actual_width = size.x if size.x > 0 else custom_minimum_size.x
 	var actual_height = size.y if size.y > 0 else custom_minimum_size.y
-	var container_width = max(0, actual_width - content_left - content_right)
-	var container_height = max(0, actual_height - padding_vertical * 2)
 	
-	_scroll_container.position = Vector2(container_x, padding_vertical)
+	# 如果尺寸仍然为0，使用默认值
+	if actual_width <= 0:
+		actual_width = 100.0
+	if actual_height <= 0:
+		actual_height = SIZE_MAP.get(button_size, SIZE_MAP[ButtonSize.STANDARD36])["height"]
+	
+	var container_width = maxf(0.0, actual_width - content_left - content_right)
+	var container_height = maxf(0.0, actual_height - padding_vertical * 2)
+	
+	# 如果是图标在上的布局，需要为图标腾出顶部空间
+	if has_icon and has_text and icon_layout_mode == IconLayoutMode.ICON_TOP:
+		var top_offset = padding_vertical + icon_size + icon_text_gap
+		_scroll_container.position = Vector2(container_x, top_offset)
+		container_height = maxf(0.0, actual_height - top_offset - padding_vertical)
+	else:
+		_scroll_container.position = Vector2(container_x, padding_vertical)
+	
 	_scroll_container.size = Vector2(container_width, container_height)
 	
 	# 更新标签位置（垂直居中）
@@ -782,39 +807,52 @@ func _update_scroll_container_rect() -> void:
 		if label_height <= 0:
 			# 如果标签还没有尺寸，使用字体高度估算
 			var font = _scroll_label.get_theme_font("font")
-			var font_size = _scroll_label.get_theme_font_size("font_size")
+			var font_size_val = _scroll_label.get_theme_font_size("font_size")
 			if font:
-				label_height = font.get_height(font_size)
+				label_height = font.get_height(font_size_val)
 		_scroll_label.position.y = (container_height - label_height) / 2.0
 
 func _update_scroll() -> void:
-	if not is_inside_tree() or not enable_text_scroll or not _scroll_label:
+	if not is_inside_tree() or not enable_text_scroll or not _scroll_label or not _scroll_container:
 		return
 	
 	# 更新容器位置
 	_update_scroll_container_rect()
 	
-	var container_width = _scroll_container.size.x if _scroll_container else 0.0
-	if container_width <= 0:
+	# 等待一帧确保容器尺寸已更新
+	if not is_inside_tree():
 		return
 	
+	var container_width = _scroll_container.size.x
+	if container_width <= 0:
+		# 容器宽度为0，延迟重试
+		await get_tree().process_frame
+		if not is_inside_tree() or not _scroll_container:
+			return
+		container_width = _scroll_container.size.x
+		if container_width <= 0:
+			return
+	
 	# 先测量单个文字的宽度
-	_scroll_label.text = text
+	_scroll_label.text = text if text else ""
+	
+	# 等待一帧让标签更新尺寸
 	await get_tree().process_frame
 	
-	if not _scroll_label:
+	# 再次检查节点是否有效
+	if not is_inside_tree() or not _scroll_label or not _scroll_container:
 		return
 	
 	_text_width = _scroll_label.size.x
 	
-	# 设置文字内容（循环模式下需要重复显示）
-	var is_loop_mode = (scroll_mode == 1)
-	
-	# 如果文字没有超出容器，不需要滚动
-	if _text_width <= container_width:
+	# 如果文字为空或没有超出容器，不需要滚动
+	if _text_width <= 0 or _text_width <= container_width:
 		_scroll_label.position.x = 0
 		_stop_scroll()
 		return
+	
+	# 设置文字内容（循环模式下需要重复显示）
+	var is_loop_mode = (scroll_mode == 1)
 	
 	# 文字超出容器，需要滚动
 	if is_loop_mode:
@@ -822,35 +860,45 @@ func _update_scroll() -> void:
 		var gap_text = "   "  # 使用固定的空格间隔
 		var font = _scroll_label.get_theme_font("font")
 		var font_size = _scroll_label.get_theme_font_size("font_size")
-		var gap_width: float = 0.0
-		if font:
+		var gap_width: float = scroll_gap  # 使用用户设置的间隔
+		if gap_width <= 0 and font:
 			gap_width = font.get_string_size(gap_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		if gap_width <= 0:
+			gap_width = 50.0  # 默认间隔
 		
-		# 计算需要的重复数量以确保无缝循环
-		# 滚动动画：从 position.x = 0 滚动到 position.x = -(text_width + gap_width)，然后重置到0
-		# 在滚动过程中的任意时刻，容器内都需要有完整的文字显示
-		# 当 position.x = -segment_width 时，第一份文字刚好完全滚出，第二份文字从位置0开始
-		# 所以需要确保从位置0开始有足够的文字填满容器
-		# 需要的份数 = ceil(container_width / segment_width) + 1（被滚出的那份）
+		# 计算单个段落宽度（文字+间隔）
 		var segment_width = _text_width + gap_width
-		var min_repeats = ceili(container_width / segment_width) + 2  # +2 确保足够
+		if segment_width <= 0:
+			return
+		
+		# 关键修复：需要足够多的重复来填满"容器宽度 + 一个段落宽度"
+		# 这样在任何滚动位置，容器内都有完整的文字
+		# 最小重复数 = ceil((容器宽度 + 段落宽度) / 段落宽度) + 1 (安全余量)
+		var min_repeats = ceili((container_width + segment_width) / segment_width) + 1
 		# 确保至少有用户设置的重复数量
-		var actual_repeats = max(scroll_repeat_count, min_repeats)
+		var actual_repeats = maxi(scroll_repeat_count, min_repeats)
+		# 为了更平滑的效果，再多加几份
+		actual_repeats = maxi(actual_repeats, 4)
 		
 		# 构建重复文字（每份文字后都加间隔，确保循环无缝）
 		var repeated_text = ""
 		for i in actual_repeats:
-			repeated_text += text
+			repeated_text += text if text else ""
 			repeated_text += gap_text
 		_scroll_label.text = repeated_text
 		
 		await get_tree().process_frame
-	
-	if not _scroll_label:
-		return
+		
+		# 再次检查节点是否有效
+		if not is_inside_tree() or not _scroll_label:
+			return
+		
+		# 存储段落宽度供滚动使用
+		_segment_width = segment_width
 	
 	# 重置位置
 	_scroll_label.position.x = 0
+	_scroll_position = 0.0
 	
 	# 开始滚动
 	_start_scroll()
@@ -864,11 +912,16 @@ func _start_scroll() -> void:
 
 func _stop_scroll() -> void:
 	_is_scrolling = false
-	if _scroll_tween and _scroll_tween.is_valid():
-		_scroll_tween.kill()
+	set_process(false)  # 停止 _process
+	_scroll_position = 0.0
+	_scroll_state = 0
+	
+	if _scroll_tween:
+		if _scroll_tween.is_valid():
+			_scroll_tween.kill()
 		_scroll_tween = null
 	
-	if _scroll_label:
+	if _scroll_label and is_instance_valid(_scroll_label):
 		_scroll_label.position.x = 0
 
 func _do_scroll_animation() -> void:
@@ -876,65 +929,138 @@ func _do_scroll_animation() -> void:
 		return
 	
 	var container_width = _scroll_container.size.x
+	if container_width <= 0 or _text_width <= 0:
+		_stop_scroll()
+		return
+	
 	var is_loop_mode = (scroll_mode == 1)
 	
-	# 停止之前的动画
+	# 停止之前的 Tween 动画（如果有）
 	if _scroll_tween and _scroll_tween.is_valid():
 		_scroll_tween.kill()
-	
-	_scroll_tween = create_tween()
-	_scroll_tween.set_loops()  # 无限循环
+		_scroll_tween = null
 	
 	if is_loop_mode:
-		# 循环滚动模式：无缝循环
-		# 计算单份文字+间隔的实际像素宽度
-		var single_segment_width = _text_width + _get_gap_pixel_width()
-		var duration = single_segment_width / scroll_speed
+		# 循环滚动模式：使用 _process 实现真正的无缝滚动
+		# _segment_width 已经在 _update_scroll 中计算好了
+		if _segment_width <= 0:
+			var gap_width = _get_gap_pixel_width()
+			if gap_width <= 0:
+				gap_width = scroll_gap if scroll_gap > 0 else 50.0
+			_segment_width = _text_width + gap_width
 		
-		# 等待 -> 从0滚动到-(单份文字+间隔) -> 瞬间重置到0
-		_scroll_tween.tween_interval(scroll_delay)
-		_scroll_tween.tween_property(_scroll_label, "position:x", -single_segment_width, duration).set_trans(Tween.TRANS_LINEAR)
-		_scroll_tween.tween_callback(func(): 
-			if _scroll_label:
-				_scroll_label.position.x = 0
-		)
-	else:
-		# 来回滚动模式
-		var scroll_distance = _text_width - container_width
-		if scroll_distance <= 0:
+		if _segment_width <= 0 or scroll_speed <= 0:
 			_stop_scroll()
 			return
 		
-		var duration = scroll_distance / scroll_speed
+		# 初始化滚动状态（不重置 _scroll_position，保持连续性）
+		_scroll_wait_timer = scroll_delay
+		_scroll_state = 0  # 等待开始
+		set_process(true)
+	else:
+		# 来回滚动模式：使用 _process 实现平滑滚动
+		var scroll_distance = _text_width - container_width
+		if scroll_distance <= 0 or scroll_speed <= 0:
+			_stop_scroll()
+			return
 		
-		# 等待 -> 滚动到末尾 -> 等待 -> 滚动回开头
-		_scroll_tween.tween_interval(scroll_delay)
-		_scroll_tween.tween_property(_scroll_label, "position:x", -scroll_distance, duration).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		_scroll_tween.tween_interval(scroll_end_delay)
-		_scroll_tween.tween_property(_scroll_label, "position:x", 0.0, duration).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		_segment_width = scroll_distance  # 在来回模式中存储滚动距离
+		_scroll_position = 0.0
+		_scroll_wait_timer = scroll_delay
+		_scroll_state = 0  # 等待开始
+		set_process(true)
+
+func _process(delta: float) -> void:
+	if not _is_scrolling or not _scroll_label or not is_instance_valid(_scroll_label):
+		set_process(false)
+		return
+	
+	var is_loop_mode = (scroll_mode == 1)
+	
+	if is_loop_mode:
+		_process_loop_scroll(delta)
+	else:
+		_process_bounce_scroll(delta)
+
+## 处理循环滚动（无缝无限滚动）
+func _process_loop_scroll(delta: float) -> void:
+	if _scroll_state == 0:
+		# 等待开始
+		_scroll_wait_timer -= delta
+		if _scroll_wait_timer <= 0:
+			_scroll_state = 1  # 开始滚动
+	else:
+		# 持续滚动
+		_scroll_position += scroll_speed * delta
+		
+		# 当滚动超过一个段落宽度时，无缝重置
+		if _scroll_position >= _segment_width:
+			_scroll_position = fmod(_scroll_position, _segment_width)
+		
+		# 更新标签位置
+		if _scroll_label and is_instance_valid(_scroll_label):
+			_scroll_label.position.x = -_scroll_position
+
+## 处理来回滚动
+func _process_bounce_scroll(delta: float) -> void:
+	match _scroll_state:
+		0:  # 等待开始
+			_scroll_wait_timer -= delta
+			if _scroll_wait_timer <= 0:
+				_scroll_state = 1  # 开始向前滚动
+		1:  # 向前滚动（向左）
+			_scroll_position += scroll_speed * delta
+			if _scroll_position >= _segment_width:
+				_scroll_position = _segment_width
+				_scroll_wait_timer = scroll_end_delay
+				_scroll_state = 2  # 等待结束
+			_update_scroll_label_position()
+		2:  # 等待结束
+			_scroll_wait_timer -= delta
+			if _scroll_wait_timer <= 0:
+				_scroll_state = 3  # 开始返回
+		3:  # 返回滚动（向右）
+			_scroll_position -= scroll_speed * delta
+			if _scroll_position <= 0:
+				_scroll_position = 0
+				_scroll_wait_timer = scroll_delay
+				_scroll_state = 0  # 重新等待开始
+			_update_scroll_label_position()
+
+func _update_scroll_label_position() -> void:
+	if _scroll_label and is_instance_valid(_scroll_label):
+		_scroll_label.position.x = -_scroll_position
 
 # 重写 text 属性的 setter 以支持滚动更新
 func _set(property: StringName, value: Variant) -> bool:
 	if property == "text":
-		# 调用父类设置
-		text = value
-		# 更新滚动
+		# 更新滚动标签
 		if enable_text_scroll and _scroll_label and is_inside_tree():
 			# 立即停止当前滚动并重置位置
 			_stop_scroll()
-			call_deferred("_update_scroll")
-		return false  # 返回 false 让父类也处理
+			# 延迟更新滚动，等父类设置完成
+			call_deferred("_deferred_update_scroll_text")
+		return false  # 返回 false 让父类处理
 	return false
+
+## 延迟更新滚动文字（在 text 属性设置完成后调用）
+func _deferred_update_scroll_text() -> void:
+	if _scroll_label and is_inside_tree():
+		_update_scroll()
 
 # 计算间隔的实际像素宽度
 func _get_gap_pixel_width() -> float:
+	# 如果设置了 scroll_gap，优先使用
+	if scroll_gap > 0:
+		return scroll_gap
+	
 	if not _scroll_label:
-		return 0.0
+		return 50.0  # 默认间隔
 	
 	# 使用与 _update_scroll 中相同的间隔文字
 	var gap_text = "   "
 	var font = _scroll_label.get_theme_font("font")
-	var font_size = _scroll_label.get_theme_font_size("font_size")
+	var font_size_val = _scroll_label.get_theme_font_size("font_size")
 	if font:
-		return font.get_string_size(gap_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
-	return 0.0
+		return font.get_string_size(gap_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size_val).x
+	return 50.0  # 默认间隔

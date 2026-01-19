@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://u41mvs44vtys"
 path.s3tc="res://.godot/imported/quick-sky2.jpg-44ec6986ff9419a11fc54b5bcd907c32.s3tc.ctex"
+path.etc2="res://.godot/imported/quick-sky2.jpg-44ec6986ff9419a11fc54b5bcd907c32.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/3d/skybox/quick-sky2.jpg"
-dest_files=["res://.godot/imported/quick-sky2.jpg-44ec6986ff9419a11fc54b5bcd907c32.s3tc.ctex"]
+dest_files=["res://.godot/imported/quick-sky2.jpg-44ec6986ff9419a11fc54b5bcd907c32.s3tc.ctex", "res://.godot/imported/quick-sky2.jpg-44ec6986ff9419a11fc54b5bcd907c32.etc2.ctex"]
 
 [params]
 

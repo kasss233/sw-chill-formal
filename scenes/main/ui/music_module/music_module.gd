@@ -16,16 +16,14 @@ signal music_status_changed()
 ## 音乐资源
 @export var audio_res: AudioRes
 ## icon 
-@export var play_icon: Texture
-@export var pause_icon: Texture
+@export var play_icon:Texture
+@export var pause_icon:Texture
 ##顺序播放icon
-@export var order_icon: Texture
+@export var order_icon:Texture
 ##随机播放icon
-@export var random_icon: Texture
+@export var random_icon:Texture
 ##单曲循环icon
-@export var single_icon: Texture
-## 音频播放器引用（用于同步状态）
-@export var audio_player: Node
+@export var single_icon:Texture
 # --- 节点引用 ---
 ## 歌单面板
 @onready var frosted_panel: PanelContainer = $FrostedPanel
@@ -36,8 +34,8 @@ signal music_status_changed()
 ## 音乐列表容器（用于存放所有 MusicList 实例，同时只显示一个）
 @onready var list_container: Control = $FrostedPanel/VBoxContainer/ListContainer
 #@onready var label=$PanelContainer/VBoxContainer/Label
-@onready var status_button = $PanelContainer/VBoxContainer/HBoxContainer/StatusButton
-@onready var mode_button = $PanelContainer/VBoxContainer/HBoxContainer/ModeButton
+@onready var status_button=$PanelContainer/VBoxContainer/HBoxContainer/StatusButton
+@onready var mode_button=$PanelContainer/VBoxContainer/HBoxContainer/ModeButton
 @onready var tab_button: MaterialButton = $PanelContainer/VBoxContainer/HBoxContainer/TabButton
 
 
@@ -47,14 +45,47 @@ var current_list_index: int = 0
 ## 是否弹出了选项面板
 var option_board_opened: bool = false
 ## 当前的icon
-var is_playing: bool = false
+var is_playing: bool=false
 ## 播放下一首的选择方式
 var next_play_mode: int = 0 # 0: 顺序播放, 1: 随机播放, 2: 单曲循环
 func _ready() -> void:
 	_setup_initial_music()
 	_setup_list_menu()
 	_setup_add_menu()
+	# 连接AudioPlayer信号
+	if AudioPlayer:
+		AudioPlayer.music_changed.connect(_on_audio_player_music_changed)
+		AudioPlayer.music_finished.connect(play_next_music)
+	# 延迟初始化 - 使用定时器确保在所有子节点完全准备好后执行
+	var timer = get_tree().create_timer(0.1)
+	timer.timeout.connect(_deferred_init)
+
+## 延迟初始化，确保所有节点和autoload都已准备好
+func _deferred_init() -> void:
+	# 初始化第一首歌
+	_init_first_music()
+	# 同步播放状态
 	_sync_play_status()
+
+## 初始化加载第一首歌到AudioPlayer，并设置当前列表的播放索引
+func _init_first_music() -> void:
+	var current_list = get_current_list()
+	if not current_list:
+		return
+	
+	if current_list.get_music_count() > 0:
+		var first_music_item = current_list.vbox.get_child(0) as MusicItem
+		if first_music_item:
+			var first_music = first_music_item.get_music_name()
+			# 设置列表的当前播放索引为0
+			current_list.current_playing_index = 0
+			current_list.current_playing_name = first_music
+			# 设置AudioPlayer的第一首歌（不自动播放）
+			if AudioPlayer:
+				AudioPlayer.set_bgm(first_music, false)
+			# 更新UI显示
+			set_current_music_display(first_music)
+			print("[Music Module] Initial music set: %s (index: 0)" % first_music)
 
 # --- 内部处理函数 ---
 ## 初始化默认列表并加载音乐
@@ -74,7 +105,7 @@ func _setup_list_menu() -> void:
 	if not list_menu_button:
 		return
 	# 连接菜单项点击信号
-	print("[%s]Setting up music list menu" % [name])
+	print("[%s]Setting up music list menu"%[name])
 	list_menu_button.menu_item_pressed.connect(_on_list_menu_item_pressed)
 	# 更新菜单项
 	_update_list_menu()
@@ -89,9 +120,9 @@ func _setup_add_menu() -> void:
 ## 添加菜单项点击处理
 func _on_add_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
 	match p_index:
-		0: # 导入音乐
+		0:  # 导入音乐
 			_open_import_music_dialog()
-		1: # 添加歌单
+		1:  # 添加歌单
 			_open_add_playlist_dialog()
 
 ## 打开导入音乐对话框
@@ -144,7 +175,7 @@ func add_music(p_list_name: String, p_music_name: String) -> void:
 func remove_music(p_list_name: String, p_music_name: String) -> void:
 	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	#如果列表是全部音乐，则从每个列表中删除，并从资源中删除
-	if p_list_name == "全部音乐":
+	if p_list_name=="全部音乐":
 		#从所有列表中移除该音乐
 		for child in list_container.get_children():
 			if child is MusicList:
@@ -221,19 +252,21 @@ func play_next_music() -> void:
 	var current_list = get_current_list()
 	if not current_list:
 		return
-	if next_play_mode == 0:
+	if next_play_mode==0:
 		current_list.play_next_music()
-	elif next_play_mode == 1:
+	elif next_play_mode==1:
 		current_list.play_random_music()
-	elif next_play_mode == 2:
+	elif next_play_mode==2:
 		current_list.play_single_music()
 
 # --- 信号回调 ---
 ## 更换当前播放的音乐，更新 UI 并发出信号
 func _on_music_changed(p_name: String) -> void:
 	print("[Music Module] Changing music to: %s" % p_name)
+	# 调用AudioPlayer切换音乐
+	if AudioPlayer:
+		AudioPlayer.change_bgm(p_name)
 	music_changed.emit(p_name)
-	#label.text=p_name
 	tab_button.text = p_name
 ## 播放上一首
 func _on_last_button_pressed() -> void:
@@ -246,10 +279,18 @@ func _on_last_button_pressed() -> void:
 				current_list.play_random_music()
 			2:
 				current_list.play_last_music()
+		# 切换歌曲后强制开始播放
+		if AudioPlayer and AudioPlayer.get_is_paused():
+			AudioPlayer.toggle_playback()
+			await get_tree().process_frame
+			_sync_play_status()
 
 
 ## 播放/暂停
 func _on_status_button_pressed() -> void:
+	# 调用AudioPlayer切换播放状态
+	if AudioPlayer:
+		AudioPlayer.toggle_playback()
 	music_status_changed.emit()
 	print("[Music Module] music_status_changed emitted")
 	# 延迟一帧后同步图标，确保 audio_player 状态已更新
@@ -258,8 +299,8 @@ func _on_status_button_pressed() -> void:
 
 ## 同步播放/暂停按钮图标
 func _sync_play_status() -> void:
-	if audio_player and audio_player.has_method("get_is_paused"):
-		is_playing = not audio_player.get_is_paused()
+	if AudioPlayer:
+		is_playing = not AudioPlayer.get_is_paused()
 	if is_playing:
 		status_button.set_state(0)
 	else:
@@ -275,11 +316,16 @@ func _on_next_button_pressed() -> void:
 			1:
 				current_list.play_random_music()
 			2:
-				current_list.play_next_music() # 单曲循环切换按顺序播放下一首
+				current_list.play_next_music()#单曲循环切换按顺序播放下一首
+		# 切换歌曲后强制开始播放
+		if AudioPlayer and AudioPlayer.get_is_paused():
+			AudioPlayer.toggle_playback()
+			await get_tree().process_frame
+			_sync_play_status()
 
 ## 当菜单选中一个歌单时的处理
 func _on_list_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
-	print("[%s]Switch music list to %d" % [self.name, p_index])
+	print("[%s]Switch music list to %d"%[self.name,p_index])
 	_switch_to_list(p_index)
 
 ## 切换到指定索引的列表
@@ -305,7 +351,7 @@ func _update_list_menu() -> void:
 	for child in list_container.get_children():
 		if child is MusicList:
 			list_menu_button.add_menu_item(child.name)
-			print("[%s]Added %s to music list menu" % [name, child.name])
+			print("[%s]Added %s to music list menu"%[name,child.name])
 
 ## 当点击音乐项的选项按钮时，弹出选项面板
 func _on_music_options_requested(p_music_name: String, p_list_name: String) -> void:
@@ -378,11 +424,11 @@ func _on_mode_button_pressed() -> void:
 	next_play_mode = (next_play_mode + 1) % 3
 	match next_play_mode:
 		0:
-			mode_button.icon = order_icon
+			mode_button.icon= order_icon
 		1:
-			mode_button.icon = random_icon
+			mode_button.icon= random_icon
 		2:
-			mode_button.icon = single_icon
+			mode_button.icon= single_icon
 			
 func _on_add_button_pressed() -> void:
 	_open_import_music_dialog()
@@ -398,12 +444,12 @@ func _on_bgm_added(_name: String) -> void:
 	if all_music_list:
 		all_music_list.add_music(_name)
 ## 当请求删除特定音乐时的回调
-func _on_music_removed(p_music_name: String, p_list_name: String) -> void:
+func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
 	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
 	#如果列表是全部音乐，则弹出确认对话框
-	if p_list_name == "全部音乐":
+	if p_list_name=="全部音乐":
 		var confirm_dialog = ConfirmationDialog.new()
-		confirm_dialog.dialog_text = "确定要删除音乐%s吗？这将彻底移除该音乐。" % p_music_name
+		confirm_dialog.dialog_text="确定要删除音乐%s吗？这将彻底移除该音乐。" % p_music_name
 		confirm_dialog.confirmed.connect(func():
 			#从所有列表中移除该音乐
 			for child in list_container.get_children():
@@ -422,6 +468,10 @@ func _on_music_removed(p_music_name: String, p_list_name: String) -> void:
 
 #----辅助函数
 	
+## 当AudioPlayer的音乐改变时同步UI显示
+func _on_audio_player_music_changed(p_name: String) -> void:
+	tab_button.text = p_name
+
 ## 检查指定音乐是否已存在于某个列表中
 func is_music_in_list(p_list_name: String, p_music_name: String) -> bool:
 	var target_list = list_container.get_node_or_null(p_list_name) as MusicList

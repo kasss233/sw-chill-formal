@@ -2,17 +2,15 @@ extends Node
 
 ## 音频管理器，负责全局背景音乐（BGM）和音效（SFX）的加载与播放
 
+# --- 信号 ---
+## 当音乐改变时发出
+signal music_changed(p_name: String)
+## 当音乐播放完毕时发出
+signal music_finished()
+
 # --- 导出变量 ---
 ## 包含所有音频资源的 Resource
 @export var audio_res: AudioRes
-## UI 节点引用，用于连接播放指令信号
-@export var ui: UI
-## 初始歌单名称（留空则默认第一个歌单）
-@export var initial_list_name: String = ""
-## 初始播放的音乐名称（留空则默认歌单中第一首音乐）
-@export var initial_bgm_name: String = ""
-## 初始是否为暂停状态
-@export var initial_paused: bool = true
 
 @export_group("Volume Settings")
 ## BGM 主音量（0.0 - 1.0）
@@ -55,42 +53,7 @@ var _target_volume_db: float = 0.0
 # --- 内置函数 ---
 func _ready() -> void:
 	_init_audio_players()
-	_connect_ui_signals()
-	_init_playback_state()
-
-## 初始化播放状态
-func _init_playback_state() -> void:
-	is_paused = initial_paused
-	
-	# 确定初始歌单
-	var target_list_name = initial_list_name
-	if target_list_name == "" and ui:
-		# 默认使用第一个歌单
-		var list_names = ui.get_music_list_names()
-		if list_names.size() > 0:
-			target_list_name = list_names[0]
-	
-	# 切换到目标歌单
-	if target_list_name != "" and ui:
-		ui.switch_to_list_by_name(target_list_name)
-	
-	# 确定初始音乐
-	var target_bgm_name = initial_bgm_name
-	if target_bgm_name == "" and ui and target_list_name != "":
-		# 默认使用歌单中第一首音乐
-		var music_names = ui.get_list_music_names(target_list_name)
-		if music_names.size() > 0:
-			target_bgm_name = music_names[0]
-	
-	# 设置初始音乐
-	if target_bgm_name != "":
-		set_bgm(target_bgm_name, not initial_paused)
-		# 更新 UI 显示
-		if ui:
-			ui.set_current_music_display(target_bgm_name)
-		print("[AudioPlayer] Initial BGM set: [%s] from list [%s], paused: %s" % [target_bgm_name, target_list_name, initial_paused])
-	else:
-		print("[AudioPlayer] No music available for initial playback")
+	print("[AudioPlayer] Initialized as autoload singleton")
 
 # --- 内部初始化 ---
 ## 根据资源初始化所有的 AudioStreamPlayer
@@ -107,11 +70,6 @@ func _init_audio_players() -> void:
 	for item in audio_res.BGM:
 		add_bgm_from_resource(item)
 	audio_res.bgm_added.connect(_on_bgm_added)
-## 连接来自 UI 的播放控制信号
-func _connect_ui_signals() -> void:
-	if ui:
-		ui.music_changed.connect(_on_music_changed)
-		ui.music_status_changed.connect(_on_music_status_changed)
 
 # --- 公有 API ---
 ## 播放指定名称的音效
@@ -138,6 +96,7 @@ func set_bgm(p_name: String, p_play: bool = true) -> void:
 	var audio = bgm_container.get_node_or_null(p_name) as AudioStreamPlayer
 	if audio:
 		current_bgm_name = p_name
+		music_changed.emit(p_name)
 		if p_play:
 			audio.play()
 			print("[AudioPlayer] Started BGM: [%s]" % p_name)
@@ -231,6 +190,14 @@ func set_sfx_volume(volume: float) -> void:
 func get_sfx_volume() -> float:
 	return sfx_volume
 
+## 根据名称切换BGM（保持播放/暂停状态）
+func change_bgm(p_name: String) -> void:
+	switch_bgm(p_name)
+
+## 切换播放/暂停状态
+func toggle_playback() -> void:
+	toggle_bgm_playback()
+
 ## 带淡入效果播放 BGM
 func play_bgm_with_fade(p_name: String, custom_fade_duration: float = -1.0) -> void:
 	var duration = custom_fade_duration if custom_fade_duration >= 0 else fade_in_duration
@@ -249,13 +216,9 @@ func crossfade_to_bgm(p_name: String, custom_fade_duration: float = -1.0) -> voi
 	_fade_to_bgm(p_name, duration, false)
 
 # --- 信号回调 ---
-func _on_music_changed(p_name: String) -> void:
-	switch_bgm(p_name)
-
-func _on_music_status_changed() -> void:
-	toggle_bgm_playback()
 func _on_music_finished() -> void:
-	ui.play_next_music()
+	music_finished.emit()
+	
 func _on_bgm_added(_name: String) -> void:
 	var item = audio_res.get_bgm_item_by_name(_name)
 	if item:
@@ -324,6 +287,7 @@ func _fade_to_bgm(p_name: String, duration: float, stop_immediately: bool = fals
 			old_audio.stop()
 			old_audio.stream_paused = false
 		current_bgm_name = p_name
+		music_changed.emit(p_name)
 		new_audio.volume_db = _target_volume_db
 		new_audio.play()
 		is_paused = false
@@ -345,6 +309,7 @@ func _fade_to_bgm(p_name: String, duration: float, stop_immediately: bool = fals
 	
 	# 淡入新的 BGM
 	current_bgm_name = p_name
+	music_changed.emit(p_name)
 	new_audio.volume_db = -80.0
 	new_audio.play()
 	is_paused = false

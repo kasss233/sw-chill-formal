@@ -4,8 +4,9 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dsnjt07kdjqt7"
 path.s3tc="res://.godot/imported/lowpoly_mouse_0.png-4bb5d9cf24b1856f3f425467a754099e.s3tc.ctex"
+path.etc2="res://.godot/imported/lowpoly_mouse_0.png-4bb5d9cf24b1856f3f425467a754099e.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
@@ -15,7 +16,7 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/3d/mouses/modern/lowpoly_mouse_0.png"
-dest_files=["res://.godot/imported/lowpoly_mouse_0.png-4bb5d9cf24b1856f3f425467a754099e.s3tc.ctex"]
+dest_files=["res://.godot/imported/lowpoly_mouse_0.png-4bb5d9cf24b1856f3f425467a754099e.s3tc.ctex", "res://.godot/imported/lowpoly_mouse_0.png-4bb5d9cf24b1856f3f425467a754099e.etc2.ctex"]
 
 [params]
 
