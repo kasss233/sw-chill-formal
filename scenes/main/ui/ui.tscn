@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://b8aqjm4e8p3u2"]
+[gd_scene load_steps=5 format=3 uid="uid://b8aqjm4e8p3u2"]
 
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
 [ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
 [ext_resource type="PackedScene" uid="uid://o8cxkfnpu5ug" path="res://scenes/main/ui/note_module/note_module.tscn" id="3_3q8gq"]
+[ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/env_time_setter/env_time_setter.tscn" id="4_ex8bf"]
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -27,3 +28,19 @@ offset_right = -36.0
 offset_bottom = -36.0
 grow_horizontal = 0
 grow_vertical = 0
+
+[node name="EnvTimeSetter" parent="." instance=ExtResource("4_ex8bf")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -74.0
+offset_top = -36.0
+offset_right = -74.0
+offset_bottom = -36.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[connection signal="env_time_changed" from="EnvTimeSetter" to="." method="_on_env_time_setter_env_time_changed"]

@@ -9,6 +9,8 @@ signal music_changed(p_name: String)
 ## 当播放状态（播放/暂停）切换时发出
 signal music_status_changed()
 
+## 切换环境时间
+signal env_time_changed(mode: int)
 # --- 节点引用 ---
 ## 音乐管理模块
 @onready var music_module: Control = $MusicModule
@@ -40,9 +42,9 @@ func change_music(p_name: String) -> void:
 	if music_module:
 		music_module.change_music(p_name)
 ## 删除音乐
-func remove_music(p_music_name: String,p_list_name: String) -> void:
+func remove_music(p_music_name: String, p_list_name: String) -> void:
 	if music_module:
-		music_module.remove_music(p_music_name,p_list_name)
+		music_module.remove_music(p_music_name, p_list_name)
 ## 播放下一首音乐
 func play_next_music() -> void:
 	if music_module:
@@ -93,3 +95,7 @@ func _on_music_changed(p_name: String) -> void:
 
 func _on_music_status_changed() -> void:
 	music_status_changed.emit()
+
+
+func _on_env_time_setter_env_time_changed(mode: int) -> void:
+	env_time_changed.emit(mode)
