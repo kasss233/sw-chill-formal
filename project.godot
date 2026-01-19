@@ -20,7 +20,7 @@ GuiTransitions="*res://addons/simple-gui-transitions/singleton.gd"
 
 [display]
 
-window/stretch/aspect="expand"
+window/stretch/mode="canvas_items"
 
 [editor_plugins]
 
