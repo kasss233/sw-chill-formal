@@ -19,7 +19,7 @@ static func adjust_mesh_zforward(mesh: ImporterMesh, blendshapes: Array):
 		var bsarr: Array[Array] = []
 		for bsidx in range(bscount):
 			bsarr.append(mesh.get_surface_blend_shape_arrays(surf_idx, bsidx))
-		var lods: Dictionary = {}  # mesh.surface_get_lods(surf_idx) # get_lods(mesh, surf_idx)
+		var lods: Dictionary = {} # mesh.surface_get_lods(surf_idx) # get_lods(mesh, surf_idx)
 		var mat: Material = mesh.get_surface_material(surf_idx)
 		var vert_arr_len: int = len(arr[ArrayMesh.ARRAY_VERTEX])
 		var vertarr: PackedVector3Array = arr[ArrayMesh.ARRAY_VERTEX]
@@ -33,8 +33,8 @@ static func adjust_mesh_zforward(mesh: ImporterMesh, blendshapes: Array):
 		if typeof(arr[ArrayMesh.ARRAY_TANGENT]) == TYPE_PACKED_FLOAT32_ARRAY:
 			var tangarr: PackedFloat32Array = arr[ArrayMesh.ARRAY_TANGENT]
 			for i in range(vert_arr_len):
-				tangarr[i * 4] = -tangarr[i * 4]
-				tangarr[i * 4 + 2] = -tangarr[i * 4 + 2]
+				tangarr[i * 4] = - tangarr[i * 4]
+				tangarr[i * 4 + 2] = - tangarr[i * 4 + 2]
 		for bsidx in range(len(bsarr)):
 			vertarr = bsarr[bsidx][ArrayMesh.ARRAY_VERTEX]
 			for i in range(vert_arr_len):
@@ -46,8 +46,8 @@ static func adjust_mesh_zforward(mesh: ImporterMesh, blendshapes: Array):
 			if typeof(bsarr[bsidx][ArrayMesh.ARRAY_TANGENT]) == TYPE_PACKED_FLOAT32_ARRAY:
 				var tangarr: PackedFloat32Array = bsarr[bsidx][ArrayMesh.ARRAY_TANGENT]
 				for i in range(vert_arr_len):
-					tangarr[i * 4] = -tangarr[i * 4]
-					tangarr[i * 4 + 2] = -tangarr[i * 4 + 2]
+					tangarr[i * 4] = - tangarr[i * 4]
+					tangarr[i * 4 + 2] = - tangarr[i * 4 + 2]
 			bsarr[bsidx].resize(ArrayMesh.ARRAY_MAX)
 
 		surf_data_by_mesh.push_back({"prim": prim, "arr": arr, "bsarr": bsarr, "lods": lods, "fmt_compress_flags": fmt_compress_flags, "name": name, "mat": mat})
@@ -185,7 +185,7 @@ static func skeleton_rename(gstate: GLTFState, p_base_scene: Node, p_skeleton: S
 					if bind_bone_name.is_empty():
 						#bind_bone_name = node.get_bone_name(skin.get_bind_bone(i))
 						if skin.get_bind_bone(i) != -1:
-							break  # Not using named binds: no need to rename skin.
+							break # Not using named binds: no need to rename skin.
 					var bone_name_from_skel: StringName = p_bone_map.find_profile_bone_name(bind_bone_name)
 					if not bone_name_from_skel.is_empty():
 						skin.set_bind_name(i, bone_name_from_skel)
@@ -250,7 +250,7 @@ static func skeleton_rotate(p_base_scene: Node, src_skeleton: Skeleton3D, p_bone
 
 			var prof_idx: int = profile.find_bone(src_bone_name)
 			if prof_idx >= 0:
-				tgt_rot = src_pg.inverse() * prof_skeleton.get_bone_global_rest(prof_idx).basis  # Mapped bone uses reference pose.
+				tgt_rot = src_pg.inverse() * prof_skeleton.get_bone_global_rest(prof_idx).basis # Mapped bone uses reference pose.
 
 		if src_skeleton.get_bone_parent(src_idx) >= 0:
 			diffs[src_idx] = (tgt_rot.inverse() * diffs[src_skeleton.get_bone_parent(src_idx)] * src_skeleton.get_bone_rest(src_idx).basis)
@@ -302,6 +302,8 @@ static func apply_mesh_rotation(p_base_scene: Node, src_skeleton: Skeleton3D, ol
 		var bone_idx: int = attachment.bone_idx
 		if bone_idx == -1:
 			bone_idx = src_skeleton.find_bone(attachment.bone_name)
+		if bone_idx == -1:
+			continue
 		var adjust_transform: Transform3D = src_skeleton.get_bone_global_rest(bone_idx).affine_inverse() * old_skeleton_global_rest[bone_idx]
 		adjust_transform = adjust_transform.scaled(global_transform_scale_local)
 
@@ -352,7 +354,7 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 		if bind_name != &"":
 			if bone_names_to_hide.has(bind_name):
 				bind_indices_to_hide[i] = true
-		else:  # non-named binds???
+		else: # non-named binds???
 			if bone_names_to_hide.values().count(skin.get_bind_bone(i)) != 0:
 				bind_indices_to_hide[i] = true
 
@@ -369,7 +371,7 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 		var bsarr: Array[Array] = []
 		for bsidx in range(bscount):
 			bsarr.append(mesh.get_surface_blend_shape_arrays(surf_idx, bsidx).duplicate(true))
-		var lods: Dictionary = {}  # mesh.surface_get_lods(surf_idx) # get_lods(mesh, surf_idx)
+		var lods: Dictionary = {} # mesh.surface_get_lods(surf_idx) # get_lods(mesh, surf_idx)
 		var mat: Material = mesh.get_surface_material(surf_idx)
 		var vert_arr_len: int = len(arr[ArrayMesh.ARRAY_VERTEX])
 		var hide_verts: PackedInt32Array
@@ -396,7 +398,7 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 				if hide_verts[indexarr[i]] == 0 && hide_verts[indexarr[i + 1]] == 0 && hide_verts[indexarr[i + 2]] == 0:
 					cnt += 3
 			if cnt == 0:
-				continue  # We skip this primitive entirely.
+				continue # We skip this primitive entirely.
 			new_indexarr.resize(cnt)
 			cnt = 0
 			for i in range(0, len(indexarr) - 2, 3):
@@ -409,7 +411,7 @@ static func _generate_hide_bone_mesh(mesh: ImporterMesh, skin: Skin, bone_names_
 
 		surf_data_by_mesh.push_back({"prim": prim, "arr": arr, "bsarr": bsarr, "lods": lods, "fmt_compress_flags": fmt_compress_flags, "name": name, "mat": mat})
 
-	if len(surf_data_by_mesh) == 0:  # all primitives were gobbled up
+	if len(surf_data_by_mesh) == 0: # all primitives were gobbled up
 		return null
 	if not did_hide_any_surface_verts:
 		return mesh
@@ -480,9 +482,9 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 					if head_hidden_mesh == null:
 						flag = "thirdPersonOnly"
 					if head_hidden_mesh == mesh:
-						flag = "both"  # Nothing to do: No head verts.
+						flag = "both" # Nothing to do: No head verts.
 
-			var layer_mask: int = layer_mask_first | layer_mask_third  # "both"
+			var layer_mask: int = layer_mask_first | layer_mask_third # "both"
 			if flag == "thirdPersonOnly":
 				layer_mask = layer_mask_third
 				if head_hiding_method == vrm_constants_class.HeadHidingSetting.FirstPersonOnly:
@@ -508,7 +510,7 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 				if flag == "thirdPersonOnly":
 					node.shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 
-			if flag == "auto" and head_hidden_mesh != mesh:  # If it is still "auto", we have something to hide.
+			if flag == "auto" and head_hidden_mesh != mesh: # If it is still "auto", we have something to hide.
 				if (head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers or
 						head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayersWithShadow or
 						head_hiding_method == vrm_constants_class.HeadHidingSetting.FirstPersonOnlyWithShadow):
@@ -555,7 +557,7 @@ static func perform_head_hiding(gstate: GLTFState, mesh_annotations_by_node: Dic
 					node_to_head_hidden_node[node] = duplicate_shadow_node
 
 			if (layer_mask_first != 0 and layer_mask != 0 and
-					(head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers or 
+					(head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayers or
 					head_hiding_method == vrm_constants_class.HeadHidingSetting.BothLayersWithShadow)):
 				if node.layers & layer_mask_first == 0 or node.layers & layer_mask_third == 0:
 					if head_hidden_node != null:

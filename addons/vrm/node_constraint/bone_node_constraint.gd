@@ -107,6 +107,8 @@ func evaluate() -> void:
 func evaluate_aim() -> void:
 	if source_node == null or target_node == null:
 		return
+	if target_bone == -1:
+		return
 	var source_global_transform: Transform3D = _get_source_global_transform() # * source_node.get_bone_pose(source_bone).affine_inverse() * Transform3D(source_node.get_bone_rest(source_bone).basis, Vector3())
 	var target_global_transform: Transform3D = _get_target_global_transform() * target_node.get_bone_pose(target_bone).affine_inverse() # * Transform3D(target_node.get_bone_rest(target_bone).basis, Vector3())
 	var target_rest_transform: Transform3D = target_node.get_bone_rest(target_bone) # .basis.get_rotation_quaternion()
@@ -138,7 +140,7 @@ func evaluate_roll() -> void:
 	var source_axis: Vector3 = source_quat.get_axis()
 	var source_angle: float = source_quat.get_angle()
 	# Calculate what we need to apply to the target.
-	var axis_index: int = aim_or_roll_axis - 1  # Vector3.Axis
+	var axis_index: int = aim_or_roll_axis - 1 # Vector3.Axis
 	var axis_value: float = source_axis[axis_index]
 	var rotation_quat := Quaternion.IDENTITY
 	if not is_zero_approx(axis_value):
@@ -156,7 +158,7 @@ func evaluate_rotation() -> void:
 	_set_weighted_posed_target_rotation(source_quat)
 
 
-static func from_dictionary(dict: Dictionary):  # -> BoneNodeConstraint:
+static func from_dictionary(dict: Dictionary): # -> BoneNodeConstraint:
 	var ret := new()
 	if not dict.has("constraint"):
 		return ret
@@ -217,6 +219,8 @@ func _get_posed_source_transform() -> Transform3D:
 
 
 func _get_source_global_transform() -> Transform3D:
+	if source_node == null or not source_node.is_inside_tree():
+		return Transform3D.IDENTITY
 	if source_bone == -1:
 		return source_node.global_transform
 	var skeleton: Skeleton3D = source_node as Skeleton3D
@@ -227,6 +231,8 @@ func _get_source_global_transform() -> Transform3D:
 
 
 func _get_target_global_transform() -> Transform3D:
+	if target_node == null or not target_node.is_inside_tree():
+		return Transform3D.IDENTITY
 	if target_bone == -1:
 		return target_node.global_transform
 	var skeleton: Skeleton3D = target_node as Skeleton3D
@@ -237,8 +243,11 @@ func _get_target_global_transform() -> Transform3D:
 
 
 func _get_target_global_rest() -> Transform3D:
+	if target_node == null or not target_node.is_inside_tree():
+		return Transform3D.IDENTITY
 	if target_bone == -1:
-		var parent_global: Transform3D = target_node.get_parent().global_transform
+		var parent: Node = target_node.get_parent()
+		var parent_global: Transform3D = parent.global_transform if parent is Node3D and parent.is_inside_tree() else Transform3D.IDENTITY
 		return parent_global * Transform3D(Basis(target_rest_rotation), target_rest_origin)
 	var skeleton: Skeleton3D = target_node as Skeleton3D
 	var ret := skeleton.get_bone_global_rest(target_bone)
@@ -266,6 +275,8 @@ func _set_weighted_global_target_rotation(rotation_quat: Quaternion) -> void:
 	if weight != 1.0:
 		rotation_quat = Quaternion.IDENTITY.slerp(rotation_quat, weight)
 	if target_bone == -1:
+		if target_node == null or not target_node.is_inside_tree():
+			return
 		var target_global_transform: Transform3D = target_node.global_transform
 		var scale_basis: Basis = Basis.from_scale(target_global_transform.basis.get_scale())
 		target_global_transform.basis = Basis(rotation_quat) * scale_basis

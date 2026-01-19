@@ -13,7 +13,7 @@ var action_playback: AnimationNodeStateMachinePlayback
 func _ready() -> void:
 	action_tree.active = true
 	action_playback = action_tree.get("parameters/playback")
-	set_dodge()
+	set_cheer()
 func start_saying():
 	saying=true
 func stop_saying():

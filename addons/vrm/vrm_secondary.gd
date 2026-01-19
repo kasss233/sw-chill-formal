@@ -129,7 +129,7 @@ func _on_recreate_collider():
 func _ready() -> void:
 	skel = get_node(skeleton)
 	if skel == null:
-		return  # Not supported.
+		return # Not supported.
 
 	if ClassDB.class_exists(&"SkeletonModifier3D"):
 		if internal_modifier_node != null:
@@ -245,15 +245,15 @@ func update_centers(skel_transform: Transform3D):
 	var skel_transform_inv: Transform3D = skel_transform.affine_inverse()
 	var center_xform: Transform3D
 	var center_xform_inv: Transform3D
-	if default_springbone_center != null:
+	if default_springbone_center != null and default_springbone_center.is_inside_tree():
 		center_xform = default_springbone_center.global_transform
 		center_xform_inv = center_xform.affine_inverse()
 	for center_i in range(len(center_nodes)):
 		var center_node: Node3D = center_nodes[center_i]
-		if (center_bones[center_i] == -1 and center_node == null) or override_springbone_center:
+		if (center_bones[center_i] == -1 and center_node == null) or override_springbone_center or (center_node != null and not center_node.is_inside_tree()):
 			center_transforms[center_i] = skel_transform
 			center_transforms_inv[center_i] = skel_transform_inv
-			if default_springbone_center != null:
+			if default_springbone_center != null and default_springbone_center.is_inside_tree():
 				center_transforms[center_i] = center_xform_inv * center_transforms[center_i]
 				center_transforms_inv[center_i] = center_transforms_inv[center_i] * center_xform
 		elif center_bones[center_i] == -1 and center_node != null:
@@ -266,8 +266,7 @@ func update_centers(skel_transform: Transform3D):
 
 func tick_spring_bones(delta: float) -> void:
 	# force update skeleton
-
-	if skel == null:
+	if skel == null or not skel.is_inside_tree():
 		return
 	var skel_transform: Transform3D = skel.global_transform
 
@@ -348,7 +347,7 @@ func do_process(delta: float) -> void:
 		tick_spring_bones(delta)
 	elif Engine.is_editor_hint():
 		if secondary_gizmo != null:
-			if skel != null:
+			if skel != null and skel.is_inside_tree():
 				var skel_transform: Transform3D = skel.global_transform
 				update_centers(skel_transform)
 				for collider_i in range(len(colliders_internal)):

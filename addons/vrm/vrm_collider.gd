@@ -19,7 +19,7 @@ extends Resource
 	set(value):
 		offset = value
 		emit_changed()
-@export var tail: Vector3:  # if is_capsule
+@export var tail: Vector3: # if is_capsule
 	set(value):
 		tail = value
 		emit_changed()
@@ -96,7 +96,7 @@ class VrmRuntimeCollider:
 			bone_idx = skel.find_bone(collider.bone)
 		if bone_idx != -1:
 			position = center_transform * (skel.get_bone_global_pose(bone_idx) * offset)
-		else:  # if node != null:
+		elif node != null and node.is_inside_tree():
 			position = center_transform * skel_global_xform_inv * node.global_transform * offset
 
 	func collision(bone_position: Vector3, bone_radius: float, bone_length: float, out: Vector3, position_offset: Vector3 = Vector3.ZERO) -> Vector3:
@@ -156,7 +156,7 @@ class CapsuleCollider:
 		if bone_idx != -1:
 			position = p_center_transform * (p_skel.get_bone_global_pose(bone_idx) * offset)
 			tail_position = p_center_transform * (p_skel.get_bone_global_pose(bone_idx) * tail_offset)
-		else:  # if node != null
+		elif node != null and node.is_inside_tree():
 			position = p_center_transform * p_skel_global_xform_inv * node.global_transform * offset
 			tail_position = p_center_transform * p_skel_global_xform_inv * node.global_transform * tail_offset
 
@@ -183,7 +183,7 @@ class CapsuleCollider:
 		var up_axis: Vector3 = (tail - position).normalized()
 		if up_axis.is_equal_approx(Vector3.ZERO):
 			up_axis = Vector3(0, 1, 0)
-		var right_axis: Vector3  #= up_axis.cross(Vector3.RIGHT).normalized()
+		var right_axis: Vector3 # = up_axis.cross(Vector3.RIGHT).normalized()
 		if abs(up_axis.dot(Vector3.RIGHT)) < 0.8:
 			right_axis = up_axis.cross(Vector3.RIGHT).normalized()
 		elif abs(up_axis.dot(Vector3.FORWARD)) < 0.8:

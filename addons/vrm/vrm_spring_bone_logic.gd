@@ -28,6 +28,8 @@ static func from_to_rotation_safe(from: Vector3, to: Vector3) -> Quaternion:
 
 
 func get_global_pose(skel: Skeleton3D) -> Transform3D:
+	if parent_idx == -1:
+		return skel.get_bone_pose(bone_idx)
 	return skel.get_bone_global_pose(parent_idx) * skel.get_bone_pose(bone_idx)
 
 
@@ -44,6 +46,8 @@ func get_local_pose_rotation_cached() -> Quaternion:
 
 
 func reset(skel: Skeleton3D) -> void:
+	if bone_idx == -1:
+		return
 	if not ClassDB.class_exists(&"SkeletonModifier3D"):
 		skel.set_bone_global_pose_override(bone_idx, initial_transform, 1.0, true)
 
@@ -86,8 +90,8 @@ func update(skel: Skeleton3D, center_transform: Transform3D, center_transform_in
 		next_tail = collider.collision(origin, radius, length, next_tail)
 
 	# Recording current tails for next process
-	prev_tail = current_tail  # center_transform_inv * current_tail
-	current_tail = next_tail  # center_transform_inv * next_tail
+	prev_tail = current_tail # center_transform_inv * current_tail
+	current_tail = next_tail # center_transform_inv * next_tail
 
 	# Apply rotation
 	var ft = from_to_rotation_safe(local_pose_rotation * (bone_axis), center_transform_inv.basis * (next_tail - origin))

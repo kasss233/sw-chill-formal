@@ -54,5 +54,4 @@ pointing/emulate_touch_from_mouse=true
 
 [rendering]
 
-renderer/rendering_method="mobile"
-anti_aliasing/quality/screen_space_aa=2
+anti_aliasing/quality/use_taa=true

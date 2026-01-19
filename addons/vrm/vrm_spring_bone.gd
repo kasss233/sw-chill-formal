@@ -90,23 +90,30 @@ class SpringBoneRuntimeState:
 				verlets.clear()
 				for id in range(len(joint_nodes) - 1):
 					var verlet: VRMSpringBoneLogic = create_vertlet(id, center_transform_inv)
-					verlets.append(verlet)
+					if verlet != null:
+						verlets.append(verlet)
 
 
 	func create_vertlet(id: int, center_tr_inv: Transform3D) -> VRMSpringBoneLogic:
 		var verlet: VRMSpringBoneLogic
 		if id < len(joint_nodes) - 1:
 			var bone_idx: int = skel.find_bone(joint_nodes[id])
+			if bone_idx == -1:
+				return null
 			var pos: Vector3
 			if joint_nodes[id + 1].is_empty():
 				var delta: Vector3 = skel.get_bone_rest(bone_idx).origin
 				pos = delta.normalized() * 0.07
 			else:
 				var first_child: int = skel.find_bone(joint_nodes[id + 1])
-				var local_position: Vector3 = skel.get_bone_rest(first_child).origin
-				var sca: Vector3 = skel.get_bone_rest(first_child).basis.get_scale()
-				pos = Vector3(local_position.x * sca.x, local_position.y * sca.y, local_position.z * sca.z)
-			verlet = VRMSpringBoneLogic.new(skel, bone_idx, center_tr_inv, pos, skel.get_bone_global_pose_no_override(id))
+				if first_child == -1:
+					var delta: Vector3 = skel.get_bone_rest(bone_idx).origin
+					pos = delta.normalized() * 0.07
+				else:
+					var local_position: Vector3 = skel.get_bone_rest(first_child).origin
+					var sca: Vector3 = skel.get_bone_rest(first_child).basis.get_scale()
+					pos = Vector3(local_position.x * sca.x, local_position.y * sca.y, local_position.z * sca.z)
+			verlet = VRMSpringBoneLogic.new(skel, bone_idx, center_tr_inv, pos, skel.get_bone_global_pose_no_override(bone_idx))
 		return verlet
 
 
@@ -139,7 +146,7 @@ class SpringBoneRuntimeState:
 
 
 	func update(delta: float, center_transform: Transform3D, center_transform_inv: Transform3D) -> void:
-		if verlets.is_empty() or len(verlets) != len(springbone.joint_nodes):
+		if verlets.is_empty() or len(verlets) < len(springbone.joint_nodes) - 1:
 			if joint_nodes.is_empty():
 				return
 			setup(center_transform_inv)
