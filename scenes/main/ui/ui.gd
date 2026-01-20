@@ -11,6 +11,8 @@ signal music_status_changed()
 
 ## 切换环境时间
 signal env_time_changed(mode: int)
+## 切换天气
+signal env_weather_changed(mode:int)
 # --- 节点引用 ---
 ## 音乐管理模块
 @onready var music_module: Control = $MusicModule
@@ -99,3 +101,7 @@ func _on_music_status_changed() -> void:
 
 func _on_env_time_setter_env_time_changed(mode: int) -> void:
 	env_time_changed.emit(mode)
+
+
+func _on_env_setter_env_weather_changed(mode: int) -> void:
+	env_weather_changed.emit(mode)

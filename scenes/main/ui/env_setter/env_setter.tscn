@@ -1,0 +1,205 @@
+[gd_scene load_steps=25 format=3 uid="uid://bsk40q141nhng"]
+
+[ext_resource type="Script" uid="uid://g3h1hclaruxb" path="res://scenes/main/ui/env_setter/env_setter.gd" id="1_iahff"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_b4mu8"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="3_t7p8r"]
+[ext_resource type="Texture2D" uid="uid://ucqcesyiou3u" path="res://assets/ui/icons/wb_sunny_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="4_dlm0l"]
+[ext_resource type="Texture2D" uid="uid://br6k5el85uq1v" path="res://assets/ui/icons/wb_twilight_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="5_xly7c"]
+[ext_resource type="Texture2D" uid="uid://cv33u7vkx65r4" path="res://assets/ui/icons/bedtime_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="6_s3f03"]
+[ext_resource type="Texture2D" uid="uid://cgyvm6ep5vpyw" path="res://assets/ui/icons/sync_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_wn8k3"]
+[ext_resource type="Texture2D" uid="uid://ea1alaylyb6w" path="res://assets/ui/icons/rainy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="8_b4mu8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3bpux"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j36pu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jec7i"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7oay3"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4j3q"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="Resource" id="Resource_84458"]
+script = ExtResource("3_t7p8r")
+state_name = "Daytime"
+icon = ExtResource("4_dlm0l")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_5cvtp"]
+script = ExtResource("3_t7p8r")
+state_name = "Dusk"
+icon = ExtResource("5_xly7c")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_2s0wq"]
+script = ExtResource("3_t7p8r")
+state_name = "Evening"
+icon = ExtResource("6_s3f03")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_2tfue"]
+script = ExtResource("3_t7p8r")
+state_name = "Sync_with_system"
+icon = ExtResource("7_wn8k3")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t7p8r"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dlm0l"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xly7c"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3f03"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wn8k3"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="Resource" id="Resource_3bpux"]
+script = ExtResource("3_t7p8r")
+state_name = "Sunny"
+icon = ExtResource("4_dlm0l")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_j36pu"]
+script = ExtResource("3_t7p8r")
+state_name = "Rainy"
+icon = ExtResource("8_b4mu8")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="EnvSetter" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_iahff")
+
+[node name="TimeButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 1
+offset_right = 36.0
+offset_bottom = 36.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3bpux")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_j36pu")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jec7i")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_7oay3")
+theme_override_styles/focus = SubResource("StyleBoxFlat_m4j3q")
+script = ExtResource("2_b4mu8")
+states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_84458"), SubResource("Resource_5cvtp"), SubResource("Resource_2s0wq"), SubResource("Resource_2tfue")])
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="WeatherButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 0
+offset_left = 49.0
+offset_right = 81.0
+offset_bottom = 36.0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_t7p8r")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dlm0l")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xly7c")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_s3f03")
+theme_override_styles/focus = SubResource("StyleBoxFlat_wn8k3")
+script = ExtResource("2_b4mu8")
+states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_3bpux"), SubResource("Resource_j36pu")])
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[connection signal="state_changed" from="TimeButton" to="." method="_on_time_button_state_changed"]
+[connection signal="state_changed" from="WeatherButton" to="." method="_on_weather_button_state_changed"]
