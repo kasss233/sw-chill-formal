@@ -13,6 +13,8 @@ signal music_status_changed()
 signal env_time_changed(mode: int)
 ## 切换天气
 signal env_weather_changed(mode:int)
+## 角色互动 
+signal character_interacted
 # --- 节点引用 ---
 ## 音乐管理模块
 @onready var music_module: Control = $MusicModule
@@ -105,3 +107,7 @@ func _on_env_time_setter_env_time_changed(mode: int) -> void:
 
 func _on_env_setter_env_weather_changed(mode: int) -> void:
 	env_weather_changed.emit(mode)
+
+
+func _on_character_interactor_character_interacted() -> void:
+	character_interacted.emit()

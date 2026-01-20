@@ -1,3 +1,4 @@
+class_name Character
 extends Node3D
 @export var emotion_animation: AnimationPlayer
 @export var action_animation: AnimationPlayer

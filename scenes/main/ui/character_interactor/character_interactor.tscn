@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://b6bxw47hgr5em"]
+
+[ext_resource type="Script" uid="uid://cmo8aeqofv0jc" path="res://scenes/main/ui/character_interactor/character_interactor.gd" id="1_l7jq4"]
+
+[node name="CharacterInteractor" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_l7jq4")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 35.0
+offset_top = -53.0
+offset_right = 296.0
+offset_bottom = 468.0
+flat = true
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
