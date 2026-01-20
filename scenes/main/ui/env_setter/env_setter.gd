@@ -22,3 +22,7 @@ func _on_weather_button_state_changed(_old_state: int, new_state: int) -> void:
 			emit_signal("env_weather_changed",0) # sunny
 		1:
 			emit_signal("env_weather_changed",1) # rainy
+		2:
+			emit_signal("env_weather_changed",2) # snowy
+		3:
+			emit_signal("env_weather_changed",3) # sync
