@@ -44,8 +44,15 @@ func setup(host: Control, shader_path: String = "res://scenes/main/ui/components
 	ripple_panel.material = ripple_material
 	
 	host.add_child(ripple_panel)
-	ripple_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
-	ripple_panel.size = host.size
+	# 设置 anchors 填充父容器，offsets 设为 0 让 size 自动跟随
+	ripple_panel.anchor_left = 0.0
+	ripple_panel.anchor_top = 0.0
+	ripple_panel.anchor_right = 1.0
+	ripple_panel.anchor_bottom = 1.0
+	ripple_panel.offset_left = 0
+	ripple_panel.offset_top = 0
+	ripple_panel.offset_right = 0
+	ripple_panel.offset_bottom = 0
 
 ## 设置涟漪颜色
 func set_ripple_color(color: Color) -> void:
@@ -63,8 +70,7 @@ func set_corner_radius(radius: float) -> void:
 func update_size(new_size: Vector2) -> void:
 	if ripple_material:
 		ripple_material.set_shader_parameter("button_size", new_size)
-	if ripple_panel:
-		ripple_panel.size = new_size
+	# PRESET_FULL_RECT 会自动跟随父容器尺寸，不需要手动设置 size
 
 ## 触发涟漪效果（按下时调用）
 func trigger_ripple(local_mouse_pos: Vector2) -> void:
