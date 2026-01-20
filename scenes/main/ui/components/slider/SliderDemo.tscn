@@ -1,0 +1,91 @@
+[gd_scene load_steps=3 format=3 uid="uid://dj2kf8m5a3xvg"]
+
+[ext_resource type="Script" uid="uid://dhu2yew0yphby" path="res://scenes/main/ui/components/slider/SliderDemo.gd" id="1_demo"]
+[ext_resource type="Script" uid="uid://dlsbsc0torxs0" path="res://scenes/main/ui/components/slider/MaterialSlider.gd" id="2_slider"]
+
+[node name="SliderDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_demo")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.12, 0.14, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -180.0
+offset_right = 180.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "MaterialSlider 演示"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="VBox1" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Label1" type="Label" parent="VBoxContainer/HBoxContainer/VBox1"]
+layout_mode = 2
+text = "横向滑动条"
+
+[node name="HorizontalSlider" type="Control" parent="VBoxContainer/HBoxContainer/VBox1"]
+custom_minimum_size = Vector2(200, 32)
+layout_mode = 2
+script = ExtResource("2_slider")
+track_thickness = 28
+
+[node name="VBox2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/VBox2"]
+layout_mode = 2
+text = "竖向"
+
+[node name="VerticalSlider" type="Control" parent="VBoxContainer/HBoxContainer/VBox2"]
+custom_minimum_size = Vector2(32, 120)
+layout_mode = 2
+script = ExtResource("2_slider")
+orientation = 1
+
+[node name="Label3" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "自定义样式（绿色主题，更粗）"
+
+[node name="CustomSlider" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(300, 40)
+layout_mode = 2
+script = ExtResource("2_slider")
+track_thickness = 40
+
+[node name="ValueLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "横向: 0 | 竖向: 0 | 自定义: 0"
+horizontal_alignment = 1

@@ -28,7 +28,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(240, 160)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uabc6"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ktb70"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -129,7 +129,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_uabc6")
+theme_override_styles/panel = SubResource("StyleBoxFlat_ktb70")
 script = ExtResource("FrostedPanelScript")
 noise_texture = SubResource("NoiseTexture2D_3ey0m")
 
