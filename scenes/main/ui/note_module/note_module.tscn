@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://y6qt40qr5w3x" path="res://scenes/main/ui/note_module/note/note.tscn" id="2_r3pkf"]
 [ext_resource type="Texture2D" uid="uid://dumeuvinhlojt" path="res://assets/ui/icons/attach_file_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="2_tvr07"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_naere"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r3pkf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -16,7 +16,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tvr07"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rwug5"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -27,7 +27,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r3pkf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qwws7"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -38,7 +38,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rwug5"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yyybl"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -49,7 +49,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qwws7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3tm6q"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -77,11 +77,11 @@ layout_mode = 1
 offset_right = 36.0
 offset_bottom = 36.0
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_naere")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_tvr07")
-theme_override_styles/hover = SubResource("StyleBoxFlat_r3pkf")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_rwug5")
-theme_override_styles/focus = SubResource("StyleBoxFlat_qwws7")
+theme_override_styles/normal = SubResource("StyleBoxFlat_r3pkf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_rwug5")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qwws7")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yyybl")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3tm6q")
 script = ExtResource("1_naere")
 button_icon = ExtResource("2_tvr07")
 padding_horizontal = 14
