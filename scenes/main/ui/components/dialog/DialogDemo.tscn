@@ -1,0 +1,225 @@
+[gd_scene load_steps=2 format=3 uid="uid://3v4084yosww1"]
+
+[ext_resource type="Script" uid="uid://cpnrq2kx1ohle" path="res://scenes/main/ui/components/dialog/DialogDemo.gd" id="DialogDemoScript"]
+
+[node name="DialogDemo2" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("DialogDemoScript")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "MaterialDialog Demo 对话框示例"
+
+[node name="HSeparator" type="HSeparator" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="InfoSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="InfoTitle" type="Label" parent="ScrollContainer/VBoxContainer/InfoSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "信息对话框 (INFO)"
+
+[node name="InfoButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/InfoSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowInfoBtn" type="Button" parent="ScrollContainer/VBoxContainer/InfoSection/InfoButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "显示信息对话框"
+
+[node name="ShowInfoWithIconBtn" type="Button" parent="ScrollContainer/VBoxContainer/InfoSection/InfoButtons"]
+custom_minimum_size = Vector2(160, 40)
+layout_mode = 2
+text = "带图标的信息对话框"
+
+[node name="WarningSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WarningTitle" type="Label" parent="ScrollContainer/VBoxContainer/WarningSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "警告对话框 (WARNING)"
+
+[node name="WarningButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/WarningSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowWarningBtn" type="Button" parent="ScrollContainer/VBoxContainer/WarningSection/WarningButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "显示警告对话框"
+
+[node name="ErrorSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ErrorTitle" type="Label" parent="ScrollContainer/VBoxContainer/ErrorSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "错误对话框 (ERROR)"
+
+[node name="ErrorButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/ErrorSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowErrorBtn" type="Button" parent="ScrollContainer/VBoxContainer/ErrorSection/ErrorButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "显示错误对话框"
+
+[node name="QuestionSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuestionTitle" type="Label" parent="ScrollContainer/VBoxContainer/QuestionSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "询问对话框 (QUESTION)"
+
+[node name="QuestionButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/QuestionSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowQuestionBtn" type="Button" parent="ScrollContainer/VBoxContainer/QuestionSection/QuestionButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "显示询问对话框"
+
+[node name="CustomSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CustomTitle" type="Label" parent="ScrollContainer/VBoxContainer/CustomSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "自定义对话框 (CUSTOM)"
+
+[node name="CustomButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/CustomSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowCustomBtn" type="Button" parent="ScrollContainer/VBoxContainer/CustomSection/CustomButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "显示自定义对话框"
+
+[node name="VSeparator" type="VSeparator" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MultiButtonSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MultiButtonTitle" type="Label" parent="ScrollContainer/VBoxContainer/MultiButtonSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "多按钮对话框示例"
+
+[node name="MultiButtonButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/MultiButtonSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowThreeBtn" type="Button" parent="ScrollContainer/VBoxContainer/MultiButtonSection/MultiButtonButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "三个按钮对话框"
+
+[node name="ShowManyBtn" type="Button" parent="ScrollContainer/VBoxContainer/MultiButtonSection/MultiButtonButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "多个按钮对话框"
+
+[node name="LongTextSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LongTextTitle" type="Label" parent="ScrollContainer/VBoxContainer/LongTextSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "长文本对话框示例"
+
+[node name="LongTextButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/LongTextSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowLongTextBtn" type="Button" parent="ScrollContainer/VBoxContainer/LongTextSection/LongTextButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "长文本示例"
+
+[node name="VSeparator2" type="VSeparator" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CustomContentSection" type="VBoxContainer" parent="ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CustomContentTitle" type="Label" parent="ScrollContainer/VBoxContainer/CustomContentSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "自定义内容组件示例"
+
+[node name="CustomContentButtons" type="HBoxContainer" parent="ScrollContainer/VBoxContainer/CustomContentSection"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShowLineEditDialog" type="Button" parent="ScrollContainer/VBoxContainer/CustomContentSection/CustomContentButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "输入框对话框"
+
+[node name="ShowSpinBoxDialog" type="Button" parent="ScrollContainer/VBoxContainer/CustomContentSection/CustomContentButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "数字输入对话框"
+
+[node name="ShowCheckBoxDialog" type="Button" parent="ScrollContainer/VBoxContainer/CustomContentSection/CustomContentButtons"]
+custom_minimum_size = Vector2(140, 40)
+layout_mode = 2
+text = "复选框对话框"
+
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/InfoSection/InfoButtons/ShowInfoBtn" to="." method="_on_show_info_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/InfoSection/InfoButtons/ShowInfoWithIconBtn" to="." method="_on_show_info_with_icon_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/WarningSection/WarningButtons/ShowWarningBtn" to="." method="_on_show_warning_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/ErrorSection/ErrorButtons/ShowErrorBtn" to="." method="_on_show_error_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/QuestionSection/QuestionButtons/ShowQuestionBtn" to="." method="_on_show_question_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/CustomSection/CustomButtons/ShowCustomBtn" to="." method="_on_show_custom_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/MultiButtonSection/MultiButtonButtons/ShowThreeBtn" to="." method="_on_show_three_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/MultiButtonSection/MultiButtonButtons/ShowManyBtn" to="." method="_on_show_many_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/LongTextSection/LongTextButtons/ShowLongTextBtn" to="." method="_on_show_long_text_pressed"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/CustomContentSection/CustomContentButtons/ShowLineEditDialog" to="." method="_on_show_line_edit_dialog"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/CustomContentSection/CustomContentButtons/ShowSpinBoxDialog" to="." method="_on_show_spin_box_dialog"]
+[connection signal="pressed" from="ScrollContainer/VBoxContainer/CustomContentSection/CustomContentButtons/ShowCheckBoxDialog" to="." method="_on_show_check_box_dialog"]

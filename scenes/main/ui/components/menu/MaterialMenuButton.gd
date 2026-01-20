@@ -13,9 +13,9 @@ signal menu_item_pressed(index: int, item: MaterialMenuItem)
 		# 断开旧菜单的信号
 		if menu and menu.item_pressed.is_connected(_on_menu_item_pressed):
 			menu.item_pressed.disconnect(_on_menu_item_pressed)
-		
+
 		menu = value
-		
+
 		# 连接新菜单的信号
 		if menu and not menu.item_pressed.is_connected(_on_menu_item_pressed):
 			menu.item_pressed.connect(_on_menu_item_pressed)
@@ -30,12 +30,15 @@ signal menu_item_pressed(index: int, item: MaterialMenuItem)
 @export var disable_menu_when_disabled: bool = true
 
 func _ready() -> void:
+	# 确保涟漪效果启用
+	enable_ripple = true
+
 	super._ready()
-	
+
 	# 连接按钮点击信号
 	if not pressed.is_connected(_on_button_pressed):
 		pressed.connect(_on_button_pressed)
-	
+
 	# 连接菜单信号
 	if menu and not menu.item_pressed.is_connected(_on_menu_item_pressed):
 		menu.item_pressed.connect(_on_menu_item_pressed)

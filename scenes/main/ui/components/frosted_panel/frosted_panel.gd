@@ -29,7 +29,7 @@ extends PanelContainer
 		tint_color = value
 		_update_shader_params()
 
-@export_range(0.0, 1.0) var noise_amount: float = 0.03:
+@export_range(0.0, 1.0) var noise_amount: float = 0:
 	set(value):
 		noise_amount = value
 		_update_shader_params()

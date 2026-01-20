@@ -652,7 +652,6 @@ offset_bottom = -167.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_00qru")
 script = ExtResource("12_2p7cx")
 corner_radius = 20.0
-noise_amount = 0.0
 noise_texture = SubResource("NoiseTexture2D_00qru")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
@@ -764,7 +763,6 @@ offset_bottom = -21.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_5kdm8")
 script = ExtResource("12_2p7cx")
 corner_radius = 20.0
-noise_amount = 0.0
 noise_texture = SubResource("NoiseTexture2D_62hhh")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
