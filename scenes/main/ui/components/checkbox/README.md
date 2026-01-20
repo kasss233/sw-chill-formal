@@ -54,18 +54,18 @@ extends Control
 @onready var checkbox = $MaterialCheckbox
 
 func _ready():
-    # 设置图标
-    checkbox.unchecked_icon = preload("res://assets/ui/checkbox_unchecked.svg")
-    checkbox.checked_icon = preload("res://assets/ui/checkbox_checked.svg")
-    
-    # 设置文本
-    checkbox.text = "启用功能"
-    
-    # 监听状态变化
-    checkbox.toggled.connect(_on_checkbox_toggled)
+	# 设置图标
+	checkbox.unchecked_icon = preload("res://assets/ui/checkbox_unchecked.svg")
+	checkbox.checked_icon = preload("res://assets/ui/checkbox_checked.svg")
+	
+	# 设置文本
+	checkbox.text = "启用功能"
+	
+	# 监听状态变化
+	checkbox.toggled.connect(_on_checkbox_toggled)
 
 func _on_checkbox_toggled(pressed: bool):
-    print("复选框状态: ", pressed)
+	print("复选框状态: ", pressed)
 ```
 
 ### 自定义样式
@@ -88,9 +88,9 @@ checkbox.set_state_colors(Color.GREEN, Color.GRAY)
 
 ```gdscript
 checkbox.set_material_style(
-    MaterialCheckbox.CheckboxSize.MEDIUM40,
-    preload("res://assets/ui/checked.svg"),
-    preload("res://assets/ui/unchecked.svg"),
+	MaterialCheckbox.CheckboxSize.MEDIUM40,
+	preload("res://assets/ui/checked.svg"),
+	preload("res://assets/ui/unchecked.svg"),
     "同意条款"
 )
 ```
@@ -124,6 +124,6 @@ scenes/main/ui/components/
 │   ├── MaterialButton.gd
 │   └── ripple.gdshader
 └── checkbox/
-    ├── MaterialCheckbox.gd
-    └── README.md
+	├── MaterialCheckbox.gd
+	└── README.md
 ```

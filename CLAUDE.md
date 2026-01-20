@@ -81,7 +81,7 @@ The UI is organized as modular, loosely-coupled components in `scenes/main/ui/`:
 All custom components are in `scenes/main/ui/components/`:
 
 #### **Core Components**:
-- **MaterialButton**: Base button with ripple effect, multiple size presets, icon+text layout
+- **MaterialButton**: Base button with ripple effect, multiple size presets, icon+text layout, text scrolling animation
 - **MaterialCheckBox**: Custom checkbox with Material Design styling
 - **MaterialToggleButton**: Multi-state button with cycle modes (forward/backward/ping-pong)
 - **MaterialDialog**: Full-featured modal dialog with types (INFO, WARNING, ERROR, QUESTION), animation, callbacks
@@ -89,6 +89,12 @@ All custom components are in `scenes/main/ui/components/`:
 - **MaterialMenuButton**: Button with integrated dropdown menu
 - **FrostedPanel**: Shader-based frosted glass effect panel (used in music module)
 - **MaterialRippleMixin**: Reusable ripple effect system for buttons/checkboxes
+- **MaterialSegmentedButton**: Material Design segmented selector with capsule-shaped container, blue highlight on selected item, sliding animation
+- **MaterialSwitch**: Material Design toggle switch with acceleration animation and background color gradient, single size
+- **MaterialTextField**: Material Design text input with pill-shaped full rounded corners, supports solid/transparent/frosted background styles
+- **InnerPanel**: Inner sub-panel component with rounded corners, border, and semi-transparent background (shader-based)
+- **Calendar**: Calendar widget using calendar_library plugin, supports year/month navigation and date selection
+- **DatePicker**: Button that pops up a calendar picker for date selection
 
 #### **Usage Pattern**:
 - All components extend Godot primitives (Button, CheckBox, etc.) marked with `@tool` for editor preview
@@ -138,18 +144,25 @@ scenes/main/
 └── ui/                      # UI modules and components
     ├── components/          # Reusable Material Design UI components
     │   ├── button/          # MaterialButton
+    │   ├── calendar/        # Calendar widget
     │   ├── checkbox/        # MaterialCheckBox
+    │   ├── date_picker/     # DatePicker button
     │   ├── dialog/          # MaterialDialog
-    │   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
-    │   ├── toggle_button/   # MaterialToggleButton
     │   ├── frosted_panel/   # Shader-based frosted glass panel
-    │   └── shared/          # MaterialRippleMixin, MaterialSizeConfig
+    │   ├── inner_panel/     # InnerPanel (shader-based panel with rounded corners)
+    │   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
+    │   ├── segmented_button/# MaterialSegmentedButton
+    │   ├── shared/          # MaterialRippleMixin, MaterialSizeConfig
+    │   ├── switch/          # MaterialSwitch
+    │   ├── text_field/      # MaterialTextField
+    │   └── toggle_button/   # MaterialToggleButton
     ├── music_module/        # Music player UI and playlist management
     ├── task_module_new/     # Task/todo management
     └── text_module/         # Text input module
 
 addons/                      # Third-party plugins
 ├── vrm/                     # VRM character support
+├── Godot-MToon-Shader/      # MToon shader for VRM
 ├── sky_3d/                  # 3D sky rendering
 ├── simple-gui-transitions/  # GUI transition system (autoload)
 ├── SmoothScroll/            # Smooth scrolling container

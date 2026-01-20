@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dpvjyp0i6a7px"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="MaterialDragHandleScript"]
+
+[node name="MaterialDragHandle" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 1
+script = ExtResource("MaterialDragHandleScript")

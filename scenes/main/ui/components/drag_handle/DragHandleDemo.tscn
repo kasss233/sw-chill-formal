@@ -1,0 +1,596 @@
+[gd_scene load_steps=21 format=3 uid="uid://bcyvfpikgmn2t"]
+
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="2_ktb70"]
+[ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/DragHandleDemo.gd" id="DragHandleDemoScript"]
+[ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="DragHandleScript"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="FrostedPanelScript"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_h41xp"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_3ey0m"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_h41xp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xl3w5"]
+shader = ExtResource("2_ktb70")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_3ey0m")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(240, 160)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uabc6"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_edcfo"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_idglm"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_edcfo")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qafvp"]
+shader = ExtResource("2_ktb70")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_idglm")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(220, 140)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l2w45"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_4ac80"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_1q2eg"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_4ac80")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0ljxc"]
+shader = ExtResource("2_ktb70")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_1q2eg")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(200, 130)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_omgs5"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ajj67"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_27yxg"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_ajj67")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4gjam"]
+shader = ExtResource("2_ktb70")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_27yxg")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(320, 120)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dqqf2"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="DragHandleDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("DragHandleDemoScript")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.12, 1)
+
+[node name="DecorativeBlue" type="ColorRect" parent="."]
+z_index = -1
+layout_mode = 0
+offset_left = 50.0
+offset_top = 120.0
+offset_right = 230.0
+offset_bottom = 300.0
+color = Color(0.35, 0.65, 0.95, 0.4)
+
+[node name="DecorativeOrange" type="ColorRect" parent="."]
+z_index = -1
+layout_mode = 0
+offset_left = 300.0
+offset_top = 180.0
+offset_right = 450.0
+offset_bottom = 380.0
+color = Color(0.95, 0.5, 0.3, 0.4)
+
+[node name="DecorativePurple" type="ColorRect" parent="."]
+z_index = -1
+layout_mode = 0
+offset_left = 550.0
+offset_top = 130.0
+offset_right = 710.0
+offset_bottom = 290.0
+color = Color(0.5, 0.3, 0.95, 0.4)
+
+[node name="DecorativeGreen" type="ColorRect" parent="."]
+z_index = -1
+layout_mode = 0
+offset_left = 200.0
+offset_top = 350.0
+offset_right = 400.0
+offset_bottom = 500.0
+color = Color(0.3, 0.85, 0.5, 0.4)
+
+[node name="TitleLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 80.0
+grow_horizontal = 2
+text = "MaterialDragHandle - 透明拖拽手柄"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 70.0
+offset_bottom = 100.0
+grow_horizontal = 2
+text = "按住面板标题栏可拖动移动 · 不会移出屏幕边界"
+horizontal_alignment = 1
+
+[node name="Panel1" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 80.0
+offset_top = 130.0
+offset_right = 320.0
+offset_bottom = 290.0
+
+[node name="FrostedPanel" type="PanelContainer" parent="Panel1"]
+material = SubResource("ShaderMaterial_xl3w5")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_uabc6")
+script = ExtResource("FrostedPanelScript")
+noise_texture = SubResource("NoiseTexture2D_3ey0m")
+
+[node name="Header" type="Control" parent="Panel1"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+grow_horizontal = 2
+
+[node name="HeaderBg" type="ColorRect" parent="Panel1/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="TitleLabel" type="Label" parent="Panel1/Header"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -10.0
+offset_right = 160.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "基础面板"
+
+[node name="DragIcon" type="Panel" parent="Panel1/Header"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = 204.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = 30.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="DragHandle" type="Control" parent="Panel1/Header" node_paths=PackedStringArray("drag_target", "target_node")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("DragHandleScript")
+drag_target = NodePath("../..")
+target_node = NodePath("../..")
+
+[node name="ContentLabel" type="Label" parent="Panel1"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 60.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "按住标题栏拖动
+透明拖拽手柄捕获鼠标事件"
+
+[node name="Panel2" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 360.0
+offset_top = 150.0
+offset_right = 580.0
+offset_bottom = 290.0
+
+[node name="FrostedPanel" type="PanelContainer" parent="Panel2"]
+material = SubResource("ShaderMaterial_qafvp")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_l2w45")
+script = ExtResource("FrostedPanelScript")
+noise_texture = SubResource("NoiseTexture2D_idglm")
+
+[node name="Header" type="Control" parent="Panel2"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+grow_horizontal = 2
+
+[node name="HeaderBg" type="ColorRect" parent="Panel2/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="TitleLabel" type="Label" parent="Panel2/Header"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -10.0
+offset_right = 150.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "透明效果"
+
+[node name="DragIcon" type="Panel" parent="Panel2/Header"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = 184.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = 30.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="DragHandle" type="Control" parent="Panel2/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("DragHandleScript")
+drag_opacity = 0.7
+smooth_factor = 0.15
+
+[node name="ContentLabel" type="Label" parent="Panel2"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 60.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "拖动时半透明
+smooth_factor=0.15"
+
+[node name="Panel3" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 620.0
+offset_top = 140.0
+offset_right = 820.0
+offset_bottom = 270.0
+
+[node name="FrostedPanel" type="PanelContainer" parent="Panel3"]
+material = SubResource("ShaderMaterial_0ljxc")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_omgs5")
+script = ExtResource("FrostedPanelScript")
+noise_texture = SubResource("NoiseTexture2D_1q2eg")
+
+[node name="Header" type="Control" parent="Panel3"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+grow_horizontal = 2
+
+[node name="HeaderBg" type="ColorRect" parent="Panel3/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="TitleLabel" type="Label" parent="Panel3/Header"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -10.0
+offset_right = 140.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "高亮边框"
+
+[node name="DragIcon" type="Panel" parent="Panel3/Header"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = 174.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = 30.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="DragHandle" type="Control" parent="Panel3/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("DragHandleScript")
+
+[node name="ContentLabel" type="Label" parent="Panel3"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 60.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "蓝色高亮边框
+blur_amount=4.0"
+
+[node name="Panel4" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 200.0
+offset_top = 380.0
+offset_right = 520.0
+offset_bottom = 500.0
+
+[node name="FrostedPanel" type="PanelContainer" parent="Panel4"]
+material = SubResource("ShaderMaterial_4gjam")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dqqf2")
+script = ExtResource("FrostedPanelScript")
+noise_texture = SubResource("NoiseTexture2D_27yxg")
+
+[node name="Header" type="Control" parent="Panel4"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+grow_horizontal = 2
+
+[node name="HeaderBg" type="ColorRect" parent="Panel4/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="TitleLabel" type="Label" parent="Panel4/Header"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -10.0
+offset_right = 160.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "设置面板"
+
+[node name="DragIcon" type="Panel" parent="Panel4/Header"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = 294.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = 30.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="DragHandle" type="Control" parent="Panel4/Header"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("DragHandleScript")
+
+[node name="ContentLabel" type="Label" parent="Panel4"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 60.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "MaterialDragHandle 是透明组件
+可作为任何 Control 的子节点
+拖动时会移动父节点"
+
+[node name="BottomInfo" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -80.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Line1" type="Label" parent="BottomInfo"]
+layout_mode = 2
+text = "MaterialDragHandle 使用方式：将节点作为子组件添加到可拖动区域（如标题栏）"
+horizontal_alignment = 1
+
+[node name="Line2" type="Label" parent="BottomInfo"]
+layout_mode = 2
+text = "var drag_handle = MaterialDragHandle.new()  ·  parent.add_child(drag_handle)"
+horizontal_alignment = 1
