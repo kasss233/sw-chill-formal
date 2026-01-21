@@ -136,17 +136,17 @@ scenes/main/
 ├── 3d/                      # 3D components (character, room, buildings)
 ├── audio_player/            # Autoload audio manager
 └── ui/                      # UI modules and components
-    ├── components/          # Reusable Material Design UI components
-    │   ├── button/          # MaterialButton
-    │   ├── checkbox/        # MaterialCheckBox
-    │   ├── dialog/          # MaterialDialog
-    │   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
-    │   ├── toggle_button/   # MaterialToggleButton
-    │   ├── frosted_panel/   # Shader-based frosted glass panel
-    │   └── shared/          # MaterialRippleMixin, MaterialSizeConfig
-    ├── music_module/        # Music player UI and playlist management
-    ├── task_module_new/     # Task/todo management
-    └── text_module/         # Text input module
+	├── components/          # Reusable Material Design UI components
+	│   ├── button/          # MaterialButton
+	│   ├── checkbox/        # MaterialCheckBox
+	│   ├── dialog/          # MaterialDialog
+	│   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
+	│   ├── toggle_button/   # MaterialToggleButton
+	│   ├── frosted_panel/   # Shader-based frosted glass panel
+	│   └── shared/          # MaterialRippleMixin, MaterialSizeConfig
+	├── music_module/        # Music player UI and playlist management
+	├── task_module_new/     # Task/todo management
+	└── text_module/         # Text input module
 
 addons/                      # Third-party plugins
 ├── vrm/                     # VRM character support

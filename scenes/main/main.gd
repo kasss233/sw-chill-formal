@@ -4,9 +4,9 @@ extends Node
 @export var rain_particle: Node3D
 @export var snow_particle: Node3D
 @export var character: Character
-@export var TIME_OF_DAYTIME := 8
-@export var TIME_OF_DUSK := 17
-@export var TIME_OF_EVENING := 21
+@export var TIME_OF_DAYTIME :float= 8
+@export var TIME_OF_DUSK :float= 17
+@export var TIME_OF_EVENING :float= 21
 @export var RAINY_LIGHT_ENERGY := 0.2
 @export var SUNNY_LIGHT_ENERGY := 0.7
 func _ready() -> void:
@@ -67,9 +67,19 @@ func _on_ui_env_weather_changed(mode: int) -> void:
 
 func _on_ui_character_interacted() -> void:
 	# rand2
-	var rand = randi() % 2
+	var rand = randi() % 7
 	match rand:
 		0:
-			character.set_pose_watch()
+			character.set_watch_pose()
 		1:
-			character.set_dodge()
+			character.set_dodge_pose()
+		2:
+			character.set_laughing_pose()
+		3:
+			character.set_clap_pose()
+		4:
+			character.set_cheer_pose()
+		5:
+			character.set_angry_pose()
+		6:
+			character.set_disbelief_pose()
