@@ -234,6 +234,9 @@ func add_bgm_from_resource(audio_item:AudioItem):
 	bgm_container.add_child(audio)
 	print("[AudioPlayer] Added BGM from resource: %s" % audio_item.name)
 func add_sound_effect_from_resource(audio_item:AudioItem):
+	if not audio_item:
+		push_error("[%s]Audio item is null"%[name])
+		return
 	var audio = AudioStreamPlayer.new()
 	audio.name = audio_item.name
 	audio.stream = audio_item.stream

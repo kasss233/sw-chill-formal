@@ -1,0 +1,107 @@
+[gd_scene load_steps=4 format=3 uid="uid://br2jlynew0761"]
+
+[ext_resource type="Script" uid="uid://cbwfh3i2hpkrx" path="res://scenes/main/ui/components/fab/FABDemo.gd" id="1_demo"]
+[ext_resource type="Script" uid="uid://bcx7kt54lptjq" path="res://scenes/main/ui/components/fab/MaterialFAB.gd" id="2_fab"]
+[ext_resource type="Texture2D" uid="uid://dumeuvinhlojt" path="res://assets/ui/icons/attach_file_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_kuc34"]
+
+[node name="FABDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_demo")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.15, 0.18, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 32
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "MaterialFAB 演示"
+horizontal_alignment = 1
+
+[node name="HBoxSmall" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="LabelSmall" type="Label" parent="VBoxContainer/HBoxSmall"]
+layout_mode = 2
+text = "Small (40dp):"
+
+[node name="FABSmall" type="Control" parent="VBoxContainer/HBoxSmall"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("2_fab")
+fab_size = 0
+
+[node name="HBoxStandard" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="LabelStandard" type="Label" parent="VBoxContainer/HBoxStandard"]
+layout_mode = 2
+text = "Standard (56dp):"
+
+[node name="FABStandard" type="Control" parent="VBoxContainer/HBoxStandard"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("2_fab")
+
+[node name="HBoxLarge" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="LabelLarge" type="Label" parent="VBoxContainer/HBoxLarge"]
+layout_mode = 2
+text = "Large (96dp):"
+
+[node name="FABLarge" type="Control" parent="VBoxContainer/HBoxLarge"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("2_fab")
+fab_size = 2
+
+[node name="HBoxExtended" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="LabelExtended" type="Label" parent="VBoxContainer/HBoxExtended"]
+layout_mode = 2
+text = "Extended:"
+
+[node name="FABExtended" type="Control" parent="VBoxContainer/HBoxExtended"]
+custom_minimum_size = Vector2(152, 80)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("2_fab")
+fab_icon = ExtResource("3_kuc34")
+fab_text = "新建任务"

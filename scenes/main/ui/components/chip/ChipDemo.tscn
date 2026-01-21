@@ -1,0 +1,115 @@
+[gd_scene load_steps=2 format=3 uid="uid://bq7r8k5vn1xqy"]
+
+[ext_resource type="Script" uid="uid://88ngm0nvl4um" path="res://scenes/main/ui/components/chip/ChipDemo.gd" id="1_demo"]
+
+[node name="ChipDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_demo")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.12, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "MaterialChip 演示"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="SuggestionSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SuggestionLabel" type="Label" parent="VBoxContainer/SuggestionSection"]
+layout_mode = 2
+text = "Suggestion Chips (建议类型)"
+
+[node name="SuggestionChips" type="HFlowContainer" parent="VBoxContainer/SuggestionSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="FilterSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FilterLabel" type="Label" parent="VBoxContainer/FilterSection"]
+layout_mode = 2
+text = "Filter Chips (筛选类型) - 点击切换选中状态"
+
+[node name="FilterChips" type="HFlowContainer" parent="VBoxContainer/FilterSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="InputSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="InputLabel" type="Label" parent="VBoxContainer/InputSection"]
+layout_mode = 2
+text = "Input Chips (输入类型) - 点击 × 删除"
+
+[node name="InputChips" type="HFlowContainer" parent="VBoxContainer/InputSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="AssistSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AssistLabel" type="Label" parent="VBoxContainer/AssistSection"]
+layout_mode = 2
+text = "Assist Chips (辅助类型)"
+
+[node name="AssistChips" type="HFlowContainer" parent="VBoxContainer/AssistSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="StyleSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StyleLabel" type="Label" parent="VBoxContainer/StyleSection"]
+layout_mode = 2
+text = "样式对比 (Outlined vs Filled)"
+
+[node name="StyleChips" type="HFlowContainer" parent="VBoxContainer/StyleSection"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="LogLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.8, 0.5, 1)
+text = "点击 Chip 查看交互日志..."
