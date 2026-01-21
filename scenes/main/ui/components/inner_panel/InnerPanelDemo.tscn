@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8rqa31txevl5"]
+
+[ext_resource type="Script" uid="uid://dg3yutp2lwsuh" path="res://scenes/main/ui/components/inner_panel/InnerPanelDemo.gd" id="InnerPanelDemoScript"]
+
+[node name="InnerPanelDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("InnerPanelDemoScript")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.1, 1)

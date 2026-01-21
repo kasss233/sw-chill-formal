@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3 uid="uid://5q337kiwl3os"]
+
+[ext_resource type="Script" uid="uid://bj0cn3cnck2w6" path="res://scenes/main/ui/components/frosted_panel/FrostedPanelDemo.gd" id="FrostedPanelDemoScript"]
+
+[node name="FrostedPanelDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("FrostedPanelDemoScript")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.15, 0.2, 1)
+
+[node name="DecorativeRects" type="Node2D" parent="."]
+position = Vector2(100, 100)
+
+[node name="Background_DecorativeRects#Rect1" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 200.0
+offset_bottom = 200.0
+color = Color(0.35, 0.65, 0.95, 0.3)
+
+[node name="Background_DecorativeRects#Rect2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 100.0
+offset_right = 450.0
+offset_bottom = 250.0
+color = Color(0.95, 0.5, 0.3, 0.3)
+
+[node name="Background_DecorativeRects#Rect3" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 300.0
+offset_right = 400.0
+offset_bottom = 400.0
+color = Color(0.3, 0.7, 0.3, 0.3)
