@@ -69,10 +69,13 @@ class OllamaLLM(LLMInterface):
         
         # 发送请求
         try:
+            # 根据max_tokens动态调整超时时间
+            # 小模型可能较慢，给更多时间
+            timeout_seconds = 300 if max_tokens is None or max_tokens > 500 else 180
             response = requests.post(
                 self.chat_endpoint,
                 json=payload,
-                timeout=120  # 120秒超时
+                timeout=timeout_seconds
             )
             response.raise_for_status()
             
@@ -86,6 +89,12 @@ class OllamaLLM(LLMInterface):
                     "total_duration": result.get("total_duration", 0),
                     "eval_count": result.get("eval_count", 0),
                 }
+            )
+        except requests.exceptions.Timeout as e:
+            raise RuntimeError(
+                f"Ollama API调用超时: {str(e)}\n"
+                f"提示: 模型生成时间过长，可能是模型较大或硬件性能不足。\n"
+                f"建议: 1) 尝试更小的模型 2) 减少max_tokens限制 3) 检查Ollama服务是否正常运行"
             )
         except requests.exceptions.RequestException as e:
             raise RuntimeError(f"Ollama API调用失败: {str(e)}")
@@ -132,11 +141,13 @@ class OllamaLLM(LLMInterface):
         
         # 发送流式请求
         try:
+            # 流式请求也需要较长的超时时间
+            timeout_seconds = 300 if max_tokens is None or max_tokens > 500 else 180
             response = requests.post(
                 self.chat_endpoint,
                 json=payload,
                 stream=True,
-                timeout=120
+                timeout=timeout_seconds
             )
             response.raise_for_status()
             
