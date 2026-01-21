@@ -170,7 +170,7 @@ def main():
     print("-" * 60)
     # user_message = "你好，今天有什么任务要完成吗？"
     # user_message = "你好，今天有什么任务要完成吗？"
-    user_message = "你好，我想学习python，帮我列一个学习列表吧！"
+    user_message = "你好，我想学习python，帮我列一个学习列表吧！顺便帮我把音乐声音调大一点儿。"
     print(f"用户: {user_message}")
     print("-" * 60)
     
