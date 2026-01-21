@@ -68,6 +68,7 @@ signal drag_moved(position: Vector2)
 var _dragging: bool = false
 var _drag_start_global_pos: Vector2
 var _target_start_pos: Vector2
+var _handle_start_pos: Vector2  # 拖拽开始时手柄自身的全局位置
 var _target: Control = null
 var _tween: Tween
 var _target_start_modulate: Color = Color.WHITE
@@ -127,6 +128,7 @@ func _start_dragging() -> void:
 	# 使用全局鼠标位置，避免父节点移动时坐标系变化
 	_drag_start_global_pos = get_global_mouse_position()
 	_target_start_pos = _target.global_position
+	_handle_start_pos = global_position  # 记录手柄自身的初始全局位置
 	_target_start_modulate = _target.modulate
 
 	# 视觉反馈
@@ -163,11 +165,23 @@ func _handle_drag() -> void:
 	# 应用边界限制
 	var clamped_pos = _apply_boundary(new_pos)
 
+	# 计算目标节点实际移动的距离（考虑边界限制）
+	var actual_delta = clamped_pos - _target_start_pos
+
 	if smooth_factor > 0:
 		# 平滑移动
 		_target.global_position = _target.global_position.lerp(clamped_pos, smooth_factor)
 	else:
 		_target.global_position = clamped_pos
+
+	# 如果 DragHandle 不是 target 的子孙节点，需要同步移动自身
+	# 这样可以确保手柄始终跟随目标节点移动
+	if not _is_descendant_of_target():
+		var handle_new_pos = _handle_start_pos + actual_delta
+		if smooth_factor > 0:
+			global_position = global_position.lerp(handle_new_pos, smooth_factor)
+		else:
+			global_position = handle_new_pos
 
 	drag_moved.emit(_target.global_position)
 
@@ -305,3 +319,18 @@ func set_boundary_rect(rect: Rect2) -> void:
 ## 设置边界模式
 func set_boundary_mode(mode: BoundaryMode) -> void:
 	boundary_mode = mode
+
+
+## 检查 DragHandle 是否是 target 的子孙节点
+## 如果是，则 DragHandle 会自动跟随 target 移动（由于父子关系）
+## 如果不是，则需要手动同步 DragHandle 的位置
+func _is_descendant_of_target() -> bool:
+	if not _target:
+		return false
+
+	var current = get_parent()
+	while current:
+		if current == _target:
+			return true
+		current = current.get_parent()
+	return false
