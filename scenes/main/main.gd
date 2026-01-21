@@ -64,11 +64,11 @@ func _on_ui_env_weather_changed(mode: int) -> void:
 		3:
 			set_sync_weather()
 
-
+var cur_pose=2;
 func _on_ui_character_interacted() -> void:
 	# rand2
-	var rand = randi() % 7
-	match rand:
+	#var rand = randi() % 7
+	match cur_pose:
 		0:
 			character.set_watch_pose()
 		1:
@@ -83,3 +83,4 @@ func _on_ui_character_interacted() -> void:
 			character.set_angry_pose()
 		6:
 			character.set_disbelief_pose()
+	cur_pose=(cur_pose+1)%7

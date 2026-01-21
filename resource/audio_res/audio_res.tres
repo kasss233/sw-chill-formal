@@ -55,4 +55,3 @@ metadata/_custom_type_script = "uid://c8gyw3w871pec"
 [resource]
 script = ExtResource("3_sropa")
 BGM = Array[ExtResource("1_v4rmg")]([SubResource("Resource_abpj1"), SubResource("Resource_l3kqj"), SubResource("Resource_kmcbe"), SubResource("Resource_d2rx6"), SubResource("Resource_tsfuh"), SubResource("Resource_0gx6c"), SubResource("Resource_sldgf")])
-sound_effect = Array[ExtResource("1_v4rmg")]([null])

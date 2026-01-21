@@ -142,23 +142,23 @@ scenes/main/
 ├── 3d/                      # 3D components (character, room, buildings)
 ├── audio_player/            # Autoload audio manager
 └── ui/                      # UI modules and components
-    ├── components/          # Reusable Material Design UI components
-    │   ├── button/          # MaterialButton
-    │   ├── calendar/        # Calendar widget
-    │   ├── checkbox/        # MaterialCheckBox
-    │   ├── date_picker/     # DatePicker button
-    │   ├── dialog/          # MaterialDialog
-    │   ├── frosted_panel/   # Shader-based frosted glass panel
-    │   ├── inner_panel/     # InnerPanel (shader-based panel with rounded corners)
-    │   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
-    │   ├── segmented_button/# MaterialSegmentedButton
-    │   ├── shared/          # MaterialRippleMixin, MaterialSizeConfig
-    │   ├── switch/          # MaterialSwitch
-    │   ├── text_field/      # MaterialTextField
-    │   └── toggle_button/   # MaterialToggleButton
-    ├── music_module/        # Music player UI and playlist management
-    ├── task_module_new/     # Task/todo management
-    └── text_module/         # Text input module
+	├── components/          # Reusable Material Design UI components
+	│   ├── button/          # MaterialButton
+	│   ├── calendar/        # Calendar widget
+	│   ├── checkbox/        # MaterialCheckBox
+	│   ├── date_picker/     # DatePicker button
+	│   ├── dialog/          # MaterialDialog
+	│   ├── frosted_panel/   # Shader-based frosted glass panel
+	│   ├── inner_panel/     # InnerPanel (shader-based panel with rounded corners)
+	│   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
+	│   ├── segmented_button/# MaterialSegmentedButton
+	│   ├── shared/          # MaterialRippleMixin, MaterialSizeConfig
+	│   ├── switch/          # MaterialSwitch
+	│   ├── text_field/      # MaterialTextField
+	│   └── toggle_button/   # MaterialToggleButton
+	├── music_module/        # Music player UI and playlist management
+	├── task_module_new/     # Task/todo management
+	└── text_module/         # Text input module
 
 addons/                      # Third-party plugins
 ├── vrm/                     # VRM character support
