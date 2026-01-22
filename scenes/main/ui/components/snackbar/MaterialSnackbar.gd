@@ -114,6 +114,9 @@ const TYPE_CONFIG: Dictionary = {
 		icon_size = v
 		_update_icon()
 
+## 使用屏幕尺寸而非父节点尺寸
+@export var use_viewport_size: bool = false
+
 # 内部节点
 var _background: Panel
 var _hbox: HBoxContainer
@@ -281,11 +284,18 @@ func _apply_type_style(msg_type: int) -> void:
 	# 更新图标
 	_update_icon()
 
+## 获取容器尺寸（根据配置使用屏幕尺寸或父节点尺寸）
+func _get_container_size() -> Vector2:
+	if use_viewport_size:
+		return get_viewport_rect().size
+	else:
+		return get_parent_area_size()
+
 func _update_layout() -> void:
 	if not is_inside_tree() or not get_parent():
 		return
 
-	var parent_size = get_parent_area_size()
+	var parent_size = _get_container_size()
 
 	# 计算 snackbar 尺寸
 	var max_width = parent_size.x - horizontal_margin * 2
@@ -313,9 +323,9 @@ func _update_layout() -> void:
 
 	size = Vector2(snackbar_width, snackbar_height)
 
-	# 根据 display_position 计算位置
+	# 根据 display_position 计算位置（使用 global_position 以支持屏幕定位）
 	var pos = _calculate_position(parent_size, snackbar_width, snackbar_height)
-	set_position(pos)
+	global_position = pos
 
 	# 更新内部布局
 	if _background:
@@ -449,18 +459,18 @@ func _animate_show() -> void:
 	visible = true
 
 	# 计算起始位置
-	var parent_size = get_parent_area_size()
-	var target_pos = position
+	var parent_size = _get_container_size()
+	var target_pos = global_position
 	var start_pos = _get_animation_start_pos(target_pos, parent_size)
 
-	set_position(start_pos)
+	global_position = start_pos
 	modulate.a = 0
 
 	_tween = create_tween()
 	_tween.set_ease(Tween.EASE_OUT)
 	_tween.set_trans(Tween.TRANS_BACK)
 	_tween.set_parallel(true)
-	_tween.tween_property(self, "position", target_pos, ANIMATION_DURATION)
+	_tween.tween_property(self, "global_position", target_pos, ANIMATION_DURATION)
 	_tween.tween_property(self, "modulate:a", 1.0, ANIMATION_DURATION * 0.6)
 
 func _hide_snackbar() -> void:
@@ -469,14 +479,14 @@ func _hide_snackbar() -> void:
 
 	_timer.stop()
 
-	var parent_size = get_parent_area_size()
-	var end_pos = _get_animation_end_pos(position, parent_size)
+	var parent_size = _get_container_size()
+	var end_pos = _get_animation_end_pos(global_position, parent_size)
 
 	_tween = create_tween()
 	_tween.set_ease(Tween.EASE_IN)
 	_tween.set_trans(Tween.TRANS_QUAD)
 	_tween.set_parallel(true)
-	_tween.tween_property(self, "position", end_pos, ANIMATION_DURATION * 0.8)
+	_tween.tween_property(self, "global_position", end_pos, ANIMATION_DURATION * 0.8)
 	_tween.tween_property(self, "modulate:a", 0.0, ANIMATION_DURATION * 0.6)
 	_tween.chain().tween_callback(_on_hide_complete)
 

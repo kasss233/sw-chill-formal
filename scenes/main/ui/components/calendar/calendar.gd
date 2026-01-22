@@ -7,16 +7,17 @@ signal date_selected(year: int, month: int, day: int)
 signal cancelled
 
 # 节点引用
-@onready var prev_month_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/PrevMonthButton
-@onready var next_month_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/NextMonthButton
-@onready var prev_year_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/PrevYearButton
-@onready var next_year_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/NextYearButton
-@onready var month_label = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Label
-@onready var year_label = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/Label2
-@onready var grid_container = $PanelContainer/MarginContainer/VBoxContainer/GridContainer
-@onready var action_container = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3
-@onready var cancel_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/Button
-@onready var confirm_button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer3/Button2
+
+@onready var prev_month_button: MaterialButton = $VBoxContainer/HBoxContainer/PrevMonthButton
+@onready var next_month_button: MaterialButton = $VBoxContainer/HBoxContainer/NextMonthButton
+@onready var prev_year_button: MaterialButton = $VBoxContainer/HBoxContainer/PrevYearButton
+@onready var next_year_button: MaterialButton = $VBoxContainer/HBoxContainer/NextYearButton
+@onready var month_label: Label = $VBoxContainer/HBoxContainer/MonthLabel
+@onready var year_label: Label = $VBoxContainer/HBoxContainer/YearLabel
+@onready var grid_container: GridContainer = $VBoxContainer/GridContainer
+@onready var action_container: HBoxContainer = $VBoxContainer/ActionContainer
+@onready var cancel_button: MaterialButton = $VBoxContainer/HBoxContainer3/CancelButton
+@onready var confirm_button: MaterialButton = $VBoxContainer/HBoxContainer3/ConfirmButton
 
 # 日历库实例
 var calendar: Calendar
@@ -26,7 +27,7 @@ var current_month: int
 # 选中的日期
 var selected_date: Dictionary = {}  # {year: int, month: int, day: int}
 # 日期按钮数组
-var day_buttons: Array[Button] = []
+var day_buttons: Array[MaterialButton] = []
 
 # 中文月份映射
 const CHINESE_MONTHS = {
@@ -76,7 +77,7 @@ func _collect_day_buttons():
 	"""收集 GridContainer 中的所有按钮"""
 	day_buttons.clear()
 	for child in grid_container.get_children():
-		if child is Button:
+		if child is MaterialButton:
 			day_buttons.append(child)
 
 func _update_calendar():
@@ -120,6 +121,8 @@ func _update_calendar():
 					selected_date["month"] == day_data.month and
 					selected_date["day"] == day_data.day):
 					button.modulate = Color(0.3, 0.7, 1.0, 1)  # 蓝色高亮
+					button.background_color = Color("ffffff00")
+					button.set_pressed_no_signal(true)
 			
 			button_index += 1
 

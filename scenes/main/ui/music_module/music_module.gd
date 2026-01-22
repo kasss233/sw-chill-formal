@@ -38,6 +38,10 @@ signal music_status_changed()
 @onready var mode_button=$PanelContainer/VBoxContainer/HBoxContainer/ModeButton
 @onready var tab_button: MaterialButton = $PanelContainer/VBoxContainer/HBoxContainer/TabButton
 
+# 文件对话框和确认对话框
+var _file_dialog: FileDialog
+var _delete_dialog: MaterialDialog
+
 
 # --- 成员变量 ---
 ## 当前选中的音乐列表索引
@@ -52,6 +56,8 @@ func _ready() -> void:
 	_setup_initial_music()
 	_setup_list_menu()
 	_setup_add_menu()
+	_setup_file_dialog()
+	_setup_delete_dialog()
 	# 连接AudioPlayer信号
 	if AudioPlayer:
 		AudioPlayer.music_changed.connect(_on_audio_player_music_changed)
@@ -117,6 +123,24 @@ func _setup_add_menu() -> void:
 	# 连接菜单项点击信号
 	add_menu_button.menu_item_pressed.connect(_on_add_menu_item_pressed)
 
+## 设置文件对话框
+func _setup_file_dialog() -> void:
+	_file_dialog = FileDialog.new()
+	_file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	_file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	_file_dialog.display_mode = FileDialog.DISPLAY_LIST
+	_file_dialog.filters = ["*.ogg ; OGG Audio", "*.wav ; WAV Audio", "*.mp3 ; MP3 Audio"]
+	_file_dialog.use_native_dialog = true
+	_file_dialog.files_selected.connect(_on_files_selected)
+	add_child(_file_dialog)
+
+## 设置删除确认对话框
+func _setup_delete_dialog() -> void:
+	_delete_dialog = MaterialDialog.new()
+	_delete_dialog.dialog_type = MaterialDialog.DialogType.QUESTION
+	_delete_dialog.dialog_size = MaterialDialog.DialogSize.MEDIUM
+	add_child(_delete_dialog)
+
 ## 添加菜单项点击处理
 func _on_add_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
 	match p_index:
@@ -127,14 +151,8 @@ func _on_add_menu_item_pressed(p_index: int, _item: MaterialMenuItem) -> void:
 
 ## 打开导入音乐对话框
 func _open_import_music_dialog() -> void:
-	var file_dialog = FileDialog.new()
-	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
-	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
-	file_dialog.display_mode = FileDialog.DISPLAY_LIST
-	file_dialog.filters = ["*.ogg ; OGG Audio", "*.wav ; WAV Audio", "*.mp3 ; MP3 Audio"]
-	file_dialog.files_selected.connect(_on_files_selected)
-	add_child(file_dialog)
-	file_dialog.popup_centered()
+	if _file_dialog:
+		_file_dialog.popup_centered()
 
 ## 打开添加歌单对话框
 func _open_add_playlist_dialog() -> void:
@@ -446,23 +464,42 @@ func _on_bgm_added(_name: String) -> void:
 ## 当请求删除特定音乐时的回调
 func _on_music_removed(p_music_name: String,p_list_name: String) -> void:
 	var target_list = list_container.get_node_or_null(p_list_name) as MusicList
-	#如果列表是全部音乐，则弹出确认对话框
+	# 如果列表是全部音乐，则弹出确认对话框
 	if p_list_name=="全部音乐":
-		var confirm_dialog = ConfirmationDialog.new()
-		confirm_dialog.dialog_text="确定要删除音乐%s吗？这将彻底移除该音乐。" % p_music_name
-		confirm_dialog.confirmed.connect(func():
-			#从所有列表中移除该音乐
+		if not _delete_dialog:
+			return
+
+		# 配置对话框
+		_delete_dialog.dialog_title = "删除音乐"
+		_delete_dialog.dialog_text = "确定要删除音乐 %s 吗？\n这将彻底移除该音乐。" % p_music_name
+
+		# 清空之前的按钮
+		_delete_dialog.clear_buttons()
+
+		# 添加取消按钮
+		var cancel_btn = _delete_dialog.add_button("取消")
+		cancel_btn.pressed.connect(func():
+			_delete_dialog.hide_dialog()
+		)
+
+		# 添加确定按钮
+		var confirm_btn = _delete_dialog.add_button("确定")
+		confirm_btn.pressed.connect(func():
+			# 从所有列表中移除该音乐
 			for child in list_container.get_children():
 				if child is MusicList:
 					child.remove_music(p_music_name)
-			#从资源中移除该音乐
+			# 从资源中移除该音乐
 			var item = audio_res.get_bgm_item_by_name(p_music_name)
 			if item:
 				audio_res.remove_bgm(p_music_name)
+			_delete_dialog.hide_dialog()
 		)
-		add_child(confirm_dialog)
-		confirm_dialog.popup_centered()
+
+		# 显示对话框
+		_delete_dialog.show_dialog()
 		return
+
 	if target_list:
 		target_list.remove_music(p_music_name)
 

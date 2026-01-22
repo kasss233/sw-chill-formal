@@ -5,7 +5,7 @@ class_name InputBox
 ## 一开始使用 LineEdit 输入，当文本超出边界时自动切换到 TextEdit 多行输入
 
 # 信号
-signal text_submitted(text: String)  # 用户提交文本时发出
+signal text_submitted(text: String, attachments: Array)  # 用户提交文本时发出（包含附件）
 signal text_changed(text: String)    # 文本变化时发出
 
 # 配置
@@ -20,12 +20,20 @@ signal text_changed(text: String)    # 文本变化时发出
 @onready var text_edit_container: MarginContainer = $FrostedPanel/MarginContainer/VBoxContainer/MarginContainer
 @onready var text_edit: TextEdit = $FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/TextEdit
 @onready var submit_button = $FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer/SubmitToggleButton
+@onready var material_menu = $MaterialMenu
+@onready var smooth_scroll_container = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer
+@onready var attach_hbox_container = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer
+@onready var material_chip1 = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer/MaterialChip
+@onready var material_chip2 = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer/MaterialChip2
+@onready var file_dialog: FileDialog = $FileDialog
+@onready var snackbar: MaterialSnackbar = $MaterialSnackbar
 
 # 状态
 var _is_multiline_mode: bool = false  # 是否处于多行模式
 var _is_transitioning: bool = false   # 是否正在切换动画中
 var _current_tween: Tween = null      # 当前动画 Tween
 var _height_tween: Tween = null       # 高度调整动画 Tween
+var _attachments: Array = []          # 附件列表（最多2个）
 
 # LineEdit 的原始最小宽度，用于保持布局稳定
 var _line_edit_min_width: float = 0.0
@@ -49,10 +57,25 @@ func _ready() -> void:
 	text_edit.text_changed.connect(_on_text_edit_text_changed)
 	text_edit.gui_input.connect(_on_text_edit_gui_input)
 
+	# 连接MaterialMenu信号
+	material_menu.item_pressed.connect(_on_menu_item_pressed)
+
+	# 连接FileDialog信号
+	file_dialog.file_selected.connect(_on_file_selected)
+
+	# 连接MaterialChip删除信号
+	material_chip1.deleted.connect(_on_chip1_deleted)
+	material_chip2.deleted.connect(_on_chip2_deleted)
+
 	# 初始化状态：隐藏 TextEdit 容器（使用 visible = false 因为它在独立的位置）
 	text_edit_container.visible = false
 	text_edit_container.modulate.a = 0.0
 	text_edit.custom_minimum_size.y = min_text_edit_height
+
+	# 初始化附件UI
+	smooth_scroll_container.visible = false
+	material_chip1.visible = false
+	material_chip2.visible = false
 
 
 func _on_line_edit_text_changed(new_text: String) -> void:
@@ -69,7 +92,7 @@ func _on_line_edit_text_changed(new_text: String) -> void:
 func _on_line_edit_submitted(new_text: String) -> void:
 	if new_text.strip_edges().is_empty():
 		return
-	text_submitted.emit(new_text)
+	text_submitted.emit(new_text, _attachments)
 	clear_text()
 
 
@@ -104,7 +127,7 @@ func _on_text_edit_gui_input(event: InputEvent) -> void:
 			# 普通回车提交
 			var current_text := text_edit.text.strip_edges()
 			if not current_text.is_empty():
-				text_submitted.emit(current_text)
+				text_submitted.emit(current_text, _attachments)
 				clear_text()
 			get_viewport().set_input_as_handled()
 
@@ -353,6 +376,9 @@ func clear_text() -> void:
 		line_edit.mouse_filter = _line_edit_original_mouse_filter
 		line_edit.focus_mode = Control.FOCUS_ALL
 
+	# 清空附件
+	clear_attachments()
+
 
 ## 获取焦点
 func focus() -> void:
@@ -360,3 +386,95 @@ func focus() -> void:
 		text_edit.grab_focus()
 	else:
 		line_edit.grab_focus()
+
+
+## ============ 附件管理 ============
+
+## 处理菜单项点击
+func _on_menu_item_pressed(index: int, item) -> void:
+	match index:
+		0:  # 添加图片
+			_open_image_picker()
+		1:  # 拍照
+			# TODO: 实现拍照功能
+			pass
+
+
+## 打开图片选择器
+func _open_image_picker() -> void:
+	# 检查是否已有2张图片
+	if _attachments.size() >= 2:
+		_show_max_attachments_warning()
+		return
+
+	# 打开文件选择对话框
+	file_dialog.popup_centered()
+
+
+## 显示最大附件数量警告
+func _show_max_attachments_warning() -> void:
+	snackbar.show_message("最多只能添加两张图片")
+
+
+## 处理文件选择
+func _on_file_selected(path: String) -> void:
+	# 检查是否是图片文件
+	var ext = path.get_extension().to_lower()
+	if not ext in ["png", "jpg", "jpeg", "gif", "bmp", "webp"]:
+		_show_invalid_file_warning()
+		return
+
+	# 添加到附件列表
+	_attachments.append(path)
+	_update_attachment_ui()
+
+
+## 显示无效文件警告
+func _show_invalid_file_warning() -> void:
+	snackbar.show_warning("请选择有效的图片文件")
+
+
+## 更新附件UI
+func _update_attachment_ui() -> void:
+	var attachment_count = _attachments.size()
+
+	# 显示/隐藏SmoothScrollContainer
+	smooth_scroll_container.visible = attachment_count > 0
+
+	# 更新Chip显示
+	if attachment_count >= 1:
+		material_chip1.visible = true
+		material_chip1.text = "图片" + str(1)
+	else:
+		material_chip1.visible = false
+
+	if attachment_count >= 2:
+		material_chip2.visible = true
+		material_chip2.text = "图片" + str(2)
+	else:
+		material_chip2.visible = false
+
+
+## 处理Chip1删除
+func _on_chip1_deleted() -> void:
+	if _attachments.size() >= 1:
+		_attachments.remove_at(0)
+		_update_attachment_ui()
+
+
+## 处理Chip2删除
+func _on_chip2_deleted() -> void:
+	if _attachments.size() >= 2:
+		_attachments.remove_at(1)
+		_update_attachment_ui()
+
+
+## 清空附件
+func clear_attachments() -> void:
+	_attachments.clear()
+	_update_attachment_ui()
+
+
+## 获取附件列表
+func get_attachments() -> Array:
+	return _attachments.duplicate()
