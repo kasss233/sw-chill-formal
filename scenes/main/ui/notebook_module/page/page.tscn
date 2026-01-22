@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://injv2w2no8tk"]
 
-[ext_resource type="Script" uid="uid://dpnovs76kqy7i" path="res://scenes/main/ui/notebook/page/page.gd" id="1_e66jv"]
+[ext_resource type="Script" uid="uid://dpnovs76kqy7i" path="res://scenes/main/ui/notebook_module/page/page.gd" id="1_e66jv"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_h1msg"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_e66jv"]
 
