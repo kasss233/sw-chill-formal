@@ -199,7 +199,6 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_lwmwt")
 script = ExtResource("5_ji0d4")
 corner_radius = 21.555
 tint_color = Color(0, 0, 0, 0.47843137)
-noise_amount = 0.0
 noise_texture = SubResource("NoiseTexture2D_x5yqf")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
@@ -246,8 +245,6 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_2sft3")
 icon_alignment = 1
 script = ExtResource("7_68max")
 button_icon = ExtResource("7_ji0d4")
-content_alignment = null
-min_width = null
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"

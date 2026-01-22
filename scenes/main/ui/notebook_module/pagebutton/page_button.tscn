@@ -1,88 +1,142 @@
-[gd_scene load_steps=8 format=3 uid="uid://bwkofikr0rnvr"]
+[gd_scene load_steps=15 format=3 uid="uid://bwkofikr0rnvr"]
 
 [ext_resource type="Script" uid="uid://cql2sc6pub7wo" path="res://scenes/main/ui/notebook_module/pagebutton/page_button.gd" id="1_mbis7"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_sxwfx"]
+[ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="2_0xpqe"]
+[ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="3_p4xaa"]
+[ext_resource type="Texture2D" uid="uid://cgeqypbnt0ug4" path="res://assets/ui/icons/cancel_24dp.svg" id="5_b5dx1"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mbis7"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_agfnf"]
+shader = ExtResource("2_0xpqe")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(76, 39)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xpqe"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
 bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mpods"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0xpqe"]
+
+[sub_resource type="Theme" id="Theme_p4xaa"]
+LineEdit/styles/focus = SubResource("StyleBoxEmpty_0xpqe")
+LineEdit/styles/normal = SubResource("StyleBoxEmpty_0xpqe")
+LineEdit/styles/read_only = SubResource("StyleBoxEmpty_0xpqe")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4xaa"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b5dx1"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r1amk"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_agfnf"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qlcbh"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gmmlq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bptnj"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toxtl"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [node name="PageButton" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
 script = ExtResource("1_mbis7")
 
-[node name="MaterialButton" type="Button" parent="."]
-clip_contents = true
-custom_minimum_size = Vector2(0, 36)
+[node name="InnerPanel" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_agfnf")
 layout_mode = 0
-offset_right = 76.0
-offset_bottom = 37.0
+offset_right = 16.0
+offset_bottom = 16.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_0xpqe")
+script = ExtResource("3_p4xaa")
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="InnerPanel"]
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="InnerPanel/HBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_p4xaa")
+text = "默认"
+editable = false
+flat = true
+caret_blink = true
+
+[node name="RemoveButton" type="Button" parent="InnerPanel/HBoxContainer"]
+visible = false
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_mbis7")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mpods")
-theme_override_styles/hover = SubResource("StyleBoxFlat_r1amk")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_qlcbh")
-theme_override_styles/focus = SubResource("StyleBoxFlat_bptnj")
-text = "新笔记"
+theme_override_styles/normal = SubResource("StyleBoxFlat_p4xaa")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_b5dx1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_agfnf")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_gmmlq")
+theme_override_styles/focus = SubResource("StyleBoxFlat_toxtl")
 script = ExtResource("1_sxwfx")
+button_icon = ExtResource("5_b5dx1")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
+[connection signal="mouse_entered" from="InnerPanel" to="." method="_on_inner_panel_mouse_entered"]
+[connection signal="mouse_exited" from="InnerPanel" to="." method="_on_inner_panel_mouse_exited"]
+[connection signal="focus_exited" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_focus_exited"]
+[connection signal="gui_input" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_gui_input"]
+[connection signal="mouse_entered" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_mouse_entered"]
+[connection signal="mouse_exited" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_mouse_exited"]
+[connection signal="text_submitted" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
+[connection signal="mouse_entered" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_mouse_entered"]
+[connection signal="mouse_exited" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_mouse_exited"]
+[connection signal="pressed" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_pressed"]

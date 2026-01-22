@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://bmsmfccv7kma"]
+[gd_scene load_steps=27 format=3 uid="uid://bmsmfccv7kma"]
 
 [ext_resource type="Script" uid="uid://c5icyiww08u1w" path="res://scenes/main/ui/notebook_module/note_book.gd" id="1_00gxi"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_uh028"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://c7ck2hhjgnsuf" path="res://assets/ui/icons/add_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_7e0cj"]
 [ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="8_f48v4"]
 [ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="9_i5tje"]
+[ext_resource type="Texture2D" uid="uid://bd6svjhok0cub" path="res://assets/ui/icons/event_note_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="10_24wte"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_7e0cj"]
 frequency = 0.1
@@ -30,10 +31,10 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_00gxi")
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(407, 432)
+shader_parameter/size = Vector2(446, 432)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mq1iw"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qpvdy"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -45,7 +46,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7e0cj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_24wte"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -56,7 +57,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00gxi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qkw8s"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -67,7 +68,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ed7lx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1n8r0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -78,7 +79,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aw2qm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_155b8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -89,7 +90,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f48v4"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3obe"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -106,9 +107,9 @@ shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
-shader_parameter/size = Vector2(298, 376)
+shader_parameter/size = Vector2(282, 368)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m7g7n"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kpbt"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -120,7 +121,62 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="NoteBook" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np3s2"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbgbm"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4b6by"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh74x"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="NoteBook" type="Control" node_paths=PackedStringArray("vbox", "inner_panel", "panel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -130,54 +186,79 @@ grow_vertical = 2
 script = ExtResource("1_00gxi")
 page_button = ExtResource("2_ed7lx")
 page = ExtResource("3_mq1iw")
+vbox = NodePath("FrostedPanel/VBoxContainer/HBoxContainer/ScrollContainer/VBoxContainer")
+inner_panel = NodePath("FrostedPanel/VBoxContainer/HBoxContainer/InnerPanel")
+panel = NodePath("FrostedPanel")
 
 [node name="FrostedPanel" type="PanelContainer" parent="."]
 material = SubResource("ShaderMaterial_ed7lx")
 layout_mode = 0
-offset_right = 407.0
+offset_right = 446.0
 offset_bottom = 432.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_mq1iw")
+theme_override_styles/panel = SubResource("StyleBoxFlat_qpvdy")
 script = ExtResource("2_0j3f0")
 noise_texture = SubResource("NoiseTexture2D_00gxi")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 21.0
-offset_top = 67.0
-offset_right = 88.0
-offset_bottom = 400.0
-theme_override_constants/separation = 20
+[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel"]
+layout_mode = 2
 
-[node name="AddButton" type="Button" parent="."]
+[node name="AddButton" type="Button" parent="FrostedPanel/VBoxContainer"]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
-layout_mode = 0
-offset_left = 21.0
-offset_top = 27.0
-offset_right = 57.0
-offset_bottom = 63.0
+layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_7e0cj")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_00gxi")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ed7lx")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_aw2qm")
-theme_override_styles/focus = SubResource("StyleBoxFlat_f48v4")
+theme_override_styles/normal = SubResource("StyleBoxFlat_24wte")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qkw8s")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1n8r0")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_155b8")
+theme_override_styles/focus = SubResource("StyleBoxFlat_m3obe")
 script = ExtResource("3_0j3f0")
 button_icon = ExtResource("4_7e0cj")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="InnerPanel" type="PanelContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="FrostedPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="FrostedPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/VBoxContainer/HBoxContainer/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/separation = 60
+
+[node name="InnerPanel" type="PanelContainer" parent="FrostedPanel/VBoxContainer/HBoxContainer"]
 material = SubResource("ShaderMaterial_7lyeq")
-layout_mode = 0
-offset_left = 106.0
-offset_top = 48.0
-offset_right = 404.0
-offset_bottom = 424.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_m7g7n")
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.06
+theme_override_styles/panel = SubResource("StyleBoxFlat_0kpbt")
 script = ExtResource("9_i5tje")
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 
-[connection signal="pressed" from="AddButton" to="." method="_on_add_button_pressed"]
+[node name="MaterialButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 0
+offset_left = 178.0
+offset_top = 467.0
+offset_right = 206.0
+offset_bottom = 503.0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_np3s2")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pbgbm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4b6by")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_df4gt")
+theme_override_styles/focus = SubResource("StyleBoxFlat_lh74x")
+script = ExtResource("3_0j3f0")
+button_icon = ExtResource("10_24wte")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[connection signal="pressed" from="FrostedPanel/VBoxContainer/AddButton" to="." method="_on_add_button_pressed"]
+[connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
