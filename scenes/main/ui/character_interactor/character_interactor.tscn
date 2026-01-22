@@ -1,6 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://b6bxw47hgr5em"]
+[gd_scene load_steps=7 format=3 uid="uid://b6bxw47hgr5em"]
 
 [ext_resource type="Script" uid="uid://cmo8aeqofv0jc" path="res://scenes/main/ui/character_interactor/character_interactor.gd" id="1_l7jq4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l7jq4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gqgsq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ppuyt"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q7qux"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w3pib"]
 
 [node name="CharacterInteractor" type="Control"]
 layout_mode = 3
@@ -13,6 +23,11 @@ offset_left = 35.0
 offset_top = -53.0
 offset_right = 296.0
 offset_bottom = 468.0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_l7jq4")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_gqgsq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ppuyt")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_q7qux")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_w3pib")
 flat = true
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

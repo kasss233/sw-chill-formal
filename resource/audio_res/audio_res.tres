@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AudioRes" load_steps=17 format=3 uid="uid://dweygfwutymm5"]
+[gd_resource type="Resource" script_class="AudioRes" load_steps=19 format=3 uid="uid://dweygfwutymm5"]
 
 [ext_resource type="Script" uid="uid://c8gyw3w871pec" path="res://resource/audio_res/audio_item/audio_item.gd" id="1_v4rmg"]
 [ext_resource type="AudioStream" uid="uid://1tebddn53oqf" path="res://assets/music/barradeen-bedtime-after-a-coffee.mp3" id="2_05d4i"]
@@ -9,6 +9,7 @@
 [ext_resource type="AudioStream" uid="uid://cosiiuj5ptqyo" path="res://assets/music/When-I-Was-A-Boy.mp3" id="6_dukgh"]
 [ext_resource type="AudioStream" uid="uid://j6ug3y1vjp5l" path="res://assets/music/Wildflowers.mp3" id="7_ry46o"]
 [ext_resource type="AudioStream" uid="uid://dwebfr4h5ki18" path="res://assets/music/メインテーマ_冬 .mp3" id="8_s3m1o"]
+[ext_resource type="AudioStream" uid="uid://78cigy3k03q4" path="res://assets/music/Travelers' encore.mp3" id="9_sldgf"]
 
 [sub_resource type="Resource" id="Resource_abpj1"]
 script = ExtResource("1_v4rmg")
@@ -52,6 +53,12 @@ name = "メインテーマ_冬 "
 stream = ExtResource("8_s3m1o")
 metadata/_custom_type_script = "uid://c8gyw3w871pec"
 
+[sub_resource type="Resource" id="Resource_dukgh"]
+script = ExtResource("1_v4rmg")
+name = "Travelers' encore"
+stream = ExtResource("9_sldgf")
+metadata/_custom_type_script = "uid://c8gyw3w871pec"
+
 [resource]
 script = ExtResource("3_sropa")
-BGM = Array[ExtResource("1_v4rmg")]([SubResource("Resource_abpj1"), SubResource("Resource_l3kqj"), SubResource("Resource_kmcbe"), SubResource("Resource_d2rx6"), SubResource("Resource_tsfuh"), SubResource("Resource_0gx6c"), SubResource("Resource_sldgf")])
+BGM = Array[ExtResource("1_v4rmg")]([SubResource("Resource_abpj1"), SubResource("Resource_l3kqj"), SubResource("Resource_kmcbe"), SubResource("Resource_d2rx6"), SubResource("Resource_tsfuh"), SubResource("Resource_0gx6c"), SubResource("Resource_sldgf"), SubResource("Resource_dukgh")])

@@ -26,14 +26,14 @@ The project has two critical autoload singletons defined in `project.godot`:
 - Key methods: `go_to(id, callback)`, `show(id)`, `hide(id)`
 - Handles all GUI state transitions across the application
 
-#### **AudioPlayer** (`scenes/main/audio_player/audio_player.gd`)
+#### **AudioPlayer** (`scenes/main/audio_player/audio_player.tscn`)
 - Centralized audio management for BGM and SFX
 - Key features:
   - Volume control with fade-in/fade-out animations
   - Play/pause state preservation across track switches
   - Dynamic BGM loading from `AudioRes` resource
   - Crossfade support between tracks
-- Key methods: `play_bgm(name)`, `change_bgm(name)`, `toggle_bgm_playback()`, `set_bgm_volume()`, `crossfade_to_bgm()`
+- Key methods: `play_bgm()`, `change_bgm()`, `switch_bgm()`, `toggle_bgm_playback()`, `set_bgm_volume()`, `crossfade_to_bgm()`
 - Signals: `music_changed`, `music_finished`
 - **Important**: The `is_paused` state is separate from the current track - allows switching BGM while preserving playback state
 
@@ -43,6 +43,7 @@ The project has two critical autoload singletons defined in `project.godot`:
 - Custom Resource class that acts as centralized audio inventory
 - Contains arrays of `AudioItem` resources: `BGM` and `sound_effect`
 - Supports dynamic loading: `add_bgm(name, path)` emits `bgm_added` signal
+- Methods: `remove_bgm()`, `get_bgm_item_by_name()`
 - AudioPlayer subscribes to this signal to add AudioStreamPlayer nodes dynamically
 
 **Data Flow**:
@@ -71,10 +72,33 @@ The UI is organized as modular, loosely-coupled components in `scenes/main/ui/`:
 - Uses ReorderableVBox for drag-to-reorder
 - Tasks separated by completion state with visual separator
 - Entry animations: fade + scale with back easing (0.4s)
+- Components: TaskItem, TaskData, LineEdit
 
-#### **TextModule** (`scenes/main/ui/text_module/text_module.gd`)
-- Simple text input with TextEdit + Button
-- Emits `text_entered(text)` signal
+#### **NoteModule** (`scenes/main/ui/note_module/note_module.gd`)
+- Sticky note system with limit of 20 notes
+- Creates draggable note windows
+- API: `take_note(text)` for programmatic note creation
+
+#### **NotebookModule** (`scenes/main/ui/notebook_module/note_book.gd`)
+- Multi-page notebook with page management
+- Components: PageButton (page selector), Page (content area)
+- Saves page content in dictionary
+
+#### **InputBox** (`scenes/main/ui/input_box/input_box.gd`)
+- ChatGPT-style AI conversation input box
+- Auto-switches between LineEdit (single-line) and TextEdit (multi-line)
+- Supports image attachments (max 2)
+- Smooth height animations and transitions
+- Integrated with MaterialMenu, MaterialChip, MaterialSnackbar
+
+#### **CharacterInteractor** (`scenes/main/ui/character_interactor/character_interactor.gd`)
+- Simple button that emits signal after 3 clicks
+- Used for character interaction triggers
+
+#### **EnvSetter** (`scenes/main/ui/env_setter/env_setter.gd`)
+- Environment time setter (daytime, afternoon, dusk, evening, sync)
+- Weather setter (sunny, rainy, snowy, sync)
+- Uses MaterialToggleButton for state switching
 
 ### Material Design UI Components
 
@@ -87,11 +111,16 @@ All custom components are in `scenes/main/ui/components/`:
 - **MaterialDialog**: Full-featured modal dialog with types (INFO, WARNING, ERROR, QUESTION), animation, callbacks
 - **MaterialMenu**: Context menu with check items, separators, keyboard shortcuts
 - **MaterialMenuButton**: Button with integrated dropdown menu
-- **FrostedPanel**: Shader-based frosted glass effect panel (used in music module)
-- **MaterialRippleMixin**: Reusable ripple effect system for buttons/checkboxes
 - **MaterialSegmentedButton**: Material Design segmented selector with capsule-shaped container, blue highlight on selected item, sliding animation
 - **MaterialSwitch**: Material Design toggle switch with acceleration animation and background color gradient, single size
 - **MaterialTextField**: Material Design text input with pill-shaped full rounded corners, supports solid/transparent/frosted background styles
+- **MaterialChip**: Material Design Chip component (tags/filters) with four types (ASSIST, FILTER, INPUT, SUGGESTION), three sizes (SMALL/STANDARD/LARGE), two styles (FILLED/OUTLINED), supports icons, selection state, deletion
+- **MaterialFAB**: Floating Action Button with three sizes (SMALL/STANDARD/LARGE), supports Extended mode with text, customizable background and icon colors
+- **MaterialSnackbar**: Bottom toast notification system with seven position options, five types (DEFAULT/INFO/SUCCESS/WARNING/ERROR), auto-dismiss with configurable duration, optional action button
+- **MaterialSlider**: Material Design slider for volume/progress control, supports horizontal and vertical orientations, configurable min/max/step values
+- **MaterialProgressIndicator**: Two types (LINEAR/CIRCULAR), two modes (DETERMINATE/INDETERMINATE), animated progress transitions
+- **MaterialDragHandle**: Drag handle for moving parent nodes, four boundary modes (SCREEN/CUSTOM_RECT/PARENT_CONTAINER/NONE), visual feedback during drag
+- **FrostedPanel**: Shader-based frosted glass effect panel (used in music module)
 - **InnerPanel**: Inner sub-panel component with rounded corners, border, and semi-transparent background (shader-based)
 - **Calendar**: Calendar widget using calendar_library plugin, supports year/month navigation and date selection
 - **DatePicker**: Button that pops up a calendar picker for date selection
@@ -105,12 +134,18 @@ All custom components are in `scenes/main/ui/components/`:
 
 #### **Character** (`scenes/main/3d/character/character.gd`)
 - Node3D with VRM character model support
-- State management: `typing`, `happy`, `sad`, `surprised`, `saying`
 - Dual AnimationTree system: `action_tree` (poses) and `emotion_tree` (emotions)
-- Key methods: `set_typing()`, `set_happy()`, `set_pose_watch()`, `start_saying()`
+- Pose methods: `set_typing_pose()`, `set_watch_pose()`, `set_cheer_pose()`, `set_disbelief_pose()`, `set_dodge_pose()`, `set_angry_pose()`, `set_clap_pose()`, `set_laughing_pose()`
+- Emotion methods: `set_happy()`, `set_sad()`, `set_surprised()`, `set_angry()`
+- Dialogue methods: `start_saying()`, `stop_saying()`
 
 #### **Room Components** (`scenes/main/3d/room/`)
-- 3D environment props (alarm clock, dolls, etc.)
+- 3D environment props (alarm clock, cup, dolls, etc.)
+
+#### **Environment Components**
+- `outdoor/` - Outdoor environment
+- `rain/` - Rain effects
+- `snow/` - Snow effects
 
 ### Key Architectural Patterns
 
@@ -146,19 +181,29 @@ scenes/main/
 	│   ├── button/          # MaterialButton
 	│   ├── calendar/        # Calendar widget
 	│   ├── checkbox/        # MaterialCheckBox
+	│   ├── chip/            # MaterialChip
 	│   ├── date_picker/     # DatePicker button
 	│   ├── dialog/          # MaterialDialog
+	│   ├── drag_handle/     # MaterialDragHandle
+	│   ├── fab/             # MaterialFAB
 	│   ├── frosted_panel/   # Shader-based frosted glass panel
 	│   ├── inner_panel/     # InnerPanel (shader-based panel with rounded corners)
 	│   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
+	│   ├── progress_indicator/ # MaterialProgressIndicator
 	│   ├── segmented_button/# MaterialSegmentedButton
 	│   ├── shared/          # MaterialRippleMixin, MaterialSizeConfig
+	│   ├── slider/          # MaterialSlider
+	│   ├── snackbar/        # MaterialSnackbar
 	│   ├── switch/          # MaterialSwitch
 	│   ├── text_field/      # MaterialTextField
 	│   └── toggle_button/   # MaterialToggleButton
+	├── character_interactor/# Character interaction trigger
+	├── env_setter/          # Environment time and weather setter
+	├── input_box/           # ChatGPT-style AI conversation input
 	├── music_module/        # Music player UI and playlist management
-	├── task_module_new/     # Task/todo management
-	└── text_module/         # Text input module
+	├── note_module/         # Sticky note system
+	├── notebook_module/     # Multi-page notebook
+	└── task_module_new/     # Task/todo management
 
 addons/                      # Third-party plugins
 ├── vrm/                     # VRM character support
@@ -177,7 +222,7 @@ resource/audio_res/          # Audio resource management
 
 - **Godot Version**: This project uses Godot 4.5 with Mobile rendering method
 - **Language Convention**: All conversations, documentation, comments, and commit messages should be in Chinese (中文). The codebase contains Chinese comments throughout.
-- **Enabled Plugins**: vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d
+- **Enabled Plugins**: vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d, calendar_library
 - **Color Organization**: The project uses folder colors in the editor (addons=purple, assets=yellow, scenes=green, main=pink, scripts=teal)
 - **Signal Pattern**: When adding new UI features, always follow the signal-based pattern: component emits → parent listens → controller coordinates → singleton executes
 - **State Preservation**: The AudioPlayer's `is_paused` state is intentionally separate from the current track to allow seamless BGM switching while maintaining play/pause state
