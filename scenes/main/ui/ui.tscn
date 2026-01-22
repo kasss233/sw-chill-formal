@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://b8aqjm4e8p3u2"]
+[gd_scene load_steps=7 format=3 uid="uid://b8aqjm4e8p3u2"]
 
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
 [ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
 [ext_resource type="PackedScene" uid="uid://o8cxkfnpu5ug" path="res://scenes/main/ui/note_module/note_module.tscn" id="3_3q8gq"]
 [ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/env_setter/env_setter.tscn" id="4_ex8bf"]
 [ext_resource type="PackedScene" uid="uid://b6bxw47hgr5em" path="res://scenes/main/ui/character_interactor/character_interactor.tscn" id="5_fhd3w"]
+[ext_resource type="PackedScene" uid="uid://bro0lt35ms0j1" path="res://scenes/main/ui/input_box/input_box.tscn" id="6_nswco"]
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -14,6 +15,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_nf0va")
+
+[node name="InputBox" parent="." instance=ExtResource("6_nswco")]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
 
 [node name="MusicModule" parent="." instance=ExtResource("1_2q31f")]
 layout_mode = 1

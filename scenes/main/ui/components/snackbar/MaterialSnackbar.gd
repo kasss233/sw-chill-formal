@@ -323,9 +323,9 @@ func _update_layout() -> void:
 
 	size = Vector2(snackbar_width, snackbar_height)
 
-	# 根据 display_position 计算位置
+	# 根据 display_position 计算位置（使用 global_position 以支持屏幕定位）
 	var pos = _calculate_position(parent_size, snackbar_width, snackbar_height)
-	set_position(pos)
+	global_position = pos
 
 	# 更新内部布局
 	if _background:
@@ -460,17 +460,17 @@ func _animate_show() -> void:
 
 	# 计算起始位置
 	var parent_size = _get_container_size()
-	var target_pos = position
+	var target_pos = global_position
 	var start_pos = _get_animation_start_pos(target_pos, parent_size)
 
-	set_position(start_pos)
+	global_position = start_pos
 	modulate.a = 0
 
 	_tween = create_tween()
 	_tween.set_ease(Tween.EASE_OUT)
 	_tween.set_trans(Tween.TRANS_BACK)
 	_tween.set_parallel(true)
-	_tween.tween_property(self, "position", target_pos, ANIMATION_DURATION)
+	_tween.tween_property(self, "global_position", target_pos, ANIMATION_DURATION)
 	_tween.tween_property(self, "modulate:a", 1.0, ANIMATION_DURATION * 0.6)
 
 func _hide_snackbar() -> void:
@@ -480,13 +480,13 @@ func _hide_snackbar() -> void:
 	_timer.stop()
 
 	var parent_size = _get_container_size()
-	var end_pos = _get_animation_end_pos(position, parent_size)
+	var end_pos = _get_animation_end_pos(global_position, parent_size)
 
 	_tween = create_tween()
 	_tween.set_ease(Tween.EASE_IN)
 	_tween.set_trans(Tween.TRANS_QUAD)
 	_tween.set_parallel(true)
-	_tween.tween_property(self, "position", end_pos, ANIMATION_DURATION * 0.8)
+	_tween.tween_property(self, "global_position", end_pos, ANIMATION_DURATION * 0.8)
 	_tween.tween_property(self, "modulate:a", 0.0, ANIMATION_DURATION * 0.6)
 	_tween.chain().tween_callback(_on_hide_complete)
 

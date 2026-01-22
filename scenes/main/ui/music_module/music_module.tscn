@@ -643,6 +643,7 @@ editor_items = Array[ExtResource("11_btupq")]([SubResource("Resource_t1xwq"), Su
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="FrostedPanel" type="PanelContainer" parent="."]
+visible = false
 material = SubResource("ShaderMaterial_62hhh")
 layout_mode = 0
 offset_left = 2.0
@@ -755,11 +756,13 @@ size_flags_vertical = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 material = SubResource("ShaderMaterial_f0bs5")
-layout_mode = 0
-offset_left = 30.0
-offset_top = -82.0
-offset_right = 360.0
-offset_bottom = -21.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -61.0
+offset_right = 334.0
+grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_5kdm8")
 script = ExtResource("12_2p7cx")
 corner_radius = 20.0
