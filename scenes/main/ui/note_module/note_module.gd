@@ -1,5 +1,6 @@
 extends Control
 @export var note: PackedScene
+@onready var canvas_layer: CanvasLayer = $CanvasLayer
 var cnt: int = 0
 func _on_material_button_pressed() -> void:
 	if (cnt >= 20):
@@ -8,7 +9,7 @@ func _on_material_button_pressed() -> void:
 	cnt += 1
 	var new_note = note.instantiate() as Note
 	new_note.note_closed.connect(_on_note_closed)
-	get_parent().add_child(new_note)
+	canvas_layer.add_child(new_note)
 	#放在中间
 	new_note.global_position = get_viewport().get_visible_rect().size / 2 - new_note.size / 2
 func _on_note_closed() -> void:
@@ -22,7 +23,7 @@ func take_note(text: String):
 		return
 	var new_note = note.instantiate() as Note
 	new_note.note_closed.connect(_on_note_closed)
-	get_parent().add_child(new_note)
+	canvas_layer.add_child(new_note)
 	new_note.global_position = get_viewport().get_visible_rect().size / 2 - new_note.size / 2
 	print("[Note Module] taking note: ", text)
 	new_note.set_text(text)

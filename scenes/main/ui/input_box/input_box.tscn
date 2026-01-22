@@ -396,28 +396,14 @@ text = "拍照"
 icon = ExtResource("16_d007x")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
-[node name="InputBox" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="InputBox" type="MarginContainer"]
+offset_right = 316.0
+offset_bottom = 76.0
 script = ExtResource("1_o8rmt")
 
 [node name="FrostedPanel" type="PanelContainer" parent="."]
 material = SubResource("ShaderMaterial_60koo")
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -158.0
-offset_top = -76.0
-offset_right = 158.0
-grow_horizontal = 2
-grow_vertical = 0
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_kuivi")
 script = ExtResource("2_t5fk1")
 corner_radius = 25.0
@@ -595,12 +581,9 @@ padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
 [node name="MaterialMenu" type="PanelContainer" parent="."]
+visible = false
 custom_minimum_size = Vector2(100, 0)
-layout_mode = 0
-offset_left = 162.0
-offset_top = -283.0
-offset_right = 362.0
-offset_bottom = -187.0
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_5x1cm")
 script = ExtResource("13_d007x")
 editor_items = Array[ExtResource("14_q6tgl")]([SubResource("Resource_c48v0"), SubResource("Resource_q6tgl")])
@@ -618,8 +601,9 @@ filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.gif, *.bmp, *.webp ; 图片
 use_native_dialog = true
 
 [node name="MaterialSnackbar" type="Control" parent="."]
+visible = false
 modulate = Color(1, 1, 1, 0)
-anchors_preset = 0
+layout_mode = 2
 script = ExtResource("17_snackbar")
 display_position = 1
 use_viewport_size = true

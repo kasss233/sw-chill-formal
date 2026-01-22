@@ -6,59 +6,59 @@
 [ext_resource type="Texture2D" uid="uid://dumeuvinhlojt" path="res://assets/ui/icons/attach_file_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="2_tvr07"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r3pkf"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rwug5"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qwws7"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yyybl"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3tm6q"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k77k2"]
 content_margin_left = 14.0
@@ -115,22 +115,16 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="NoteModule" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="NoteModule" type="MarginContainer"]
+offset_right = 40.0
+offset_bottom = 48.0
 script = ExtResource("1_tvr07")
 note = ExtResource("2_r3pkf")
 
 [node name="MaterialButton" type="Button" parent="."]
 clip_contents = true
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 1
-offset_right = 36.0
-offset_bottom = 36.0
+custom_minimum_size = Vector2(36, 48)
+layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_r3pkf")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_rwug5")
@@ -138,20 +132,19 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_qwws7")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_yyybl")
 theme_override_styles/focus = SubResource("StyleBoxFlat_3tm6q")
 script = ExtResource("1_naere")
+button_size = 3
 button_icon = ExtResource("2_tvr07")
-padding_horizontal = 14
-padding_vertical = 7
+icon_size = 24
+background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+padding_horizontal = 20
+padding_vertical = 10
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="MaterialButton2" type="Button" parent="."]
 visible = false
 clip_contents = true
 custom_minimum_size = Vector2(0, 36)
-layout_mode = 0
-offset_left = 79.0
-offset_top = -3.0
-offset_right = 151.0
-offset_bottom = 34.0
+layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_k77k2")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_mnfdr")
@@ -163,6 +156,8 @@ script = ExtResource("1_naere")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
 [connection signal="pressed" from="MaterialButton2" to="." method="_on_material_button_2_pressed"]

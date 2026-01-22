@@ -13,6 +13,10 @@ var page_names: Array[String] = []
 var pages: Dictionary = {}
 var current_page_btn: PageButton = null
 var is_page_opened: bool = false
+
+func _ready() -> void:
+	panel.visible = false
+
 func _on_add_button_pressed() -> void:
 	var new_page_button = page_button.instantiate() as PageButton
 	vbox.add_child(new_page_button)

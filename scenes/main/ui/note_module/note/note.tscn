@@ -187,7 +187,6 @@ offset_left = 104.0
 offset_top = 12.0
 offset_right = 166.0
 offset_bottom = 65.0
-mouse_filter = 1
 script = ExtResource("6_v5ehv")
 drag_target = NodePath("../FrostedPanel")
 target_node = NodePath("../FrostedPanel")
