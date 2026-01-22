@@ -15,10 +15,12 @@ signal env_time_changed(mode: int)
 signal env_weather_changed(mode:int)
 ## 角色互动 
 signal character_interacted
+## 任务完成
+signal task_finished
 # --- 节点引用 ---
 ## 音乐管理模块
 @onready var music_module: Control = $MusicModule
-
+@onready var note_module=$NoteModule
 # --- 内置函数 ---
 func _ready() -> void:
 	_connect_signals()
@@ -92,7 +94,10 @@ func switch_to_list_by_name(p_list_name: String) -> void:
 func set_current_music_display(p_music_name: String) -> void:
 	if music_module:
 		music_module.set_current_music_display(p_music_name)
-
+		
+##  添加新的便签(带动画)
+func take_note(text:String):
+	note_module.take_note(text)
 # --- 信号转发回调 ---
 func _on_music_changed(p_name: String) -> void:
 	music_changed.emit(p_name)

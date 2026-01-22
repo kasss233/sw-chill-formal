@@ -1,0 +1,88 @@
+[gd_scene load_steps=8 format=3 uid="uid://bwkofikr0rnvr"]
+
+[ext_resource type="Script" uid="uid://cql2sc6pub7wo" path="res://scenes/main/ui/notebook/pagebutton/page_button.gd" id="1_mbis7"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_sxwfx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mbis7"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mpods"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r1amk"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qlcbh"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bptnj"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="PageButton" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mbis7")
+
+[node name="MaterialButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 0
+offset_right = 76.0
+offset_bottom = 37.0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_mbis7")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_mpods")
+theme_override_styles/hover = SubResource("StyleBoxFlat_r1amk")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qlcbh")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bptnj")
+text = "新笔记"
+script = ExtResource("1_sxwfx")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]

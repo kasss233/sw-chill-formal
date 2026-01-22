@@ -1,0 +1,183 @@
+[gd_scene load_steps=21 format=3 uid="uid://bmsmfccv7kma"]
+
+[ext_resource type="Script" uid="uid://c5icyiww08u1w" path="res://scenes/main/ui/notebook/note_book.gd" id="1_00gxi"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_uh028"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_0j3f0"]
+[ext_resource type="PackedScene" uid="uid://bwkofikr0rnvr" path="res://scenes/main/ui/notebook/pagebutton/page_button.tscn" id="2_ed7lx"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_0j3f0"]
+[ext_resource type="PackedScene" uid="uid://injv2w2no8tk" path="res://scenes/main/ui/notebook/page/page.tscn" id="3_mq1iw"]
+[ext_resource type="Texture2D" uid="uid://c7ck2hhjgnsuf" path="res://assets/ui/icons/add_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_7e0cj"]
+[ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="8_f48v4"]
+[ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="9_i5tje"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7e0cj"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_00gxi"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_7e0cj")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ed7lx"]
+shader = ExtResource("1_uh028")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_00gxi")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(407, 432)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mq1iw"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7e0cj"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00gxi"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ed7lx"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aw2qm"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f48v4"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7lyeq"]
+shader = ExtResource("8_f48v4")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(298, 376)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m7g7n"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="NoteBook" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_00gxi")
+page_button = ExtResource("2_ed7lx")
+page = ExtResource("3_mq1iw")
+
+[node name="FrostedPanel" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_ed7lx")
+layout_mode = 0
+offset_right = 407.0
+offset_bottom = 432.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_mq1iw")
+script = ExtResource("2_0j3f0")
+noise_texture = SubResource("NoiseTexture2D_00gxi")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 67.0
+offset_right = 88.0
+offset_bottom = 400.0
+theme_override_constants/separation = 20
+
+[node name="AddButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 0
+offset_left = 21.0
+offset_top = 27.0
+offset_right = 57.0
+offset_bottom = 63.0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_7e0cj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_00gxi")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ed7lx")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_aw2qm")
+theme_override_styles/focus = SubResource("StyleBoxFlat_f48v4")
+script = ExtResource("3_0j3f0")
+button_icon = ExtResource("4_7e0cj")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="InnerPanel" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_7lyeq")
+layout_mode = 0
+offset_left = 106.0
+offset_top = 48.0
+offset_right = 404.0
+offset_bottom = 424.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_m7g7n")
+script = ExtResource("9_i5tje")
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[connection signal="pressed" from="AddButton" to="." method="_on_add_button_pressed"]
