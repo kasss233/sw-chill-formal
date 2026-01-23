@@ -14,7 +14,7 @@ func _ready() -> void:
 func _setup_ui() -> void:
 	# 创建主容器
 	var main_container = VBoxContainer.new()
-	main_container.set_anchors_preset(Control.PRESET_CENTER)
+	main_container.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	main_container.add_theme_constant_override("separation", 20)
 	add_child(main_container)
 	

@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://cshc06pyk77f" path="res://scenes/main/ui/task_module_new/task_module_new.tscn" id="5_enf1w"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="6_6xygf"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7qysn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6xygf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -18,7 +18,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ka0c4"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7qysn"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -29,7 +29,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enf1w"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ka0c4"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -40,7 +40,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpi25"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enf1w"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -51,7 +51,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htout"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpi25"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -90,11 +90,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_7qysn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ka0c4")
-theme_override_styles/hover = SubResource("StyleBoxFlat_enf1w")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bpi25")
-theme_override_styles/focus = SubResource("StyleBoxFlat_htout")
+theme_override_styles/normal = SubResource("StyleBoxFlat_6xygf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_7qysn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ka0c4")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_enf1w")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bpi25")
 script = ExtResource("2_6xygf")
 states = Array[ExtResource("3_7qysn")]([SubResource("Resource_jomwj"), SubResource("Resource_b65r1")])
 button_size = 3
@@ -121,7 +121,7 @@ script = ExtResource("6_6xygf")
 auto_start = 0
 animation_enter = 3
 animation_leave = 3
-duration = 0.39999999999999997
+duration = 0.4
 delay = 0.03
 transition_type = "BACK"
 layout = NodePath("../CanvasLayer/TaskModuleNew")

@@ -1,0 +1,154 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8yjvb2qwm3la"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/music_module_test_panel.gd" id="1_music_test"]
+
+[node name="MusicModuleTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_music_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="MusicNameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "音乐名称 (用于播放/添加/移除)"
+
+[node name="PlaylistNameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "歌单名称 (用于切换/创建/查询)"
+
+[node name="PlayModeInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "播放模式 (0=顺序, 1=随机, 2=单曲循环)"
+
+[node name="PlaybackSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "播放控制 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="PlayMusicBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "播放指定音乐 (agent_play_music)"
+
+[node name="PauseBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "暂停播放 (agent_set_playing)"
+
+[node name="ResumeBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "继续播放 (agent_set_playing)"
+
+[node name="PlayNextBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "播放下一首 (agent_play_next)"
+
+[node name="PlayPreviousBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "播放上一首 (agent_play_previous)"
+
+[node name="SetModeBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaybackSection"]
+layout_mode = 2
+text = "设置播放模式 (agent_set_play_mode)"
+
+[node name="PlaylistSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaylistSection"]
+layout_mode = 2
+text = "歌单管理 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="SwitchListBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaylistSection"]
+layout_mode = 2
+text = "切换歌单 (agent_switch_to_list)"
+
+[node name="CreatePlaylistBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaylistSection"]
+layout_mode = 2
+text = "创建新歌单 (agent_create_playlist)"
+
+[node name="AddMusicBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaylistSection"]
+layout_mode = 2
+text = "添加音乐到���单 (agent_add_music_to_list)"
+
+[node name="RemoveMusicBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaylistSection"]
+layout_mode = 2
+text = "从歌单移除音乐 (agent_remove_music_from_list)"
+
+[node name="DeletePlaylistBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PlaylistSection"]
+layout_mode = 2
+text = "删除歌单 (agent_delete_playlist)"
+
+[node name="QuerySection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "查询信息 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="GetCurrentInfoBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "获取当前播放信息 (agent_get_current_music_info)"
+
+[node name="GetAllPlaylistsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "获取所有歌单 (agent_get_all_playlists)"
+
+[node name="GetPlaylistMusicBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "获取歌单音乐 (agent_get_playlist_music)"
+
+[node name="GetAllMusicBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "获取所有歌单及音乐 (agent_get_all_playlists_music)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]测试日志将显示在这里...[/color]"
+scroll_following = true

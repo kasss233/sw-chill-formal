@@ -46,10 +46,10 @@ func _ready() -> void:
 func _on_button_pressed() -> void:
 	if not menu:
 		return
-	
+
 	if disable_menu_when_disabled and disabled:
 		return
-	
+
 	if menu.visible:
 		menu.hide_menu()
 	else:
@@ -58,7 +58,7 @@ func _on_button_pressed() -> void:
 func _show_menu() -> void:
 	if not menu:
 		return
-	
+
 	match popup_position:
 		0:  # 下方
 			menu.popup_below(self, menu_offset)

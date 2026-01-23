@@ -285,6 +285,58 @@ func add_check_item(text: String, is_checked: bool = false, icon: Texture2D = nu
 	item.set_checkable(is_checked, check_tex)
 	return item
 
+## 在指定位置插入菜单项
+func insert_item(index: int, text: String, icon: Texture2D = null, shortcut: String = "") -> MaterialMenuItem:
+	# 确保容器已初始化
+	_ensure_container()
+
+	# 限制索引范围
+	index = clampi(index, 0, _items.size())
+
+	var item = MaterialMenuItem.new()
+	item.set_item(text, icon, shortcut)
+	item.item_height = _get_item_height()
+	item.hover_color = hover_color
+	item.ripple_color = ripple_color
+
+	# 先添加到容器末尾
+	_items_container.add_child(item)
+
+	# 移动到正确位置
+	if index < _items.size():
+		_items_container.move_child(item, index)
+
+	# 插入到数组
+	_items.insert(index, item)
+
+	# 重新连接所有菜单项的信号（因为索引改变了）
+	_reconnect_all_item_signals()
+
+	return item
+
+## 在指定位置插入可选中菜单项
+func insert_check_item(index: int, text: String, is_checked: bool = false, icon: Texture2D = null) -> MaterialMenuItem:
+	var item = insert_item(index, text, icon)
+	# 确保使用默认check图标（如果没有提供）
+	var check_tex = default_check_icon if default_check_icon else preload("res://assets/ui/icons/check_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg")
+	item.set_checkable(is_checked, check_tex)
+	return item
+
+## 重新连接所有菜单项的信号
+func _reconnect_all_item_signals() -> void:
+	for i in range(_items.size()):
+		var item = _items[i]
+		if item is MaterialMenuItem:
+			# 断开旧的信号连接
+			if item.pressed.is_connected(_on_item_pressed):
+				item.pressed.disconnect(_on_item_pressed)
+			if item.hovered.is_connected(_on_item_hovered):
+				item.hovered.disconnect(_on_item_hovered)
+
+			# 重新连接信号，使用正确的索引
+			item.pressed.connect(_on_item_pressed.bind(i))
+			item.hovered.connect(_on_item_hovered.bind(item))
+
 ## 添加子菜单
 func add_submenu(text: String, sub_menu: MaterialMenu, icon: Texture2D = null) -> MaterialMenuItem:
 	var item = add_item(text, icon)
@@ -307,8 +359,18 @@ func add_separator() -> MaterialMenuSeparator:
 func clear_items() -> void:
 	for item in _items:
 		if is_instance_valid(item):
+			# 先从容器中移除，再释放
+			if item.get_parent() == _items_container:
+				_items_container.remove_child(item)
 			item.queue_free()
 	_items.clear()
+
+	# 强制更新容器布局
+	if _items_container:
+		_items_container.queue_sort()
+		# 重置尺寸
+		custom_minimum_size.y = 0
+		size.y = 0
 
 ## 获取菜单项数量
 func get_item_count() -> int:
@@ -356,7 +418,7 @@ func show_menu(at_position: Vector2 = Vector2.ZERO) -> void:
 	# 只有根菜单（非子菜单）才创建背景层
 	if not _parent_menu:
 		_create_background_blocker()
-	
+
 	# 设置位置
 	if at_position != Vector2.ZERO:
 		global_position = at_position

@@ -11,23 +11,22 @@ script = ExtResource("4_u6jcq")
 [sub_resource type="Resource" id="Resource_gir5d"]
 script = ExtResource("4_u6jcq")
 
-[node name="MusicList" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="MusicList" type="MarginContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_ys5r8")
 music_item_scene = ExtResource("2_l8xbh")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
-layout_mode = 0
-offset_right = 1152.0
-offset_bottom = 648.0
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 4
 script = ExtResource("3_4nkv7")
 wheel_scroll_damper = SubResource("Resource_l2wwv")
 dragging_scroll_damper = SubResource("Resource_gir5d")
+hide_scrollbar_over_time = true
+scrollbar_hide_time = 1.0
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]

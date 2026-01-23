@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://b8aqjm4e8p3u2"]
+[gd_scene load_steps=28 format=3 uid="uid://b8aqjm4e8p3u2"]
 
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
 [ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
@@ -6,9 +6,33 @@
 [ext_resource type="PackedScene" uid="uid://b6bxw47hgr5em" path="res://scenes/main/ui/character_interactor/character_interactor.tscn" id="5_fhd3w"]
 [ext_resource type="PackedScene" uid="uid://bro0lt35ms0j1" path="res://scenes/main/ui/input_box/input_box.tscn" id="6_nswco"]
 [ext_resource type="PackedScene" uid="uid://dmv8hgscsfuvj" path="res://scenes/main/ui/tab_panel/tab_panel.tscn" id="7_dynxa"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="7_vb4k3"]
 [ext_resource type="PackedScene" uid="uid://daa0dvlkhliq6" path="res://scenes/main/ui/debug/test_panel.tscn" id="8_test_panel"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dynxa"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_hnkmo"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_a7tfl"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_hnkmo")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vb4k3"]
+shader = ExtResource("7_vb4k3")
+shader_parameter/corner_radius = 32.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_a7tfl")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(88, 296)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q7r1g"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -20,34 +44,12 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vb4k3"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q7r1g"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2vsow"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -58,7 +60,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -69,7 +71,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -80,7 +82,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -91,7 +93,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -102,7 +104,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -113,7 +115,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -124,7 +126,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -135,7 +137,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -146,7 +148,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -157,7 +159,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -168,7 +170,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
@@ -179,13 +181,35 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rx81l"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rv47i"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[node name="UI" type="Control" node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "test_panel", "env_setter")]
+[node name="UI" type="Control" node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -197,8 +221,40 @@ music_module = NodePath("MusicModule")
 note_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteModule")
 note_book = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteBook")
 task_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule/CanvasLayer/TaskModuleNew")
-test_panel = NodePath("TestPanel")
-env_setter = NodePath("EnvSetter")
+
+[node name="TabPanel" parent="." instance=ExtResource("7_dynxa")]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -148.0
+offset_bottom = 148.0
+grow_vertical = 2
+
+[node name="FrostedPanel" parent="TabPanel" index="0"]
+material = SubResource("ShaderMaterial_vb4k3")
+theme_override_styles/panel = SubResource("StyleBoxFlat_q7r1g")
+
+[node name="TodoButton" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule" index="0"]
+theme_override_styles/normal = SubResource("StyleBoxFlat_2vsow")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_y8df3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mwct6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_g7gay")
+theme_override_styles/focus = SubResource("StyleBoxFlat_hkhhe")
+
+[node name="NoteButton" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" index="1"]
+theme_override_styles/normal = SubResource("StyleBoxFlat_khr3h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_uypi5")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tnos5")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_w2hwp")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3ru4j")
+
+[node name="SettingButton" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" index="4"]
+theme_override_styles/normal = SubResource("StyleBoxFlat_uumow")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_djxf0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_87oeu")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_rx81l")
+theme_override_styles/focus = SubResource("StyleBoxFlat_rv47i")
 
 [node name="InputBox" parent="." instance=ExtResource("6_nswco")]
 layout_mode = 1
@@ -238,45 +294,12 @@ offset_top = 115.0
 offset_right = 642.0
 offset_bottom = 115.0
 
-[node name="TabPanel" parent="." instance=ExtResource("7_dynxa")]
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -70.0
-offset_bottom = 70.0
-grow_vertical = 2
-
-[node name="FrostedPanel" parent="TabPanel" index="0"]
-theme_override_styles/panel = SubResource("StyleBoxFlat_dynxa")
-
-[node name="TodoButton" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule" index="0"]
-theme_override_styles/normal = SubResource("StyleBoxFlat_vb4k3")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_q7r1g")
-theme_override_styles/hover = SubResource("StyleBoxFlat_2vsow")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_y8df3")
-theme_override_styles/focus = SubResource("StyleBoxFlat_mwct6")
-
-[node name="NoteButton" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" index="1"]
-theme_override_styles/normal = SubResource("StyleBoxFlat_g7gay")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_hkhhe")
-theme_override_styles/hover = SubResource("StyleBoxFlat_khr3h")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_uypi5")
-theme_override_styles/focus = SubResource("StyleBoxFlat_tnos5")
-
-[node name="SettingButton" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" index="4"]
-theme_override_styles/normal = SubResource("StyleBoxFlat_w2hwp")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_3ru4j")
-theme_override_styles/hover = SubResource("StyleBoxFlat_uumow")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_djxf0")
-theme_override_styles/focus = SubResource("StyleBoxFlat_87oeu")
-
 [node name="TestPanel" parent="." node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
-layout_mode = 1
-offset_left = 840.0
-offset_top = 123.0
-offset_right = 1108.0
-offset_bottom = 518.0
+layout_mode = 0
+offset_left = 841.0
+offset_top = 92.0
+offset_right = 1147.0
+offset_bottom = 506.0
 ui = NodePath("..")
 
 [connection signal="env_time_changed" from="EnvSetter" to="." method="_on_env_time_setter_env_time_changed"]

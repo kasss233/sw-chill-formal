@@ -1,12 +1,13 @@
 extends MarginContainer
 
 @onready var task_module_new: MarginContainer = $CanvasLayer/TaskModuleNew
+@onready var todo_button: MaterialToggleButton = $TodoButton
 
 func _ready() -> void:
 	task_module_new.visible = false
 
 func _on_todo_button_state_changed(old_state: int, new_state: int) -> void:
-	if task_module_new.visible:
+	if new_state==0:
 		GuiTransitions.hide("task")
 	else:
 		GuiTransitions.show("task")

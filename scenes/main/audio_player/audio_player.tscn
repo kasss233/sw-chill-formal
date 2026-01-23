@@ -6,6 +6,12 @@
 [node name="AudioPlayer" type="Node"]
 script = ExtResource("1_7i0mx")
 audio_res = ExtResource("2_jfj46")
+bgm_volume = null
+sfx_volume = null
+fade_enabled = null
+fade_in_duration = null
+fade_out_duration = null
+fade_curve = null
 
 [node name="SoundEffect" type="Node" parent="."]
 

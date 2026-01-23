@@ -5,7 +5,7 @@ extends Control
 
 # --- 信号 ---
 ## 当点击播放按钮时发出，传递音乐名称
-signal music_changed(p_name: String)
+signal music_selected(p_name: String)
 ## 当点击选项按钮时发出，传递音乐名称
 signal music_options_requested(p_name: String)
 ## 当点击删除按钮时发出，传递音乐名称
@@ -19,8 +19,8 @@ signal music_category_changed(p_name: String, category: String, checked: bool)
 ## 播放按钮引用
 @onready var button: MaterialButton = $InnerPanel/HBoxContainer/Button
 
+@onready var material_menu: MaterialMenu = $CanvasLayer/MaterialMenu
 
-@onready var material_menu: MaterialMenu = $MaterialMenu
 
 
 # --- 私有变量 ---
@@ -69,7 +69,7 @@ func get_music_name() -> String:
 
 ## 触发播放逻辑
 func play_music() -> void:
-	music_changed.emit(music_name)
+	music_selected.emit(music_name)
 
 func remove_music() -> void:
 	music_removed.emit(music_name)
@@ -86,6 +86,75 @@ func get_category_checked(category: String) -> bool:
 		var item_index = _category_items[category] as int
 		return _options_menu.is_item_checked(item_index)
 	return false
+
+## 添加新的分类选项到菜单
+func add_category(category: String, checked: bool = false) -> void:
+	# 如果分类已存在，不重复添加
+	if category in _category_items:
+		return
+
+	if not _options_menu:
+		return
+
+	# 计算应该插入的位置（在所有现有分类之后，分隔符之前）
+	var insert_index = _category_items.size()
+
+	# 使用 MaterialMenu 的 insert_check_item 方法在指定位置插入
+	_options_menu.insert_check_item(insert_index, category, checked)
+
+	# 添加新分类到映射
+	_category_items[category] = insert_index
+
+	# 注意：插入后，分隔符和删除选项的索引会自动+1
+	# 但我们在 _on_menu_item_pressed 中动态计算删除索引，所以不需要手动更新
+
+## 从菜单中移除分类选项
+func remove_category(category: String) -> void:
+	# 如果分类不存在，直接返回
+	if category not in _category_items:
+		return
+
+	if not _options_menu:
+		return
+
+	# 从字典中移除该分类
+	_category_items.erase(category)
+
+	# 重建菜单
+	_rebuild_category_menu()
+
+## 重建分类菜单（移除分类后需要重建）
+func _rebuild_category_menu() -> void:
+	if not _options_menu:
+		return
+
+	# 保存当前所有分类及其勾选状态
+	var categories_state: Dictionary = {}
+	for category in _category_items:
+		var index = _category_items[category]
+		categories_state[category] = _options_menu.is_item_checked(index)
+
+	# 清空菜单
+	_options_menu.clear_items()
+	_category_items.clear()
+
+	# 重新添加所有分类
+	for category in categories_state:
+		var current_index = _options_menu.get_item_count()
+		_options_menu.add_check_item(category, categories_state[category])
+		_category_items[category] = current_index
+
+	# 添加分割线
+	_options_menu.add_separator()
+
+	# 添加删除选项
+	var delete_icon = preload("res://assets/ui/icons/delete_forever_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg")
+	_options_menu.add_item("删除", delete_icon, "")
+
+	# 重新连接信号
+	if not _options_menu.item_pressed.is_connected(_on_menu_item_pressed):
+		_options_menu.item_pressed.connect(_on_menu_item_pressed)
+
 # --- 信号回调 ---
 func _on_button_pressed() -> void:
 	play_music()

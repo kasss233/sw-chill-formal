@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GuiTransitions="*res://addons/simple-gui-transitions/singleton.gd"
+MusicState="*res://scenes/main/audio_player/music_state.gd"
 AudioPlayer="*res://scenes/main/audio_player/audio_player.tscn"
 
 [display]

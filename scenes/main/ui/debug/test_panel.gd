@@ -41,9 +41,10 @@ func _initialize_test_panels() -> void:
 			child.set_task_module(ui.task_module)
 			print("[TestPanel] 已为 %s 设置TaskModule引用" % child.name)
 
-		# 未来可以添加其他模块的初始化
-		# if child.has_method("set_music_module") and ui.music_module:
-		#     child.set_music_module(ui.music_module)
+		# 初始化MusicModule测试页
+		if child.has_method("set_music_module") and ui.music_module:
+			child.set_music_module(ui.music_module)
+			print("[TestPanel] 已为 %s 设置MusicModule引用" % child.name)
 
 ## 公共方法：切换到指定的测试页
 ## @param tab_name: Tab名称

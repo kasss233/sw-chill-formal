@@ -1,22 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://daa0dvlkhliq6"]
+[gd_scene load_steps=5 format=3 uid="uid://daa0dvlkhliq6"]
 
 [ext_resource type="Script" uid="uid://c3harjmj1bpcc" path="res://scenes/main/ui/debug/test_panel.gd" id="1_test_panel"]
 [ext_resource type="PackedScene" uid="uid://dh3k8yjvb2qwm" path="res://scenes/main/ui/debug/task_module_test_panel.tscn" id="2_task_test"]
 [ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="3_fjyjl"]
+[ext_resource type="PackedScene" uid="uid://c8yjvb2qwm3la" path="res://scenes/main/ui/debug/music_module_test_panel.tscn" id="3_uae58"]
 
-[node name="TestPanel" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 268.0
-offset_bottom = 395.0
+[node name="TestPanel" type="MarginContainer"]
+offset_right = 314.0
+offset_bottom = 425.0
 script = ExtResource("1_test_panel")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_right = 268.0
-offset_bottom = 395.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
@@ -47,16 +42,22 @@ layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="TaskModule测试" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("2_task_test")]
+[node name="Task" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("2_task_test")]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="MaterialDragHandle" type="Control" parent="." node_paths=PackedStringArray("drag_target", "target_node")]
-anchors_preset = 0
-offset_right = 160.0
-offset_bottom = 60.0
-script = ExtResource("3_fjyjl")
-drag_target = NodePath("")
-target_node = NodePath("")
+[node name="music" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("3_uae58")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MaterialDragHandle" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("drag_target", "target_node")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 198.0
+offset_bottom = 59.0
+script = ExtResource("3_fjyjl")
+drag_target = NodePath("../../PanelContainer")
+target_node = NodePath("../../PanelContainer")

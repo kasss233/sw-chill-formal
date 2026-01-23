@@ -11,15 +11,15 @@
 [ext_resource type="Texture2D" uid="uid://cm0gq0kcat5eo" path="res://assets/ui/icons/more_horiz_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="6_flquy"]
 [ext_resource type="Script" uid="uid://c66rtlpmo48ps" path="res://scenes/main/ui/components/menu/MaterialMenu.gd" id="8_rcw5g"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_7fa2n"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ykqi0"]
 shader = ExtResource("2_vxwb3")
-shader_parameter/corner_radius = 8.0
+shader_parameter/corner_radius = 16.0
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
-shader_parameter/size = Vector2(340, 37)
+shader_parameter/size = Vector2(240, 37)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_24yt7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fsdxl"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -64,7 +64,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0tp04"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_85qi5"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -75,7 +75,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ybgrx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxro8"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -86,34 +86,12 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_85qi5"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxro8"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_022sh"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -124,7 +102,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -135,13 +113,35 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fgnp8"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_24yt7"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0tp04"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -160,19 +160,17 @@ shadow_color = Color(0, 0, 0, 0.3)
 shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
-[node name="MusicItem" type="Control"]
-custom_minimum_size = Vector2(300, 36)
-layout_mode = 3
-anchors_preset = 0
+[node name="MusicItem" type="MarginContainer"]
+offset_right = 240.0
+offset_bottom = 37.0
 script = ExtResource("1_f10aj")
 
 [node name="InnerPanel" type="PanelContainer" parent="."]
-material = SubResource("ShaderMaterial_7fa2n")
-layout_mode = 0
-offset_right = 16.0
-offset_bottom = 16.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_24yt7")
+material = SubResource("ShaderMaterial_ykqi0")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fsdxl")
 script = ExtResource("3_3seb5")
+corner_radius = 16.0
 content_padding = 0.0
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 
@@ -181,23 +179,34 @@ layout_mode = 2
 
 [node name="Button" type="Button" parent="InnerPanel/HBoxContainer"]
 clip_contents = true
-custom_minimum_size = Vector2(300, 36)
+custom_minimum_size = Vector2(200, 36)
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 1
 mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 0)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 0)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 0)
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 0)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 0)
 theme_override_styles/normal = SubResource("StyleBoxFlat_vxwb3")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_3seb5")
 theme_override_styles/hover = SubResource("StyleBoxFlat_7fa2n")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_0tp04")
-theme_override_styles/focus = SubResource("StyleBoxFlat_ybgrx")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_85qi5")
+theme_override_styles/focus = SubResource("StyleBoxFlat_mxro8")
 text = "null"
 flat = true
 alignment = 0
+text_overrun_behavior = 5
 script = ExtResource("2_ykqi0")
 content_alignment = 0
-min_width = 300
+min_width = 200
 padding_horizontal = 14
 padding_vertical = 7
+text_overrun = 5
+enable_text_scroll = true
+scroll_speed = 20.0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="OptionButton" type="Button" parent="InnerPanel/HBoxContainer"]
@@ -220,31 +229,31 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_85qi5")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mxro8")
-theme_override_styles/hover = SubResource("StyleBoxFlat_022sh")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ql8jh")
-theme_override_styles/focus = SubResource("StyleBoxFlat_ijy10")
+theme_override_styles/normal = SubResource("StyleBoxFlat_022sh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ql8jh")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ijy10")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_fgnp8")
+theme_override_styles/focus = SubResource("StyleBoxFlat_24yt7")
 script = ExtResource("6_ddvgi")
-menu = NodePath("../../../MaterialMenu")
+menu = NodePath("../../../CanvasLayer/MaterialMenu")
 button_icon = ExtResource("6_flquy")
-content_alignment = null
-min_width = null
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="MaterialMenu" type="PanelContainer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer"]
+top_level = true
 custom_minimum_size = Vector2(200, 0)
-layout_mode = 0
-offset_left = 139.0
-offset_top = 92.0
-offset_right = 339.0
-offset_bottom = 148.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_fgnp8")
+offset_left = 140.0
+offset_top = 164.0
+offset_right = 340.0
+offset_bottom = 201.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_0tp04")
 script = ExtResource("8_rcw5g")
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [connection signal="pressed" from="InnerPanel/HBoxContainer/Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="InnerPanel/HBoxContainer/OptionButton" to="." method="_on_option_button_pressed"]
 [connection signal="pressed" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_pressed"]

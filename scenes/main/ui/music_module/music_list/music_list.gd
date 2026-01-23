@@ -4,8 +4,8 @@ extends Control
 ## 音乐列表容器，管理多个 MusicItem 并处理播放逻辑
 
 # --- 信号 ---
-## 当列表中的音乐被触发更改时发出
-signal music_changed(p_name: String)
+## 当列表中的音乐被选中时发出
+signal music_selected(p_name: String)
 ## 当列表中的音乐被收藏时发出
 signal music_favoured(p_name: String)
 ## 当请求显示特定音乐的选项菜单时发出
@@ -25,6 +25,10 @@ signal music_category_changed(music_name: String, category: String, checked: boo
 var current_playing_index: int = -1
 ## 当前播放的音乐名称
 var current_playing_name: String = ""
+## 随机播放列表（存储打乱后的索引顺序）
+var shuffled_playlist: Array[int] = []
+## 当前在随机播放列表中的位置
+var shuffled_playlist_index: int = -1
 
 # --- 公有 API ---
 ## 获取列表中音乐的数量
@@ -58,7 +62,7 @@ func add_music(p_name: String) -> void:
 	vbox.add_child(m)
 	
 	# 连接信号
-	m.music_changed.connect(_on_music_changed)
+	m.music_selected.connect(_on_music_selected)
 	m.music_options_requested.connect(_on_music_options_requested)
 	m.music_removed.connect(_on_music_removed)
 	m.music_category_changed.connect(_on_music_category_changed)
@@ -104,14 +108,100 @@ func play_last_music() -> void:
 		
 	var last_index = (current_playing_index - 1 + vbox.get_child_count()) % vbox.get_child_count()
 	play_music(last_index)
-## 随机播放下一首，保证不跟当前重复
+## 随机播放下一首，使用打乱的播放列表
 func play_random_music() -> void:
 	if get_music_count() == 0:
 		return
-	var random_index = randi() % get_music_count()
-	while random_index == current_playing_index and get_music_count() > 1:
-		random_index = randi() % get_music_count()
-	play_music(random_index)
+
+	# 如果随机播放列表为空，重新生成
+	if shuffled_playlist.is_empty():
+		generate_shuffled_playlist()
+		# generate_shuffled_playlist() 已经设置了正确的 shuffled_playlist_index
+		# 如果当前没有播放歌曲，从第一首开始
+		if shuffled_playlist_index == -1 and shuffled_playlist.size() > 0:
+			shuffled_playlist_index = 0
+		else:
+			# 如果当前正在播放歌曲，移动到下一首
+			shuffled_playlist_index += 1
+			# 如果超出范围，循环到开头
+			if shuffled_playlist_index >= shuffled_playlist.size():
+				shuffled_playlist_index = 0
+	elif shuffled_playlist_index >= shuffled_playlist.size() - 1:
+		# 已播放完，重新生成并从头开始
+		#generate_shuffled_playlist()
+		shuffled_playlist_index = 0
+	else:
+		# 移动到下一首
+		shuffled_playlist_index += 1
+
+	# 播放随机列表中的当前歌曲
+	if shuffled_playlist_index >= 0 and shuffled_playlist_index < shuffled_playlist.size():
+		var target_index = shuffled_playlist[shuffled_playlist_index]
+		play_music(target_index)
+
+## 随机播放上一首，使用打乱的播放列表
+func play_random_previous() -> void:
+	if get_music_count() == 0:
+		return
+
+	# 如果随机播放列表为空，生成一个
+	if shuffled_playlist.is_empty():
+		generate_shuffled_playlist()
+		# generate_shuffled_playlist() 已经设置了正确的 shuffled_playlist_index
+		# 如果当前没有播放歌曲，从第一首开始
+		if shuffled_playlist_index == -1 and shuffled_playlist.size() > 0:
+			shuffled_playlist_index = 0
+		else:
+			# 如果当前正在播放歌曲，移动到上一首
+			shuffled_playlist_index -= 1
+			# 如果小于0，循环到末尾
+			if shuffled_playlist_index < 0:
+				shuffled_playlist_index = shuffled_playlist.size() - 1
+	elif shuffled_playlist_index > 0:
+		# 移动到上一首
+		shuffled_playlist_index -= 1
+	else:
+		# 已经在第一首，循环到最后一首
+		shuffled_playlist_index = shuffled_playlist.size() - 1
+
+	# 播放随机列表中的当前歌曲
+	if shuffled_playlist_index >= 0 and shuffled_playlist_index < shuffled_playlist.size():
+		var target_index = shuffled_playlist[shuffled_playlist_index]
+		play_music(target_index)
+
+## 生成打乱的播放列表
+func generate_shuffled_playlist() -> void:
+	shuffled_playlist.clear()
+
+	# 创建索引数组
+	for i in range(get_music_count()):
+		shuffled_playlist.append(i)
+
+	# Fisher-Yates 洗牌算法
+	for i in range(shuffled_playlist.size() - 1, 0, -1):
+		var j = randi() % (i + 1)
+		var temp = shuffled_playlist[i]
+		shuffled_playlist[i] = shuffled_playlist[j]
+		shuffled_playlist[j] = temp
+
+	# 如果当前正在播放某首歌，找到它在随机列表中的位置并设置为当前索引
+	if current_playing_index != -1 and shuffled_playlist.size() > 0:
+		var current_pos = shuffled_playlist.find(current_playing_index)
+		if current_pos != -1:
+			shuffled_playlist_index = current_pos
+			print("[MusicList] Generated shuffled playlist, current song at position: ", current_pos)
+		else:
+			shuffled_playlist_index = 0
+	else:
+		shuffled_playlist_index = -1
+
+	print("[MusicList] Generated shuffled playlist: ", shuffled_playlist)
+
+## 重置随机播放列表（当歌单内容改变时调用）
+func reset_shuffled_playlist() -> void:
+	shuffled_playlist.clear()
+	shuffled_playlist_index = -1
+	print("[MusicList] Reset shuffled playlist")
 func play_single_music() -> void:
 	if current_playing_index != -1:
 		play_music(current_playing_index)
@@ -131,8 +221,8 @@ func get_music_category_checked(p_music_name: String, category: String) -> bool:
 	return false
 
 # --- 信号回调 ---
-func _on_music_changed(p_name: String) -> void:
-	music_changed.emit(p_name)
+func _on_music_selected(p_name: String) -> void:
+	music_selected.emit(p_name)
 	current_playing_name = p_name
 	for i in range(vbox.get_child_count()):
 		var child = vbox.get_child(i)
