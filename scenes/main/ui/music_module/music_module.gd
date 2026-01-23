@@ -1,3 +1,4 @@
+class_name MusicModule
 extends Control
 
 ## 音乐模块主控制器，负责管理多个音乐列表、播放控制和选项面板

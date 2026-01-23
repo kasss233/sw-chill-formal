@@ -19,8 +19,10 @@ signal character_interacted
 signal task_finished
 # --- 节点引用 ---
 ## 音乐管理模块
-@onready var music_module: Control = $MusicModule
-@onready var note_module=$NoteModule
+@export var music_module:MusicModule
+@export var note_module:NoteModule
+@export var note_book:NoteBook
+@export var TaskModule:TaskModule
 # --- 内置函数 ---
 func _ready() -> void:
 	_connect_signals()
@@ -99,6 +101,9 @@ func set_current_music_display(p_music_name: String) -> void:
 func take_note(text:String):
 	note_module.take_note(text)
 # --- 信号转发回调 ---
+## 添加新的notebook页面
+func add_note_in_notebook(_name:String,_content:String):
+	note_book.add_page_and_open(_name,_content)
 func _on_music_changed(p_name: String) -> void:
 	music_changed.emit(p_name)
 

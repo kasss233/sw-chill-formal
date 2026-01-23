@@ -1,3 +1,4 @@
+class_name NoteModule
 extends Control
 @export var note: PackedScene
 @onready var canvas_layer: CanvasLayer = $CanvasLayer

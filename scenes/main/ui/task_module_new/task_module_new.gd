@@ -1,3 +1,4 @@
+class_name TaskModule
 extends Control
 
 @export var task_item: PackedScene
