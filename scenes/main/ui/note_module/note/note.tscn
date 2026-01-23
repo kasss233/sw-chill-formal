@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://y6qt40qr5w3x"]
+[gd_scene load_steps=22 format=3 uid="uid://y6qt40qr5w3x"]
 
 [ext_resource type="Script" uid="uid://d3co7oufy3jfy" path="res://scenes/main/ui/note_module/note/note.gd" id="1_0vjod"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_wuqb7"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_8mtc7"]
 [ext_resource type="Texture2D" uid="uid://c2p0fd4s5qo8l" path="res://assets/ui/icons/close_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_0vjod"]
 [ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="6_v5ehv"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="7_4r2bj"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_8mtc7"]
 frequency = 0.1
@@ -30,7 +31,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(236, 238)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v5ehv"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4r2bj"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -49,7 +50,7 @@ LineEdit/styles/focus = SubResource("StyleBoxEmpty_wuqb7")
 LineEdit/styles/normal = SubResource("StyleBoxEmpty_wuqb7")
 LineEdit/styles/read_only = SubResource("StyleBoxEmpty_wuqb7")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4r2bj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qt28a"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -60,7 +61,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qt28a"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dkgla"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -71,7 +72,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dkgla"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kwp8s"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -82,7 +83,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kwp8s"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f52k2"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -93,7 +94,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f52k2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u558q"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -126,7 +127,7 @@ material = SubResource("ShaderMaterial_v5ehv")
 layout_mode = 0
 offset_right = 236.0
 offset_bottom = 238.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_v5ehv")
+theme_override_styles/panel = SubResource("StyleBoxFlat_4r2bj")
 script = ExtResource("2_ei3ar")
 noise_texture = SubResource("NoiseTexture2D_0vjod")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -158,11 +159,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_4r2bj")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_qt28a")
-theme_override_styles/hover = SubResource("StyleBoxFlat_dkgla")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_kwp8s")
-theme_override_styles/focus = SubResource("StyleBoxFlat_f52k2")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qt28a")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dkgla")
+theme_override_styles/hover = SubResource("StyleBoxFlat_kwp8s")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_f52k2")
+theme_override_styles/focus = SubResource("StyleBoxFlat_u558q")
 script = ExtResource("3_8mtc7")
 button_icon = ExtResource("4_0vjod")
 padding_horizontal = 14
@@ -190,5 +191,17 @@ offset_bottom = 65.0
 script = ExtResource("6_v5ehv")
 drag_target = NodePath("../FrostedPanel")
 target_node = NodePath("../FrostedPanel")
+
+[node name="GuiTransition" type="Node" parent="."]
+script = ExtResource("7_4r2bj")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.4
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("..")
+layout_id = "note"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="pressed" from="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]

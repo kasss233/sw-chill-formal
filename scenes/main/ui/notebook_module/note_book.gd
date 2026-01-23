@@ -81,4 +81,7 @@ func _on_page_removed(_name: String, btn: PageButton) -> void:
 	vbox.remove_child(btn)
 	btn.queue_free()
 func _on_material_button_pressed() -> void:
-	panel.visible = not panel.visible
+	if panel.visible:
+		GuiTransitions.hide("notebook")
+	else:
+		GuiTransitions.show("notebook")

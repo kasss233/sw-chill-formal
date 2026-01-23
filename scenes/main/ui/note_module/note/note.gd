@@ -6,8 +6,12 @@ var _tween: Tween
 var holding = false
 var drag_offset = Vector2.ZERO
 signal note_closed
+func _ready() -> void:
+	GuiTransitions.show("note")
 func _on_close_button_pressed() -> void:
 	note_closed.emit()
+	GuiTransitions.hide("note")
+	await GuiTransitions.hide_completed
 	self.queue_free()
 
 

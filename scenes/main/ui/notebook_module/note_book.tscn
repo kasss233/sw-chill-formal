@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://bmsmfccv7kma"]
+[gd_scene load_steps=32 format=3 uid="uid://bmsmfccv7kma"]
 
 [ext_resource type="Script" uid="uid://c5icyiww08u1w" path="res://scenes/main/ui/notebook_module/note_book.gd" id="1_00gxi"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_uh028"]
@@ -12,8 +12,9 @@
 [ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="8_f48v4"]
 [ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="9_i5tje"]
 [ext_resource type="Texture2D" uid="uid://bd6svjhok0cub" path="res://assets/ui/icons/event_note_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="10_24wte"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="13_155b8"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1n8r0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3obe"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -24,7 +25,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_155b8"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kpbt"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -35,7 +36,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3obe"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np3s2"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -46,7 +47,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kpbt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbgbm"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -57,7 +58,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np3s2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4b6by"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -104,7 +105,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(446, 432)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbgbm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -116,7 +117,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4b6by"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh74x"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -127,7 +128,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3u01"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -138,7 +139,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh74x"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3r6ch"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -149,7 +150,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3u01"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kgwc8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -160,7 +161,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3r6ch"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8vjhh"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -179,7 +180,7 @@ shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
 shader_parameter/size = Vector2(282, 368)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kgwc8"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_82msw"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -210,11 +211,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_1n8r0")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_155b8")
-theme_override_styles/hover = SubResource("StyleBoxFlat_m3obe")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_0kpbt")
-theme_override_styles/focus = SubResource("StyleBoxFlat_np3s2")
+theme_override_styles/normal = SubResource("StyleBoxFlat_m3obe")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0kpbt")
+theme_override_styles/hover = SubResource("StyleBoxFlat_np3s2")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_pbgbm")
+theme_override_styles/focus = SubResource("StyleBoxFlat_4b6by")
 script = ExtResource("4_1n8r0")
 states = Array[ExtResource("5_155b8")]([SubResource("Resource_3r6ch"), SubResource("Resource_kgwc8")])
 button_size = 3
@@ -239,7 +240,7 @@ offset_bottom = 216.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_pbgbm")
+theme_override_styles/panel = SubResource("StyleBoxFlat_df4gt")
 script = ExtResource("2_0j3f0")
 noise_texture = SubResource("NoiseTexture2D_00gxi")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -253,11 +254,11 @@ custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_horizontal = 0
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_4b6by")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_df4gt")
-theme_override_styles/hover = SubResource("StyleBoxFlat_lh74x")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_i3u01")
-theme_override_styles/focus = SubResource("StyleBoxFlat_3r6ch")
+theme_override_styles/normal = SubResource("StyleBoxFlat_lh74x")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_i3u01")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3r6ch")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_kgwc8")
+theme_override_styles/focus = SubResource("StyleBoxFlat_8vjhh")
 script = ExtResource("3_0j3f0")
 button_icon = ExtResource("4_7e0cj")
 padding_horizontal = 14
@@ -281,9 +282,21 @@ material = SubResource("ShaderMaterial_7lyeq")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.06
-theme_override_styles/panel = SubResource("StyleBoxFlat_kgwc8")
+theme_override_styles/panel = SubResource("StyleBoxFlat_82msw")
 script = ExtResource("9_i5tje")
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="GuiTransition" type="Node" parent="."]
+script = ExtResource("13_155b8")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.4
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/FrostedPanel")
+layout_id = "notebook"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/FrostedPanel/VBoxContainer/AddButton" to="." method="_on_add_button_pressed"]
