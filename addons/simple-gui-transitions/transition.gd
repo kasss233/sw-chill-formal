@@ -558,24 +558,27 @@ func _slide_in(node_info: NodeInfo):
 	node_info.reset_scale()
 	node_info.node.modulate.a = 0.0
 	_fade_in_node(node_info)
-
 	if node_info.delay:
 		node_info.tween.tween_interval(node_info.delay)
-
 	if _layout_only:
-		var anchor_x := "anchor_left" if animation_enter in [Anim.SLIDE_LEFT, Anim.SLIDE_RIGHT] else "anchor_top"
-		var anchor_y := "anchor_right" if animation_enter in [Anim.SLIDE_LEFT, Anim.SLIDE_RIGHT] else "anchor_bottom"
+		var is_horizontal = animation_enter in [Anim.SLIDE_LEFT, Anim.SLIDE_RIGHT]
+		var anchor_x := "anchor_left" if is_horizontal else "anchor_top"
+		var anchor_y := "anchor_right" if is_horizontal else "anchor_bottom"
+		
+		# 获取原本设计的锚点位置，而不是写死 0.0 和 1.0
+		var target_x = node_info.initial_anchor_h.x if is_horizontal else node_info.initial_anchor_v.x
+		var target_y = node_info.initial_anchor_h.y if is_horizontal else node_info.initial_anchor_v.y
+		
 		var target_anchor := node_info.get_target_anchor(animation_enter)
 		node_info.node.set(anchor_x, target_anchor.x)
 		node_info.node.set(anchor_y, target_anchor.y)
-		node_info.reset_anchors("v" if animation_enter in [Anim.SLIDE_LEFT, Anim.SLIDE_RIGHT] else "h")
-
+		node_info.reset_anchors("v" if is_horizontal else "h")
 		node_info.tween\
 			.set_trans(_transition)\
 			.set_ease(_ease)\
 			.tween_property(
 				node_info.node,
-				anchor_x, 0.0,
+				anchor_x, target_x, # 使用原本的初始值
 				node_info.duration
 			)
 		node_info.tween\
@@ -584,7 +587,7 @@ func _slide_in(node_info: NodeInfo):
 			.set_ease(_ease)\
 			.tween_property(
 				node_info.node,
-				anchor_y, 1.0,
+				anchor_y, target_y, # 使用原本的初始值
 				node_info.duration
 			)
 	else:

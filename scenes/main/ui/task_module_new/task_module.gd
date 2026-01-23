@@ -6,7 +6,10 @@ func _ready() -> void:
 	task_module_new.visible = false
 
 func _on_todo_button_state_changed(old_state: int, new_state: int) -> void:
-	task_module_new.visible = !task_module_new.visible
+	if task_module_new.visible:
+		GuiTransitions.hide("task")
+	else:
+		GuiTransitions.show("task")
 
 
 # --- Agent API 转发方法 ---
