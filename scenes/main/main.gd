@@ -4,67 +4,87 @@ extends Node
 @export var rain_particle: Node3D
 @export var snow_particle: Node3D
 @export var character: Character
-@export var TIME_OF_DAYTIME :float= 8
-@export var TIME_OF_DUSK :float= 17
-@export var TIME_OF_EVENING :float= 21
+@export var TIME_OF_DAYTIME: float = 8
+@export var TIME_OF_DUSK: float = 17
+@export var TIME_OF_EVENING: float = 21
 @export var RAINY_LIGHT_ENERGY := 0.2
 @export var SUNNY_LIGHT_ENERGY := 0.7
+
+
 func _ready() -> void:
 	_init_time()
 	_init_weather()
 func _init_weather():
-	set_sunny()
+	set_env_weather_sunny()
 func _init_time():
 	time_of_day.system_sync = false
 	time_of_day.game_time_enabled = false
 	time_of_day.current_time = TIME_OF_DAYTIME
-func _on_ui_env_time_changed(mode: int) -> void:
-	match mode:
-		0:
-			time_of_day.system_sync = false
-			time_of_day.game_time_enabled = false
-			time_of_day.current_time = TIME_OF_DAYTIME
-		1:
-			time_of_day.system_sync = false
-			time_of_day.game_time_enabled = false
-			time_of_day.current_time = TIME_OF_DUSK
-		2:
-			time_of_day.system_sync = false
-			time_of_day.game_time_enabled = false
-			time_of_day.current_time = TIME_OF_EVENING
-		3:
-			time_of_day.game_time_enabled = true
-			time_of_day.system_sync = true
-func set_rain():
-	#sky3d.sky_enabled=false
+
+## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
+func set_env_weather_rain():
 	rain_particle.visible = true
 	snow_particle.visible = false
 	sky3d.sun_energy = RAINY_LIGHT_ENERGY
-func set_sunny():
-	#sky3d.sky_enabled=true
+func set_env_weather_sunny():
 	rain_particle.visible = false
 	snow_particle.visible = false
 	sky3d.sun_energy = SUNNY_LIGHT_ENERGY
-func set_snowy():
+func set_env_weather_snowy():
 	snow_particle.visible = true
 	rain_particle.visible = false
 	sky3d.sun_energy = RAINY_LIGHT_ENERGY
-	#sky3d.sky_enabled=false
 	pass
-func set_sync_weather():
-	set_sunny()
+func set_env_weather_sync():
+	set_env_weather_sunny()
+
+var time_tween: Tween
+func _animate_time(target_time: float):
+	if time_tween:
+		time_tween.kill()
+	
+	time_of_day.system_sync = false
+	time_of_day.game_time_enabled = false
+	
+	time_tween = create_tween()
+	time_tween.set_ease(Tween.EASE_IN_OUT)
+	time_tween.set_trans(Tween.TRANS_SINE)
+	time_tween.tween_property(time_of_day, "current_time", target_time, 2.0)
+
+func set_env_time_daytime():
+	_animate_time(TIME_OF_DAYTIME)
+func set_env_time_dusk():
+	_animate_time(TIME_OF_DUSK)
+func set_env_time_evening():
+	_animate_time(TIME_OF_EVENING)
+func set_env_time_sync():
+	if time_tween:
+		time_tween.kill()
+	time_of_day.game_time_enabled = true
+	time_of_day.system_sync = true
+## --- UI 信号回调 ---
+func _on_ui_env_time_changed(mode: int) -> void:
+	match mode:
+		0:
+			set_env_time_daytime()
+		1:
+			set_env_time_dusk()
+		2:
+			set_env_time_evening()
+		3:
+			set_env_time_sync()
 func _on_ui_env_weather_changed(mode: int) -> void:
 	match mode:
 		0:
-			set_sunny()
+			set_env_weather_sunny()
 		1:
-			set_rain()
+			set_env_weather_rain()
 		2:
-			set_snowy()
+			set_env_weather_snowy()
 		3:
-			set_sync_weather()
+			set_env_weather_sync()
 
-var cur_pose=2;
+var cur_pose = 0;
 func _on_ui_character_interacted() -> void:
 	# rand2
 	#var rand = randi() % 7
@@ -83,4 +103,4 @@ func _on_ui_character_interacted() -> void:
 			character.set_angry_pose()
 		6:
 			character.set_disbelief_pose()
-	cur_pose=(cur_pose+1)%7
+	cur_pose = (cur_pose + 1) % 7

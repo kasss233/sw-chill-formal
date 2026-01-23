@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://ea1alaylyb6w" path="res://assets/ui/icons/rainy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="8_b4mu8"]
 [ext_resource type="Texture2D" uid="uid://dsyfo2labws7t" path="res://assets/ui/icons/weather_snowy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="9_t7p8r"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dlm0l"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t7p8r"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -21,7 +21,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xly7c"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dlm0l"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -32,7 +32,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3f03"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xly7c"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -43,7 +43,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wn8k3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3f03"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -54,7 +54,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3bpux"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wn8k3"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -89,7 +89,7 @@ state_name = "Sync_with_system"
 icon = ExtResource("7_wn8k3")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t7p8r"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3bpux"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -184,11 +184,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_dlm0l")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_xly7c")
-theme_override_styles/hover = SubResource("StyleBoxFlat_s3f03")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_wn8k3")
-theme_override_styles/focus = SubResource("StyleBoxFlat_3bpux")
+theme_override_styles/normal = SubResource("StyleBoxFlat_t7p8r")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dlm0l")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xly7c")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_s3f03")
+theme_override_styles/focus = SubResource("StyleBoxFlat_wn8k3")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_84458"), SubResource("Resource_5cvtp"), SubResource("Resource_2s0wq"), SubResource("Resource_2tfue")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
@@ -205,7 +205,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_t7p8r")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3bpux")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_j36pu")
 theme_override_styles/hover = SubResource("StyleBoxFlat_jec7i")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_7oay3")

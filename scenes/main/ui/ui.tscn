@@ -185,7 +185,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[node name="UI" type="Control" node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "test_panel")]
+[node name="UI" type="Control" node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "test_panel", "env_setter")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -198,6 +198,7 @@ note_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/Note
 note_book = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteBook")
 task_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule/CanvasLayer/TaskModuleNew")
 test_panel = NodePath("TestPanel")
+env_setter = NodePath("EnvSetter")
 
 [node name="InputBox" parent="." instance=ExtResource("6_nswco")]
 layout_mode = 1
@@ -270,12 +271,13 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_uumow")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_djxf0")
 theme_override_styles/focus = SubResource("StyleBoxFlat_87oeu")
 
-[node name="TestPanel" parent="." instance=ExtResource("8_test_panel")]
+[node name="TestPanel" parent="." node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
 layout_mode = 1
 offset_left = 840.0
 offset_top = 123.0
 offset_right = 1108.0
 offset_bottom = 518.0
+ui = NodePath("..")
 
 [connection signal="env_time_changed" from="EnvSetter" to="." method="_on_env_time_setter_env_time_changed"]
 [connection signal="env_weather_changed" from="EnvSetter" to="." method="_on_env_setter_env_weather_changed"]

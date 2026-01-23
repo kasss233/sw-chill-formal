@@ -10,14 +10,11 @@ extends Control
 @onready var close_button: Button = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/CloseButton
 
 # UI模块引用
-var ui: UI = null
+@export var ui: UI
 
 func _ready() -> void:
 	title_label.text = "UI模块测试面板"
 	close_button.pressed.connect(_on_close_button_pressed)
-
-	# 自动查找父级UI节点
-	_find_ui_parent()
 
 	# 初始化所有测试页
 	_initialize_test_panels()
@@ -31,16 +28,6 @@ func _input(event: InputEvent) -> void:
 			_on_close_button_pressed()
 			get_viewport().set_input_as_handled()
 
-## 查找父级UI节点
-func _find_ui_parent() -> void:
-	var parent = get_parent()
-	while parent != null:
-		if parent is UI:
-			ui = parent
-			print("[TestPanel] 已找到UI父节点: %s" % ui.name)
-			return
-		parent = parent.get_parent()
-	print("[TestPanel] 警告: 未找到UI父节点")
 
 ## 初始化所有测试页，传递模块引用
 func _initialize_test_panels() -> void:
