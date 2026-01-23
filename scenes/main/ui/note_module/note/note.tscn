@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://y6qt40qr5w3x"]
+[gd_scene load_steps=21 format=3 uid="uid://y6qt40qr5w3x"]
 
 [ext_resource type="Script" uid="uid://d3co7oufy3jfy" path="res://scenes/main/ui/note_module/note/note.gd" id="1_0vjod"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_wuqb7"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_8mtc7"]
 [ext_resource type="Texture2D" uid="uid://c2p0fd4s5qo8l" path="res://assets/ui/icons/close_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_0vjod"]
 [ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="6_v5ehv"]
-[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="7_4r2bj"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_8mtc7"]
 frequency = 0.1
@@ -191,17 +190,5 @@ offset_bottom = 65.0
 script = ExtResource("6_v5ehv")
 drag_target = NodePath("../FrostedPanel")
 target_node = NodePath("../FrostedPanel")
-
-[node name="GuiTransition" type="Node" parent="."]
-script = ExtResource("7_4r2bj")
-auto_start = 0
-animation_enter = 3
-animation_leave = 3
-duration = 0.4
-delay = 0.03
-transition_type = "BACK"
-layout = NodePath("..")
-layout_id = "note"
-metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="pressed" from="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]

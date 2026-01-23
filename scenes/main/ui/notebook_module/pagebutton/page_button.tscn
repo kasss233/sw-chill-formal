@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="3_p4xaa"]
 [ext_resource type="Texture2D" uid="uid://cgeqypbnt0ug4" path="res://assets/ui/icons/cancel_24dp.svg" id="5_b5dx1"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_agfnf"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0xpqe"]
 shader = ExtResource("2_0xpqe")
 shader_parameter/corner_radius = 15.0
 shader_parameter/border_width = 1.0
@@ -19,7 +19,7 @@ shader_parameter/size = Vector2(112, 48)
 [sub_resource type="Theme" id="Theme_hve66"]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_toxtl")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xpqe"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4xaa"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -34,7 +34,7 @@ LineEdit/styles/focus = SubResource("StyleBoxEmpty_0xpqe")
 LineEdit/styles/normal = SubResource("StyleBoxEmpty_0xpqe")
 LineEdit/styles/read_only = SubResource("StyleBoxEmpty_0xpqe")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4xaa"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b5dx1"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -45,7 +45,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b5dx1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_agfnf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -56,7 +56,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_agfnf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gmmlq"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -67,7 +67,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gmmlq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hve66"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -78,7 +78,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hve66"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ekewq"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -95,12 +95,12 @@ anchors_preset = 0
 script = ExtResource("1_mbis7")
 
 [node name="InnerPanel" type="PanelContainer" parent="."]
-material = SubResource("ShaderMaterial_agfnf")
+material = SubResource("ShaderMaterial_0xpqe")
 layout_mode = 0
 offset_right = 100.0
 offset_bottom = 34.0
 theme = SubResource("Theme_hve66")
-theme_override_styles/panel = SubResource("StyleBoxFlat_0xpqe")
+theme_override_styles/panel = SubResource("StyleBoxFlat_p4xaa")
 script = ExtResource("3_p4xaa")
 corner_radius = 15.0
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
@@ -121,11 +121,11 @@ clip_contents = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_p4xaa")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_b5dx1")
-theme_override_styles/hover = SubResource("StyleBoxFlat_agfnf")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_gmmlq")
-theme_override_styles/focus = SubResource("StyleBoxFlat_hve66")
+theme_override_styles/normal = SubResource("StyleBoxFlat_b5dx1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_agfnf")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gmmlq")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_hve66")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ekewq")
 script = ExtResource("1_sxwfx")
 button_size = 0
 button_icon = ExtResource("5_b5dx1")
