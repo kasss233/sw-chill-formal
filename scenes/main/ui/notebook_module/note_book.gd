@@ -16,7 +16,8 @@ var current_page_btn: PageButton = null
 var is_page_opened: bool = false
 
 func _ready() -> void:
-	panel.visible = false
+	panel.visible = true
+	add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击“+”按钮添加新页面。")
 
 
 func add_page_and_open(_name: String, _content: String) -> void:
