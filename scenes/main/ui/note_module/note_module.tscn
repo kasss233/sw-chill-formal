@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://o8cxkfnpu5ug"]
+[gd_scene load_steps=10 format=3 uid="uid://o8cxkfnpu5ug"]
 
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_naere"]
 [ext_resource type="Script" uid="uid://dwgyqssx4w8o4" path="res://scenes/main/ui/note_module/note_module.gd" id="1_tvr07"]
@@ -60,61 +60,6 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k77k2"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mnfdr"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0qi2y"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5puyq"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bk81"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [node name="NoteModule" type="MarginContainer"]
 offset_right = 40.0
 offset_bottom = 48.0
@@ -140,24 +85,6 @@ padding_horizontal = 20
 padding_vertical = 10
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="MaterialButton2" type="Button" parent="."]
-visible = false
-clip_contents = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_k77k2")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mnfdr")
-theme_override_styles/hover = SubResource("StyleBoxFlat_0qi2y")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_5puyq")
-theme_override_styles/focus = SubResource("StyleBoxFlat_6bk81")
-text = "agent"
-script = ExtResource("1_naere")
-padding_horizontal = 14
-padding_vertical = 7
-metadata/_custom_type_script = "uid://b4c4qoitosxfn"
-
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
-[connection signal="pressed" from="MaterialButton2" to="." method="_on_material_button_2_pressed"]

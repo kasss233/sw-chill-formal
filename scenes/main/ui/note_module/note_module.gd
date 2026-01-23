@@ -29,7 +29,3 @@ func take_note(text: String):
 	print("[Note Module] taking note: ", text)
 	new_note.set_text(text)
 	cnt += 1
-
-
-func _on_material_button_2_pressed() -> void:
-	take_note("哈哈哈哈哈哈哈哈哈123456")
