@@ -20,7 +20,8 @@ signal text_changed(text: String)    # 文本变化时发出
 @onready var text_edit_container: MarginContainer = $FrostedPanel/MarginContainer/VBoxContainer/MarginContainer
 @onready var text_edit: TextEdit = $FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/TextEdit
 @onready var submit_button = $FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer/SubmitToggleButton
-@onready var material_menu = $MaterialMenu
+@onready var material_menu: MaterialMenu = $CanvasLayer/MaterialMenu
+
 @onready var smooth_scroll_container = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer
 @onready var attach_hbox_container = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer
 @onready var material_chip1 = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer/MaterialChip

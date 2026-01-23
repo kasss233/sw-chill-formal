@@ -492,7 +492,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_2r1w8")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_qxf7m")
 theme_override_styles/focus = SubResource("StyleBoxFlat_mhg7t")
 script = ExtResource("5_vyd8f")
-menu = NodePath("../../../../../MaterialMenu")
+menu = NodePath("../../../../../CanvasLayer/MaterialMenu")
 button_icon = ExtResource("4_7lvpk")
 background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 padding_horizontal = 14
@@ -554,7 +554,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_7po0x")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_o4cds")
 theme_override_styles/focus = SubResource("StyleBoxFlat_mjpji")
 script = ExtResource("5_vyd8f")
-menu = NodePath("../../../../../MaterialMenu")
+menu = NodePath("../../../../../CanvasLayer/MaterialMenu")
 button_icon = ExtResource("16_o8rmt")
 background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 padding_horizontal = 14
@@ -573,22 +573,12 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_b67ot")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_ghhhn")
 theme_override_styles/focus = SubResource("StyleBoxFlat_w7o7x")
 script = ExtResource("5_vyd8f")
-menu = NodePath("../../../../../MaterialMenu")
+menu = NodePath("../../../../../CanvasLayer/MaterialMenu")
 button_icon = ExtResource("15_xijg3")
 background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
-
-[node name="MaterialMenu" type="PanelContainer" parent="."]
-visible = false
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_5x1cm")
-script = ExtResource("13_d007x")
-editor_items = Array[ExtResource("14_q6tgl")]([SubResource("Resource_c48v0"), SubResource("Resource_q6tgl")])
-min_width = 100
-metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="FileDialog" type="FileDialog" parent="."]
 title = "Open a File"
@@ -607,3 +597,17 @@ layout_mode = 2
 script = ExtResource("17_snackbar")
 display_position = 1
 use_viewport_size = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer"]
+custom_minimum_size = Vector2(100, 0)
+offset_left = 71.0
+offset_top = 76.0
+offset_right = 242.0
+offset_bottom = 172.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_5x1cm")
+script = ExtResource("13_d007x")
+editor_items = Array[ExtResource("14_q6tgl")]([SubResource("Resource_c48v0"), SubResource("Resource_q6tgl")])
+min_width = 100
+metadata/_custom_type_script = "uid://c66rtlpmo48ps"

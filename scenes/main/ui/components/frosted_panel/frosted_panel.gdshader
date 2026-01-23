@@ -46,9 +46,10 @@ void fragment() {
 	
 	// Calculate panel SDF
 	float panel_dist = rounded_rect_sdf(panel_pos, panel_size, corner_radius);
-	
-	// Panel alpha (inside = 1, outside = 0)
-	float panel_alpha = 1.0 - smoothstep(-0.5, 0.5, panel_dist);
+
+	// Panel alpha (inside = 1, outside = 0) with adaptive anti-aliasing
+	float edge_width = fwidth(panel_dist) * 1.0;
+	float panel_alpha = 1.0 - smoothstep(-edge_width, edge_width, panel_dist);
 	
 	// Screen Blur (use panel UV for proper sampling)
 	vec4 screen_color = textureLod(SCREEN_TEXTURE, SCREEN_UV, blur_amount);
@@ -61,8 +62,10 @@ void fragment() {
 	// Mix Tint
 	vec4 panel_color = mix(screen_color, tint_color, tint_color.a);
 	
-	// Border Logic
-	float border_mask = 1.0 - smoothstep(border_width - 0.5, border_width + 0.5, abs(panel_dist + border_width * 0.5));
+	// Border Logic with adaptive anti-aliasing
+	float border_edge = abs(panel_dist + border_width * 0.5);
+	float border_width_aa = fwidth(border_edge) * 1.0;
+	float border_mask = 1.0 - smoothstep(border_width - border_width_aa, border_width + border_width_aa, border_edge);
 	panel_color.rgb = mix(panel_color.rgb, border_color.rgb, border_mask * border_color.a * panel_alpha);
 	
 	// Combine: shadow behind, panel on top
