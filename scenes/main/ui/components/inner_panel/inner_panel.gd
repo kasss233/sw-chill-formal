@@ -35,7 +35,9 @@ extends PanelContainer
 		_update_content_padding()
 
 func _ready() -> void:
-	if not material:
+	if material:
+		material = material.duplicate()
+	else:
 		material = ShaderMaterial.new()
 		material.shader = preload("res://scenes/main/ui/components/inner_panel/inner_panel.gdshader")
 	

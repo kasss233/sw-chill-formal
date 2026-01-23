@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bwkofikr0rnvr"]
+[gd_scene load_steps=17 format=3 uid="uid://bwkofikr0rnvr"]
 
 [ext_resource type="Script" uid="uid://cql2sc6pub7wo" path="res://scenes/main/ui/notebook_module/pagebutton/page_button.gd" id="1_mbis7"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_sxwfx"]
@@ -12,12 +12,19 @@ shader_parameter/corner_radius = 15.0
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
-shader_parameter/size = Vector2(100, 34)
+shader_parameter/size = Vector2(112, 48)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toxtl"]
 
 [sub_resource type="Theme" id="Theme_hve66"]
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_toxtl")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xpqe"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0xpqe"]
 
@@ -27,7 +34,7 @@ LineEdit/styles/focus = SubResource("StyleBoxEmpty_0xpqe")
 LineEdit/styles/normal = SubResource("StyleBoxEmpty_0xpqe")
 LineEdit/styles/read_only = SubResource("StyleBoxEmpty_0xpqe")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0xpqe"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4xaa"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -38,7 +45,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4xaa"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b5dx1"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -49,7 +56,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b5dx1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_agfnf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -60,7 +67,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_agfnf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gmmlq"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -71,7 +78,7 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gmmlq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hve66"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -93,6 +100,7 @@ layout_mode = 0
 offset_right = 100.0
 offset_bottom = 34.0
 theme = SubResource("Theme_hve66")
+theme_override_styles/panel = SubResource("StyleBoxFlat_0xpqe")
 script = ExtResource("3_p4xaa")
 corner_radius = 15.0
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
@@ -109,16 +117,15 @@ flat = true
 caret_blink = true
 
 [node name="RemoveButton" type="Button" parent="InnerPanel/HBoxContainer"]
-visible = false
 clip_contents = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_0xpqe")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_p4xaa")
-theme_override_styles/hover = SubResource("StyleBoxFlat_b5dx1")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_agfnf")
-theme_override_styles/focus = SubResource("StyleBoxFlat_gmmlq")
+theme_override_styles/normal = SubResource("StyleBoxFlat_p4xaa")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_b5dx1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_agfnf")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_gmmlq")
+theme_override_styles/focus = SubResource("StyleBoxFlat_hve66")
 script = ExtResource("1_sxwfx")
 button_size = 0
 button_icon = ExtResource("5_b5dx1")
@@ -127,13 +134,8 @@ padding_horizontal = 12
 padding_vertical = 6
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[connection signal="mouse_entered" from="InnerPanel" to="." method="_on_inner_panel_mouse_entered"]
-[connection signal="mouse_exited" from="InnerPanel" to="." method="_on_inner_panel_mouse_exited"]
+[connection signal="focus_entered" from="InnerPanel" to="." method="_on_inner_panel_focus_entered"]
 [connection signal="focus_exited" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_focus_exited"]
 [connection signal="gui_input" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_gui_input"]
-[connection signal="mouse_entered" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_mouse_entered"]
-[connection signal="mouse_exited" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_mouse_exited"]
 [connection signal="text_submitted" from="InnerPanel/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
-[connection signal="mouse_entered" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_mouse_entered"]
-[connection signal="mouse_exited" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_mouse_exited"]
 [connection signal="pressed" from="InnerPanel/HBoxContainer/RemoveButton" to="." method="_on_remove_button_pressed"]

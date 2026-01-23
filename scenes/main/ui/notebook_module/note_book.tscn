@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://bd6svjhok0cub" path="res://assets/ui/icons/event_note_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="10_24wte"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="13_155b8"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3obe"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_155b8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -25,7 +25,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kpbt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3obe"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -36,7 +36,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np3s2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kpbt"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -47,7 +47,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbgbm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_np3s2"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -58,7 +58,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4b6by"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pbgbm"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -105,7 +105,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(446, 432)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4b6by"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -117,7 +117,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh74x"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -128,7 +128,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3u01"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lh74x"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -139,7 +139,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3r6ch"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3u01"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -150,7 +150,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kgwc8"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3r6ch"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -161,7 +161,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8vjhh"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kgwc8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -180,7 +180,7 @@ shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
 shader_parameter/size = Vector2(282, 368)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_82msw"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8vjhh"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -211,11 +211,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_m3obe")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_0kpbt")
-theme_override_styles/hover = SubResource("StyleBoxFlat_np3s2")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_pbgbm")
-theme_override_styles/focus = SubResource("StyleBoxFlat_4b6by")
+theme_override_styles/normal = SubResource("StyleBoxFlat_155b8")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_m3obe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_0kpbt")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_np3s2")
+theme_override_styles/focus = SubResource("StyleBoxFlat_pbgbm")
 script = ExtResource("4_1n8r0")
 states = Array[ExtResource("5_155b8")]([SubResource("Resource_3r6ch"), SubResource("Resource_kgwc8")])
 button_size = 3
@@ -240,7 +240,7 @@ offset_bottom = 216.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_df4gt")
+theme_override_styles/panel = SubResource("StyleBoxFlat_4b6by")
 script = ExtResource("2_0j3f0")
 noise_texture = SubResource("NoiseTexture2D_00gxi")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -254,11 +254,11 @@ custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_horizontal = 0
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_lh74x")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_i3u01")
-theme_override_styles/hover = SubResource("StyleBoxFlat_3r6ch")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_kgwc8")
-theme_override_styles/focus = SubResource("StyleBoxFlat_8vjhh")
+theme_override_styles/normal = SubResource("StyleBoxFlat_df4gt")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lh74x")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i3u01")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_3r6ch")
+theme_override_styles/focus = SubResource("StyleBoxFlat_kgwc8")
 script = ExtResource("3_0j3f0")
 button_icon = ExtResource("4_7e0cj")
 padding_horizontal = 14
@@ -282,7 +282,7 @@ material = SubResource("ShaderMaterial_7lyeq")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.06
-theme_override_styles/panel = SubResource("StyleBoxFlat_82msw")
+theme_override_styles/panel = SubResource("StyleBoxFlat_8vjhh")
 script = ExtResource("9_i5tje")
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 

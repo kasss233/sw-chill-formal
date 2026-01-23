@@ -60,7 +60,9 @@ extends PanelContainer
 var _shadow_padding: float = 0.0
 
 func _ready() -> void:
-	if not material:
+	if material:
+		material = material.duplicate()
+	else:
 		material = ShaderMaterial.new()
 		material.shader = preload("res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader")
 	
