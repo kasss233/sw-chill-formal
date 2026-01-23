@@ -60,6 +60,11 @@ func set_env_time_evening():
 func set_env_time_sync():
 	if time_tween:
 		time_tween.kill()
+	# 获取系统时间
+	var now = Time.get_datetime_dict_from_system()
+	var hour = now.hour + now.minute / 60.0
+	_animate_time(hour)
+	await time_tween.finished
 	time_of_day.game_time_enabled = true
 	time_of_day.system_sync = true
 ## --- UI 信号回调 ---
