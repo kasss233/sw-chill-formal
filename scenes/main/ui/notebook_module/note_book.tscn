@@ -251,6 +251,7 @@ layout_mode = 2
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
+size_flags_horizontal = 0
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_4b6by")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_df4gt")

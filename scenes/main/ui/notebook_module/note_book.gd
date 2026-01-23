@@ -16,8 +16,10 @@ var current_page_btn: PageButton = null
 var is_page_opened: bool = false
 
 func _ready() -> void:
-	panel.visible = true
-	add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击“+”按钮添加新页面。")
+	panel.visible = false
+	inner_panel.visible=false
+	#panel.visible = true
+	#add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击“+”按钮添加新页面。")
 
 
 func add_page_and_open(_name: String, _content: String) -> void:
@@ -37,6 +39,7 @@ func add_page(_name: String) -> PageButton:
 	new_page_button.page_removed.connect(_on_page_removed.bind(new_page_button))
 	return new_page_button
 func change_page(_name: String, btn: PageButton, animate: bool = false) -> void:
+	inner_panel.visible=true
 	if btn == current_page_btn:
 		return
 	if is_page_opened:
