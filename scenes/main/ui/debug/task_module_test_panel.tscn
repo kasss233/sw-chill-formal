@@ -1,0 +1,108 @@
+[gd_scene load_steps=2 format=3 uid="uid://dh3k8yjvb2qwm"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/task_module_test_panel.gd" id="1_task_test"]
+
+[node name="TaskModuleTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_task_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="TaskTitleInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "任务标题 (用于添加/更新)"
+
+[node name="TaskIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "任务ID (用于更新/删除/查询)"
+
+[node name="TaskPositionInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "新位置 (用于调整顺序，0-based)"
+
+[node name="ButtonSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "Agent API 测试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddTaskBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "添加任务 (agent_add_task)"
+
+[node name="UpdateTitleBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "更新标题 (agent_update_task_title)"
+
+[node name="MarkCompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "标记为完成 (agent_mark_task_completed)"
+
+[node name="MarkUncompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "标记为未完成 (agent_mark_task_completed)"
+
+[node name="RemoveTaskBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "删除任务 (agent_remove_task)"
+
+[node name="ReorderTaskBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "调整任务顺序 (agent_reorder_task)"
+
+[node name="GetTaskInfoBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "获取任务信息 (agent_get_task_info)"
+
+[node name="GetAllTasksBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "获取所有任务 (agent_get_all_tasks)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]测试日志将显示在这里...[/color]"
+scroll_following = true

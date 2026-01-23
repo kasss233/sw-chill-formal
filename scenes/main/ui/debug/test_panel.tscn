@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3 uid="uid://daa0dvlkhliq6"]
+
+[ext_resource type="Script" uid="uid://c3harjmj1bpcc" path="res://scenes/main/ui/debug/test_panel.gd" id="1_test_panel"]
+[ext_resource type="PackedScene" uid="uid://dh3k8yjvb2qwm" path="res://scenes/main/ui/debug/task_module_test_panel.tscn" id="2_task_test"]
+[ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="3_fjyjl"]
+
+[node name="TestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 268.0
+offset_bottom = 395.0
+script = ExtResource("1_test_panel")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 268.0
+offset_bottom = 395.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "UI模块测试面板"
+
+[node name="CloseButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "关闭 [ESC]"
+
+[node name="TabContainer" type="TabContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="TaskModule测试" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("2_task_test")]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="MaterialDragHandle" type="Control" parent="." node_paths=PackedStringArray("drag_target", "target_node")]
+anchors_preset = 0
+offset_right = 160.0
+offset_bottom = 60.0
+script = ExtResource("3_fjyjl")
+drag_target = NodePath("")
+target_node = NodePath("")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]

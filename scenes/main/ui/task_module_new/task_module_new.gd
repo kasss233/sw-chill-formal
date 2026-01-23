@@ -19,16 +19,21 @@ var separator_index: int = 0 # 分隔符在容器中的索引位置
 # 防止递归调用的标志
 var _is_programmatic_reorder: bool = false
 
+# Agent 操作锁定标志
+var is_agent_operating: bool = false
+
 func _ready() -> void:
 	# 初始化分隔符位置（从编辑器中的 FinishedCheckBox 获取索引）
 	separator_index = finished_check_box.get_index()
 	finished_check_box.toggled.connect(_on_separator_toggled)
-	
+
 	# 连接 ReorderableVBox 的 reordered 信号
 	#v_box_container.reordered.connect(_on_v_box_container_reordered)
-	
-	add_task(TaskData.create_example(task_id))
-	task_id += 1
+
+	# 初始化task_id为当前最大ID+1
+	_initialize_task_id()
+
+	#add_task(TaskData.create_example(task_id))
 
 #============API==============
 func add_task(task: TaskData) -> void:
@@ -143,36 +148,71 @@ func get_finished_task_list() -> Array[TaskData]:
 			completed.append(task)
 	return completed
 
+## 批量加载任务（用于从外部数据源恢复任务）
+## @param tasks: TaskData数组
+func load_tasks(tasks: Array[TaskData]) -> void:
+	# 清空现有任务
+	for child in v_box_container.get_children():
+		if child.has_method("set_task"):
+			v_box_container.remove_child(child)
+			child.queue_free()
+
+	all_tasks_data_list.clear()
+	task_cnt = 0
+	finished_task_cnt = 0
+	separator_index = finished_check_box.get_index()
+
+	# 添加所有任务
+	for task in tasks:
+		add_task(task)
+
+	# 重新初始化task_id
+	_initialize_task_id()
+
+	print("[%s]Loaded %d tasks" % [self.name, tasks.size()])
+
 func mark_task_as_completed(id: int) -> void:
 	for i in range(all_tasks_data_list.size()):
 		if all_tasks_data_list[i].id == id and not all_tasks_data_list[i].is_completed:
 			var task_data = all_tasks_data_list[i]
 			task_data.is_completed = true
-			
+			task_data.finish_timestamp = Time.get_unix_time_from_system()
+
 			# 移动任务到已完成区域（分隔符之后）
 			var ui_index = _get_ui_index_for_task(i)
 			var item = v_box_container.get_child(ui_index)
-			
+
+			# 临时断开信号，避免触发其他任务的状态变化
+			if item.has_method("set_task") and item.state_changed.is_connected(_on_task_state_changed):
+				item.state_changed.disconnect(_on_task_state_changed)
+
 			# 更新数据列表顺序
 			all_tasks_data_list.remove_at(i)
 			all_tasks_data_list.append(task_data)
-			
+
 			# 更新UI顺序
 			v_box_container.reorder_child_by_index(ui_index, v_box_container.get_child_count() - 1)
-			
+
 			# 更新计数
 			task_cnt -= 1
 			finished_task_cnt += 1
 			separator_index -= 1
-			
+
+			# 更新UI节点的task_data和checkbox状态
 			if item.has_method("set_task"):
+				# 直接调用set_task让TaskItem自己处理所有更新
 				item.set_task(task_data)
-			
+				print("[%s]Updated task item for task %d: completed=true" % [self.name, id])
+
+			# 重新连接信号
+			if item.has_method("set_task") and not item.state_changed.is_connected(_on_task_state_changed):
+				item.state_changed.connect(_on_task_state_changed)
+
 			_update_ui()
 			_update_separator_position()
 			print("[%s]Task(id: %s) marked as completed" % [self.name, id])
 			return
-	
+
 	print("[%s]Task with id %s not found in active tasks" % [self.name, id])
 
 func mark_task_as_uncompleted(id: int) -> void:
@@ -180,38 +220,287 @@ func mark_task_as_uncompleted(id: int) -> void:
 		if all_tasks_data_list[i].id == id and all_tasks_data_list[i].is_completed:
 			var task_data = all_tasks_data_list[i]
 			task_data.is_completed = false
-			
+			task_data.finish_timestamp = 0
+
 			# 移动任务到未完成区域（分隔符之前）
 			var ui_index = _get_ui_index_for_task(i)
 			var item = v_box_container.get_child(ui_index)
-			
+
+			# 临时断开信号，避免触发其他任务的状态变化
+			if item.has_method("set_task") and item.state_changed.is_connected(_on_task_state_changed):
+				item.state_changed.disconnect(_on_task_state_changed)
+
 			# 更新数据列表顺序
 			all_tasks_data_list.remove_at(i)
 			all_tasks_data_list.insert(separator_index, task_data)
-			
+
 			# 更新UI顺序
 			v_box_container.reorder_child_by_index(ui_index, separator_index)
-			
+
 			# 更新计数
 			finished_task_cnt -= 1
 			task_cnt += 1
 			separator_index += 1
-			
+
+			# 更新UI节点的task_data和checkbox状态
 			if item.has_method("set_task"):
+				# 直接调用set_task让TaskItem自己处理所有更新
 				item.set_task(task_data)
-			
+				print("[%s]Updated task item for task %d: completed=false" % [self.name, id])
+
+			# 重新连接信号
+			if item.has_method("set_task") and not item.state_changed.is_connected(_on_task_state_changed):
+				item.state_changed.connect(_on_task_state_changed)
+
 			_update_ui()
 			_update_separator_position()
 			print("[%s]Task(id: %s) marked as not completed" % [self.name, id])
 			return
-	
+
 	print("[%s]Task with id %s not found in finished tasks" % [self.name, id])
 
 
 
-#============APIEND===========
+#============Agent API===========
+## Agent API: 添加新任务（带动画）
+## @param title: 任务标题
+## @param due_timestamp: 截止时间戳（可选）
+## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
+## @return: 新任务的 ID
+func agent_add_task(title: String, due_timestamp: int = 0, typing_speed: float = 0.05) -> int:
+	var new_id = _generate_task_id()
+
+	# 先创建空标题的任务
+	var task_data = TaskData.new(new_id, "", due_timestamp, false)
+	add_task(task_data)  # 添加到UI，已包含淡入动画
+
+	# 如果标题不为空，启动打字动画（不阻塞返回）
+	if not title.is_empty():
+		_start_typing_animation(new_id, title, typing_speed)
+
+	return new_id
+
+## 启动打字动画（异步执行，不阻塞）
+func _start_typing_animation(task_id: int, title: String, typing_speed: float) -> void:
+	# 等待淡入动画完成（0.4秒）
+	await get_tree().create_timer(0.4).timeout
+
+	var item = _get_task_item_from_id(task_id)
+	if item != null:
+		await _simulate_typing_effect(item, title, typing_speed)
+
+## Agent API: 修改任务名称（模拟打字效果）
+## @param id: 任务 ID
+## @param new_title: 新标题
+## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
+## @return: 是否成功
+func agent_update_task_title(id: int, new_title: String, typing_speed: float = 0.05) -> bool:
+	_lock_module()
+	var item = _get_task_item_from_id(id)
+	if item == null:
+		_unlock_module()
+		return false
+
+	# 不展开编辑模式，直接模拟打字
+	await _simulate_typing_effect(item, new_title, typing_speed)
+	_unlock_module()
+	return true
+
+## Agent API: 标记任务完成状态
+## @param id: 任务 ID
+## @param completed: 是否完成
+## @return: 是否成功
+func agent_mark_task_completed(id: int, completed: bool) -> bool:
+	_lock_module()
+	if completed:
+		mark_task_as_completed(id)
+	else:
+		mark_task_as_uncompleted(id)
+	_unlock_module()
+	return true
+
+## Agent API: 删除任务
+## @param id: 任务 ID
+## @return: 是否成功
+func agent_remove_task(id: int) -> bool:
+	_lock_module()
+	remove_task(id)
+	_unlock_module()
+	return true
+
+## Agent API: 获取任务信息
+## @param id: 任务 ID
+## @return: 任务信息字典
+func agent_get_task_info(id: int) -> Dictionary:
+	var task_data = get_task_from_id(id)
+	if task_data == null:
+		return {}
+	return {
+		"id": task_data.id,
+		"title": task_data.title,
+		"is_completed": task_data.is_completed,
+		"due_timestamp": task_data.due_timestamp,
+		"finish_timestamp": task_data.finish_timestamp
+	}
+
+## Agent API: 获取所有任务信息
+## @return: 任务信息数组
+func agent_get_all_tasks() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for task_data in all_tasks_data_list:
+		result.append({
+			"id": task_data.id,
+			"title": task_data.title,
+			"is_completed": task_data.is_completed,
+			"due_timestamp": task_data.due_timestamp,
+			"finish_timestamp": task_data.finish_timestamp
+		})
+	return result
+
+## Agent API: 调整任务顺序
+## @param id: 任务 ID
+## @param new_position: 新位置索引（在同类别任务中的位置，0-based）
+## @return: 是否成功
+func agent_reorder_task(id: int, new_position: int) -> bool:
+	_lock_module()
+
+	# 查找任务
+	var task_data = get_task_from_id(id)
+	if task_data == null:
+		print("[%s]Error: Task with id %d not found" % [self.name, id])
+		_unlock_module()
+		return false
+
+	# 找到任务在数据列表中的当前索引
+	var current_data_index = -1
+	for i in range(all_tasks_data_list.size()):
+		if all_tasks_data_list[i].id == id:
+			current_data_index = i
+			break
+
+	if current_data_index == -1:
+		print("[%s]Error: Task data not found" % [self.name])
+		_unlock_module()
+		return false
+
+	# 确定任务类别（已完成/未完成）
+	var is_completed = task_data.is_completed
+
+	# 计算目标数据索引
+	var target_data_index: int
+	if is_completed:
+		# 已完成任务：new_position 是在已完成任务中的索引
+		# 已完成任务从 separator_index 开始
+		target_data_index = separator_index + new_position
+
+		# 验证位置有效性
+		if target_data_index < separator_index or target_data_index >= all_tasks_data_list.size():
+			print("[%s]Error: Invalid position %d for completed task (valid range: 0-%d)" % [self.name, new_position, finished_task_cnt - 1])
+			_unlock_module()
+			return false
+	else:
+		# 未完成任务：new_position 是在未完成任务中的索引
+		target_data_index = new_position
+
+		# 验证位置有效性
+		if target_data_index < 0 or target_data_index >= separator_index:
+			print("[%s]Error: Invalid position %d for uncompleted task (valid range: 0-%d)" % [self.name, new_position, task_cnt - 1])
+			_unlock_module()
+			return false
+
+	# 如果位置没有变化，直接返回
+	if current_data_index == target_data_index:
+		print("[%s]Task %d already at position %d" % [self.name, id, new_position])
+		_unlock_module()
+		return true
+
+	# 移动数据列表中的任务
+	var moved_task = all_tasks_data_list[current_data_index]
+	all_tasks_data_list.remove_at(current_data_index)
+	all_tasks_data_list.insert(target_data_index, moved_task)
+
+	# 移动UI中的任务
+	var current_ui_index = _get_ui_index_for_task(current_data_index)
+	var target_ui_index = _get_ui_index_for_task(target_data_index)
+	v_box_container.reorder_child_by_index(current_ui_index, target_ui_index)
+
+	print("[%s]Task %d reordered from position %d to %d (category: %s)" % [self.name, id, current_data_index, target_data_index, "completed" if is_completed else "uncompleted"])
+
+	_unlock_module()
+	return true
+
+#============Agent API END===========
 
 #============内部辅助方法===========
+## 初始化task_id为当前最大ID+1
+func _initialize_task_id() -> void:
+	var max_id = 0
+	for task in all_tasks_data_list:
+		if task.id > max_id:
+			max_id = task.id
+	task_id = max_id + 1
+	print("[%s]Initialized task_id to %d" % [self.name, task_id])
+
+## 生成新的唯一任务ID
+func _generate_task_id() -> int:
+	var new_id = task_id
+	task_id += 1
+
+	# 安全检查：确保ID不冲突
+	while _id_exists(new_id):
+		print("[%s]Warning: ID %d already exists, incrementing" % [self.name, new_id])
+		new_id = task_id
+		task_id += 1
+
+	return new_id
+
+## 检查ID是否已存在
+func _id_exists(id: int) -> bool:
+	for task in all_tasks_data_list:
+		if task.id == id:
+			return true
+	return false
+
+## 锁定模块（Agent 操作时禁止用户交互）
+func _lock_module() -> void:
+	is_agent_operating = true
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	print("[%s]Module locked for agent operation" % [self.name])
+
+## 解锁模块（Agent 操作完成后恢复用户交互）
+func _unlock_module() -> void:
+	is_agent_operating = false
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	print("[%s]Module unlocked" % [self.name])
+
+## 根据任务ID获取对应的UI节点
+func _get_task_item_from_id(id: int) -> Control:
+	for i in range(v_box_container.get_child_count()):
+		var child = v_box_container.get_child(i)
+		if child.has_method("set_task") and child.task_data and child.task_data.id == id:
+			return child
+	return null
+
+## 模拟打字效果（逐字符显示）
+func _simulate_typing_effect(item: Control, text: String, speed: float) -> void:
+	var line_edit = item.get_node("MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit")
+	var current_text = ""
+
+	for i in range(text.length()):
+		current_text += text[i]
+		line_edit.text = current_text
+		await get_tree().create_timer(speed).timeout
+
+	# 更新 TaskData
+	var task_data = item.task_data
+	task_data.title = text
+
+	# 更新数据列表
+	for i in range(all_tasks_data_list.size()):
+		if all_tasks_data_list[i].id == task_data.id:
+			all_tasks_data_list[i] = task_data
+			break
+
 # 获取任务在UI中的实际索引（考虑分隔符）
 func _get_ui_index_for_task(data_index: int) -> int:
 	# 如果任务在分隔符之前（未完成任务），UI索引 = 数据索引
@@ -356,8 +645,8 @@ func _on_v_box_container_reordered(from: int, to: int) -> void:
 	_is_programmatic_reorder = false
 
 func _on_add_button_pressed() -> void:
-	add_task(TaskData.create_example(task_id))
-	task_id += 1
+	var new_id = _generate_task_id()
+	add_task(TaskData.create_example(new_id))
 
 func _on_task_item_content_changed(item: InnerPanel) -> void:
 	# 查找并更新对应的任务数据

@@ -1,0 +1,47 @@
+[gd_scene load_steps=4 format=3 uid="uid://bm8k3yjvcaqwp"]
+
+[ext_resource type="PackedScene" uid="uid://c7qxvb8yjhqwj" path="res://scenes/main/ui/debug/test_panel.tscn" id="1_test_panel"]
+[ext_resource type="PackedScene" uid="uid://dh3k8yjvb2qwm" path="res://scenes/main/ui/debug/task_module_test_panel.tscn" id="2_task_test"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/task_module_new/task_module_new.tscn" id="3_task_module"]
+
+[node name="TestScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 400
+
+[node name="TaskModule" parent="HSplitContainer" instance=ExtResource("3_task_module")]
+layout_mode = 2
+
+[node name="TestPanel" parent="HSplitContainer" instance=ExtResource("1_test_panel")]
+layout_mode = 2
+
+[node name="TaskModuleTestPanel" parent="HSplitContainer/TestPanel/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("2_task_test")]
+layout_mode = 2
+
+[node name="InitScript" type="Node" parent="."]
+script = SubResource("GDScript_init")
+
+[sub_resource type="GDScript" id="GDScript_init"]
+script/source = "extends Node
+
+func _ready() -> void:
+	# 获取节点引用
+	var task_module = get_node(\"../HSplitContainer/TaskModule\")
+	var test_panel = get_node(\"../HSplitContainer/TestPanel/MarginContainer/VBoxContainer/TabContainer/TaskModuleTestPanel\")
+
+	# 设置TaskModule引用
+	test_panel.set_task_module(task_module)
+	print(\"[TestScene] 测试场景初始化完成\")
+"

@@ -13,19 +13,34 @@ signal music_status_changed()
 signal env_time_changed(mode: int)
 ## 切换天气
 signal env_weather_changed(mode:int)
-## 角色互动 
+## 角色互动
 signal character_interacted
 ## 任务完成
 signal task_finished
+
 # --- 节点引用 ---
 ## 音乐管理模块
 @export var music_module:MusicModule
 @export var note_module:NoteModule
 @export var note_book:NoteBook
-@export var TaskModule:TaskModule
+@export var task_module:TaskModule
+@export var test_panel:TestPanel  # 测试面板引用
+
 # --- 内置函数 ---
 func _ready() -> void:
 	_connect_signals()
+	_setup_test_panel_shortcut()
+
+## 设置测试面板快捷键（F12）
+func _setup_test_panel_shortcut() -> void:
+	pass  # 快捷键在_input中处理
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		# F12 切换测试面板
+		if event.keycode == KEY_F12:
+			toggle_test_panel()
+			get_viewport().set_input_as_handled()
 
 # --- 内部处理函数 ---
 ## 连接各子模块信号
@@ -100,6 +115,28 @@ func set_current_music_display(p_music_name: String) -> void:
 ##  添加新的便签(带动画)
 func take_note(text:String):
 	note_module.take_note(text)
+
+# --- 测试面板控制 ---
+## 切换测试面板显示/隐藏
+func toggle_test_panel() -> void:
+	if test_panel:
+		test_panel.visible = !test_panel.visible
+		print("[UI] 测试面板状态: %s" % ("显示" if test_panel.visible else "隐藏"))
+	else:
+		print("[UI] 警告: 测试面板未设置")
+
+## 显示测试面板
+func show_test_panel() -> void:
+	if test_panel:
+		test_panel.visible = true
+		print("[UI] 测试面板已显示")
+
+## 隐藏测试面板
+func hide_test_panel() -> void:
+	if test_panel:
+		test_panel.visible = false
+		print("[UI] 测试面板已隐藏")
+
 # --- 信号转发回调 ---
 ## 添加新的notebook页面
 func add_note_in_notebook(_name:String,_content:String):

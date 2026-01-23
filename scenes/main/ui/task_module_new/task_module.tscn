@@ -1,0 +1,117 @@
+[gd_scene load_steps=13 format=3 uid="uid://ov68toccadt"]
+
+[ext_resource type="Script" uid="uid://bo0vsjwch60x8" path="res://scenes/main/ui/task_module_new/task_module.gd" id="1_jrjk2"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_6xygf"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="3_7qysn"]
+[ext_resource type="Texture2D" uid="uid://beq5eu3v0jvg6" path="res://assets/ui/icons/event_list_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_ka0c4"]
+[ext_resource type="PackedScene" uid="uid://cshc06pyk77f" path="res://scenes/main/ui/task_module_new/task_module_new.tscn" id="5_enf1w"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpi25"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htout"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8x3ay"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_813qc"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ekbay"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="Resource" id="Resource_jomwj"]
+script = ExtResource("3_7qysn")
+icon = ExtResource("4_ka0c4")
+background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_b65r1"]
+script = ExtResource("3_7qysn")
+state_name = "2"
+icon = ExtResource("4_ka0c4")
+icon_color = Color(0, 0, 0, 1)
+background_color = Color(1, 1, 1, 0.7411765)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="TaskModule" type="MarginContainer"]
+offset_right = 48.0
+offset_bottom = 48.0
+script = ExtResource("1_jrjk2")
+
+[node name="TodoButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_bpi25")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_htout")
+theme_override_styles/hover = SubResource("StyleBoxFlat_8x3ay")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_813qc")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ekbay")
+script = ExtResource("2_6xygf")
+states = Array[ExtResource("3_7qysn")]([SubResource("Resource_jomwj"), SubResource("Resource_b65r1")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="TaskModuleNew" parent="CanvasLayer" instance=ExtResource("5_enf1w")]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -154.0
+offset_top = -247.0
+offset_right = 154.0
+offset_bottom = 247.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="state_changed" from="TodoButton" to="." method="_on_todo_button_state_changed"]
