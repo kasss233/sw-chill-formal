@@ -1,12 +1,13 @@
-[gd_scene load_steps=13 format=3 uid="uid://ov68toccadt"]
+[gd_scene load_steps=14 format=3 uid="uid://ov68toccadt"]
 
 [ext_resource type="Script" uid="uid://bo0vsjwch60x8" path="res://scenes/main/ui/task_module_new/task_module.gd" id="1_jrjk2"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_6xygf"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="3_7qysn"]
 [ext_resource type="Texture2D" uid="uid://beq5eu3v0jvg6" path="res://assets/ui/icons/event_list_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_ka0c4"]
 [ext_resource type="PackedScene" uid="uid://cshc06pyk77f" path="res://scenes/main/ui/task_module_new/task_module_new.tscn" id="5_enf1w"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="6_6xygf"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpi25"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7qysn"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -17,7 +18,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htout"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ka0c4"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -28,7 +29,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8x3ay"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enf1w"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -39,7 +40,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_813qc"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpi25"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -50,7 +51,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ekbay"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htout"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -89,11 +90,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_bpi25")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_htout")
-theme_override_styles/hover = SubResource("StyleBoxFlat_8x3ay")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_813qc")
-theme_override_styles/focus = SubResource("StyleBoxFlat_ekbay")
+theme_override_styles/normal = SubResource("StyleBoxFlat_7qysn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ka0c4")
+theme_override_styles/hover = SubResource("StyleBoxFlat_enf1w")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_bpi25")
+theme_override_styles/focus = SubResource("StyleBoxFlat_htout")
 script = ExtResource("2_6xygf")
 states = Array[ExtResource("3_7qysn")]([SubResource("Resource_jomwj"), SubResource("Resource_b65r1")])
 button_size = 3
@@ -102,6 +103,7 @@ metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="TaskModuleNew" parent="CanvasLayer" instance=ExtResource("5_enf1w")]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -113,5 +115,17 @@ offset_right = 154.0
 offset_bottom = 247.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="GuiTransition" type="Node" parent="."]
+script = ExtResource("6_6xygf")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.39999999999999997
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/TaskModuleNew")
+layout_id = "task"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="state_changed" from="TodoButton" to="." method="_on_todo_button_state_changed"]
