@@ -16,7 +16,8 @@ func _ready() -> void:
 	title_label.text = "UI模块测试面板"
 	close_button.pressed.connect(_on_close_button_pressed)
 
-	# 初始化所有测试页
+	# 延迟初始化所有测试页，确保UI模块的@onready变量已初始化
+	await get_tree().process_frame
 	_initialize_test_panels()
 
 	print("[TestPanel] 测试面板已就绪，当前包含 %d 个测试页" % tab_container.get_tab_count())
@@ -45,6 +46,11 @@ func _initialize_test_panels() -> void:
 		if child.has_method("set_music_module") and ui.music_module:
 			child.set_music_module(ui.music_module)
 			print("[TestPanel] 已为 %s 设置MusicModule引用" % child.name)
+
+		# 初始化InputBox测试页
+		if child.has_method("set_input_box") and ui.input_box:
+			child.set_input_box(ui.input_box)
+			print("[TestPanel] 已为 %s 设置InputBox引用" % child.name)
 
 ## 公共方法：切换到指定的测试页
 ## @param tab_name: Tab名称

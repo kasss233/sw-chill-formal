@@ -25,6 +25,7 @@ signal character_interacted
 @export var task_module: TaskModule
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
+@onready var input_box: InputBox = $InputBox
 
 # --- 内置函数 ---
 func _ready() -> void:

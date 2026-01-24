@@ -223,12 +223,11 @@ offset_right = 642.0
 offset_bottom = 115.0
 
 [node name="TestPanel" parent="." node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
-visible = false
 layout_mode = 0
-offset_left = 841.0
-offset_top = 92.0
-offset_right = 1147.0
-offset_bottom = 506.0
+offset_left = 95.0
+offset_top = 49.0
+offset_right = 401.0
+offset_bottom = 463.0
 ui = NodePath("..")
 
 [connection signal="env_time_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]

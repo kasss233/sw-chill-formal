@@ -16,7 +16,7 @@ func _init(p_id: int, p_title: String, p_timestamp: int, p_completed: bool = fal
 	self.is_completed = p_completed
 
 static func create_example(id:int):
-	return TaskData.new(id,"新任务",Time.get_unix_time_from_system(),false)
+	return TaskData.new(id,"新任务",0,false)
 
 func get_formatted_due_time() -> String:
 	if due_timestamp == 0:
