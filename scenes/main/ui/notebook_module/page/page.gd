@@ -22,7 +22,7 @@ func set_text(text: String, animate: bool = false) -> void:
 	text_edit.text = ""
 	_tween = create_tween()
 	
-	var duration = text.length() / 15 # 每秒显示 15 个字符
+	var duration = text.length() / 15.0 # 每秒显示 15 个字符
 	if duration <= 0:
 		text_edit.text = text
 		text_edit.mouse_filter = Control.MOUSE_FILTER_STOP

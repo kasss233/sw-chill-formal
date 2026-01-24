@@ -1,7 +1,9 @@
-[gd_scene load_steps=28 format=3 uid="uid://bsk40q141nhng"]
+[gd_scene load_steps=44 format=3 uid="uid://bsk40q141nhng"]
 
 [ext_resource type="Script" uid="uid://g3h1hclaruxb" path="res://scenes/main/ui/env_setter/env_setter.gd" id="1_iahff"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_b4mu8"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="2_xly7c"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_s3f03"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="3_t7p8r"]
 [ext_resource type="Texture2D" uid="uid://ucqcesyiou3u" path="res://assets/ui/icons/wb_sunny_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="4_dlm0l"]
 [ext_resource type="Texture2D" uid="uid://br6k5el85uq1v" path="res://assets/ui/icons/wb_twilight_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="5_xly7c"]
@@ -9,8 +11,45 @@
 [ext_resource type="Texture2D" uid="uid://cgyvm6ep5vpyw" path="res://assets/ui/icons/sync_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_wn8k3"]
 [ext_resource type="Texture2D" uid="uid://ea1alaylyb6w" path="res://assets/ui/icons/rainy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="8_b4mu8"]
 [ext_resource type="Texture2D" uid="uid://dsyfo2labws7t" path="res://assets/ui/icons/weather_snowy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="9_t7p8r"]
+[ext_resource type="Texture2D" uid="uid://bc6fqld333u7d" path="res://assets/ui/icons/settings_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="12_s3f03"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="13_wn8k3"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t7p8r"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wn8k3"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_3bpux"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_wn8k3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j36pu"]
+shader = ExtResource("2_xly7c")
+shader_parameter/corner_radius = 12.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_3bpux")
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(349, 333)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jec7i"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7oay3"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -21,7 +60,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dlm0l"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4j3q"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -32,7 +71,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xly7c"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iwq8r"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -43,7 +82,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3f03"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe1vx"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -54,7 +93,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wn8k3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1d75j"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -89,7 +128,7 @@ state_name = "Sync_with_system"
 icon = ExtResource("7_wn8k3")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3bpux"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_22lqf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -100,7 +139,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j36pu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_auo4y"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -111,7 +150,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jec7i"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3etl"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -122,7 +161,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7oay3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4yohj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -133,7 +172,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4j3q"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42ut6"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -168,51 +207,203 @@ state_name = "sync_with_reality"
 icon = ExtResource("7_wn8k3")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="EnvSetter" type="Control"]
-layout_mode = 3
-anchors_preset = 0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wn8k3"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3bpux"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j36pu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w6x06"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s32jb"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_lltfy"]
+load_path = "res://.godot/imported/settings_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg-30e9e08392927e27dbeaa129fb6a0943.ctex"
+
+[sub_resource type="Resource" id="Resource_yna35"]
+script = ExtResource("3_t7p8r")
+state_name = "1"
+icon = SubResource("CompressedTexture2D_lltfy")
+background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_u7uji"]
+script = ExtResource("3_t7p8r")
+state_name = "2"
+icon = ExtResource("12_s3f03")
+icon_color = Color(0, 0, 0, 1)
+background_color = Color(1, 1, 1, 0.7411765)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="EnvSetter" type="MarginContainer"]
+offset_right = 48.0
+offset_bottom = 48.0
 script = ExtResource("1_iahff")
 
-[node name="TimeButton" type="Button" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer"]
+visible = false
+material = SubResource("ShaderMaterial_j36pu")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -174.5
+offset_top = -166.5
+offset_right = 174.5
+offset_bottom = 166.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jec7i")
+script = ExtResource("3_s3f03")
+noise_texture = SubResource("NoiseTexture2D_3bpux")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+layout_mode = 2
+text = "设置"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "时间设置"
+horizontal_alignment = 1
+
+[node name="TimeButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
-layout_mode = 1
-offset_right = 36.0
-offset_bottom = 36.0
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_t7p8r")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_dlm0l")
-theme_override_styles/hover = SubResource("StyleBoxFlat_xly7c")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_s3f03")
-theme_override_styles/focus = SubResource("StyleBoxFlat_wn8k3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_7oay3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_m4j3q")
+theme_override_styles/hover = SubResource("StyleBoxFlat_iwq8r")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_fe1vx")
+theme_override_styles/focus = SubResource("StyleBoxFlat_1d75j")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_84458"), SubResource("Resource_5cvtp"), SubResource("Resource_2s0wq"), SubResource("Resource_2tfue")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="WeatherButton" type="Button" parent="."]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "天气设置"
+horizontal_alignment = 1
+
+[node name="WeatherButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2"]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
-layout_mode = 0
-offset_left = 49.0
-offset_right = 81.0
-offset_bottom = 36.0
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_3bpux")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_j36pu")
-theme_override_styles/hover = SubResource("StyleBoxFlat_jec7i")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_7oay3")
-theme_override_styles/focus = SubResource("StyleBoxFlat_m4j3q")
+theme_override_styles/normal = SubResource("StyleBoxFlat_22lqf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_auo4y")
+theme_override_styles/hover = SubResource("StyleBoxFlat_h3etl")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_4yohj")
+theme_override_styles/focus = SubResource("StyleBoxFlat_42ut6")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_3bpux"), SubResource("Resource_j36pu"), SubResource("Resource_fe1vx"), SubResource("Resource_iwq8r")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[connection signal="state_changed" from="TimeButton" to="." method="_on_time_button_state_changed"]
-[connection signal="state_changed" from="WeatherButton" to="." method="_on_weather_button_state_changed"]
+[node name="SettingButton" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_wn8k3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3bpux")
+theme_override_styles/hover = SubResource("StyleBoxFlat_j36pu")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_w6x06")
+theme_override_styles/focus = SubResource("StyleBoxFlat_s32jb")
+script = ExtResource("2_b4mu8")
+states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_yna35"), SubResource("Resource_u7uji")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="GuiTransition" type="Node" parent="."]
+script = ExtResource("13_wn8k3")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.4
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/FrostedPanel")
+layout_id = "setter"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/TimeButton" to="." method="_on_time_button_state_changed"]
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/WeatherButton" to="." method="_on_weather_button_state_changed"]
+[connection signal="pressed" from="SettingButton" to="." method="_on_setting_button_pressed"]

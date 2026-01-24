@@ -45,9 +45,12 @@ func change_page(_name: String, btn: PageButton, animate: bool = false) -> void:
 		return
 	if is_page_opened:
 		# 保存当前页面内容
-		var current_page = inner_panel.get_child(0) as Page
-		pages[current_page_btn] = current_page.get_text()
-		inner_panel.remove_child(current_page)
+		if inner_panel.get_child_count() > 0:
+			var current_page = inner_panel.get_child(0) as Page
+			if current_page:
+				pages[current_page_btn] = current_page.get_text()
+				inner_panel.remove_child(current_page)
+				current_page.queue_free() # 记得释放内存
 	current_page_btn = btn
 	var new_page = page.instantiate() as Page
 	inner_panel.add_child(new_page)
@@ -70,16 +73,34 @@ func _on_page_changed(_name: String, btn: PageButton) -> void:
 	change_page(_name, btn)
 func _on_page_removed(_name: String, btn: PageButton) -> void:
 	# 如果删除的是当前页面，清空内容区域
+	print("Removing page: ", _name)
 	if btn == current_page_btn:
-		var current_page = inner_panel.get_child(0) as Page
-		inner_panel.remove_child(current_page)
+		if inner_panel.get_child_count() > 0:
+			var current_page = inner_panel.get_child(0)
+			inner_panel.remove_child(current_page)
+			if current_page:
+				current_page.queue_free()
 		is_page_opened = false
 		current_page_btn = null
+		inner_panel.visible = false
+	
 	# 从页面名称数组和内容字典中移除
-	page_names.erase(_name)
+	# 由于名称可能已被用户修改，这里通过find来删除更稳妥
+	var actual_name = _name
+	if btn.has_method("get_page_name"):
+		actual_name = btn.get_page_name()
+	
+	var idx = page_names.find(actual_name)
+	if idx != -1:
+		page_names.remove_at(idx)
+	else:
+		page_names.erase(_name)
+		
 	pages.erase(btn)
+	
 	# 从VBoxContainer中移除对应的PageButton
-	vbox.remove_child(btn)
+	if btn.get_parent():
+		btn.get_parent().remove_child(btn)
 	btn.queue_free()
 func _on_material_button_pressed() -> void:
 	if panel.visible:

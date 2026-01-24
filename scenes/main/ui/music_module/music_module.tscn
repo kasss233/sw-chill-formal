@@ -46,8 +46,8 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_62hhh")
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/size = Vector2(334, 65)
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_50xrc"]
 content_margin_left = 12.0
@@ -398,7 +398,7 @@ shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(288, 365)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7nmkm"]
 content_margin_left = 12.0
@@ -858,6 +858,7 @@ theme_override_constants/margin_left = 12
 theme_override_constants/margin_right = 4
 
 [node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer"]
+visible = false
 custom_minimum_size = Vector2(200, 0)
 offset_left = 277.0
 offset_top = 394.0

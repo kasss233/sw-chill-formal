@@ -46,6 +46,7 @@ func _on_line_edit_text_submitted(_new_text: String) -> void:
 
 
 func _on_remove_button_pressed() -> void:
+	print("Remove button pressed for page: ", page_name)
 	page_removed.emit(page_name)
 
 

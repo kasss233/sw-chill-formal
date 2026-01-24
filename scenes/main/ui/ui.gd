@@ -164,11 +164,10 @@ func _on_playback_state_changed(_is_playing: bool) -> void:
 	music_status_changed.emit()
 
 # --- 环境信号回调 ---
-func _on_env_time_setter_env_time_changed(mode: int) -> void:
-	env_time_changed.emit(mode)
-
 func _on_env_setter_env_weather_changed(mode: int) -> void:
 	env_weather_changed.emit(mode)
+func _on_env_setter_env_time_changed(mode: int) -> void:
+	env_time_changed.emit(mode)
 
 func _on_character_interactor_character_interacted() -> void:
 	character_interacted.emit()

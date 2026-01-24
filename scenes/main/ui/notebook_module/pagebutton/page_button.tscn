@@ -126,6 +126,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_agfnf")
 theme_override_styles/hover = SubResource("StyleBoxFlat_gmmlq")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_hve66")
 theme_override_styles/focus = SubResource("StyleBoxFlat_ekewq")
+action_mode = 0
 script = ExtResource("1_sxwfx")
 button_size = 0
 button_icon = ExtResource("5_b5dx1")

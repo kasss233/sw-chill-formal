@@ -227,6 +227,7 @@ metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer"]
+visible = false
 material = SubResource("ShaderMaterial_4b6by")
 anchors_preset = 8
 anchor_left = 0.5
