@@ -1,0 +1,68 @@
+[gd_scene load_steps=7 format=3 uid="uid://dcf7ss77y1j6m"]
+
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_dqju2"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_wnrju"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_s3jd5"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_v7a05"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_s3jd5")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tvowg"]
+shader = ExtResource("1_dqju2")
+shader_parameter/corner_radius = 28.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 2.0
+shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_v7a05")
+shader_parameter/shadow_color = Color(0, 0, 0, 0)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 0)
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dqju2"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="DialogueBox" type="MarginContainer"]
+offset_right = 300.0
+offset_bottom = 100.0
+
+[node name="FrostedPanel" type="PanelContainer" parent="."]
+material = SubResource("ShaderMaterial_tvowg")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dqju2")
+script = ExtResource("2_wnrju")
+corner_radius = 28.0
+blur_amount = 2.0
+noise_texture = SubResource("NoiseTexture2D_v7a05")
+shadow_color = Color(0, 0, 0, 0)
+shadow_offset = Vector2(0, 0)
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="RichTextLabel" type="RichTextLabel" parent="FrostedPanel/MarginContainer"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+text = "114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514114514"
+scroll_following = true
