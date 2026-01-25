@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://b8aqjm4e8p3u2"]
+[gd_scene load_steps=28 format=3 uid="uid://b8aqjm4e8p3u2"]
 
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
 [ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://o8cxkfnpu5ug" path="res://scenes/main/ui/note_module/note_module.tscn" id="8_3ru4j"]
 [ext_resource type="PackedScene" uid="uid://daa0dvlkhliq6" path="res://scenes/main/ui/debug/test_panel.tscn" id="8_test_panel"]
 [ext_resource type="PackedScene" uid="uid://bmsmfccv7kma" path="res://scenes/main/ui/notebook_module/note_book.tscn" id="9_uumow"]
+[ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="11_uypi5"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="15_khr3h"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_hnkmo"]
@@ -24,7 +25,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_hnkmo")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_khr3h"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tnos5"]
 shader = ExtResource("7_vb4k3")
 shader_parameter/corner_radius = 32.0
 shader_parameter/border_width = 1.0
@@ -36,10 +37,10 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_a7tfl")
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/size = Vector2(88, 348)
+shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uypi5"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -51,7 +52,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -62,7 +63,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -73,7 +74,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -84,7 +85,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -95,7 +96,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rx81l"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -146,9 +147,9 @@ offset_bottom = 148.0
 grow_vertical = 2
 
 [node name="FrostedPanel" type="PanelContainer" parent="TabPanel"]
-material = SubResource("ShaderMaterial_khr3h")
+material = SubResource("ShaderMaterial_tnos5")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_uypi5")
+theme_override_styles/panel = SubResource("StyleBoxFlat_w2hwp")
 script = ExtResource("3_hkhhe")
 corner_radius = 32.0
 noise_texture = SubResource("NoiseTexture2D_a7tfl")
@@ -176,11 +177,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_tnos5")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_w2hwp")
-theme_override_styles/hover = SubResource("StyleBoxFlat_3ru4j")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_uumow")
-theme_override_styles/focus = SubResource("StyleBoxFlat_djxf0")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3ru4j")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_uumow")
+theme_override_styles/hover = SubResource("StyleBoxFlat_djxf0")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_87oeu")
+theme_override_styles/focus = SubResource("StyleBoxFlat_rx81l")
 script = ExtResource("5_uypi5")
 states = Array[ExtResource("6_tnos5")]([SubResource("Resource_ln37o"), SubResource("Resource_mnnl2")])
 button_size = 3
@@ -193,6 +194,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("4_ex8bf")]
+layout_mode = 2
+
+[node name="PomodoroTechniqueModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("11_uypi5")]
 layout_mode = 2
 
 [node name="InputBox" parent="." instance=ExtResource("6_nswco")]

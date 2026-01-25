@@ -1,0 +1,124 @@
+[gd_scene load_steps=15 format=3 uid="uid://b6i5hsuylq63q"]
+
+[ext_resource type="Script" uid="uid://bfhbmx6omo2rw" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.gd" id="1_176ir"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="1_j5njq"]
+[ext_resource type="PackedScene" uid="uid://dlh85yjkmh47q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/pomodoro_technique.tscn" id="2_d16ot"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="3_by32n"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="4_176ir"]
+[ext_resource type="Texture2D" uid="uid://cbc5vls45q8b8" path="res://assets/ui/icons/alarm_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="5_inigl"]
+[ext_resource type="Texture2D" uid="uid://dxba6ufkchx8g" path="res://assets/ui/icons/alarm_24dp.svg" id="6_t05ik"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_by32n"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_176ir"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inigl"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t05ik"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n4djj"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="Resource" id="Resource_x41pg"]
+script = ExtResource("4_176ir")
+icon = ExtResource("5_inigl")
+background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_l545r"]
+script = ExtResource("4_176ir")
+icon = ExtResource("6_t05ik")
+background_color = Color(1, 1, 1, 0.7411765)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="PomodoroTechniqueModule" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_176ir")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GuiTransition" type="Node" parent="CanvasLayer"]
+script = ExtResource("1_j5njq")
+auto_start = 0
+animation_enter = 2
+animation_leave = 2
+duration = 0.41
+transition_type = "BACK"
+layout = NodePath("../PomodoroTechnique")
+layout_id = "pomodorotechnique"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[node name="PomodoroTechnique" parent="CanvasLayer" instance=ExtResource("2_d16ot")]
+offset_left = 817.0
+offset_top = -3.0
+offset_right = 5.0
+offset_bottom = -311.0
+
+[node name="pomodoro_button" type="Button" parent="."]
+clip_contents = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_by32n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_176ir")
+theme_override_styles/hover = SubResource("StyleBoxFlat_inigl")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_t05ik")
+theme_override_styles/focus = SubResource("StyleBoxFlat_n4djj")
+script = ExtResource("3_by32n")
+states = Array[ExtResource("4_176ir")]([SubResource("Resource_x41pg"), SubResource("Resource_l545r")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[connection signal="state_changed" from="pomodoro_button" to="." method="_on_pomodoro_button_state_changed"]

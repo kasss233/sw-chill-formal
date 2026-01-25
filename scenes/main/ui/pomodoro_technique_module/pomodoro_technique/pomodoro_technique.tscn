@@ -1,25 +1,24 @@
-[gd_scene load_steps=92 format=3 uid="uid://dlh85yjkmh47q"]
+[gd_scene load_steps=91 format=3 uid="uid://dlh85yjkmh47q"]
 
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_gmbc6"]
-[ext_resource type="Script" uid="uid://ctpy8aopj65v1" path="res://scenes/main/ui/pomodoro_technique/pomodoro_technique.gd" id="2_b2k8b"]
+[ext_resource type="Script" uid="uid://ctpy8aopj65v1" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/pomodoro_technique.gd" id="2_b2k8b"]
 [ext_resource type="Texture2D" uid="uid://cqb73su40nwpo" path="res://assets/ui/icons/keyboard_arrow_right_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="2_cn7co"]
 [ext_resource type="Texture2D" uid="uid://1g34yvsn1tq0" path="res://assets/ui/icons/keyboard_arrow_left_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_h3mhw"]
-[ext_resource type="Script" uid="uid://bri6tuigwtayf" path="res://scenes/main/ui/pomodoro_technique/loop.gd" id="3_xjdt3"]
+[ext_resource type="Script" uid="uid://bri6tuigwtayf" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/loop.gd" id="3_xjdt3"]
 [ext_resource type="Texture2D" uid="uid://cfkbg6r6pkpu8" path="res://assets/ui/icons/stat_1_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_4f7lw"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="4_cn7co"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="4_h3mhw"]
 [ext_resource type="Texture2D" uid="uid://bmjaa8f3sscwa" path="res://assets/ui/icons/stat_minus_1_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="5_5ud0i"]
-[ext_resource type="Script" uid="uid://bacmqowwk8jse" path="res://scenes/main/ui/pomodoro_technique/work.gd" id="7_5ud0i"]
-[ext_resource type="Script" uid="uid://cubr4hrt1i74h" path="res://scenes/main/ui/pomodoro_technique/rest.gd" id="10_b0vw5"]
+[ext_resource type="Script" uid="uid://bacmqowwk8jse" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/work.gd" id="7_5ud0i"]
+[ext_resource type="Script" uid="uid://cubr4hrt1i74h" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/rest.gd" id="10_b0vw5"]
 [ext_resource type="Texture2D" uid="uid://bepyjk501lvcs" path="res://assets/ui/icons/pause_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="11_v3ijv"]
 [ext_resource type="Texture2D" uid="uid://6x8jejxi7rp5" path="res://assets/ui/icons/stop_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="12_0l3pm"]
-[ext_resource type="Script" uid="uid://ds5q17m8btwjn" path="res://scenes/main/ui/pomodoro_technique/v_box_container.gd" id="13_b2k8b"]
+[ext_resource type="Script" uid="uid://ds5q17m8btwjn" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/v_box_container.gd" id="13_b2k8b"]
 [ext_resource type="Texture2D" uid="uid://7dbvs5h1rfge" path="res://assets/ui/icons/play_arrow_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="13_ec58n"]
 [ext_resource type="Script" uid="uid://qac15j88w15i" path="res://scenes/main/ui/components/progress_indicator/MaterialProgressIndicator.gd" id="14_0l3pm"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="14_3ethe"]
-[ext_resource type="LabelSettings" uid="uid://dxyirgokaqpuc" path="res://scenes/main/ui/pomodoro_technique/pomodoro_technique.tres" id="15_ec58n"]
+[ext_resource type="LabelSettings" uid="uid://dxyirgokaqpuc" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique/pomodoro_technique.tres" id="15_ec58n"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="15_sjcdi"]
-[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="20_vg1t7"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_h3mhw"]
 frequency = 0.1
@@ -56,7 +55,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ujf5"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icnyw"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -67,7 +66,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sjq2q"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_331gv"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -78,7 +77,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fybek"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6oyl3"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -89,7 +88,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4vhj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lgast"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -100,7 +99,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h80mq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_umxeu"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -111,7 +110,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kbvxv"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5irs5"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -122,7 +121,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1ggr"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p4whh"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -133,7 +132,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yqxju"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lfkl6"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -144,7 +143,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8jvaw"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qisxr"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -155,7 +154,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qxuch"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hsgyi"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -174,7 +173,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_3ethe")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_1rdwl"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ffctn"]
 shader = ExtResource("4_h3mhw")
 shader_parameter/corner_radius = 12.0
 shader_parameter/border_width = 1.0
@@ -189,7 +188,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(60, 127)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uthw7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4b1cf"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -201,7 +200,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_12brt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dindj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -212,7 +211,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4l8gu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tkiee"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -223,7 +222,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_te6qa"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_db7kp"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -234,7 +233,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_crnxi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yoybf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -245,7 +244,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5pq1n"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ohisu"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -256,7 +255,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o6nim"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_adymb"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -267,7 +266,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_egljh"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7u743"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -278,7 +277,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qyaj6"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1mpp4"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -289,7 +288,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_135st"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5h80b"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -300,7 +299,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_co7m2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5x1xx"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -319,7 +318,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_b0vw5")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_h7250"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8tcj5"]
 shader = ExtResource("4_h3mhw")
 shader_parameter/corner_radius = 12.0
 shader_parameter/border_width = 1.0
@@ -334,7 +333,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(60, 127)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mkxfu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_68eh1"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -346,7 +345,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w3s5f"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j8ibe"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -357,7 +356,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_151cv"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_73de1"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -368,7 +367,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8b4i8"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y4que"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -379,7 +378,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_twk7c"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_an76w"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -390,7 +389,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glwgq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xn43v"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -401,7 +400,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_myvy4"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bibsn"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -412,7 +411,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ncbtt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yg0wo"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -423,7 +422,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mky5o"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1ts6y"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -434,7 +433,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2ltkh"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7ua1o"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -445,7 +444,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jwa1c"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jxcbr"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -464,7 +463,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_6cadn")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_or5pb"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lei2t"]
 shader = ExtResource("4_h3mhw")
 shader_parameter/corner_radius = 12.0
 shader_parameter/border_width = 1.0
@@ -479,7 +478,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(60, 60)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0l8yi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bxsi4"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -491,7 +490,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lap2y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l0i3"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -502,7 +501,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pqt78"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h33lo"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -513,7 +512,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6cadn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i4b27"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -524,7 +523,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0lmqf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_73tdg"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -535,7 +534,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_it2fo"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sf1dv"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -554,7 +553,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_7mous")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_q776c"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_imnoo"]
 shader = ExtResource("4_h3mhw")
 shader_parameter/corner_radius = 12.0
 shader_parameter/border_width = 1.0
@@ -569,7 +568,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(60, 60)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_anc0w"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnx0a"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -581,7 +580,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b2k8b"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6wq28"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -592,7 +591,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1rdwl"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hoq2m"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -603,7 +602,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h7250"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r1tr4"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -614,7 +613,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_or5pb"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tbry5"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -625,7 +624,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q776c"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xj2by"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -654,7 +653,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_myvy4")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_pr21p"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rrrh6"]
 shader = ExtResource("4_h3mhw")
 shader_parameter/corner_radius = 12.0
 shader_parameter/border_width = 1.0
@@ -669,7 +668,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(60, 60)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gxp6u"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gvyoc"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -681,7 +680,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bwf6a"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w3x80"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -692,7 +691,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e1o18"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7msri"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -703,7 +702,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kd6oj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xcdxe"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -714,7 +713,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6p520"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w6orf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -725,7 +724,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3dmx2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n0v5g"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -779,11 +778,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_4ujf5")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_sjq2q")
-theme_override_styles/hover = SubResource("StyleBoxFlat_fybek")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_m4vhj")
-theme_override_styles/focus = SubResource("StyleBoxFlat_h80mq")
+theme_override_styles/normal = SubResource("StyleBoxFlat_icnyw")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_331gv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6oyl3")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_lgast")
+theme_override_styles/focus = SubResource("StyleBoxFlat_umxeu")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("3_h3mhw")
 padding_horizontal = 14
@@ -821,11 +820,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_kbvxv")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_g1ggr")
-theme_override_styles/hover = SubResource("StyleBoxFlat_yqxju")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_8jvaw")
-theme_override_styles/focus = SubResource("StyleBoxFlat_qxuch")
+theme_override_styles/normal = SubResource("StyleBoxFlat_5irs5")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_p4whh")
+theme_override_styles/hover = SubResource("StyleBoxFlat_lfkl6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qisxr")
+theme_override_styles/focus = SubResource("StyleBoxFlat_hsgyi")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("2_cn7co")
 padding_horizontal = 14
@@ -849,9 +848,9 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="times" type="PanelContainer" parent="idle/VBoxContainer/HBoxContainer/work"]
-material = SubResource("ShaderMaterial_1rdwl")
+material = SubResource("ShaderMaterial_ffctn")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_uthw7")
+theme_override_styles/panel = SubResource("StyleBoxFlat_4b1cf")
 script = ExtResource("4_cn7co")
 noise_texture = SubResource("NoiseTexture2D_sjcdi")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -865,11 +864,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_12brt")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_4l8gu")
-theme_override_styles/hover = SubResource("StyleBoxFlat_te6qa")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_crnxi")
-theme_override_styles/focus = SubResource("StyleBoxFlat_5pq1n")
+theme_override_styles/normal = SubResource("StyleBoxFlat_dindj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tkiee")
+theme_override_styles/hover = SubResource("StyleBoxFlat_db7kp")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yoybf")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ohisu")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("4_4f7lw")
 padding_horizontal = 14
@@ -887,11 +886,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_o6nim")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_egljh")
-theme_override_styles/hover = SubResource("StyleBoxFlat_qyaj6")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_135st")
-theme_override_styles/focus = SubResource("StyleBoxFlat_co7m2")
+theme_override_styles/normal = SubResource("StyleBoxFlat_adymb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_7u743")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1mpp4")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_5h80b")
+theme_override_styles/focus = SubResource("StyleBoxFlat_5x1xx")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("5_5ud0i")
 padding_horizontal = 14
@@ -911,9 +910,9 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="times" type="PanelContainer" parent="idle/VBoxContainer/HBoxContainer/rest"]
-material = SubResource("ShaderMaterial_h7250")
+material = SubResource("ShaderMaterial_8tcj5")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_mkxfu")
+theme_override_styles/panel = SubResource("StyleBoxFlat_68eh1")
 script = ExtResource("4_cn7co")
 noise_texture = SubResource("NoiseTexture2D_wf88q")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -927,11 +926,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_w3s5f")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_151cv")
-theme_override_styles/hover = SubResource("StyleBoxFlat_8b4i8")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_twk7c")
-theme_override_styles/focus = SubResource("StyleBoxFlat_glwgq")
+theme_override_styles/normal = SubResource("StyleBoxFlat_j8ibe")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_73de1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_y4que")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_an76w")
+theme_override_styles/focus = SubResource("StyleBoxFlat_xn43v")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("4_4f7lw")
 padding_horizontal = 14
@@ -949,11 +948,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_myvy4")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ncbtt")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mky5o")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_2ltkh")
-theme_override_styles/focus = SubResource("StyleBoxFlat_jwa1c")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bibsn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yg0wo")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1ts6y")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_7ua1o")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jxcbr")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("5_5ud0i")
 padding_horizontal = 14
@@ -964,9 +963,9 @@ metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 layout_mode = 2
 
 [node name="FrostedPanel" type="PanelContainer" parent="idle/VBoxContainer/control_buttons"]
-material = SubResource("ShaderMaterial_or5pb")
+material = SubResource("ShaderMaterial_lei2t")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_0l8yi")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bxsi4")
 script = ExtResource("4_cn7co")
 noise_texture = SubResource("NoiseTexture2D_0lmqf")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -976,11 +975,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_lap2y")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pqt78")
-theme_override_styles/hover = SubResource("StyleBoxFlat_6cadn")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_0lmqf")
-theme_override_styles/focus = SubResource("StyleBoxFlat_it2fo")
+theme_override_styles/normal = SubResource("StyleBoxFlat_5l0i3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_h33lo")
+theme_override_styles/hover = SubResource("StyleBoxFlat_i4b27")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_73tdg")
+theme_override_styles/focus = SubResource("StyleBoxFlat_sf1dv")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("13_ec58n")
 padding_horizontal = 14
@@ -1052,9 +1051,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="FrostedPanel" type="PanelContainer" parent="running/VBoxContainer/CenterContainer/running"]
-material = SubResource("ShaderMaterial_q776c")
+material = SubResource("ShaderMaterial_imnoo")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_anc0w")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tnx0a")
 script = ExtResource("4_cn7co")
 noise_texture = SubResource("NoiseTexture2D_3ethe")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -1068,11 +1067,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_b2k8b")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_1rdwl")
-theme_override_styles/hover = SubResource("StyleBoxFlat_h7250")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_or5pb")
-theme_override_styles/focus = SubResource("StyleBoxFlat_q776c")
+theme_override_styles/normal = SubResource("StyleBoxFlat_6wq28")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hoq2m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_r1tr4")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tbry5")
+theme_override_styles/focus = SubResource("StyleBoxFlat_xj2by")
 script = ExtResource("14_3ethe")
 states = Array[ExtResource("15_sjcdi")]([SubResource("Resource_2dd7d"), SubResource("Resource_c7ufb")])
 padding_horizontal = 14
@@ -1080,9 +1079,9 @@ padding_vertical = 7
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="FrostedPanel2" type="PanelContainer" parent="running/VBoxContainer/CenterContainer/running"]
-material = SubResource("ShaderMaterial_pr21p")
+material = SubResource("ShaderMaterial_rrrh6")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_gxp6u")
+theme_override_styles/panel = SubResource("StyleBoxFlat_gvyoc")
 script = ExtResource("4_cn7co")
 noise_texture = SubResource("NoiseTexture2D_ncbtt")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -1092,27 +1091,16 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_bwf6a")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_e1o18")
-theme_override_styles/hover = SubResource("StyleBoxFlat_kd6oj")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_6p520")
-theme_override_styles/focus = SubResource("StyleBoxFlat_3dmx2")
+theme_override_styles/normal = SubResource("StyleBoxFlat_w3x80")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_7msri")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xcdxe")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_w6orf")
+theme_override_styles/focus = SubResource("StyleBoxFlat_n0v5g")
 script = ExtResource("1_gmbc6")
 button_icon = ExtResource("12_0l3pm")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
-
-[node name="GuiTransition" type="Node" parent="."]
-script = ExtResource("20_vg1t7")
-auto_start = 1
-animation_enter = 3
-animation_leave = 2
-duration = 0.41
-transition_type = "BACK"
-layout = NodePath("..")
-layout_id = "pomodorotechnique"
-metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="all_completed" from="." to="." method="_on_all_completed"]
 [connection signal="pressed" from="idle/VBoxContainer/loop/CenterContainer/loop_time_minus" to="idle/VBoxContainer/loop" method="_on_loop_time_minus_pressed"]
