@@ -223,7 +223,6 @@ offset_right = 642.0
 offset_bottom = 115.0
 
 [node name="TestPanel" parent="." node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
-visible = false
 layout_mode = 0
 offset_left = 841.0
 offset_top = 92.0

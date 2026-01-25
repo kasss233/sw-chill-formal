@@ -18,11 +18,14 @@ var is_page_opened: bool = false
 func _ready() -> void:
 	panel.visible = false
 	inner_panel.visible = false
+	#add_page_and_open("123","dsadasdawdwa")
 	#panel.visible = true
 	#add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击“+”按钮添加新页面。")
 
 
 func add_page_and_open(_name: String, _content: String) -> void:
+	if !panel.visible:
+		GuiTransitions.show("notebook")
 	var new_page_button = add_page(_name)
 	# 设置页面内容
 	pages[new_page_button] = _content

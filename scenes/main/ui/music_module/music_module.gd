@@ -56,6 +56,7 @@ func _ready() -> void:
 	_setup_delete_dialog()
 	_setup_add_playlist_dialog()
 	_connect_music_state()
+	frosted_panel.visible=false
 	# 延迟初始化
 	var timer = get_tree().create_timer(0.1)
 	timer.timeout.connect(_deferred_init)

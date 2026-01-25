@@ -3,7 +3,9 @@ extends Control
 @export var note: PackedScene
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
 var cnt: int = 0
-
+func _ready() -> void:
+	#take_note("3213124112313123")
+	pass
 func _on_material_button_pressed() -> void:
 	if (cnt >= 20):
 		print("[Note Module] note count limit reached")
