@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://daa0dvlkhliq6"]
+[gd_scene load_steps=6 format=3 uid="uid://daa0dvlkhliq6"]
 
 [ext_resource type="Script" uid="uid://c3harjmj1bpcc" path="res://scenes/main/ui/debug/test_panel.gd" id="1_test_panel"]
 [ext_resource type="PackedScene" uid="uid://dh3k8yjvb2qwm" path="res://scenes/main/ui/debug/task_module_test_panel.tscn" id="2_task_test"]
 [ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="3_fjyjl"]
 [ext_resource type="PackedScene" uid="uid://c8yjvb2qwm3la" path="res://scenes/main/ui/debug/music_module_test_panel.tscn" id="3_uae58"]
+[ext_resource type="PackedScene" uid="uid://dxvj8y3k4m5nb" path="res://scenes/main/ui/debug/input_box_test_panel.tscn" id="4_input_test"]
 
 [node name="TestPanel" type="MarginContainer"]
 offset_right = 314.0
@@ -50,6 +51,11 @@ metadata/_tab_index = 0
 visible = false
 layout_mode = 2
 metadata/_tab_index = 1
+
+[node name="InputBox" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("4_input_test")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

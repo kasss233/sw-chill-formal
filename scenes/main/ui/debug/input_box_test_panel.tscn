@@ -1,0 +1,126 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxvj8y3k4m5nb"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/input_box_test_panel.gd" id="1_input_test"]
+
+[node name="InputBoxTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_input_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="MessageInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "消息文本 (用于发送消息/设置文本)"
+
+[node name="Attachment1Input" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "附件路径1 (可选)"
+
+[node name="Attachment2Input" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "附件路径2 (可选)"
+
+[node name="DialogSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DialogSection"]
+layout_mode = 2
+text = "对话控制 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="SendMessageBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DialogSection"]
+layout_mode = 2
+text = "发送消息 (agent_send_message)"
+
+[node name="StopGenerationBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DialogSection"]
+layout_mode = 2
+text = "停止生成 (agent_stop_generation)"
+
+[node name="ResetToReadyBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DialogSection"]
+layout_mode = 2
+text = "重置到就绪 (agent_reset_to_ready)"
+
+[node name="QuerySection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "状态查询 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="GetStatusBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "获取状态 (agent_get_status)"
+
+[node name="IsGeneratingBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "检查是否生成中 (agent_is_generating)"
+
+[node name="IsReadyBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/QuerySection"]
+layout_mode = 2
+text = "检查是否就绪 (agent_is_ready)"
+
+[node name="HelperSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HelperSection"]
+layout_mode = 2
+text = "辅助功能 API (彩蛋):"
+theme_override_font_sizes/font_size = 16
+
+[node name="SetTextBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HelperSection"]
+layout_mode = 2
+text = "设置文本 (agent_set_text)"
+
+[node name="ClearInputBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HelperSection"]
+layout_mode = 2
+text = "清空输入 (agent_clear_input)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]测试日志将显示在这里...[/color]"
+scroll_following = true

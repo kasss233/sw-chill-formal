@@ -351,13 +351,15 @@ func _adjust_child_rect(delta: float = -1.0):
 	var last_child := children[-1]
 	if is_vertical:
 		if _is_using_process and _drop_zone_index == children.size() and _focus_child != null and is_instance_valid(_focus_child):
+			# 拖拽到末尾时，需要额外空间给被拖拽的子节点
 			custom_minimum_size.y = _expect_child_rect[-1].end.y + _focus_child.size.y + separation
-		elif not _is_using_process:
+		else:
+			# 程序化重排序或非动画模式时，使用最后一个子节点的实际位置
 			custom_minimum_size.y = last_child.get_rect().end.y
 	else:
 		if _is_using_process and _drop_zone_index == children.size() and _focus_child != null and is_instance_valid(_focus_child):
 			custom_minimum_size.x = _expect_child_rect[-1].end.x + _focus_child.size.x + separation
-		elif not _is_using_process:
+		else:
 			custom_minimum_size.x = last_child.get_rect().end.x
 
 	# Adjust rect every process frame until child is dropped and finished lerping 
@@ -462,6 +464,20 @@ func _on_drag_ended_enable_scroll(child: Control):
 		scroll_container.set("allow_vertical_scroll", _original_allow_vertical_scroll)
 
 
+## 同步 SmoothScrollContainer 的 pos 状态
+## 用于程序化重排序后保持滑动功能正常
+func _sync_smooth_scroll_pos() -> void:
+	if _is_smooth_scroll and scroll_container != null:
+		# 延迟同步，确保布局已经更新
+		call_deferred("_do_sync_smooth_scroll_pos")
+
+
+## 实际执行 SmoothScrollContainer 的 pos 同步
+func _do_sync_smooth_scroll_pos() -> void:
+	if scroll_container != null and is_instance_valid(scroll_container):
+		scroll_container.pos = -Vector2(scroll_container.scroll_horizontal, scroll_container.scroll_vertical)
+
+
 ## Programmatically reorder a child from one index to another.
 ## This achieves the same result as manual drag-and-drop but through code.
 ## [br][br]
@@ -477,7 +493,7 @@ func reorder_child_by_index(from_index: int, to_index: int, animate: bool = true
 		var c := _child as Control
 		if c != null and c.visible:
 			children.append(c)
-	
+
 	# Validate indices
 	if from_index < 0 or from_index >= children.size():
 		push_warning("ReorderableContainer: from_index %d is out of range (0-%d)" % [from_index, children.size() - 1])
@@ -487,20 +503,23 @@ func reorder_child_by_index(from_index: int, to_index: int, animate: bool = true
 		return false
 	if from_index == to_index:
 		return true  # No change needed
-	
+
 	var child := children[from_index]
-	
+
 	if animate:
 		# Enable process mode for animation
 		_is_using_process = true
-	
+
 	# Use the Node's move_child method (not Container's)
 	(self as Node).move_child(child, to_index)
 	reordered.emit(from_index, to_index)
-	
+
 	if not animate:
 		_on_sort_children()
-	
+
+	# 同步 SmoothScrollContainer 的 pos 状态，防止滑动失效
+	_sync_smooth_scroll_pos()
+
 	return true
 
 
@@ -546,7 +565,7 @@ func swap_children_at(index_a: int, index_b: int, animate: bool = true) -> bool:
 		var c := _child as Control
 		if c != null and c.visible:
 			children.append(c)
-	
+
 	# Validate indices
 	if index_a < 0 or index_a >= children.size():
 		push_warning("ReorderableContainer: index_a %d is out of range (0-%d)" % [index_a, children.size() - 1])
@@ -556,28 +575,31 @@ func swap_children_at(index_a: int, index_b: int, animate: bool = true) -> bool:
 		return false
 	if index_a == index_b:
 		return true  # No change needed
-	
+
 	# Ensure index_a < index_b for consistent behavior
 	if index_a > index_b:
 		var temp := index_a
 		index_a = index_b
 		index_b = temp
-	
+
 	var child_a := children[index_a]
 	var child_b := children[index_b]
-	
+
 	if animate:
 		_is_using_process = true
-	
+
 	# Move child_b to index_a first, then child_a to index_b
 	(self as Node).move_child(child_b, index_a)
 	(self as Node).move_child(child_a, index_b)
-	
+
 	reordered.emit(index_a, index_b)
-	
+
 	if not animate:
 		_on_sort_children()
-	
+
+	# 同步 SmoothScrollContainer 的 pos 状态，防止滑动失效
+	_sync_smooth_scroll_pos()
+
 	return true
 
 

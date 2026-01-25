@@ -58,6 +58,10 @@ placeholder_text = "任务ID (用于更新/删除/查询)"
 layout_mode = 2
 placeholder_text = "新位置 (用于调整顺序，0-based)"
 
+[node name="DueTimestampInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "截止时间戳 (Unix时间戳，留空则为1小时后)"
+
 [node name="ButtonSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -98,6 +102,18 @@ text = "获取任务信息 (agent_get_task_info)"
 [node name="GetAllTasksBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
 layout_mode = 2
 text = "获取所有任务 (agent_get_all_tasks)"
+
+[node name="SetDueTimeBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "设置截止时间 (agent_set_task_due_time)"
+
+[node name="GetOverdueTasksBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "获取过期任务 (agent_get_overdue_tasks)"
+
+[node name="IsTaskOverdueBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "检查任务是否过期 (agent_is_task_overdue)"
 
 [node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 300)

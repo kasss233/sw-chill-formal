@@ -58,9 +58,9 @@ func add_task(task: TaskData) -> void:
 		finished_task_cnt += 1
 		# 已经在末尾，不需要移动
 	else:
-		# 未完成任务添加到分隔符之前
-		all_tasks_data_list.insert(separator_index, task)
-		v_box_container.reorder_child_to(t, separator_index, false)
+		# 未完成任务添加到第一个位置
+		all_tasks_data_list.insert(0, task)
+		v_box_container.reorder_child_to(t, 0, false)
 		separator_index += 1
 		task_cnt += 1
 	
@@ -429,6 +429,63 @@ func agent_reorder_task(id: int, new_position: int) -> bool:
 	_unlock_module()
 	return true
 
+## Agent API: 设置任务截止时间
+## @param id: 任务 ID
+## @param due_timestamp: 截止时间戳（Unix时间戳）
+## @return: 是否成功
+func agent_set_task_due_time(id: int, due_timestamp: int) -> bool:
+	_lock_module()
+	var task_data = get_task_from_id(id)
+	if task_data == null:
+		print("[%s]Error: Task with id %d not found" % [self.name, id])
+		_unlock_module()
+		return false
+
+	# 更新任务数据
+	task_data.due_timestamp = due_timestamp
+
+	# 更新UI显示
+	var item = _get_task_item_from_id(id)
+	if item != null:
+		item.due_time_label.text = task_data.get_formatted_due_time()
+		item.due_time_label.visible = true
+		# 检查并更新过期状态
+		item._check_and_update_overdue_status()
+
+	print("[%s]Task %d due time set to %d" % [self.name, id, due_timestamp])
+	_unlock_module()
+	return true
+
+## Agent API: 获取过期任务列表
+## @return: 过期任务信息数组
+func agent_get_overdue_tasks() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var now = Time.get_unix_time_from_system()
+
+	for task_data in all_tasks_data_list:
+		if task_data.due_timestamp > 0 and now > task_data.due_timestamp and not task_data.is_completed:
+			result.append({
+				"id": task_data.id,
+				"title": task_data.title,
+				"is_completed": task_data.is_completed,
+				"due_timestamp": task_data.due_timestamp,
+				"finish_timestamp": task_data.finish_timestamp,
+				"overdue_seconds": now - task_data.due_timestamp
+			})
+
+	return result
+
+## Agent API: 检查任务是否过期
+## @param id: 任务 ID
+## @return: 是否过期（如果任务不存在或没有截止时间，返回 false）
+func agent_is_task_overdue(id: int) -> bool:
+	var task_data = get_task_from_id(id)
+	if task_data == null or task_data.due_timestamp == 0:
+		return false
+
+	var now = Time.get_unix_time_from_system()
+	return now > task_data.due_timestamp and not task_data.is_completed
+
 #============Agent API END===========
 
 #============内部辅助方法===========
@@ -733,25 +790,21 @@ func _on_task_state_changed(item: InnerPanel):
 		
 		print("[%s]Task(id: %s) marked as completed" % [self.name, task_data.id])
 	else:
-		# 任务被标记为未完成 - 移动到分隔符之前的末尾
+		# 任务被标记为未完成 - 移动到第一个位置
 		var moved_task = all_tasks_data_list[data_index]
-		
-		# 计算插入位置（在移除之前）
-		# 如果任务在分隔符之后（已完成区域），插入位置就是当前的 separator_index
-		var insert_index = separator_index
-		
+
+		# 从原位置移除，插入到第一个位置
 		all_tasks_data_list.remove_at(data_index)
-		all_tasks_data_list.insert(insert_index, moved_task)
-		
+		all_tasks_data_list.insert(0, moved_task)
+
 		# 更新计数
 		finished_task_cnt -= 1
 		task_cnt += 1
 		separator_index += 1
-		
-		# 移动UI到分隔符前
-		if separator_index <= v_box_container.get_child_count():
-			v_box_container.reorder_child_by_index(ui_index, separator_index)
-		
+
+		# 移动UI到第一个位置
+		v_box_container.reorder_child_by_index(ui_index, 0)
+
 		print("[%s]Task(id: %s) marked as not completed" % [self.name, task_data.id])
 	
 	_is_programmatic_reorder = false

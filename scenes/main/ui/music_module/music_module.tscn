@@ -741,19 +741,17 @@ metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer"]
-visible = false
 material = SubResource("ShaderMaterial_tooop")
 custom_minimum_size = Vector2(288, 365)
-anchors_preset = 8
-anchor_left = 0.5
+anchors_preset = 6
+anchor_left = 1.0
 anchor_top = 0.5
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -144.0
+offset_left = -288.0
 offset_top = -182.5
-offset_right = 144.0
 offset_bottom = 182.5
-grow_horizontal = 2
+grow_horizontal = 0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7nmkm")
 script = ExtResource("12_2p7cx")
