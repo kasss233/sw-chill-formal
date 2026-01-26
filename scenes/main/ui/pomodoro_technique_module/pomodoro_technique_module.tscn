@@ -76,31 +76,9 @@ background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
 [node name="PomodoroTechniqueModule" type="MarginContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 48.0
+offset_bottom = 48.0
 script = ExtResource("1_176ir")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="GuiTransition" type="Node" parent="CanvasLayer"]
-script = ExtResource("1_j5njq")
-auto_start = 0
-animation_enter = 2
-animation_leave = 2
-duration = 0.41
-transition_type = "BACK"
-layout = NodePath("../PomodoroTechnique")
-layout_id = "pomodorotechnique"
-metadata/_custom_type_script = "uid://bimelmc1ce1b2"
-
-[node name="PomodoroTechnique" parent="CanvasLayer" instance=ExtResource("2_d16ot")]
-offset_left = 817.0
-offset_top = -3.0
-offset_right = 5.0
-offset_bottom = -311.0
 
 [node name="pomodoro_button" type="Button" parent="."]
 clip_contents = true
@@ -121,9 +99,23 @@ states = Array[ExtResource("4_176ir")]([SubResource("Resource_x41pg"), SubResour
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[connection signal="work_completed" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_completed"]
-[connection signal="work_continued" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_continued"]
-[connection signal="work_paused" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_paused"]
-[connection signal="work_started" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_started"]
-[connection signal="work_stopped" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_stopped"]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GuiTransition" type="Node" parent="CanvasLayer"]
+script = ExtResource("1_j5njq")
+auto_start = 0
+animation_enter = 2
+animation_leave = 2
+duration = 0.41
+transition_type = "BACK"
+layout = NodePath("../PomodoroTechnique")
+layout_id = "pomodorotechnique"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[node name="PomodoroTechnique" parent="CanvasLayer" instance=ExtResource("2_d16ot")]
+offset_left = 817.0
+offset_top = -3.0
+offset_right = 5.0
+offset_bottom = -311.0
+
 [connection signal="state_changed" from="pomodoro_button" to="." method="_on_pomodoro_button_state_changed"]

@@ -1,6 +1,11 @@
 class_name TaskModule
 extends Control
 
+# 信号定义
+signal task_completed(task_id: int, task_title: String)  # 任务完成信号
+signal task_deadline_reached(task_id: int, task_title: String)  # 截止时间到信号
+signal task_deadline_warning(task_id: int, task_title: String)  # 截止时间剩余15分钟警告信号
+
 @export var task_item: PackedScene
 @onready var scroll_container: ScrollContainer = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer
 @onready var v_box_container: ReorderableVBox = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer
@@ -68,6 +73,9 @@ func add_task(task: TaskData) -> void:
 	t.content_changed.connect(_on_task_item_content_changed)
 	t.delete_requested.connect(_on_item_delete_requested)
 	t.state_changed.connect(_on_task_state_changed)
+	t.task_completed.connect(_on_task_completed)
+	t.task_deadline_reached.connect(_on_task_deadline_reached)
+	t.task_deadline_warning.connect(_on_task_deadline_warning)
 	
 	# 播放添加动画
 	_play_add_animation(t)
@@ -818,3 +826,21 @@ func _on_separator_toggled(toggled_on: bool) -> void:
 		var child = v_box_container.get_child(i)
 		if child.has_method("set_task"):
 			child.visible = toggled_on
+
+## 任务完成信号处理
+func _on_task_completed(item: InnerPanel) -> void:
+	if item.task_data:
+		task_completed.emit(item.task_data.id, item.task_data.title)
+		print("[%s]Task completed signal forwarded: id=%d, title=%s" % [self.name, item.task_data.id, item.task_data.title])
+
+## 截止时间到信号处理
+func _on_task_deadline_reached(item: InnerPanel) -> void:
+	if item.task_data:
+		task_deadline_reached.emit(item.task_data.id, item.task_data.title)
+		print("[%s]Task deadline reached signal forwarded: id=%d, title=%s" % [self.name, item.task_data.id, item.task_data.title])
+
+## 截止时间剩余15分钟警告信号处理
+func _on_task_deadline_warning(item: InnerPanel) -> void:
+	if item.task_data:
+		task_deadline_warning.emit(item.task_data.id, item.task_data.title)
+		print("[%s]Task deadline warning signal forwarded: id=%d, title=%s" % [self.name, item.task_data.id, item.task_data.title])

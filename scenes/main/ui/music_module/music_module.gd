@@ -47,6 +47,8 @@ var option_board_opened: bool = false
 var _updating_button_state: bool = false
 ## Agent 操作锁定标志
 var is_agent_operating: bool = false
+## UI 引用（用于层级管理）
+@export var _ui: UI = null
 
 func _ready() -> void:
 	_init_managers()
@@ -383,6 +385,8 @@ func _on_mode_button_pressed() -> void:
 		MusicState.cycle_play_mode()
 
 func _on_tab_button_pressed() -> void:
+	_request_top_layer()
+
 	if frosted_panel.visible:
 		GuiTransitions.hide("musiclist")
 	else:
@@ -528,6 +532,24 @@ func _play_next_by_mode() -> void:
 			current_list.play_single_music()
 
 # --- Agent API ---
+
+## 请求新的顶层层级
+func _request_top_layer() -> void:
+	if _ui:
+		canvas_layer.layer = _ui.request_top_layer()
+	else:
+		# 降级方案：使用固定的高层级
+		canvas_layer.layer = 100
+
+func show_module():
+	if !frosted_panel.visible:
+		# 请求新的顶层层级
+		_request_top_layer()
+		GuiTransitions.show("musiclist")
+
+func hide_module():
+	if frosted_panel.visible:
+		GuiTransitions.hide("musiclist")
 
 func agent_play_music(music_name: String) -> bool:
 	_lock_module()

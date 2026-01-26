@@ -61,13 +61,16 @@ void fragment() {
 
 	// Mix Tint
 	vec4 panel_color = mix(screen_color, tint_color, tint_color.a);
-	
+
 	// Border Logic with adaptive anti-aliasing
-	float border_edge = abs(panel_dist + border_width * 0.5);
-	float border_width_aa = fwidth(border_edge) * 1.0;
-	float border_mask = 1.0 - smoothstep(border_width - border_width_aa, border_width + border_width_aa, border_edge);
-	panel_color.rgb = mix(panel_color.rgb, border_color.rgb, border_mask * border_color.a * panel_alpha);
-	
+	// 只有当边框宽度大于0.01时才渲染边框
+	if (border_width > 0.01) {
+		float border_edge = abs(panel_dist + border_width * 0.5);
+		float border_width_aa = fwidth(border_edge) * 1.0;
+		float border_mask = 1.0 - smoothstep(border_width - border_width_aa, border_width + border_width_aa, border_edge);
+		panel_color.rgb = mix(panel_color.rgb, border_color.rgb, border_mask * border_color.a * panel_alpha);
+	}
+
 	// Combine: shadow behind, panel on top
 	vec3 final_color = shadow_color.rgb;
 	float final_alpha = shadow_alpha;

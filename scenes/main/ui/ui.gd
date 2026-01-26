@@ -17,6 +17,13 @@ signal env_weather_changed(mode: int)
 ## 角色互动
 signal character_interacted
 
+## 任务完成信号
+signal task_completed(task_id: int, task_title: String)
+## 截止时间到信号
+signal task_deadline_reached(task_id: int, task_title: String)
+## 截止时间剩余15分钟警告信号
+signal task_deadline_warning(task_id: int, task_title: String)
+
 # --- 节点引用 ---
 ## 音乐管理模块
 @export var music_module: MusicModule
@@ -25,7 +32,13 @@ signal character_interacted
 @export var task_module: TaskModule
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
-@onready var input_box: InputBox = $InputBox
+@onready var dialogue_box: DialogueBox = $VBoxContainer/DialogueBox
+@onready var input_box: InputBox = $VBoxContainer/InputBox
+
+# --- 层级管理 ---
+## 当前最高层级（用于模块 Z-order 管理）
+var _current_top_layer: int = 10
+
 
 # --- 内置函数 ---
 func _ready() -> void:
@@ -50,6 +63,12 @@ func _connect_signals() -> void:
 	if MusicState:
 		MusicState.track_changed.connect(_on_track_changed)
 		MusicState.playback_state_changed.connect(_on_playback_state_changed)
+
+	# 连接 TaskModule 信号
+	if task_module:
+		task_module.task_completed.connect(_on_task_completed)
+		task_module.task_deadline_reached.connect(_on_task_deadline_reached)
+		task_module.task_deadline_warning.connect(_on_task_deadline_warning)
 
 # --- 公有 API (音乐模块包装) ---
 ## 添加一个新的音乐列表
@@ -125,10 +144,7 @@ func take_note(text: String):
 ## 添加新的notebook页面
 func add_note_in_notebook(_name: String, _content: String):
 	note_book.add_page_and_open(_name, _content)
-	note_book.focus_mode = Control.FOCUS_CLICK
-## 添加任务
-func add_task(_task_name: String):
-	task_module.agent_add_task(_task_name)
+
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
 func set_env_weather(mode: int) -> void:
 	if env_setter:
@@ -138,14 +154,85 @@ func set_env_weather(mode: int) -> void:
 func set_env_time(mode: int) -> void:
 	if env_setter:
 		env_setter.set_time(mode)
+
+# --- 公有 API (任务模块包装) ---
+## Agent API: 添加新任务（带动画）
+## @param title: 任务标题
+## @param due_timestamp: 截止时间戳（可选）
+## @return: 新任务的 ID
+func agent_add_task(title: String, due_timestamp: int = 0) -> int:
+	if task_module:
+		return task_module.agent_add_task(title, due_timestamp)
+	return -1
+
+## Agent API: 修改任务名称（模拟打字效果）
+## @param id: 任务 ID
+## @param new_title: 新标题
+## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
+## @return: 是否成功
+func agent_update_task_title(id: int, new_title: String, typing_speed: float = 0.05) -> bool:
+	if task_module:
+		return await task_module.agent_update_task_title(id, new_title, typing_speed)
+	return false
+
+## Agent API: 标记任务完成状态
+## @param id: 任务 ID
+## @param completed: 是否完成
+## @return: 是否成功
+func agent_mark_task_completed(id: int, completed: bool) -> bool:
+	if task_module:
+		return task_module.agent_mark_task_completed(id, completed)
+	return false
+
+## Agent API: 删除任务
+## @param id: 任务 ID
+## @return: 是否成功
+func agent_remove_task(id: int) -> bool:
+	if task_module:
+		return task_module.agent_remove_task(id)
+	return false
+
+## Agent API: 获取任务信息
+## @param id: 任务 ID
+## @return: 任务信息字典
+func agent_get_task_info(id: int) -> Dictionary:
+	if task_module:
+		return task_module.agent_get_task_info(id)
+	return {}
+
+## Agent API: 获取所有任务信息
+## @return: 任务信息数组
+func agent_get_all_tasks() -> Array[Dictionary]:
+	if task_module:
+		return task_module.agent_get_all_tasks()
+	return []
+
+## 显示任务模块
+func show_task_module() -> void:
+	if task_module:
+		task_module.show_module()
+
+## 隐藏任务模块
+func hide_task_module() -> void:
+	if task_module:
+		task_module.hide_module()
+
 # --- 测试面板控制 ---
 ## 切换测试面板显示/隐藏
 func toggle_test_panel() -> void:
 	if test_panel:
 		test_panel.visible = !test_panel.visible
-		print("[UI] 测试面板状态: %s" % ("显示" if test_panel.visible else "隐藏"))
-	else:
-		print("[UI] 警告: 测试面板未设置")
+
+# --- 层级管理 ---
+## 请求一个新的顶层层级（用于模块打开时自动置顶）
+## @return 新的层级值
+func request_top_layer() -> int:
+	_current_top_layer += 1
+	return _current_top_layer
+
+## 重置层级计数器（可选，用于防止层级值过大）
+func reset_layer_counter() -> void:
+	_current_top_layer = 10
 
 ## 显示测试面板
 func show_test_panel() -> void:
@@ -174,6 +261,16 @@ func _on_env_setter_env_time_changed(mode: int) -> void:
 
 func _on_character_interactor_character_interacted() -> void:
 	character_interacted.emit()
+
+# --- TaskModule 信号回调 ---
+func _on_task_completed(task_id: int, task_title: String) -> void:
+	task_completed.emit(task_id, task_title)
+
+func _on_task_deadline_reached(task_id: int, task_title: String) -> void:
+	task_deadline_reached.emit(task_id, task_title)
+
+func _on_task_deadline_warning(task_id: int, task_title: String) -> void:
+	task_deadline_warning.emit(task_id, task_title)
 
 # --- 番茄钟回调 ---
 signal work_completed
