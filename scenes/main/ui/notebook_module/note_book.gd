@@ -8,6 +8,7 @@ extends Control
 @export var vbox: VBoxContainer
 @export var inner_panel: InnerPanel
 @export var panel: FrostedPanel
+@export var button: MaterialToggleButton
 ## 数组变量，保存pagebutton名称
 var page_names: Array[String] = []
 ## 保存页面按钮和对应的页面内容
@@ -24,14 +25,13 @@ func _ready() -> void:
 
 
 func add_page_and_open(_name: String, _content: String) -> void:
-	if !panel.visible:
-		GuiTransitions.show("notebook")
+	if button.current_state == 0:
+		button.set_state(1)
 	var new_page_button = add_page(_name)
 	# 设置页面内容
 	pages[new_page_button] = _content
 	# 自动打开新添加的页面
 	change_page(_name, new_page_button, true)
-
 
 func add_page(_name: String) -> PageButton:
 	var new_page_button = page_button.instantiate() as PageButton
@@ -63,6 +63,7 @@ func change_page(_name: String, btn: PageButton, animate: bool = false) -> void:
 		new_page.set_text(pages[btn], animate)
 	else:
 		new_page.set_text("", animate)
+
 func _on_add_button_pressed() -> void:
 	var base_name = "新页面"
 	var new_name = base_name
@@ -105,8 +106,9 @@ func _on_page_removed(_name: String, btn: PageButton) -> void:
 	if btn.get_parent():
 		btn.get_parent().remove_child(btn)
 	btn.queue_free()
-func _on_material_button_pressed() -> void:
-	if panel.visible:
-		GuiTransitions.hide("notebook")
-	else:
-		GuiTransitions.show("notebook")
+
+
+func _on_material_button_state_changed(_old_state: int, new_state: int) -> void:
+	match new_state:
+		0: GuiTransitions.hide("notebook")
+		1: GuiTransitions.show("notebook")

@@ -139,15 +139,20 @@ func start_rest() -> void:
 	_update_status_display()
 	rest_started.emit()
 	print("休息开始 [", current_loop, "/", total_loops, "]: ", rest_duration, "分钟")
-
+signal work_paused
+signal work_continued
 func toggle_pause() -> void:
 	if is_running:
 		timer.stop()
 		is_running = false
+		if is_work_mode:
+			work_paused.emit()
 	else:
 		if remaining_seconds > 0:
 			timer.start()
 			is_running = true
+			if is_work_mode:
+				work_continued.emit()
 
 func stop_timer() -> void:
 	timer.stop()
@@ -205,14 +210,15 @@ func get_current_mode_progress() -> float:
 	return _get_progress()
 
 # 按钮回调
+
 func _on_pause_button_state_changed(old_state: int, new_state: int) -> void:
 	toggle_pause()
-
+signal work_stopped
 func _on_stop_button_pressed() -> void:
 	stop_timer()
 	_idle_view();
-	
 	print("计时器已停止")
+	work_stopped.emit()
 
 # 启动番茄钟（带循环次数）
 func pomodoro_start(_work_duration: int, _rest_duration: int, _loop_times: int) -> void:

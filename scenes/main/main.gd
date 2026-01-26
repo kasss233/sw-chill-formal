@@ -109,3 +109,23 @@ func _on_ui_character_interacted() -> void:
 		6:
 			character.set_disbelief_pose()
 	cur_pose = (cur_pose + 1) % 7
+
+
+func _on_ui_work_completed() -> void:
+	character.set_typing_pose(false)
+
+
+func _on_ui_work_started() -> void:
+	character.set_typing_pose(true)
+
+
+func _on_ui_work_paused() -> void:
+	character.set_typing_pose(false)
+
+
+func _on_ui_work_stopped() -> void:
+	character.set_typing_pose(false)
+
+
+func _on_ui_work_continued() -> void:
+	character.set_typing_pose(true)

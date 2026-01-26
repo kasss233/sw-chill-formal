@@ -103,7 +103,7 @@ shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(446, 432)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
 content_margin_left = 12.0
@@ -192,7 +192,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="NoteBook" type="MarginContainer" node_paths=PackedStringArray("vbox", "inner_panel", "panel")]
+[node name="NoteBook" type="MarginContainer" node_paths=PackedStringArray("vbox", "inner_panel", "panel", "button")]
 offset_right = 36.0
 offset_bottom = 36.0
 script = ExtResource("1_00gxi")
@@ -201,6 +201,7 @@ page = ExtResource("3_mq1iw")
 vbox = NodePath("CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/ScrollContainer/VBoxContainer")
 inner_panel = NodePath("CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/InnerPanel")
 panel = NodePath("CanvasLayer/FrostedPanel")
+button = NodePath("MaterialButton")
 
 [node name="MaterialButton" type="Button" parent="."]
 clip_contents = true
@@ -299,5 +300,5 @@ layout = NodePath("../CanvasLayer/FrostedPanel")
 layout_id = "notebook"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
-[connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
+[connection signal="state_changed" from="MaterialButton" to="." method="_on_material_button_state_changed"]
 [connection signal="pressed" from="CanvasLayer/FrostedPanel/VBoxContainer/AddButton" to="." method="_on_add_button_pressed"]

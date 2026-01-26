@@ -125,7 +125,10 @@ func take_note(text: String):
 ## 添加新的notebook页面
 func add_note_in_notebook(_name: String, _content: String):
 	note_book.add_page_and_open(_name, _content)
-
+	note_book.focus_mode = Control.FOCUS_CLICK
+## 添加任务
+func add_task(_task_name: String):
+	task_module.agent_add_task(_task_name)
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
 func set_env_weather(mode: int) -> void:
 	if env_setter:
@@ -135,7 +138,6 @@ func set_env_weather(mode: int) -> void:
 func set_env_time(mode: int) -> void:
 	if env_setter:
 		env_setter.set_time(mode)
-
 # --- 测试面板控制 ---
 ## 切换测试面板显示/隐藏
 func toggle_test_panel() -> void:
@@ -172,3 +174,24 @@ func _on_env_setter_env_time_changed(mode: int) -> void:
 
 func _on_character_interactor_character_interacted() -> void:
 	character_interacted.emit()
+
+# --- 番茄钟回调 ---
+signal work_completed
+func _on_pomodoro_technique_module_work_completed() -> void:
+	work_completed.emit()
+
+signal work_started
+func _on_pomodoro_technique_module_work_started() -> void:
+	work_started.emit()
+
+signal work_paused
+func _on_pomodoro_technique_module_work_paused() -> void:
+	work_paused.emit()
+
+signal work_stopped
+func _on_pomodoro_technique_module_work_stopped() -> void:
+	work_stopped.emit()
+
+signal work_continued
+func _on_pomodoro_technique_module_work_continued() -> void:
+	work_continued.emit()

@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://cbc5vls45q8b8" path="res://assets/ui/icons/alarm_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="5_inigl"]
 [ext_resource type="Texture2D" uid="uid://dxba6ufkchx8g" path="res://assets/ui/icons/alarm_24dp.svg" id="6_t05ik"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_by32n"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_176ir"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -19,7 +19,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_176ir"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inigl"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -30,7 +30,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inigl"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t05ik"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -41,7 +41,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t05ik"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n4djj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -52,7 +52,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n4djj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0l40p"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -111,14 +111,19 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_by32n")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_176ir")
-theme_override_styles/hover = SubResource("StyleBoxFlat_inigl")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_t05ik")
-theme_override_styles/focus = SubResource("StyleBoxFlat_n4djj")
+theme_override_styles/normal = SubResource("StyleBoxFlat_176ir")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_inigl")
+theme_override_styles/hover = SubResource("StyleBoxFlat_t05ik")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_n4djj")
+theme_override_styles/focus = SubResource("StyleBoxFlat_0l40p")
 script = ExtResource("3_by32n")
 states = Array[ExtResource("4_176ir")]([SubResource("Resource_x41pg"), SubResource("Resource_l545r")])
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
+[connection signal="work_completed" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_completed"]
+[connection signal="work_continued" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_continued"]
+[connection signal="work_paused" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_paused"]
+[connection signal="work_started" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_started"]
+[connection signal="work_stopped" from="CanvasLayer/PomodoroTechnique" to="." method="_on_pomodoro_technique_work_stopped"]
 [connection signal="state_changed" from="pomodoro_button" to="." method="_on_pomodoro_button_state_changed"]

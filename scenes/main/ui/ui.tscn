@@ -25,7 +25,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_hnkmo")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tnos5"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uypi5"]
 shader = ExtResource("7_vb4k3")
 shader_parameter/corner_radius = 32.0
 shader_parameter/border_width = 1.0
@@ -40,7 +40,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(88, 348)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -52,7 +52,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -63,7 +63,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -74,7 +74,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -85,7 +85,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -96,7 +96,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rx81l"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -147,9 +147,9 @@ offset_bottom = 148.0
 grow_vertical = 2
 
 [node name="FrostedPanel" type="PanelContainer" parent="TabPanel"]
-material = SubResource("ShaderMaterial_tnos5")
+material = SubResource("ShaderMaterial_uypi5")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_w2hwp")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tnos5")
 script = ExtResource("3_hkhhe")
 corner_radius = 32.0
 noise_texture = SubResource("NoiseTexture2D_a7tfl")
@@ -177,11 +177,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_3ru4j")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_uumow")
-theme_override_styles/hover = SubResource("StyleBoxFlat_djxf0")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_87oeu")
-theme_override_styles/focus = SubResource("StyleBoxFlat_rx81l")
+theme_override_styles/normal = SubResource("StyleBoxFlat_w2hwp")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3ru4j")
+theme_override_styles/hover = SubResource("StyleBoxFlat_uumow")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_djxf0")
+theme_override_styles/focus = SubResource("StyleBoxFlat_87oeu")
 script = ExtResource("5_uypi5")
 states = Array[ExtResource("6_tnos5")]([SubResource("Resource_ln37o"), SubResource("Resource_mnnl2")])
 button_size = 3
@@ -228,6 +228,7 @@ offset_right = 642.0
 offset_bottom = 115.0
 
 [node name="TestPanel" parent="." node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
+visible = false
 layout_mode = 0
 offset_left = 75.0
 offset_top = 1.0
@@ -236,6 +237,7 @@ offset_bottom = 415.0
 ui = NodePath("..")
 
 [node name="DialogueBox" parent="." instance=ExtResource("15_khr3h")]
+visible = false
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -251,4 +253,9 @@ grow_vertical = 0
 
 [connection signal="env_time_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]
 [connection signal="env_weather_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_weather_changed"]
+[connection signal="work_completed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_completed"]
+[connection signal="work_continued" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_continued"]
+[connection signal="work_paused" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_paused"]
+[connection signal="work_started" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_started"]
+[connection signal="work_stopped" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_stopped"]
 [connection signal="character_interacted" from="CharacterInteractor" to="." method="_on_character_interactor_character_interacted"]
