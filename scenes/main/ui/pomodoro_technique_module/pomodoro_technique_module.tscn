@@ -97,10 +97,8 @@ layout_id = "pomodorotechnique"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [node name="PomodoroTechnique" parent="CanvasLayer" instance=ExtResource("2_d16ot")]
-offset_left = 817.0
-offset_top = -3.0
-offset_right = 5.0
-offset_bottom = -311.0
+offset_left = 168.0
+offset_right = -644.0
 
 [node name="pomodoro_button" type="Button" parent="."]
 clip_contents = true

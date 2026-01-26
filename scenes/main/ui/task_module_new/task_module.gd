@@ -16,6 +16,8 @@ func _on_todo_button_state_changed(old_state: int, new_state: int) -> void:
 # --- Agent API 转发方法 ---
 ## Agent API: 添加新任务（带动画）
 func agent_add_task(title: String, due_timestamp: int = 0) -> int:
+	if !task_module_new.visible:
+		GuiTransitions.show("task")
 	return task_module_new.agent_add_task(title, due_timestamp)
 
 ## Agent API: 修改任务名称（模拟打字效果）

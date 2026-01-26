@@ -23,6 +23,7 @@ AudioPlayer="*res://scenes/main/audio_player/audio_player.tscn"
 
 [display]
 
+window/size/mode=3
 window/stretch/mode="canvas_items"
 
 [editor_plugins]

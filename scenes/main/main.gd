@@ -89,7 +89,7 @@ func _on_ui_env_weather_changed(mode: int) -> void:
 		3:
 			set_env_weather_sync()
 
-var cur_pose = 0;
+var cur_pose = 4;
 func _on_ui_character_interacted() -> void:
 	# rand2
 	#var rand = randi() % 7
@@ -108,7 +108,7 @@ func _on_ui_character_interacted() -> void:
 			character.set_angry_pose()
 		6:
 			character.set_disbelief_pose()
-	cur_pose = (cur_pose + 1) % 7
+	#cur_pose = (cur_pose + 1) % 7
 
 
 func _on_ui_work_completed() -> void:

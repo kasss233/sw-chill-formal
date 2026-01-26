@@ -268,6 +268,7 @@ func mark_task_as_uncompleted(id: int) -> void:
 ## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
 ## @return: 新任务的 ID
 func agent_add_task(title: String, due_timestamp: int = 0, typing_speed: float = 0.05) -> int:
+	
 	var new_id = _generate_task_id()
 
 	# 先创建空标题的任务
