@@ -165,8 +165,9 @@ theme_override_constants/margin_bottom = 8
 [node name="VBoxContainer" type="VBoxContainer" parent="TabPanel/FrostedPanel/MarginContainer"]
 layout_mode = 2
 
-[node name="TaskModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("4_khr3h")]
+[node name="TaskModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" node_paths=PackedStringArray("_ui") instance=ExtResource("4_khr3h")]
 layout_mode = 2
+_ui = NodePath("../../../../..")
 
 [node name="NoteButton" type="Button" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer"]
 clip_contents = true
@@ -187,19 +188,23 @@ states = Array[ExtResource("6_tnos5")]([SubResource("Resource_ln37o"), SubResour
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="NoteModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("8_3ru4j")]
+[node name="NoteModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" node_paths=PackedStringArray("_ui") instance=ExtResource("8_3ru4j")]
 layout_mode = 2
+_ui = NodePath("../../../../..")
 
-[node name="NoteBook" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("9_uumow")]
+[node name="NoteBook" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" node_paths=PackedStringArray("_ui") instance=ExtResource("9_uumow")]
 layout_mode = 2
+_ui = NodePath("../../../../..")
 
-[node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("4_ex8bf")]
+[node name="PomodoroTechniqueModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" node_paths=PackedStringArray("_ui") instance=ExtResource("11_uypi5")]
 layout_mode = 2
+_ui = NodePath("../../../../..")
 
-[node name="PomodoroTechniqueModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" instance=ExtResource("11_uypi5")]
+[node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" node_paths=PackedStringArray("_ui") instance=ExtResource("4_ex8bf")]
 layout_mode = 2
+_ui = NodePath("../../../../..")
 
-[node name="InputBox" parent="." instance=ExtResource("6_nswco")]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -207,18 +212,26 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -158.0
-offset_top = -76.0
+offset_top = -218.0
 offset_right = 158.0
-offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 0
+alignment = 2
 
-[node name="MusicModule" parent="." instance=ExtResource("1_2q31f")]
+[node name="DialogueBox" parent="VBoxContainer" instance=ExtResource("15_khr3h")]
+layout_mode = 2
+
+[node name="InputBox" parent="VBoxContainer" instance=ExtResource("6_nswco")]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="MusicModule" parent="." node_paths=PackedStringArray("_ui") instance=ExtResource("1_2q31f")]
 layout_mode = 1
 offset_left = 799.0
 offset_top = -77.0
 offset_right = 1133.0
 offset_bottom = -12.0
+_ui = NodePath("..")
 
 [node name="CharacterInteractor" parent="." instance=ExtResource("5_fhd3w")]
 layout_mode = 0
@@ -234,21 +247,6 @@ offset_top = 1.0
 offset_right = 381.0
 offset_bottom = 415.0
 ui = NodePath("..")
-
-[node name="DialogueBox" parent="." instance=ExtResource("15_khr3h")]
-visible = false
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -174.0
-offset_top = -257.0
-offset_right = 174.0
-offset_bottom = -113.0
-grow_horizontal = 2
-grow_vertical = 0
 
 [connection signal="env_time_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]
 [connection signal="env_weather_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_weather_changed"]

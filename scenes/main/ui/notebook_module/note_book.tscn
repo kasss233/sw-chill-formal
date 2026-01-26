@@ -300,5 +300,6 @@ layout = NodePath("../CanvasLayer/FrostedPanel")
 layout_id = "notebook"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
+[connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]
 [connection signal="state_changed" from="MaterialButton" to="." method="_on_material_button_state_changed"]
 [connection signal="pressed" from="CanvasLayer/FrostedPanel/VBoxContainer/AddButton" to="." method="_on_add_button_pressed"]

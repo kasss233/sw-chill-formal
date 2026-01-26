@@ -124,7 +124,7 @@ var _arc_rotation: float = 0.0      # 整体旋转角度
 var _arc_sweep: float = 0.0         # 弧扫过的角度 (0-1 of TAU)
 
 # 圆弧绘制参数
-const ARC_POINTS: int = 64  # 圆弧绘制点数
+const ARC_POINTS: int = 128  # 圆弧绘制点数（增加以改善抗锯齿效果）
 
 ## ==================== 生命周期 ====================
 
@@ -279,39 +279,25 @@ func _draw_ring_with_caps(center: Vector2, inner_r: float, outer_r: float, start
 	var end_cap_center = center + Vector2(cos(end_angle), sin(end_angle)) * mid_r
 	_draw_circle(end_cap_center, cap_radius, color)
 
-## 绘制圆形
+## 绘制圆形（使用抗锯齿）
 func _draw_circle(center: Vector2, radius: float, color: Color) -> void:
-	var points: PackedVector2Array = []
-	var segments = 16
+	# 使用Godot内置的draw_circle方法，自带抗锯齿
+	draw_circle(center, radius, color)
 
-	for i in range(segments):
-		var angle = TAU * float(i) / segments
-		points.append(center + Vector2(cos(angle), sin(angle)) * radius)
-
-	if points.size() >= 3:
-		draw_colored_polygon(points, color)
-
-## 绘制圆环扇形
+## 绘制圆环扇形（优化抗锯齿）
 func _draw_ring(center: Vector2, inner_r: float, outer_r: float, start_angle: float, end_angle: float, color: Color) -> void:
 	if inner_r <= 0 or outer_r <= inner_r:
 		return
 
-	var points: PackedVector2Array = []
 	var angle_range = end_angle - start_angle
-	var steps = maxi(int(abs(angle_range) / TAU * ARC_POINTS), 8)
+	var steps = maxi(int(abs(angle_range) / TAU * ARC_POINTS), 16)
 
-	# 外圈点（从 start 到 end）
-	for i in range(steps + 1):
-		var angle = start_angle + angle_range * (float(i) / steps)
-		points.append(center + Vector2(cos(angle), sin(angle)) * outer_r)
+	# 计算圆环的中心半径和宽度
+	var mid_radius = (inner_r + outer_r) / 2.0
+	var ring_width = outer_r - inner_r
 
-	# 内圈点（从 end 到 start，反向）
-	for i in range(steps + 1):
-		var angle = end_angle - angle_range * (float(i) / steps)
-		points.append(center + Vector2(cos(angle), sin(angle)) * inner_r)
-
-	if points.size() >= 3:
-		draw_colored_polygon(points, color)
+	# 使用draw_arc绘制圆环中心线，宽度为圆环宽度，自带抗锯齿
+	draw_arc(center, mid_radius, start_angle, end_angle, steps, color, ring_width, true)
 
 ## ==================== 动画控制 ====================
 

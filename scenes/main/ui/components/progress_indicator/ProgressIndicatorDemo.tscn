@@ -125,6 +125,7 @@ size_flags_horizontal = 4
 script = ExtResource("2_progress")
 indicator_type = 1
 progress_mode = 1
+track_thickness = 7
 
 [node name="ControlPanel" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2

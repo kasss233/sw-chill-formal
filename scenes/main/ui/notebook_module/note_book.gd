@@ -8,6 +8,11 @@ extends Control
 @export var vbox: VBoxContainer
 @export var inner_panel: InnerPanel
 @export var panel: FrostedPanel
+## UI 引用（用于层级管理）
+@export var _ui: UI = null
+
+@onready var canvas_layer: CanvasLayer = $CanvasLayer
+
 @export var button: MaterialToggleButton
 ## 数组变量，保存pagebutton名称
 var page_names: Array[String] = []
@@ -19,12 +24,26 @@ var is_page_opened: bool = false
 func _ready() -> void:
 	panel.visible = false
 	inner_panel.visible = false
+	# 设置 CanvasLayer 的初始层级
+	canvas_layer.layer = 10
 	#add_page_and_open("123","dsadasdawdwa")
 	#panel.visible = true
-	#add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击“+”按钮添加新页面。")
+	#add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击"+"按钮添加新页面。")
+
+## 请求新的顶层层级
+func _request_top_layer() -> void:
+	if _ui:
+		canvas_layer.layer = _ui.request_top_layer()
+	else:
+		# 降级方案：使用固定的高层级
+		canvas_layer.layer = 100
 
 
 func add_page_and_open(_name: String, _content: String) -> void:
+	if !panel.visible:
+		# 请求新的顶层层级
+		_request_top_layer()
+		GuiTransitions.show("notebook")
 	if button.current_state == 0:
 		button.set_state(1)
 	var new_page_button = add_page(_name)
@@ -32,6 +51,7 @@ func add_page_and_open(_name: String, _content: String) -> void:
 	pages[new_page_button] = _content
 	# 自动打开新添加的页面
 	change_page(_name, new_page_button, true)
+
 
 func add_page(_name: String) -> PageButton:
 	var new_page_button = page_button.instantiate() as PageButton
@@ -107,8 +127,11 @@ func _on_page_removed(_name: String, btn: PageButton) -> void:
 		btn.get_parent().remove_child(btn)
 	btn.queue_free()
 
-
-func _on_material_button_state_changed(_old_state: int, new_state: int) -> void:
-	match new_state:
-		0: GuiTransitions.hide("notebook")
-		1: GuiTransitions.show("notebook")
+func _on_material_button_state_changed(old_state: int, new_state: int) -> void:
+	_request_top_layer()
+	if GuiTransitions.in_transition():
+		return
+	if new_state == 1:
+		GuiTransitions.show("notebook")
+	else:
+		GuiTransitions.hide("notebook")

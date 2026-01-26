@@ -8,6 +8,9 @@ signal content_changed(item: InnerPanel)
 signal drag_started(item: InnerPanel)
 signal drag_ended(item: InnerPanel)
 signal task_overdue(item: InnerPanel)  # 任务过期信号
+signal task_completed(item: InnerPanel)  # 任务完成信号
+signal task_deadline_reached(item: InnerPanel)  # 截止时间到信号
+signal task_deadline_warning(item: InnerPanel)  # 截止时间剩余15分钟警告信号
 
 @onready var complete_check_box: CheckBox = $MarginContainer/VBoxContainer/HBoxContainer/CompleteCheckBox
 @onready var due_time_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/DueTimeLabel
@@ -24,19 +27,25 @@ var is_editing: bool = false # 新增：用于判断当前状态
 
 var task_data: TaskData
 
+# 截止时间检查相关
+var deadline_check_timer: Timer = null
+var has_warned_15min: bool = false  # 是否已发出15分钟警告
+var has_warned_deadline: bool = false  # 是否已发出截止时间到警告
+var should_warn_15min: bool = false  # 是否应该发出15分钟警告（总时间>30分钟时为true）
+
 func _ready() -> void:
 	super._ready()  # 调用父类 InnerPanel 的 _ready()，确保 shader 初始化
-	
+
 	# 初始状态设置
-	mouse_filter = Control.MOUSE_FILTER_PASS 
-	
+	mouse_filter = Control.MOUSE_FILTER_PASS
+
 	# 初始化关闭编辑模式
-	_disable_edit_mode() 
-	
+	_disable_edit_mode()
+
 	# 阻止 CheckBox 的点击事件传递到父容器
 	if complete_check_box:
 		complete_check_box.mouse_filter = Control.MOUSE_FILTER_STOP
-	
+
 	# 连接关闭按钮信号
 	if close_button:
 		close_button.pressed.connect(_on_close_button_pressed)
@@ -48,6 +57,13 @@ func _ready() -> void:
 	# 连接长按定时器信号
 	if long_press_timer:
 		long_press_timer.timeout.connect(_on_long_press_timer_timeout)
+
+	# 创建并配置截止时间检查定时器
+	deadline_check_timer = Timer.new()
+	deadline_check_timer.wait_time = 60.0  # 每60秒检查一次
+	deadline_check_timer.autostart = false
+	deadline_check_timer.timeout.connect(_on_deadline_check_timer_timeout)
+	add_child(deadline_check_timer)
 
 func set_task(data: TaskData):
 	self.task_data = data
@@ -62,17 +78,37 @@ func set_task(data: TaskData):
 	line_edit.text = task_data.title
 	complete_check_box.button_pressed = task_data.is_completed
 
+	# 重置警告标志
+	has_warned_15min = false
+	has_warned_deadline = false
+	should_warn_15min = false
+
 	# 已完成任务不显示截止时间
 	if task_data.is_completed:
 		due_time_label.visible = false
+		# 停止定时器
+		if deadline_check_timer:
+			deadline_check_timer.stop()
 	# 没有设置截止时间时也不显示
 	elif task_data.due_timestamp == 0:
 		due_time_label.visible = false
+		# 停止定时器
+		if deadline_check_timer:
+			deadline_check_timer.stop()
 	else:
 		# 有截止时间且未完成，显示并检查过期状态
 		due_time_label.text = task_data.get_formatted_due_time()
 		due_time_label.visible = true
 		_check_and_update_overdue_status()
+
+		# 判断是否应该发出15分钟警告（检查当前剩余时间是否大于30分钟）
+		var now = Time.get_unix_time_from_system()
+		var time_remaining = task_data.due_timestamp - now
+		should_warn_15min = (time_remaining > 1800)
+
+		# 启动定时器
+		if deadline_check_timer:
+			deadline_check_timer.start()
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -168,6 +204,8 @@ func _on_complete_check_box_toggled(toggled_on: bool) -> void:
 		# 退出编辑模式
 		if is_editing:
 			_disable_edit_mode()
+		# 发出任务完成信号
+		task_completed.emit(self)
 	else:
 		# 取消完成
 		task_data.finish_timestamp = 0
@@ -303,7 +341,10 @@ func _show_datetime_picker() -> void:
 	dialog.set_custom_content(content)
 
 	# 添加取消按钮
-	dialog.add_button("取消")
+	var cancel_btn = dialog.add_button("取消")
+	cancel_btn.pressed.connect(func():
+		dialog.hide_dialog()
+	)
 
 	# 添加确定按钮
 	var confirm_btn = dialog.add_button("确定")
@@ -336,6 +377,19 @@ func _show_datetime_picker() -> void:
 		# 检查是否过期
 		_check_and_update_overdue_status()
 
+		# 重置警告标志（因为设置了新的截止时间）
+		has_warned_15min = false
+		has_warned_deadline = false
+
+		# 判断总时间是否大于30分钟（1800秒）
+		var now = Time.get_unix_time_from_system()
+		var total_time = new_timestamp - now
+		should_warn_15min = (total_time > 1800)
+
+		# 启动定时器
+		if deadline_check_timer and not task_data.is_completed:
+			deadline_check_timer.start()
+
 		# 触发内容变化信号
 		content_changed.emit(self)
 
@@ -343,6 +397,33 @@ func _show_datetime_picker() -> void:
 	)
 
 	dialog.show_dialog()
+
+## 截止时间检查定时器超时处理
+func _on_deadline_check_timer_timeout() -> void:
+	# 如果任务已完成或没有截止时间，停止定时器
+	if task_data.is_completed or task_data.due_timestamp == 0:
+		deadline_check_timer.stop()
+		return
+
+	var now = Time.get_unix_time_from_system()
+	var time_remaining = task_data.due_timestamp - now
+
+	# 检查是否到达截止时间
+	if time_remaining <= 0 and not has_warned_deadline:
+		has_warned_deadline = true
+		task_deadline_reached.emit(self)
+		print("[%s]Task(id: %s) deadline reached!" % [self.name, task_data.id])
+		# 更新过期状态显示
+		_check_and_update_overdue_status()
+		return
+
+	# 检查是否剩余15分钟（900秒）
+	# 只有当总时间大于30分钟时才发出15分钟警告
+	if not has_warned_15min and should_warn_15min:
+		if time_remaining <= 900 and time_remaining > 0:
+			has_warned_15min = true
+			task_deadline_warning.emit(self)
+			print("[%s]Task(id: %s) has 15 minutes remaining!" % [self.name, task_data.id])
 
 ## 检查并更新过期状态
 func _check_and_update_overdue_status() -> void:
