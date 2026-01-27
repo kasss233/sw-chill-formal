@@ -9,7 +9,8 @@ extends Node
 @export var TIME_OF_EVENING: float = 21
 @export var RAINY_LIGHT_ENERGY := 0.2
 @export var SUNNY_LIGHT_ENERGY := 0.7
-
+@export_category("项目演示")
+@export var animation_player:AnimationPlayer
 
 func _ready() -> void:
 	_init_time()
@@ -129,3 +130,7 @@ func _on_ui_work_stopped() -> void:
 
 func _on_ui_work_continued() -> void:
 	character.set_typing_pose(true)
+
+
+func _on_ui_text_submitted() -> void:
+	animation_player.play("notebook")

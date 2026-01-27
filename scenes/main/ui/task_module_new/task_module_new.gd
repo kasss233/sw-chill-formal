@@ -1,10 +1,10 @@
-class_name TaskModule
+
 extends Control
 
 # 信号定义
-signal task_completed(task_id: int, task_title: String)  # 任务完成信号
-signal task_deadline_reached(task_id: int, task_title: String)  # 截止时间到信号
-signal task_deadline_warning(task_id: int, task_title: String)  # 截止时间剩余15分钟警告信号
+signal task_completed(task_id: int, task_title: String) # 任务完成信号
+signal task_deadline_reached(task_id: int, task_title: String) # 截止时间到信号
+signal task_deadline_warning(task_id: int, task_title: String) # 截止时间剩余15分钟警告信号
 
 @export var task_item: PackedScene
 @onready var scroll_container: ScrollContainer = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer
@@ -48,7 +48,7 @@ func add_task(task: TaskData) -> void:
 	# 设置初始状态为不可见（用于动画）
 	t.modulate.a = 0.0
 	t.scale = Vector2(0.8, 0.8)
-	t.pivot_offset = t.size / 2.0  # 设置缩放中心点
+	t.pivot_offset = t.size / 2.0 # 设置缩放中心点
 	
 	# 先添加到场景树，确保 @onready 节点已初始化
 	v_box_container.add_child(t)
@@ -88,8 +88,8 @@ func add_task(task: TaskData) -> void:
 func _play_add_animation(item: Control) -> void:
 	# 创建淡入动画
 	var tween = create_tween()
-	tween.set_parallel(true)  # 并行执行多个动画
-	tween.set_trans(Tween.TRANS_BACK)  # 使用回弹效果
+	tween.set_parallel(true) # 并行执行多个动画
+	tween.set_trans(Tween.TRANS_BACK) # 使用回弹效果
 	tween.set_ease(Tween.EASE_OUT)
 	
 	# 淡入效果
@@ -268,7 +268,6 @@ func mark_task_as_uncompleted(id: int) -> void:
 	print("[%s]Task with id %s not found in finished tasks" % [self.name, id])
 
 
-
 #============Agent API===========
 ## Agent API: 添加新任务（带动画）
 ## @param title: 任务标题
@@ -276,12 +275,12 @@ func mark_task_as_uncompleted(id: int) -> void:
 ## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
 ## @return: 新任务的 ID
 func agent_add_task(title: String, due_timestamp: int = 0, typing_speed: float = 0.05) -> int:
-	
+	GuiTransitions.show("task")
 	var new_id = _generate_task_id()
 
 	# 先创建空标题的任务
 	var task_data = TaskData.new(new_id, "", due_timestamp, false)
-	add_task(task_data)  # 添加到UI，已包含淡入动画
+	add_task(task_data) # 添加到UI，已包含淡入动画
 
 	# 如果标题不为空，启动打字动画（不阻塞返回）
 	if not title.is_empty():
@@ -793,7 +792,7 @@ func _on_task_state_changed(item: InnerPanel):
 		separator_index -= 1
 		
 		# 移动UI到分隔符后的第一个位置
-		var target_ui_index = separator_index + 1  # +1 是因为分隔符本身占一个位置
+		var target_ui_index = separator_index + 1 # +1 是因为分隔符本身占一个位置
 		if target_ui_index < v_box_container.get_child_count():
 			v_box_container.reorder_child_by_index(ui_index, target_ui_index)
 		

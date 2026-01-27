@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AudioRes" load_steps=17 format=3 uid="uid://dweygfwutymm5"]
+[gd_resource type="Resource" script_class="AudioRes" format=3 uid="uid://dweygfwutymm5"]
 
 [ext_resource type="Script" uid="uid://c8gyw3w871pec" path="res://resource/audio_res/audio_item/audio_item.gd" id="1_v4rmg"]
 [ext_resource type="AudioStream" uid="uid://1tebddn53oqf" path="res://assets/music/barradeen-bedtime-after-a-coffee.mp3" id="2_05d4i"]

@@ -37,8 +37,8 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_a7tfl")
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(88, 348)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
 content_margin_left = 12.0
@@ -133,7 +133,7 @@ script = ExtResource("1_nf0va")
 music_module = NodePath("MusicModule")
 note_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteModule")
 note_book = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteBook")
-task_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule/CanvasLayer/TaskModuleNew")
+task_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule")
 env_setter = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter")
 pomodoro_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule")
 
@@ -243,10 +243,10 @@ offset_bottom = 115.0
 
 [node name="TestPanel" parent="." unique_id=665107662 node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
 layout_mode = 0
-offset_left = 75.0
-offset_top = 1.0
-offset_right = 381.0
-offset_bottom = 415.0
+offset_left = 833.0
+offset_top = 13.0
+offset_right = 1139.0
+offset_bottom = 427.0
 ui = NodePath("..")
 
 [connection signal="work_completed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_completed"]
