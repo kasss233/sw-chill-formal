@@ -242,8 +242,8 @@ func _show_datetime_picker() -> void:
 		# 如果已有截止时间，使用已有的
 		current_timestamp = task_data.due_timestamp
 	else:
-		# 如果没有截止时间，默认设置为明天的当前时刻
-		current_timestamp = Time.get_unix_time_from_system() + 86400  # +1天
+		# 如果没有截止时间，默认设置当前时刻+1h
+		current_timestamp = Time.get_unix_time_from_system() + 3600  # +1小时
 	var local_timestamp = current_timestamp + timezone_offset
 	var datetime_dict = Time.get_datetime_dict_from_unix_time(local_timestamp)
 

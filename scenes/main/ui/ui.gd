@@ -32,6 +32,7 @@ signal task_deadline_warning(task_id: int, task_title: String)
 @export var task_module: TaskModule
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
+@export var pomodoro_module: Node # 番茄钟模块引用
 @onready var dialogue_box: DialogueBox = $VBoxContainer/DialogueBox
 @onready var input_box: InputBox = $VBoxContainer/InputBox
 
@@ -211,6 +212,92 @@ func show_task_module() -> void:
 func hide_task_module() -> void:
 	if task_module:
 		task_module.hide_module()
+
+# --- 公有 API (番茄钟模块包装) ---
+## Agent API: 启动番茄钟
+## @param work_duration: 工作时间（分钟）
+## @param rest_duration: 休息时间（分钟）
+## @param loop_times: 循环次数（默认1次）
+## @return: 是否成功启动
+func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: int = 1) -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_start_pomodoro"):
+		return pomodoro_module.agent_start_pomodoro(work_duration, rest_duration, loop_times)
+	return false
+
+## Agent API: 设置工作时间
+## @param minutes: 工作时间（分钟）
+## @return: 是否成功设置
+func agent_set_pomodoro_work_duration(minutes: int) -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_set_work_duration"):
+		return pomodoro_module.agent_set_work_duration(minutes)
+	return false
+
+## Agent API: 设置休息时间
+## @param minutes: 休息时间（分钟）
+## @return: 是否成功设置
+func agent_set_pomodoro_rest_duration(minutes: int) -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_set_rest_duration"):
+		return pomodoro_module.agent_set_rest_duration(minutes)
+	return false
+
+## Agent API: 暂停/继续番茄钟
+## @return: 是否成功切换状态
+func agent_toggle_pomodoro_pause() -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_toggle_pause"):
+		return pomodoro_module.agent_toggle_pause()
+	return false
+
+## Agent API: 停止番茄钟
+## @return: 是否成功停止
+func agent_stop_pomodoro() -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_stop"):
+		return pomodoro_module.agent_stop()
+	return false
+
+## Agent API: 获取番茄钟状态信息
+## @return: 状态信息字典
+func agent_get_pomodoro_status() -> Dictionary:
+	if pomodoro_module and pomodoro_module.has_method("agent_get_status"):
+		return pomodoro_module.agent_get_status()
+	return {
+		"error": "pomodoro_module 不可用",
+		"is_running": false,
+		"is_paused": false,
+		"is_work_mode": false
+	}
+
+## Agent API: 获取剩余时间
+## @return: 剩余时间字典（包含小时、分钟、秒）
+func agent_get_pomodoro_remaining_time() -> Dictionary:
+	if pomodoro_module and pomodoro_module.has_method("agent_get_remaining_time"):
+		return pomodoro_module.agent_get_remaining_time()
+	return {
+		"error": "pomodoro_module 不可用",
+		"hour": 0,
+		"minute": 0,
+		"second": 0
+	}
+
+## Agent API: 检查是否正在运行
+## @return: 是否正在运行
+func agent_is_pomodoro_running() -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_is_running"):
+		return pomodoro_module.agent_is_running()
+	return false
+
+## Agent API: 检查是否暂停
+## @return: 是否暂停
+func agent_is_pomodoro_paused() -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_is_paused"):
+		return pomodoro_module.agent_is_paused()
+	return false
+
+## Agent API: 检查是否在工作模式
+## @return: 是否在工作模式
+func agent_is_pomodoro_work_mode() -> bool:
+	if pomodoro_module and pomodoro_module.has_method("agent_is_work_mode"):
+		return pomodoro_module.agent_is_work_mode()
+	return false
 
 # --- 测试面板控制 ---
 ## 切换测试面板显示/隐藏

@@ -182,7 +182,10 @@ func _setup_add_playlist_dialog() -> void:
 	vbox.add_child(_playlist_name_input)
 
 	_add_playlist_dialog.set_custom_content(vbox)
-	_add_playlist_dialog.add_button("取消")
+	var cancel_btn = _add_playlist_dialog.add_button("取消")
+	cancel_btn.pressed.connect(func():
+		_add_playlist_dialog.hide_dialog()
+	)
 	var confirm_btn = _add_playlist_dialog.add_button("确定")
 	confirm_btn.pressed.connect(func():
 		_on_add_playlist_confirmed()
