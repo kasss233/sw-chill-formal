@@ -1,5 +1,5 @@
 extends Control
-
+class_name PomodoroTechniqueModule;
 ## UI 引用（用于层级管理）
 @export var _ui: UI = null
 
