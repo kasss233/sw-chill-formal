@@ -64,11 +64,6 @@ func _connect_signals() -> void:
 		MusicState.track_changed.connect(_on_track_changed)
 		MusicState.playback_state_changed.connect(_on_playback_state_changed)
 
-	# 连接 TaskModule 信号
-	if task_module:
-		task_module.task_completed.connect(_on_task_completed)
-		task_module.task_deadline_reached.connect(_on_task_deadline_reached)
-		task_module.task_deadline_warning.connect(_on_task_deadline_warning)
 
 # --- 公有 API (音乐模块包装) ---
 ## 添加一个新的音乐列表
@@ -292,3 +287,7 @@ func _on_pomodoro_technique_module_work_stopped() -> void:
 signal work_continued
 func _on_pomodoro_technique_module_work_continued() -> void:
 	work_continued.emit()
+
+signal text_submitted
+func _on_input_box_text_submitted(text: String, attachments: Array) -> void:
+	text_submitted.emit()

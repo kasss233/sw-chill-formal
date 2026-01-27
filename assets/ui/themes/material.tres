@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=24 format=3 uid="uid://ctpnw50ym2lbi"]
+[gd_resource type="Theme" format=3 uid="uid://ctpnw50ym2lbi"]
 
 [ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="1_wdfye"]
 [ext_resource type="Texture2D" uid="uid://dh1kvtkfkfr13" path="res://assets/ui/icons/radio_button_unchecked_24dp.svg" id="2_cqee6"]

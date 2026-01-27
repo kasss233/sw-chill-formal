@@ -5,16 +5,19 @@ extends Control
 @export var _ui: UI = null
 
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
-@onready var panel=$CanvasLayer/FrostedPanel
+@onready var panel = $CanvasLayer/FrostedPanel
 
 signal env_time_changed(mode: int)
 signal env_weather_changed(mode: int)
 
 func _ready() -> void:
-	panel.visible=false
+	panel.visible = false
 	# 设置 CanvasLayer 的初始层级
 	canvas_layer.layer = 10
-
+func set_weather(mode: int) -> void:
+	env_weather_changed.emit(mode)
+func set_time(mode: int) -> void:
+	env_time_changed.emit(mode)
 ## 请求新的顶层层级
 func _request_top_layer() -> void:
 	if _ui:

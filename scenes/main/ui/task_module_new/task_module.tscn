@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ov68toccadt"]
+[gd_scene format=3 uid="uid://ov68toccadt"]
 
 [ext_resource type="Script" uid="uid://bo0vsjwch60x8" path="res://scenes/main/ui/task_module_new/task_module.gd" id="1_jrjk2"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_6xygf"]
@@ -76,12 +76,12 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="TaskModule" type="MarginContainer"]
+[node name="TaskModule" type="MarginContainer" unique_id=1654234263]
 offset_right = 48.0
 offset_bottom = 48.0
 script = ExtResource("1_jrjk2")
 
-[node name="TodoButton" type="Button" parent="."]
+[node name="TodoButton" type="Button" parent="." unique_id=2007459802]
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -100,9 +100,9 @@ states = Array[ExtResource("3_7qysn")]([SubResource("Resource_jomwj"), SubResour
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1910540668]
 
-[node name="TaskModuleNew" parent="CanvasLayer" instance=ExtResource("5_enf1w")]
+[node name="TaskModuleNew" parent="CanvasLayer" unique_id=1753937828 instance=ExtResource("5_enf1w")]
 visible = false
 anchors_preset = 8
 anchor_left = 0.5
@@ -116,7 +116,7 @@ offset_bottom = 247.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="GuiTransition" type="Node" parent="."]
+[node name="GuiTransition" type="Node" parent="." unique_id=1146121115]
 script = ExtResource("6_6xygf")
 auto_start = 0
 animation_enter = 3
