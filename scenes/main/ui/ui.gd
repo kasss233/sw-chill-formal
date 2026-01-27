@@ -32,7 +32,7 @@ signal task_deadline_warning(task_id: int, task_title: String)
 @export var task_module: TaskModule
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
-@export var pomodoro_module: Node # 番茄钟模块引用
+@export var pomodoro_module: PomodoroTechniqueModule # 番茄钟模块引用
 @onready var dialogue_box: DialogueBox = $VBoxContainer/DialogueBox
 @onready var input_box: InputBox = $VBoxContainer/InputBox
 

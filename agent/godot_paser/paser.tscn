@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://oj6kvlsp3t2p"]
+
+[ext_resource type="Script" uid="uid://jyy2xkieejn2" path="res://agent/godot_paser/paser.gd" id="1_qiyxk"]
+
+[node name="Paser" type="Node" unique_id=100249702]
+script = ExtResource("1_qiyxk")
