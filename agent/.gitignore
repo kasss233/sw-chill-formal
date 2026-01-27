@@ -1,4 +1,5 @@
-﻿.idea
+.idea
 *.example
 *cache*
 *.md
+*.zip

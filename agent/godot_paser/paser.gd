@@ -2,13 +2,13 @@ extends Node
 
 # ====== 节点引用 ======
 # 这些节点引用在初始化时设置，用于调用实际的功能模块
-var task_module: Node = null  # 任务管理模块节点引用
-var project_module: Node = null  # 项目管理模块节点引用（待实现）
-var scene_component_manager: Node = null  # 场景组件管理节点引用（待实现）
-var bgm_manager: Node = null  # 背景音乐管理节点引用（待实现）
-var ambient_noise_manager: Node = null  # 环境白噪音管理节点引用（待实现）
-var focus_manager: Node = null  # 专注模式管理节点引用（待实现）
-var performance_manager: Node = null  # 演出脚本管理节点引用（待实现）
+var ui_node: UI = null  # UI 主节点引用（包含所有模块）
+var task_module: TaskModule = null  # 任务管理模块节点引用
+var music_module: MusicModule = null  # 音乐管理模块节点引用
+var note_module: NoteModule = null  # 笔记模块节点引用
+var note_book: NoteBook = null  # 笔记本模块节点引用
+var pomodoro_module: Node = null  # 番茄钟模块节点引用（待实现）
+var env_setter: EnvSetter = null  # 环境设置模块节点引用（待实现）
 
 # 任务ID生成器（用于将字符串ID转换为整数ID）
 var _task_id_counter: int = 1
@@ -17,27 +17,78 @@ var _task_id_map: Dictionary = {}  # 映射：字符串ID -> 整数ID
 # ====== 初始化 ======
 func _ready() -> void:
 	# 初始化节点引用
-	# 注意：这些路径需要根据实际场景结构调整
-	# 如果节点不存在，会在调用时进行空值检查
+	# 通过查找 UI 节点来获取所有模块引用
 	_initialize_node_references()
 
 func _initialize_node_references() -> void:
-	# 尝试查找任务管理模块
-	# 路径示例：根据实际场景结构调整
-	var task_module_path = "/root/Main/UI/TaskModuleNew"
-	if has_node(task_module_path):
-		task_module = get_node(task_module_path)
-		print("[Parser] 已找到任务管理模块: ", task_module_path)
-	else:
-		print("[Parser] 警告: 未找到任务管理模块，路径: ", task_module_path)
+	# 尝试查找 UI 节点（主场景中的 UI 节点）
+	# 路径可能因场景结构而异，尝试多个可能的路径
+	var ui_paths = [
+		"/root/Main/UI",
+		"/root/UI",
+		"../UI",
+		"../../UI"
+	]
 	
-	# 其他模块的初始化（待实现）
-	# project_module = get_node_or_null("...")
-	# scene_component_manager = get_node_or_null("...")
-	# bgm_manager = get_node_or_null("...")
-	# ambient_noise_manager = get_node_or_null("...")
-	# focus_manager = get_node_or_null("...")
-	# performance_manager = get_node_or_null("...")
+	for path in ui_paths:
+		if has_node(path):
+			ui_node = get_node(path) as UI
+			if ui_node:
+				print("[Parser] 已找到 UI 节点: ", path)
+				break
+	
+	if ui_node == null:
+		# 如果找不到 UI 节点，尝试通过场景树查找
+		var scene_tree = get_tree()
+		if scene_tree:
+			var root = scene_tree.root
+			ui_node = _find_ui_node_recursive(root)
+			if ui_node:
+				print("[Parser] 通过递归查找找到 UI 节点")
+	
+	if ui_node == null:
+		print("[Parser] 警告: 未找到 UI 节点，某些功能可能无法使用")
+		return
+	
+	# 从 UI 节点获取各个模块引用
+	task_module = ui_node.task_module
+	music_module = ui_node.music_module
+	note_module = ui_node.note_module
+	note_book = ui_node.note_book
+	env_setter = ui_node.env_setter
+	
+	# 尝试查找番茄钟模块
+	var pomodoro_paths = [
+		"/root/Main/UI/PomodoroTechniqueModule",
+		"../PomodoroTechniqueModule"
+	]
+	for path in pomodoro_paths:
+		if has_node(path):
+			pomodoro_module = get_node(path)
+			if pomodoro_module:
+				print("[Parser] 已找到番茄钟模块: ", path)
+				break
+	
+	# 打印初始化结果
+	print("[Parser] 模块初始化完成:")
+	print("  - 任务模块: ", "✓" if task_module else "✗")
+	print("  - 音乐模块: ", "✓" if music_module else "✗")
+	print("  - 笔记模块: ", "✓" if note_module else "✗")
+	print("  - 笔记本模块: ", "✓" if note_book else "✗")
+	print("  - 番茄钟模块: ", "✓" if pomodoro_module else "✗")
+	print("  - 环境设置模块: ", "✓" if env_setter else "✗")
+
+## 递归查找 UI 节点
+func _find_ui_node_recursive(node: Node) -> UI:
+	if node is UI:
+		return node as UI
+	
+	for child in node.get_children():
+		var result = _find_ui_node_recursive(child)
+		if result:
+			return result
+	
+	return null
 
 # ====== 主要解析接口 ======
 """
@@ -50,11 +101,13 @@ func _initialize_node_references() -> void:
 	Dictionary: 解析结果，包含成功状态和错误信息
 """
 func parse_and_execute(json_text: String) -> Dictionary:
+	# 注意：此函数内部可能包含异步操作
 	var result = {
 		"success": false,
 		"error": "",
 		"parsed_response": null,
-		"executed_operations": 0
+		"executed_operations": 0,
+		"text": ""
 	}
 	
 	# 清理JSON文本（移除可能的前缀）
@@ -65,7 +118,13 @@ func parse_and_execute(json_text: String) -> Dictionary:
 	# 解析JSON
 	var json_parse_result = JSON.parse_string(cleaned_text)
 	if json_parse_result == null:
-		result["error"] = "JSON解析失败"
+		# 尝试使用 JSON.parse() 获取详细错误信息
+		var json_parser = JSON.new()
+		var parse_error = json_parser.parse(cleaned_text)
+		if parse_error != OK:
+			result["error"] = "JSON解析失败: " + str(json_parser.get_error_message())
+		else:
+			result["error"] = "JSON解析失败: 未知错误"
 		print("[Parser] 错误: ", result["error"])
 		return result
 	
@@ -78,6 +137,7 @@ func parse_and_execute(json_text: String) -> Dictionary:
 		return result
 	
 	result["parsed_response"] = response_data
+	result["text"] = response_data.get("text", "")
 	
 	# 提取文本响应
 	var text = response_data.get("text", "")
@@ -92,7 +152,7 @@ func parse_and_execute(json_text: String) -> Dictionary:
 	if operations is Array:
 		for operation in operations:
 			if operation is Dictionary:
-				var op_result = _execute_operation(operation)
+				var op_result = await _execute_operation(operation)
 				if op_result.get("success", false):
 					result["executed_operations"] += 1
 				else:
@@ -106,6 +166,7 @@ func parse_and_execute(json_text: String) -> Dictionary:
 
 # ====== 操作执行分发 ======
 func _execute_operation(operation: Dictionary) -> Dictionary:
+	# 注意：此函数可能返回协程结果，调用者需要使用 await
 	var result = {
 		"success": false,
 		"error": ""
@@ -121,7 +182,7 @@ func _execute_operation(operation: Dictionary) -> Dictionary:
 		"create_task":
 			return _handle_create_task(operation)
 		"update_task":
-			return _handle_update_task(operation)
+			return await _handle_update_task(operation)
 		"delete_task":
 			return _handle_delete_task(operation)
 		"complete_task":
@@ -156,33 +217,40 @@ func _handle_create_task(operation: Dictionary) -> Dictionary:
 		return result
 	
 	var task_data = operation.get("task", {})
-	var task_data_obj = _convert_python_task_to_godot_task(task_data)
 	
-	if task_data_obj == null:
-		result["error"] = "任务数据转换失败"
-		return result
+	# 提取任务信息
+	var task_info = task_data.get("info", {})
+	var description = task_info.get("description", "新任务")
+	
+	# 处理时间戳
+	var due_timestamp = 0
+	if task_data.has("deadline") and task_data["deadline"] != null:
+		due_timestamp = _parse_datetime_to_timestamp(task_data["deadline"])
+	elif task_data.has("start_time") and task_data["start_time"] != null:
+		due_timestamp = _parse_datetime_to_timestamp(task_data["start_time"])
 	
 	# 调用本脚本内的方法（抽象层）
-	var success = _create_task_internal(task_data_obj)
+	var task_id = _create_task_internal(description, due_timestamp)
 	
-	if success:
+	if task_id > 0:
 		result["success"] = true
-		print("[Parser] 成功创建任务: ", task_data_obj.title)
+		# 保存ID映射（如果原任务有字符串ID）
+		var task_id_str = task_data.get("id", "")
+		if task_id_str != null and task_id_str != "":
+			_task_id_map[task_id_str] = task_id
+		print("[Parser] 成功创建任务: ", description, " (ID: ", task_id, ")")
 	else:
 		result["error"] = "任务创建失败"
 	
 	return result
 
-func _create_task_internal(task_data: TaskData) -> bool:
+func _create_task_internal(title: String, due_timestamp: int) -> int:
 	# 抽象层：本脚本内的处理方法
-	# 如果节点引用存在，调用节点的方法
-	if task_module != null and task_module.has_method("add_task"):
-		task_module.add_task(task_data)
-		return true
+	if task_module != null and task_module.has_method("agent_add_task"):
+		return task_module.agent_add_task(title, due_timestamp)
 	else:
 		print("[Parser] 警告: 任务管理模块不可用，任务创建功能未实现")
-		# 即使节点不存在，也返回true表示本脚本已处理（待实现时再对接）
-		return true
+		return 0
 
 func _handle_update_task(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -197,15 +265,19 @@ func _handle_update_task(operation: Dictionary) -> Dictionary:
 	# 将字符串ID转换为整数ID
 	var task_id = _get_or_create_task_id(task_id_str)
 	
-	var task_data_obj = _convert_python_task_to_godot_task(task_data)
-	if task_data_obj == null:
-		result["error"] = "任务数据转换失败"
-		return result
+	# 提取任务信息
+	var task_info = task_data.get("info", {})
+	var new_title = task_info.get("description", "")
 	
-	# 设置ID
-	task_data_obj.id = task_id
+	# 处理时间戳
+	var due_timestamp = 0
+	if task_data.has("deadline") and task_data["deadline"] != null:
+		due_timestamp = _parse_datetime_to_timestamp(task_data["deadline"])
+	elif task_data.has("start_time") and task_data["start_time"] != null:
+		due_timestamp = _parse_datetime_to_timestamp(task_data["start_time"])
 	
-	var success = _update_task_internal(task_id, task_data_obj)
+	# 调用协程函数需要使用 await
+	var success = await _update_task_internal(task_id, new_title, due_timestamp)
 	
 	if success:
 		result["success"] = true
@@ -215,24 +287,21 @@ func _handle_update_task(operation: Dictionary) -> Dictionary:
 	
 	return result
 
-func _update_task_internal(task_id: int, task_data: TaskData) -> bool:
+func _update_task_internal(task_id: int, new_title: String, due_timestamp: int) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if task_module != null and task_module.has_method("get_task_from_id"):
-		var existing_task = task_module.get_task_from_id(task_id)
-		if existing_task != null:
-			# 更新任务数据
-			existing_task.title = task_data.title
-			existing_task.due_timestamp = task_data.due_timestamp
-			existing_task.is_completed = task_data.is_completed
-			# TODO: 更新其他字段
-			print("[Parser] 任务更新功能待完善")
-			return true
-		else:
-			print("[Parser] 警告: 任务不存在，ID: ", task_id)
-			return false
-	else:
+	if task_module == null:
 		print("[Parser] 警告: 任务管理模块不可用，任务更新功能未实现")
-		return true  # 待实现
+		return false
+	
+	# 更新标题
+	if new_title != "" and task_module.has_method("agent_update_task_title"):
+		await task_module.agent_update_task_title(task_id, new_title)
+	
+	# 更新截止时间
+	if due_timestamp > 0 and task_module.has_method("agent_set_task_due_time"):
+		return task_module.agent_set_task_due_time(task_id, due_timestamp)
+	
+	return true
 
 func _handle_delete_task(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -258,12 +327,11 @@ func _handle_delete_task(operation: Dictionary) -> Dictionary:
 
 func _delete_task_internal(task_id: int) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if task_module != null and task_module.has_method("remove_task"):
-		task_module.remove_task(task_id)
-		return true
+	if task_module != null and task_module.has_method("agent_remove_task"):
+		return task_module.agent_remove_task(task_id)
 	else:
 		print("[Parser] 警告: 任务管理模块不可用，任务删除功能未实现")
-		return true  # 待实现
+		return false
 
 func _handle_complete_task(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -287,12 +355,11 @@ func _handle_complete_task(operation: Dictionary) -> Dictionary:
 
 func _complete_task_internal(task_id: int) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if task_module != null and task_module.has_method("mark_task_as_completed"):
-		task_module.mark_task_as_completed(task_id)
-		return true
+	if task_module != null and task_module.has_method("agent_mark_task_completed"):
+		return task_module.agent_mark_task_completed(task_id, true)
 	else:
 		print("[Parser] 警告: 任务管理模块不可用，任务完成功能未实现")
-		return true  # 待实现
+		return false
 
 # ====== 项目相关操作处理 ======
 func _handle_create_project(operation: Dictionary) -> Dictionary:
@@ -315,12 +382,9 @@ func _handle_create_project(operation: Dictionary) -> Dictionary:
 
 func _create_project_internal(project_data: Dictionary) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if project_module != null and project_module.has_method("create_project"):
-		project_module.create_project(project_data)
-		return true
-	else:
-		print("[Parser] 警告: 项目管理模块不可用，项目创建功能未实现")
-		return true  # 待实现
+	# 项目功能待实现
+	print("[Parser] 警告: 项目管理功能未实现")
+	return true  # 待实现
 
 func _handle_update_project(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -344,12 +408,9 @@ func _handle_update_project(operation: Dictionary) -> Dictionary:
 
 func _update_project_internal(project_id: String, project_data: Dictionary) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if project_module != null and project_module.has_method("update_project"):
-		project_module.update_project(project_id, project_data)
-		return true
-	else:
-		print("[Parser] 警告: 项目管理模块不可用，项目更新功能未实现")
-		return true  # 待实现
+	# 项目功能待实现
+	print("[Parser] 警告: 项目管理功能未实现")
+	return true  # 待实现
 
 func _handle_delete_project(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -371,12 +432,9 @@ func _handle_delete_project(operation: Dictionary) -> Dictionary:
 
 func _delete_project_internal(project_id: String) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if project_module != null and project_module.has_method("delete_project"):
-		project_module.delete_project(project_id)
-		return true
-	else:
-		print("[Parser] 警告: 项目管理模块不可用，项目删除功能未实现")
-		return true  # 待实现
+	# 项目功能待实现
+	print("[Parser] 警告: 项目管理功能未实现")
+	return true  # 待实现
 
 # ====== 场景组件操作处理 ======
 func _handle_update_scene_components(operation: Dictionary) -> Dictionary:
@@ -399,12 +457,9 @@ func _handle_update_scene_components(operation: Dictionary) -> Dictionary:
 
 func _update_scene_components_internal(components: Dictionary) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if scene_component_manager != null and scene_component_manager.has_method("update_components"):
-		scene_component_manager.update_components(components)
-		return true
-	else:
-		print("[Parser] 警告: 场景组件管理模块不可用，场景组件更新功能未实现")
-		return true  # 待实现
+	# 场景组件功能待实现
+	print("[Parser] 警告: 场景组件管理功能未实现")
+	return true  # 待实现
 
 # ====== 背景音乐操作处理 ======
 func _handle_update_bgm(operation: Dictionary) -> Dictionary:
@@ -419,6 +474,7 @@ func _handle_update_bgm(operation: Dictionary) -> Dictionary:
 	
 	match op_type:
 		"volume":
+			# 音量调整功能待实现（MusicState 单例管理）
 			var volume = operation.get("volume", 0.5)
 			success = _update_bgm_volume_internal(volume)
 		"switch":
@@ -441,34 +497,25 @@ func _handle_update_bgm(operation: Dictionary) -> Dictionary:
 
 func _update_bgm_volume_internal(volume: float) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if bgm_manager != null and bgm_manager.has_method("set_volume"):
-		bgm_manager.set_volume(volume)
-		return true
-	else:
-		print("[Parser] 警告: BGM管理模块不可用，音量调整功能未实现")
-		return true  # 待实现
+	# 音量调整功能待实现（需要通过 MusicState 单例）
+	print("[Parser] 警告: BGM音量调整功能未实现")
+	return true  # 待实现
 
 func _switch_bgm_track_internal(track_id: String) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if bgm_manager != null and bgm_manager.has_method("switch_track"):
-		bgm_manager.switch_track(track_id)
-		return true
+	if music_module != null and music_module.has_method("agent_play_music"):
+		return music_module.agent_play_music(track_id)
 	else:
-		print("[Parser] 警告: BGM管理模块不可用，切换歌曲功能未实现")
-		return true  # 待实现
+		print("[Parser] 警告: 音乐管理模块不可用，切换歌曲功能未实现")
+		return false
 
 func _toggle_bgm_playback_internal(play: bool) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if bgm_manager != null:
-		if play and bgm_manager.has_method("play"):
-			bgm_manager.play()
-			return true
-		elif not play and bgm_manager.has_method("stop"):
-			bgm_manager.stop()
-			return true
-	
-	print("[Parser] 警告: BGM管理模块不可用，播放控制功能未实现")
-	return true  # 待实现
+	if music_module != null and music_module.has_method("agent_set_playing"):
+		return music_module.agent_set_playing(play)
+	else:
+		print("[Parser] 警告: 音乐管理模块不可用，播放控制功能未实现")
+		return false
 
 # ====== 环境白噪音操作处理 ======
 func _handle_update_ambient_noise(operation: Dictionary) -> Dictionary:
@@ -493,12 +540,9 @@ func _handle_update_ambient_noise(operation: Dictionary) -> Dictionary:
 
 func _update_ambient_noise_internal(enabled: bool, volume: float) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if ambient_noise_manager != null and ambient_noise_manager.has_method("set_ambient_noise"):
-		ambient_noise_manager.set_ambient_noise(enabled, volume)
-		return true
-	else:
-		print("[Parser] 警告: 环境白噪音管理模块不可用，环境白噪音更新功能未实现")
-		return true  # 待实现
+	# 环境白噪音功能待实现
+	print("[Parser] 警告: 环境白噪音管理功能未实现")
+	return true  # 待实现
 
 # ====== 专注模式操作处理 ======
 func _handle_start_focus(operation: Dictionary) -> Dictionary:
@@ -527,12 +571,26 @@ func _handle_start_focus(operation: Dictionary) -> Dictionary:
 
 func _start_focus_internal(focus_type: String, task_id: Variant) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if focus_manager != null and focus_manager.has_method("start_focus"):
-		focus_manager.start_focus(focus_type, task_id)
-		return true
-	else:
-		print("[Parser] 警告: 专注模式管理模块不可用，开始专注功能未实现")
-		return true  # 待实现
+	match focus_type:
+		"tomato":
+			# 番茄钟专注模式
+			if pomodoro_module != null:
+				var pomodoro_technique = pomodoro_module.get_node_or_null("CanvasLayer/PomodoroTechnique")
+				if pomodoro_technique and pomodoro_technique.has_method("pomodoro_start"):
+					# 默认25分钟工作，5分钟休息，1次循环
+					pomodoro_technique.pomodoro_start(25, 5, 1)
+					return true
+		"free":
+			# 自由专注模式（待实现）
+			print("[Parser] 警告: 自由专注模式未实现")
+			return true
+		"task_triggered":
+			# 任务触发的专注模式（待实现）
+			print("[Parser] 警告: 任务触发专注模式未实现")
+			return true
+	
+	print("[Parser] 警告: 专注模式管理功能未实现")
+	return false
 
 func _handle_end_focus(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -554,12 +612,9 @@ func _handle_end_focus(operation: Dictionary) -> Dictionary:
 
 func _end_focus_internal(focus_record_id: String) -> bool:
 	# 抽象层：本脚本内的处理方法
-	if focus_manager != null and focus_manager.has_method("end_focus"):
-		focus_manager.end_focus(focus_record_id)
-		return true
-	else:
-		print("[Parser] 警告: 专注模式管理模块不可用，结束专注功能未实现")
-		return true  # 待实现
+	# 专注模式结束功能待实现
+	print("[Parser] 警告: 结束专注模式功能未实现")
+	return true  # 待实现
 
 # ====== 演出脚本处理 ======
 func _handle_performance_sequence(performance_sequence: Variant) -> void:
@@ -568,55 +623,10 @@ func _handle_performance_sequence(performance_sequence: Variant) -> void:
 		return
 	
 	# 抽象层：本脚本内的处理方法
-	if performance_manager != null and performance_manager.has_method("play_sequence"):
-		performance_manager.play_sequence(performance_sequence)
-		print("[Parser] 开始播放演出脚本序列")
-	else:
-		print("[Parser] 警告: 演出脚本管理模块不可用，演出脚本功能未实现")
+	# 演出脚本功能待实现
+	print("[Parser] 警告: 演出脚本功能未实现")
 
 # ====== 数据转换辅助方法 ======
-"""
-将Python Task模型转换为Godot TaskData对象
-"""
-func _convert_python_task_to_godot_task(task_dict: Dictionary) -> TaskData:
-	if not task_dict.has("info"):
-		print("[Parser] 错误: 任务数据缺少 'info' 字段")
-		return null
-	
-	var info = task_dict.get("info", {})
-	var description = info.get("description", "新任务")
-	
-	# 处理时间戳
-	var due_timestamp = 0
-	if task_dict.has("deadline") and task_dict["deadline"] != null:
-		due_timestamp = _parse_datetime_to_timestamp(task_dict["deadline"])
-	elif task_dict.has("start_time") and task_dict["start_time"] != null:
-		due_timestamp = _parse_datetime_to_timestamp(task_dict["start_time"])
-	
-	# 处理完成状态
-	var is_completed = task_dict.get("completed", false)
-	
-	# 生成或获取任务ID
-	var task_id_str = task_dict.get("id", "")
-	var task_id = 0
-	if task_id_str != null and task_id_str != "":
-		task_id = _get_or_create_task_id(task_id_str)
-	else:
-		# 如果没有ID，生成新的整数ID
-		task_id = _task_id_counter
-		_task_id_counter += 1
-	
-	# 创建TaskData对象
-	var task_data = TaskData.new(task_id, description, due_timestamp, is_completed)
-	
-	# 如果任务已完成，设置完成时间戳
-	if is_completed and info.has("created_at"):
-		var created_at = info.get("created_at", "")
-		if created_at != "":
-			task_data.finish_timestamp = _parse_datetime_to_timestamp(created_at)
-	
-	return task_data
-
 """
 解析ISO格式的日期时间字符串为Unix时间戳
 格式示例: "2026-01-21T15:33:06.706338"
@@ -677,6 +687,13 @@ func _get_or_create_task_id(task_id_str: String) -> int:
 	if _task_id_map.has(task_id_str):
 		return _task_id_map[task_id_str]
 	else:
+		# 如果任务模块可用，尝试查找现有任务
+		if task_module != null and task_module.has_method("agent_get_all_tasks"):
+			var all_tasks = task_module.agent_get_all_tasks()
+			# 这里可以根据其他信息匹配任务（如标题）
+			# 暂时生成新ID
+			pass
+		
 		# 创建新的映射
 		var new_id = _task_id_counter
 		_task_id_counter += 1
