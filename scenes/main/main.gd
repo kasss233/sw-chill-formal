@@ -133,4 +133,5 @@ func _on_ui_work_continued() -> void:
 
 
 func _on_ui_text_submitted() -> void:
-	animation_player.play("notebook")
+	print("play_animation")
+	animation_player.play("focus")

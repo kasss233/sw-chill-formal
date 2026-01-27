@@ -83,7 +83,8 @@ func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: in
 	work_duration = max(1, work_duration)
 	rest_duration = max(1, rest_duration)
 	loop_times = max(1, loop_times)
-	
+	# 显示番茄钟
+	pomodoro_button.set_state(1)
 	# 启动番茄钟
 	pomodoro_technique.pomodoro_start(work_duration, rest_duration, loop_times)
 	
