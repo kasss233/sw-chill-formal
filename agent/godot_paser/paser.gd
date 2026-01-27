@@ -1,14 +1,15 @@
+class_name Parser
 extends Node
 
 # ====== 节点引用 ======
 # 这些节点引用在初始化时设置，用于调用实际的功能模块
-var ui_node: UI = null  # UI 主节点引用（包含所有模块）
-var task_module: TaskModule = null  # 任务管理模块节点引用
-var music_module: MusicModule = null  # 音乐管理模块节点引用
-var note_module: NoteModule = null  # 笔记模块节点引用
-var note_book: NoteBook = null  # 笔记本模块节点引用
-var pomodoro_module: Node = null  # 番茄钟模块节点引用（待实现）
-var env_setter: EnvSetter = null  # 环境设置模块节点引用（待实现）
+@export var ui_node: UI = null  # UI 主节点引用（包含所有模块）
+@export var task_module: TaskModule = null  # 任务管理模块节点引用
+@export var music_module: MusicModule = null  # 音乐管理模块节点引用
+@export var note_module: NoteModule = null  # 笔记模块节点引用
+@export var note_book: NoteBook = null  # 笔记本模块节点引用
+@export var pomodoro_module: PomodoroTechniqueModule = null  # 番茄钟模块节点引用（使用class_name）
+@export var env_setter: EnvSetter = null  # 环境设置模块节点引用（待实现）
 
 # 任务ID生成器（用于将字符串ID转换为整数ID）
 var _task_id_counter: int = 1
@@ -29,14 +30,14 @@ func _initialize_node_references() -> void:
 		"../UI",
 		"../../UI"
 	]
-	
-	for path in ui_paths:
-		if has_node(path):
-			ui_node = get_node(path) as UI
-			if ui_node:
-				print("[Parser] 已找到 UI 节点: ", path)
-				break
-	
+	if ui_node == null:
+		for path in ui_paths:
+			if has_node(path):
+				ui_node = get_node(path) as UI
+				if ui_node:
+					print("[Parser] 已找到 UI 节点: ", path)
+					break
+		
 	if ui_node == null:
 		# 如果找不到 UI 节点，尝试通过场景树查找
 		var scene_tree = get_tree()
@@ -55,19 +56,8 @@ func _initialize_node_references() -> void:
 	music_module = ui_node.music_module
 	note_module = ui_node.note_module
 	note_book = ui_node.note_book
+	pomodoro_module = ui_node.pomodoro_module
 	env_setter = ui_node.env_setter
-	
-	# 尝试查找番茄钟模块
-	var pomodoro_paths = [
-		"/root/Main/UI/PomodoroTechniqueModule",
-		"../PomodoroTechniqueModule"
-	]
-	for path in pomodoro_paths:
-		if has_node(path):
-			pomodoro_module = get_node(path)
-			if pomodoro_module:
-				print("[Parser] 已找到番茄钟模块: ", path)
-				break
 	
 	# 打印初始化结果
 	print("[Parser] 模块初始化完成:")
@@ -101,7 +91,6 @@ func _find_ui_node_recursive(node: Node) -> UI:
 	Dictionary: 解析结果，包含成功状态和错误信息
 """
 func parse_and_execute(json_text: String) -> Dictionary:
-	# 注意：此函数内部可能包含异步操作
 	var result = {
 		"success": false,
 		"error": "",
@@ -166,7 +155,6 @@ func parse_and_execute(json_text: String) -> Dictionary:
 
 # ====== 操作执行分发 ======
 func _execute_operation(operation: Dictionary) -> Dictionary:
-	# 注意：此函数可能返回协程结果，调用者需要使用 await
 	var result = {
 		"success": false,
 		"error": ""
@@ -575,11 +563,17 @@ func _start_focus_internal(focus_type: String, task_id: Variant) -> bool:
 		"tomato":
 			# 番茄钟专注模式
 			if pomodoro_module != null:
-				var pomodoro_technique = pomodoro_module.get_node_or_null("CanvasLayer/PomodoroTechnique")
-				if pomodoro_technique and pomodoro_technique.has_method("pomodoro_start"):
-					# 默认25分钟工作，5分钟休息，1次循环
-					pomodoro_technique.pomodoro_start(25, 5, 1)
+				# 默认25分钟工作，5分钟休息，1次循环
+				var success = pomodoro_module.agent_start_pomodoro(25, 5, 1)
+				if success:
+					print("[Parser] 成功启动番茄钟专注模式")
 					return true
+				else:
+					print("[Parser] 启动番茄钟专注模式失败")
+					return false
+			else:
+				print("[Parser] 警告: 番茄钟模块不可用")
+				return false
 		"free":
 			# 自由专注模式（待实现）
 			print("[Parser] 警告: 自由专注模式未实现")
@@ -589,7 +583,7 @@ func _start_focus_internal(focus_type: String, task_id: Variant) -> bool:
 			print("[Parser] 警告: 任务触发专注模式未实现")
 			return true
 	
-	print("[Parser] 警告: 专注模式管理功能未实现")
+	print("[Parser] 警告: 未知的专注类型: ", focus_type)
 	return false
 
 func _handle_end_focus(operation: Dictionary) -> Dictionary:
@@ -612,8 +606,12 @@ func _handle_end_focus(operation: Dictionary) -> Dictionary:
 
 func _end_focus_internal(focus_record_id: String) -> bool:
 	# 抽象层：本脚本内的处理方法
+	# 如果番茄钟正在运行，停止它
+	if pomodoro_module != null and pomodoro_module.agent_is_running():
+		return pomodoro_module.agent_stop()
+	
 	# 专注模式结束功能待实现
-	print("[Parser] 警告: 结束专注模式功能未实现")
+	print("[Parser] 警告: 结束专注模式功能未完全实现")
 	return true  # 待实现
 
 # ====== 演出脚本处理 ======
