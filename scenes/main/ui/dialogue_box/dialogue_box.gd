@@ -81,11 +81,11 @@ func _ready() -> void:
 ##由agent模块调用
 func show_module() -> void:
 	if !visible:
-		GuiTransitions.show()
+		GuiTransitions.show("dialogue")
 
 func hide_module() -> void:
 	if visible:
-		GuiTransitions.hide()
+		GuiTransitions.hide("dialogue")
 
 ## 开始显示对话（流式传输）
 ## @param text: 要显示的文本（支持 BBCode）

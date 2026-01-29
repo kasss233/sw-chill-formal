@@ -33,8 +33,8 @@ signal task_deadline_warning(task_id: int, task_title: String)
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
 @export var pomodoro_module: PomodoroTechniqueModule # 番茄钟模块引用
-@onready var dialogue_box: DialogueBox = $VBoxContainer/DialogueBox
-@onready var input_box: InputBox = $VBoxContainer/InputBox
+@export var dialogue_box: DialogueBox 
+@export var input_box: InputBox
 
 # --- 层级管理 ---
 ## 当前最高层级（用于模块 Z-order 管理）
@@ -139,6 +139,7 @@ func take_note(text: String):
 
 ## 添加新的notebook页面
 func add_note_in_notebook(_name: String, _content: String):
+	note_book.show_module()
 	note_book.add_page_and_open(_name, _content)
 
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
@@ -157,6 +158,7 @@ func set_env_time(mode: int) -> void:
 ## @param due_timestamp: 截止时间戳（可选）
 ## @return: 新任务的 ID
 func agent_add_task(title: String, due_timestamp: int = 0) -> int:
+	task_module.show_module()
 	if task_module:
 		return task_module.agent_add_task(title, due_timestamp)
 	return -1
@@ -203,15 +205,6 @@ func agent_get_all_tasks() -> Array[Dictionary]:
 		return task_module.agent_get_all_tasks()
 	return []
 
-## 显示任务模块
-func show_task_module() -> void:
-	if task_module:
-		task_module.show_module()
-
-## 隐藏任务模块
-func hide_task_module() -> void:
-	if task_module:
-		task_module.hide_module()
 
 # --- 公有 API (番茄钟模块包装) ---
 ## Agent API: 启动番茄钟
@@ -220,7 +213,8 @@ func hide_task_module() -> void:
 ## @param loop_times: 循环次数（默认1次）
 ## @return: 是否成功启动
 func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: int = 1) -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_start_pomodoro"):
+	if pomodoro_module:
+		pomodoro_module.show_module()
 		return pomodoro_module.agent_start_pomodoro(work_duration, rest_duration, loop_times)
 	return false
 
@@ -298,7 +292,10 @@ func agent_is_pomodoro_work_mode() -> bool:
 	if pomodoro_module and pomodoro_module.has_method("agent_is_work_mode"):
 		return pomodoro_module.agent_is_work_mode()
 	return false
-
+## dialogue box api
+func agent_start_dialogue(text:String):
+	dialogue_box.show_module()
+	dialogue_box.start_dialogue(text)
 # --- 测试面板控制 ---
 ## 切换测试面板显示/隐藏
 func toggle_test_panel() -> void:

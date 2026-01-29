@@ -74,6 +74,10 @@ func _on_pomodoro_technique_work_continued() -> void:
 ## @param rest_duration: 休息时间（分钟）
 ## @param loop_times: 循环次数（默认1次）
 ## @return: 是否成功启动
+func show_module():
+	if !pomodoro_technique.visible:
+		_request_top_layer()
+		pomodoro_button.set_state_no_signal(1)
 func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: int = 1) -> bool:
 	if pomodoro_technique == null:
 		print("[Pomodoro Module] 错误: pomodoro_technique 节点未找到")
@@ -83,8 +87,6 @@ func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: in
 	work_duration = max(1, work_duration)
 	rest_duration = max(1, rest_duration)
 	loop_times = max(1, loop_times)
-	# 显示番茄钟
-	pomodoro_button.set_state(1)
 	# 启动番茄钟
 	pomodoro_technique.pomodoro_start(work_duration, rest_duration, loop_times)
 	

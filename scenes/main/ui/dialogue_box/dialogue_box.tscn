@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://dcf7ss77y1j6m"]
+[gd_scene format=3 uid="uid://dcf7ss77y1j6m"]
 
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_dqju2"]
 [ext_resource type="Script" uid="uid://hu62fse1idga" path="res://scenes/main/ui/dialogue_box/dialogue_box.gd" id="1_s3jd5"]
@@ -14,7 +14,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_s3jd5")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_dqju2"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v7a05"]
 shader = ExtResource("1_dqju2")
 shader_parameter/corner_radius = 28.0
 shader_parameter/border_width = 1.0
@@ -26,10 +26,10 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_v7a05")
 shader_parameter/shadow_color = Color(0, 0, 0, 0)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 0)
-shader_parameter/size = Vector2(0, 0)
+shader_parameter/size = Vector2(57, 94)
 shader_parameter/shadow_padding = 8.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wnrju"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tvowg"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -41,45 +41,12 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s3jd5"]
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v7a05"]
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tvowg"]
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
-bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yy1dk"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -90,7 +57,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -101,7 +68,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -112,7 +79,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -123,7 +90,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -134,7 +101,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -145,7 +112,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -156,7 +123,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -167,7 +134,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -178,7 +145,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -189,7 +156,7 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
-bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -200,26 +167,59 @@ content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
 content_margin_bottom = 8.0
+bg_color = Color(0.24352942, 0.24352942, 0.24352942, 0.61960787)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4mtcg"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.34352943, 0.34352943, 0.34352943, 0.61960787)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jjo2k"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.18941177, 0.18941177, 0.18941177, 0.61960787)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yss8e"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
 bg_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[node name="DialogueBox" type="MarginContainer"]
+[node name="DialogueBox" type="MarginContainer" unique_id=457246421]
 visible = false
 offset_right = 300.0
 offset_bottom = 100.0
 script = ExtResource("1_s3jd5")
 min_height = 50.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1133320889]
 layout_mode = 2
 
-[node name="FrostedPanel" type="PanelContainer" parent="VBoxContainer"]
-material = SubResource("ShaderMaterial_dqju2")
+[node name="FrostedPanel" type="PanelContainer" parent="VBoxContainer" unique_id=1228968439]
+material = SubResource("ShaderMaterial_v7a05")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wnrju")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tvowg")
 script = ExtResource("2_wnrju")
 corner_radius = 28.0
 blur_amount = 2.0
@@ -228,36 +228,36 @@ shadow_color = Color(0, 0, 0, 0)
 shadow_offset = Vector2(0, 0)
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/FrostedPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/FrostedPanel" unique_id=1138051723]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/FrostedPanel/MarginContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/FrostedPanel/MarginContainer" unique_id=443690604]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 scroll_following = true
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=2080248200]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/MarginContainer" unique_id=934847300]
 layout_mode = 2
 alignment = 1
 
-[node name="MaterialButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="MaterialButton" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1854518127]
 clip_contents = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_filter = 1
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_s3jd5")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_v7a05")
-theme_override_styles/hover = SubResource("StyleBoxFlat_tvowg")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_yy1dk")
-theme_override_styles/focus = SubResource("StyleBoxFlat_4py1m")
+theme_override_styles/normal = SubResource("StyleBoxFlat_yy1dk")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_4py1m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tnjpt")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_p3akx")
+theme_override_styles/focus = SubResource("StyleBoxFlat_303go")
 text = "button1"
 script = ExtResource("1_wnrju")
 button_size = 2
@@ -266,17 +266,17 @@ background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius = 18
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="MaterialButton2" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="MaterialButton2" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=1701768651]
 clip_contents = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_filter = 1
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_tnjpt")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_p3akx")
-theme_override_styles/hover = SubResource("StyleBoxFlat_303go")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_xi0py")
-theme_override_styles/focus = SubResource("StyleBoxFlat_q7ct1")
+theme_override_styles/normal = SubResource("StyleBoxFlat_xi0py")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_q7ct1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_0fxuo")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_vcy07")
+theme_override_styles/focus = SubResource("StyleBoxFlat_vfb1o")
 text = "button2"
 script = ExtResource("1_wnrju")
 button_size = 2
@@ -285,17 +285,17 @@ background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius = 18
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="MaterialButton3" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer"]
+[node name="MaterialButton3" type="Button" parent="VBoxContainer/MarginContainer/HBoxContainer" unique_id=217532743]
 clip_contents = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_filter = 1
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_0fxuo")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_vcy07")
-theme_override_styles/hover = SubResource("StyleBoxFlat_vfb1o")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_xhf2a")
-theme_override_styles/focus = SubResource("StyleBoxFlat_pg120")
+theme_override_styles/normal = SubResource("StyleBoxFlat_xhf2a")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_pg120")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4mtcg")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_jjo2k")
+theme_override_styles/focus = SubResource("StyleBoxFlat_yss8e")
 text = "button3"
 script = ExtResource("1_wnrju")
 button_size = 2
@@ -304,9 +304,10 @@ background_color = Color(0.27058825, 0.27058825, 0.27058825, 0.61960787)
 corner_radius = 18
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="GuiTransition" type="Node" parent="."]
+[node name="GuiTransition" type="Node" parent="." unique_id=1567284432]
 script = ExtResource("5_v7a05")
 animation_enter = 4
 animation_leave = 4
 layout = NodePath("..")
+layout_id = "dialogue"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"

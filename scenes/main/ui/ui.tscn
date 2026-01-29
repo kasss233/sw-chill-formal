@@ -122,7 +122,7 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module")]
+[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module", "dialogue_box", "input_box")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -136,6 +136,8 @@ note_book = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteBo
 task_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule")
 env_setter = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter")
 pomodoro_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule")
+dialogue_box = NodePath("VBoxContainer/DialogueBox")
+input_box = NodePath("VBoxContainer/InputBox")
 
 [node name="TabPanel" type="MarginContainer" parent="." unique_id=1423112940]
 layout_mode = 1
@@ -171,6 +173,7 @@ layout_mode = 2
 _ui = NodePath("../../../../..")
 
 [node name="NoteButton" type="Button" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1522244772]
+visible = false
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -220,7 +223,6 @@ grow_vertical = 0
 alignment = 2
 
 [node name="DialogueBox" parent="VBoxContainer" unique_id=2128522262 instance=ExtResource("15_khr3h")]
-visible = true
 layout_mode = 2
 
 [node name="InputBox" parent="VBoxContainer" unique_id=374615679 instance=ExtResource("6_nswco")]

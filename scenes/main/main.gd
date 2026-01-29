@@ -10,8 +10,8 @@ extends Node
 @export var RAINY_LIGHT_ENERGY := 0.2
 @export var SUNNY_LIGHT_ENERGY := 0.7
 @export_category("项目演示")
-@export var animation_player:AnimationPlayer
-
+@export var animation_player: AnimationPlayer
+@export var snack_bar:MaterialSnackbar
 func _ready() -> void:
 	_init_time()
 	_init_weather()
@@ -133,5 +133,5 @@ func _on_ui_work_continued() -> void:
 
 
 func _on_ui_text_submitted() -> void:
-	print("play_animation")
-	animation_player.play("focus")
+	#snack_bar.display_position = MaterialSnackbar.POS_TOP_CENTER
+	snack_bar.show_warning("DEMO未连接服务器，agent暂不可用")

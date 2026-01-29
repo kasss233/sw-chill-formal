@@ -47,7 +47,6 @@ func hide_module():
 		
 ## Agent API: 添加新任务（带动画）
 func agent_add_task(title: String, due_timestamp: int = 0) -> int:
-	show_module()
 	return task_module_new.agent_add_task(title, due_timestamp)
 
 ## Agent API: 修改任务名称（模拟打字效果）

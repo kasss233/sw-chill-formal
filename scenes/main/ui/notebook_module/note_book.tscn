@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://bmsmfccv7kma"]
+[gd_scene format=3 uid="uid://bmsmfccv7kma"]
 
 [ext_resource type="Script" uid="uid://c5icyiww08u1w" path="res://scenes/main/ui/notebook_module/note_book.gd" id="1_00gxi"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_uh028"]
@@ -103,7 +103,7 @@ shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(446, 432)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_df4gt"]
 content_margin_left = 12.0
@@ -192,7 +192,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="NoteBook" type="MarginContainer" node_paths=PackedStringArray("vbox", "inner_panel", "panel", "button")]
+[node name="NoteBook" type="MarginContainer" unique_id=1743526448 node_paths=PackedStringArray("vbox", "inner_panel", "panel", "button")]
 offset_right = 36.0
 offset_bottom = 36.0
 script = ExtResource("1_00gxi")
@@ -203,7 +203,7 @@ inner_panel = NodePath("CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/Inn
 panel = NodePath("CanvasLayer/FrostedPanel")
 button = NodePath("MaterialButton")
 
-[node name="MaterialButton" type="Button" parent="."]
+[node name="MaterialButton" type="Button" parent="." unique_id=667220230]
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -225,9 +225,9 @@ padding_horizontal = 20
 padding_vertical = 10
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1643876029]
 
-[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer"]
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=815434489]
 visible = false
 material = SubResource("ShaderMaterial_4b6by")
 anchors_preset = 8
@@ -247,10 +247,10 @@ script = ExtResource("2_0j3f0")
 noise_texture = SubResource("NoiseTexture2D_00gxi")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel" unique_id=311452755]
 layout_mode = 2
 
-[node name="AddButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="AddButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1865394782]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -267,19 +267,19 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1168929349]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=1219984745]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/ScrollContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/ScrollContainer" unique_id=316320325]
 layout_mode = 2
 theme_override_constants/separation = 60
 
-[node name="InnerPanel" type="PanelContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="InnerPanel" type="PanelContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=2095375313]
 material = SubResource("ShaderMaterial_82msw")
 layout_mode = 2
 size_flags_horizontal = 3
@@ -288,7 +288,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_hfbqt")
 script = ExtResource("9_i5tje")
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 
-[node name="GuiTransition" type="Node" parent="."]
+[node name="GuiTransition" type="Node" parent="." unique_id=1304384110]
 script = ExtResource("13_155b8")
 auto_start = 0
 animation_enter = 3

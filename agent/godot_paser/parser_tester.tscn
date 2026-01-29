@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://bk1aqy41m4cr7" path="res://agent/godot_paser/parser_tester.gd" id="1_e8au2"]
 
 [node name="ParserTester" type="CenterContainer" unique_id=524824042]
-offset_right = 1152.0
-offset_bottom = 648.0
+offset_right = 184.0
+offset_bottom = 206.0
 script = ExtResource("1_e8au2")
 metadata/_edit_group_ = true
 

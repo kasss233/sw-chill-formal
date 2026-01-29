@@ -38,14 +38,13 @@ func _request_top_layer() -> void:
 		# 降级方案：使用固定的高层级
 		canvas_layer.layer = 100
 
-
-func add_page_and_open(_name: String, _content: String) -> void:
+func show_module():
 	if !panel.visible:
 		# 请求新的顶层层级
 		_request_top_layer()
 		GuiTransitions.show("notebook")
-	if button.current_state == 0:
-		button.set_state(1)
+		button.set_state_no_signal(1)
+func add_page_and_open(_name: String, _content: String) -> void:
 	var new_page_button = add_page(_name)
 	# 设置页面内容
 	pages[new_page_button] = _content

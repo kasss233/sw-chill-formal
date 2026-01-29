@@ -10,61 +10,61 @@ func _on_button_pressed() -> void:
   "performance_sequence": null,
   "operations": [
     {
-      "action": "create_task",
-      "task": {
-        "id": "task_001",
-        "project_id": "root",
-        "info": {
-          "description": "学习Python基础语法",
-          "created_at": "2026-01-21T15:33:06.706338",
-          "last_modified_by": null,
-          "owner": "girl",
-          "completed_count": 0,
-          "total_time_spent": 0,
-          "focus_records": [],
-          "attachments": []
+	  "action": "create_task",
+	  "task": {
+		"id": "task_001",
+		"project_id": "root",
+		"info": {
+		  "description": "学习Python基础语法",
+		  "created_at": "2026-01-21T15:33:06.706338",
+		  "last_modified_by": null,
+		  "owner": "girl",
+		  "completed_count": 0,
+		  "total_time_spent": 0,
+		  "focus_records": [],
+		  "attachments": []
         },
-        "parent_task_id": null,
-        "subtasks": [],
-        "completed": false,
-        "sort_order": 0,
-        "repeat": {
-          "enabled": false,
-          "weekdays": []
+		"parent_task_id": null,
+		"subtasks": [],
+		"completed": false,
+		"sort_order": 0,
+		"repeat": {
+		  "enabled": false,
+		  "weekdays": []
         },
-        "deadline": null,
-        "start_time": null,
-        "reminder_enabled": false
+		"deadline": null,
+		"start_time": null,
+		"reminder_enabled": false
       }
     },
     {
-      "action": "create_task",
-      "task": {
-        "id": "task_002",
-        "project_id": "root",
-        "info": {
-          "description": "完成Python练习题",
-          "created_at": "2026-01-21T15:33:06.706338",
-          "owner": "girl"
+	  "action": "create_task",
+	  "task": {
+		"id": "task_002",
+		"project_id": "root",
+		"info": {
+		  "description": "完成Python练习题",
+		  "created_at": "2026-01-21T15:33:06.706338",
+		  "owner": "girl"
         },
-        "completed": false,
-        "sort_order": 1
+		"completed": false,
+		"sort_order": 1
       }
     },
     {
-      "action": "start_focus",
-      "focus_type": "tomato",
-      "task_id": "task_001"
+	  "action": "start_focus",
+	  "focus_type": "tomato",
+	  "task_id": "task_001"
     },
     {
-      "action": "update_bgm",
-      "operation_type": "switch",
-      "track_id": "轻松学习音乐"
+	  "action": "update_bgm",
+	  "operation_type": "switch",
+	  "track_id": "轻松学习音乐"
     },
     {
-      "action": "update_bgm",
-      "operation_type": "toggle",
-      "play": true
+	  "action": "update_bgm",
+	  "operation_type": "toggle",
+	  "play": true
     }
   ]
 }""")
