@@ -56,3 +56,7 @@ func _on_setting_button_pressed() -> void:
 		# 请求新的顶层层级
 		_request_top_layer()
 		GuiTransitions.show("setter")
+
+
+func _on_full_screen_checkbox_toggled(toggled_on: bool) -> void:
+	pass # Replace with function body.

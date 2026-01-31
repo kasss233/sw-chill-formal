@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://bsk40q141nhng"]
+[gd_scene format=3 uid="uid://bsk40q141nhng"]
 
 [ext_resource type="Script" uid="uid://g3h1hclaruxb" path="res://scenes/main/ui/env_setter/env_setter.gd" id="1_iahff"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_b4mu8"]
@@ -11,8 +11,11 @@
 [ext_resource type="Texture2D" uid="uid://cgyvm6ep5vpyw" path="res://assets/ui/icons/sync_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_wn8k3"]
 [ext_resource type="Texture2D" uid="uid://ea1alaylyb6w" path="res://assets/ui/icons/rainy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="8_b4mu8"]
 [ext_resource type="Texture2D" uid="uid://dsyfo2labws7t" path="res://assets/ui/icons/weather_snowy_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="9_t7p8r"]
+[ext_resource type="Script" uid="uid://bkxpnxtj5fc1f" path="res://scenes/main/ui/components/checkbox/MaterialCheckBox.gd" id="12_jec7i"]
 [ext_resource type="Texture2D" uid="uid://bc6fqld333u7d" path="res://assets/ui/icons/settings_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="12_s3f03"]
+[ext_resource type="Texture2D" uid="uid://x7vncxw8bj6s" path="res://assets/ui/icons/radio_button_unchecked_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="13_7oay3"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="13_wn8k3"]
+[ext_resource type="Texture2D" uid="uid://bmu6xfxqdku2p" path="res://assets/ui/icons/check_circle_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="14_m4j3q"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_wn8k3"]
 frequency = 0.1
@@ -22,7 +25,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_wn8k3")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wn8k3"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jec7i"]
 shader = ExtResource("2_xly7c")
 shader_parameter/corner_radius = 12.0
 shader_parameter/border_width = 1.0
@@ -37,7 +40,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(349, 333)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3bpux"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7oay3"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -49,7 +52,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j36pu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4j3q"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -60,7 +63,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jec7i"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iwq8r"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -71,7 +74,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7oay3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe1vx"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -82,7 +85,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m4j3q"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1d75j"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -93,7 +96,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iwq8r"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_22lqf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -128,7 +131,7 @@ state_name = "Sync_with_system"
 icon = ExtResource("7_wn8k3")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fe1vx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_auo4y"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -139,7 +142,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1d75j"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3etl"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -150,7 +153,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_22lqf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4yohj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -161,7 +164,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_auo4y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42ut6"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -172,7 +175,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3etl"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w6x06"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -207,7 +210,75 @@ state_name = "sync_with_reality"
 icon = ExtResource("7_wn8k3")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4yohj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s32jb"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qcv22"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_podmi"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.12)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kndp6"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.12)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v2kby"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.06)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ann06"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="ImageTexture" id="ImageTexture_45rl1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_alj4q"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -218,7 +289,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42ut6"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6mu7y"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -229,7 +300,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w6x06"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ehqmy"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -240,7 +311,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s32jb"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rg6vi"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -251,7 +322,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qcv22"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ct6nm"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -280,16 +351,16 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="EnvSetter" type="MarginContainer"]
+[node name="EnvSetter" type="MarginContainer" unique_id=1235257647]
 offset_right = 48.0
 offset_bottom = 48.0
 script = ExtResource("1_iahff")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2054325971]
 
-[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer"]
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=711930611]
 visible = false
-material = SubResource("ShaderMaterial_wn8k3")
+material = SubResource("ShaderMaterial_jec7i")
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -301,29 +372,29 @@ offset_right = 174.5
 offset_bottom = 166.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_3bpux")
+theme_override_styles/panel = SubResource("StyleBoxFlat_7oay3")
 script = ExtResource("3_s3f03")
 noise_texture = SubResource("NoiseTexture2D_3bpux")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel" unique_id=1746556238]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1147939088]
 layout_mode = 2
 text = "设置"
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1955574934]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=916364810]
 layout_mode = 2
 text = "时间设置"
 horizontal_alignment = 1
 
-[node name="TimeButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="TimeButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=1403130573]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -334,26 +405,26 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_j36pu")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_jec7i")
-theme_override_styles/hover = SubResource("StyleBoxFlat_7oay3")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_m4j3q")
-theme_override_styles/focus = SubResource("StyleBoxFlat_iwq8r")
+theme_override_styles/normal = SubResource("StyleBoxFlat_m4j3q")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_iwq8r")
+theme_override_styles/hover = SubResource("StyleBoxFlat_fe1vx")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_1d75j")
+theme_override_styles/focus = SubResource("StyleBoxFlat_22lqf")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_84458"), SubResource("Resource_5cvtp"), SubResource("Resource_2s0wq"), SubResource("Resource_2tfue")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=146928363]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2" unique_id=776993055]
 layout_mode = 2
 text = "天气设置"
 horizontal_alignment = 1
 
-[node name="WeatherButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2"]
+[node name="WeatherButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2" unique_id=794756869]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -364,16 +435,49 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_fe1vx")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_1d75j")
-theme_override_styles/hover = SubResource("StyleBoxFlat_22lqf")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_auo4y")
-theme_override_styles/focus = SubResource("StyleBoxFlat_h3etl")
+theme_override_styles/normal = SubResource("StyleBoxFlat_auo4y")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_h3etl")
+theme_override_styles/hover = SubResource("StyleBoxFlat_4yohj")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_42ut6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_w6x06")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_3bpux"), SubResource("Resource_j36pu"), SubResource("Resource_fe1vx"), SubResource("Resource_iwq8r")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="SettingButton" type="Button" parent="."]
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1701583484]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3" unique_id=456597509]
+layout_mode = 2
+text = "全屏"
+
+[node name="FullScreenCheckbox" type="CheckBox" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3" unique_id=2134212292]
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_s32jb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qcv22")
+theme_override_styles/hover = SubResource("StyleBoxFlat_podmi")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_kndp6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_v2kby")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ann06")
+theme_override_constants/check_v_offset = 0
+theme_override_icons/checked = SubResource("ImageTexture_45rl1")
+theme_override_icons/unchecked = SubResource("ImageTexture_45rl1")
+theme_override_icons/checked_disabled = SubResource("ImageTexture_45rl1")
+theme_override_icons/unchecked_disabled = SubResource("ImageTexture_45rl1")
+alignment = 1
+script = ExtResource("12_jec7i")
+unchecked_icon = ExtResource("13_7oay3")
+checked_icon = ExtResource("14_m4j3q")
+metadata/_custom_type_script = "uid://bkxpnxtj5fc1f"
+
+[node name="SettingButton" type="Button" parent="." unique_id=199275167]
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -382,17 +486,17 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_4yohj")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_42ut6")
-theme_override_styles/hover = SubResource("StyleBoxFlat_w6x06")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_s32jb")
-theme_override_styles/focus = SubResource("StyleBoxFlat_qcv22")
+theme_override_styles/normal = SubResource("StyleBoxFlat_alj4q")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6mu7y")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ehqmy")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_rg6vi")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ct6nm")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_yna35"), SubResource("Resource_u7uji")])
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="GuiTransition" type="Node" parent="."]
+[node name="GuiTransition" type="Node" parent="." unique_id=1698396598]
 script = ExtResource("13_wn8k3")
 auto_start = 0
 animation_enter = 3
@@ -406,4 +510,5 @@ metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/TimeButton" to="." method="_on_time_button_state_changed"]
 [connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/WeatherButton" to="." method="_on_weather_button_state_changed"]
+[connection signal="toggled" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3/FullScreenCheckbox" to="." method="_on_full_screen_checkbox_toggled"]
 [connection signal="pressed" from="SettingButton" to="." method="_on_setting_button_pressed"]
