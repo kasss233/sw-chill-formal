@@ -17,6 +17,8 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 config/name="sw_chill_formal"
 run/main_scene="uid://6h1mp3m4h25v"
 config/features=PackedStringArray("4.6", "Mobile")
+boot_splash/bg_color=Color(0.99607843, 0.99607843, 0.99607843, 1)
+boot_splash/image="uid://cld63jad5senf"
 config/icon="res://icon.svg"
 
 [autoload]
