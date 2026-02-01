@@ -1,4 +1,4 @@
-[gd_scene load_steps=64 format=3 uid="uid://bro0lt35ms0j1"]
+[gd_scene format=3 uid="uid://bro0lt35ms0j1"]
 
 [ext_resource type="Script" uid="uid://clfpgn6mc6pdp" path="res://scenes/main/ui/input_box/input_box.gd" id="1_o8rmt"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_q8yjo"]
@@ -396,12 +396,12 @@ text = "拍照"
 icon = ExtResource("16_d007x")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
-[node name="InputBox" type="MarginContainer"]
+[node name="InputBox" type="MarginContainer" unique_id=555437207]
 offset_right = 316.0
 offset_bottom = 76.0
 script = ExtResource("1_o8rmt")
 
-[node name="FrostedPanel" type="PanelContainer" parent="."]
+[node name="FrostedPanel" type="PanelContainer" parent="." unique_id=375968268]
 material = SubResource("ShaderMaterial_kuivi")
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bqtvt")
@@ -410,19 +410,19 @@ corner_radius = 25.0
 noise_texture = SubResource("NoiseTexture2D_sd66l")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel" unique_id=1078382059]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer" unique_id=274074280]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="SmoothScrollContainer" type="ScrollContainer" parent="FrostedPanel/MarginContainer/VBoxContainer"]
+[node name="SmoothScrollContainer" type="ScrollContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=335971954]
 visible = false
 layout_mode = 2
 horizontal_scroll_mode = 3
@@ -432,10 +432,10 @@ wheel_scroll_damper = SubResource("Resource_xijg3")
 dragging_scroll_damper = SubResource("Resource_o8rmt")
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
-[node name="AttachHBoxContainer" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer"]
+[node name="AttachHBoxContainer" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer" unique_id=449592782]
 layout_mode = 2
 
-[node name="MaterialChip" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer"]
+[node name="MaterialChip" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer" unique_id=39623609]
 visible = false
 custom_minimum_size = Vector2(108, 32)
 layout_mode = 2
@@ -447,7 +447,7 @@ text = "图片1"
 chip_icon = ExtResource("15_vyd8f")
 metadata/_custom_type_script = "uid://3xl08c2pg3qt"
 
-[node name="MaterialChip2" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer"]
+[node name="MaterialChip2" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer" unique_id=1603512958]
 visible = false
 custom_minimum_size = Vector2(108, 32)
 layout_mode = 2
@@ -459,13 +459,13 @@ text = "图片2"
 chip_icon = ExtResource("15_vyd8f")
 metadata/_custom_type_script = "uid://3xl08c2pg3qt"
 
-[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel/MarginContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=530039954]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 
-[node name="TextEdit" type="TextEdit" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer"]
+[node name="TextEdit" type="TextEdit" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer" unique_id=1833996257]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxEmpty_xijg3")
@@ -475,11 +475,11 @@ context_menu_enabled = false
 wrap_mode = 1
 scroll_smooth = true
 
-[node name="ButtonHBoxContainer" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer"]
+[node name="ButtonHBoxContainer" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=87496387]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="AddButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" node_paths=PackedStringArray("menu")]
+[node name="AddButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" unique_id=596669394 node_paths=PackedStringArray("menu")]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -497,15 +497,15 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="LineEdit" type="LineEdit" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" unique_id=1434703602]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxEmpty_vyd8f")
 theme_override_styles/read_only = SubResource("StyleBoxEmpty_d007x")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_q6tgl")
-placeholder_text = "Ciallo～(∠・ω< )⌒★"
+placeholder_text = "Ciallo~(∠-ω< )⌒★"
 
-[node name="TalkButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer"]
+[node name="TalkButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" unique_id=552309796]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -522,7 +522,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="SubmitToggleButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer"]
+[node name="SubmitToggleButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" unique_id=1104283517]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -540,7 +540,7 @@ script = ExtResource("5_at8a5")
 states = Array[ExtResource("6_t5fk1")]([SubResource("Resource_60koo"), SubResource("Resource_51pwm")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="CancelButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" node_paths=PackedStringArray("menu")]
+[node name="CancelButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" unique_id=1569775089 node_paths=PackedStringArray("menu")]
 visible = false
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
@@ -559,7 +559,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="OkButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" node_paths=PackedStringArray("menu")]
+[node name="OkButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer" unique_id=1925959590 node_paths=PackedStringArray("menu")]
 visible = false
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
@@ -578,7 +578,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="FileDialog" type="FileDialog" parent="."]
+[node name="FileDialog" type="FileDialog" parent="." unique_id=1604467096]
 title = "Open a File"
 initial_position = 1
 size = Vector2i(600, 400)
@@ -588,7 +588,7 @@ access = 2
 filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.gif, *.bmp, *.webp ; 图片文件")
 use_native_dialog = true
 
-[node name="MaterialSnackbar" type="Control" parent="."]
+[node name="MaterialSnackbar" type="Control" parent="." unique_id=121710644]
 visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 2
@@ -596,9 +596,9 @@ script = ExtResource("17_snackbar")
 display_position = 1
 use_viewport_size = true
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1221344660]
 
-[node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer"]
+[node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=1625279168]
 visible = false
 custom_minimum_size = Vector2(100, 0)
 offset_left = 71.0
