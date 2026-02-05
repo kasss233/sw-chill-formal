@@ -37,8 +37,8 @@ shader_parameter/noise_texture = SubResource("NoiseTexture2D_a7tfl")
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/size = Vector2(88, 296)
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
 content_margin_left = 12.0
@@ -238,6 +238,7 @@ offset_bottom = -12.0
 _ui = NodePath("..")
 
 [node name="CharacterInteractor" parent="." unique_id=1482575657 instance=ExtResource("5_fhd3w")]
+visible = false
 layout_mode = 0
 offset_left = 642.0
 offset_top = 115.0

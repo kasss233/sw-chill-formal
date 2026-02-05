@@ -6,19 +6,19 @@ extends Node3D
 @export var emotion_tree: AnimationTree
 @export var typing: bool = false
 @export var happy: bool = false
-@export var saying:bool=false
-@export var sad:bool=true
-@export var surprised:bool=true
-@export var angry:bool=true
+@export var saying: bool = false
+@export var sad: bool = true
+@export var surprised: bool = true
+@export var angry: bool = true
 var action_playback: AnimationNodeStateMachinePlayback
 func _ready() -> void:
 	action_tree.active = true
 	action_playback = action_tree.get("parameters/playback")
 ## 对话接口
 func start_saying():
-	saying=true
+	saying = true
 func stop_saying():
-	saying=false
+	saying = false
 	
 ## 动作接口
 func set_typing_pose(_typing: bool):
@@ -38,11 +38,15 @@ func set_clap_pose():
 func set_laughing_pose():
 	action_playback.travel("laughing")
 ## 表情接口
-func set_happy(enable:bool):
-	happy=enable
-func set_sad(enable:bool):
-	sad=enable
-func set_surprised(enable:bool):
-	surprised=enable
-func set_angry(enable:bool):
-	angry=enable
+func set_happy(enable: bool):
+	happy = enable
+func set_sad(enable: bool):
+	sad = enable
+func set_surprised(enable: bool):
+	surprised = enable
+func set_angry(enable: bool):
+	angry = enable
+
+
+func _on_area_3d_input_event(camera: Node, event: InputEvent, event_position: Vector3, normal: Vector3, shape_idx: int) -> void:
+	print("Character clicked,shape_idx:", shape_idx)
