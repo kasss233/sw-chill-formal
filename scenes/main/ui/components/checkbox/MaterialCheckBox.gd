@@ -60,6 +60,18 @@ enum CheckboxSize {
 		background_color = value
 		_update_checkbox_style()
 
+## 选中状态背景颜色 (默认透明，用于 checkbox 被选中时的背景)
+@export var pressed_background_color: Color = Color.TRANSPARENT:
+	set(value):
+		pressed_background_color = value
+		_update_checkbox_style()
+
+## 选中且悬停状态背景颜色 (默认淡灰色)
+@export var hover_pressed_background_color: Color = Color(0.4, 0.4, 0.4, 0.12):
+	set(value):
+		hover_pressed_background_color = value
+		_update_checkbox_style()
+
 ## 圆角半径 (自动根据尺寸计算，设为-1使用自动值)
 @export var corner_radius: int = -1:
 	set(value):
@@ -176,8 +188,8 @@ func _update_checkbox_style() -> void:
 	# 创建基础样式（左边距会在 _update_layout 中调整）
 	_create_stylebox("normal", background_color, radius)
 	_create_stylebox("hover", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), radius)
-	_create_stylebox("pressed", background_color.darkened(0.1) if background_color.a > 0 else Color(0.35, 0.35, 0.35, 0.10), radius)
-	_create_stylebox("hover_pressed", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), radius)
+	_create_stylebox("pressed", pressed_background_color, radius)
+	_create_stylebox("hover_pressed", hover_pressed_background_color, radius)
 	_create_stylebox("focus", background_color, radius)
 	_create_stylebox("disabled", background_color.darkened(0.3) if background_color.a > 0 else Color(0.2, 0.2, 0.2, 0.06), radius)
 
@@ -246,8 +258,8 @@ func _update_layout() -> void:
 			var left_margin = padding_horizontal + actual_icon_size + icon_text_gap
 			_create_stylebox_ex("normal", background_color, radius, left_margin)
 			_create_stylebox_ex("hover", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), radius, left_margin)
-			_create_stylebox_ex("hover_pressed", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), radius, left_margin)
-			_create_stylebox_ex("pressed", background_color.darkened(0.1) if background_color.a > 0 else Color(0.35, 0.35, 0.35, 0.10), radius, left_margin)
+			_create_stylebox_ex("hover_pressed", hover_pressed_background_color, radius, left_margin)
+			_create_stylebox_ex("pressed", pressed_background_color, radius, left_margin)
 			_create_stylebox_ex("focus", background_color, radius, left_margin)
 			_create_stylebox_ex("disabled", background_color.darkened(0.3) if background_color.a > 0 else Color(0.2, 0.2, 0.2, 0.06), radius, left_margin)
 			
@@ -268,8 +280,8 @@ func _update_layout() -> void:
 			var circle_radius = int(checkbox_height / 2.0)
 			_create_stylebox_circle("normal", background_color, circle_radius)
 			_create_stylebox_circle("hover", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), circle_radius)
-			_create_stylebox_circle("hover_pressed", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), circle_radius)
-			_create_stylebox_circle("pressed", background_color.darkened(0.1) if background_color.a > 0 else Color(0.35, 0.35, 0.35, 0.10), circle_radius)
+			_create_stylebox_circle("hover_pressed", hover_pressed_background_color, circle_radius)
+			_create_stylebox_circle("pressed", pressed_background_color, circle_radius)
 			_create_stylebox_circle("focus", background_color, circle_radius)
 			_create_stylebox_circle("disabled", background_color.darkened(0.3) if background_color.a > 0 else Color(0.2, 0.2, 0.2, 0.06), circle_radius)
 			
@@ -281,9 +293,9 @@ func _update_layout() -> void:
 		custom_minimum_size.x = 0
 		
 		_create_stylebox("normal", background_color, radius)
-		_create_stylebox("hover_pressed", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), radius)
+		_create_stylebox("hover_pressed", hover_pressed_background_color, radius)
 		_create_stylebox("hover", background_color.lightened(0.1) if background_color.a > 0 else Color(0.4, 0.4, 0.4, 0.12), radius)
-		_create_stylebox("pressed", background_color.darkened(0.1) if background_color.a > 0 else Color(0.35, 0.35, 0.35, 0.10), radius)
+		_create_stylebox("pressed", pressed_background_color, radius)
 		_create_stylebox("focus", background_color, radius)
 		_create_stylebox("disabled", background_color.darkened(0.3) if background_color.a > 0 else Color(0.2, 0.2, 0.2, 0.06), radius)
 		
