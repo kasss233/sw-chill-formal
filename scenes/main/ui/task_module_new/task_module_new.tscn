@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://cshc06pyk77f"]
+[gd_scene format=3 uid="uid://cshc06pyk77f"]
 
 [ext_resource type="PackedScene" uid="uid://behstljx3cp30" path="res://scenes/main/ui/task_module_new/task_item/TaskItem.tscn" id="1_d7dkk"]
 [ext_resource type="Script" uid="uid://ct3ivf1xpbpy1" path="res://scenes/main/ui/task_module_new/task_module_new.gd" id="1_u3ulj"]
@@ -15,24 +15,15 @@
 [ext_resource type="Texture2D" uid="uid://cfkbg6r6pkpu8" path="res://assets/ui/icons/stat_1_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="12_ji0d4"]
 [ext_resource type="Texture2D" uid="uid://bmjaa8f3sscwa" path="res://assets/ui/icons/stat_minus_1_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="13_lwmwt"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_lwmwt"]
-frequency = 0.1
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_x5yqf"]
-width = 64
-height = 64
-noise = SubResource("FastNoiseLite_lwmwt")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lwmwt"]
 shader = ExtResource("3_lwmwt")
 shader_parameter/corner_radius = 21.555
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
 shader_parameter/blur_amount = 3.0
-shader_parameter/tint_color = Color(0, 0, 0, 0.47843137)
+shader_parameter/tint_color = Color(0.3, 0.3, 0.3, 0.39215687)
 shader_parameter/noise_amount = 0.0
-shader_parameter/noise_texture = SubResource("NoiseTexture2D_x5yqf")
-shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(308, 494)
@@ -179,38 +170,37 @@ corner_radius_bottom_left = 6
 
 [sub_resource type="ImageTexture" id="ImageTexture_13sj2"]
 
-[node name="TaskModuleNew" type="MarginContainer"]
+[node name="TaskModuleNew" type="MarginContainer" unique_id=1788900625]
 offset_right = 308.0
 offset_bottom = 494.0
 script = ExtResource("1_u3ulj")
 task_item = ExtResource("1_d7dkk")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1635944858]
 material = SubResource("ShaderMaterial_lwmwt")
 clip_contents = true
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_x5yqf")
 script = ExtResource("5_ji0d4")
 corner_radius = 21.555
-tint_color = Color(0, 0, 0, 0.47843137)
-noise_texture = SubResource("NoiseTexture2D_x5yqf")
+tint_color = Color(0.3, 0.3, 0.3, 0.39215687)
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=989263620]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
+[node name="MarginContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=1445352472]
 layout_mode = 2
 theme_override_constants/margin_top = 9
 theme_override_constants/margin_bottom = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer2"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/MarginContainer2" unique_id=854299387]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="ModuleTitleLabel" type="Label" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+[node name="ModuleTitleLabel" type="Label" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer" unique_id=325636567]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -220,12 +210,12 @@ theme_override_font_sizes/font_size = 23
 text = "     Tasks"
 vertical_alignment = 1
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer" unique_id=1316758033]
 layout_mode = 2
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 16
 
-[node name="AddButton" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer"]
+[node name="AddButton" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/MarginContainer" unique_id=803622298]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -243,14 +233,14 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=243079631]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
-[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer" unique_id=854459190]
 custom_minimum_size = Vector2(252, 400)
 layout_mode = 2
 horizontal_scroll_mode = 0
@@ -262,7 +252,7 @@ hide_scrollbar_over_time = true
 scrollbar_hide_time = 1.0
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
-[node name="VBoxContainer" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer" node_paths=PackedStringArray("scroll_container")]
+[node name="VBoxContainer" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer" unique_id=1401571241 node_paths=PackedStringArray("scroll_container")]
 process_mode = 1
 custom_minimum_size = Vector2(0, 37)
 layout_mode = 2
@@ -273,7 +263,7 @@ is_vertical = true
 scroll_container = NodePath("..")
 metadata/_custom_type_script = "uid://ft8rxsmymmhj"
 
-[node name="FinishedCheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer"]
+[node name="FinishedCheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=224541829]
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 mouse_filter = 1

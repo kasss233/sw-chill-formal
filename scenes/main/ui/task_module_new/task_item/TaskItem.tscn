@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://behstljx3cp30"]
+[gd_scene format=3 uid="uid://behstljx3cp30"]
 
 [ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="1_ndk72"]
 [ext_resource type="Script" uid="uid://cqyqohlo4a7gr" path="res://scenes/main/ui/task_module_new/task_item/task_item.gd" id="1_v2s4w"]
@@ -17,7 +17,7 @@ shader = ExtResource("1_ndk72")
 shader_parameter/corner_radius = 20.0
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/background_color = Color(1, 1, 1, 0.078431375)
 shader_parameter/size = Vector2(252, 42)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tlddx"]
@@ -265,7 +265,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[node name="TaskItem" type="PanelContainer"]
+[node name="TaskItem" type="PanelContainer" unique_id=1305148266]
 material = SubResource("ShaderMaterial_ndk72")
 offset_right = 252.0
 offset_bottom = 42.0
@@ -273,24 +273,25 @@ mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_tlddx")
 script = ExtResource("1_v2s4w")
 corner_radius = 20.0
+background_color = Color(1, 1, 1, 0.078431375)
 content_padding = 0.0
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=907229849]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 5
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=457565238]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=2088645008]
 layout_mode = 2
 alignment = 1
 
-[node name="CompleteCheckBox" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="CompleteCheckBox" type="CheckBox" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=2083904685]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_vertical = 4
@@ -318,12 +319,12 @@ checked_icon = ExtResource("5_aidl3")
 icon_size = 24
 metadata/_custom_type_script = "uid://bkxpnxtj5fc1f"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=549036742]
 layout_mode = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="LineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=463877742]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 mouse_filter = 2
@@ -331,18 +332,18 @@ theme = ExtResource("2_kna65")
 text = "233"
 script = ExtResource("3_6axyk")
 
-[node name="DueTimeLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="DueTimeLabel" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer" unique_id=2050298036]
 visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "Today 22:00"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1770970898]
 visible = false
 layout_mode = 2
 alignment = 2
 
-[node name="TimeSetButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="TimeSetButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=2051623746]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -360,7 +361,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="DelButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="DelButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=862994581]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -378,7 +379,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=208401152]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -396,7 +397,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="LongPressTimer" type="Timer" parent="."]
+[node name="LongPressTimer" type="Timer" parent="." unique_id=1112131089]
 wait_time = 0.1
 
 [connection signal="toggled" from="MarginContainer/VBoxContainer/HBoxContainer/CompleteCheckBox" to="." method="_on_complete_check_box_toggled"]

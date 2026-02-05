@@ -382,6 +382,10 @@ func get_item(index: int) -> Control:
 		return _items[index]
 	return null
 
+## 获取所有菜单项
+func get_items() -> Array[Control]:
+	return _items
+
 ## 设置菜单项文字
 func set_item_text(index: int, text: String) -> void:
 	var item = get_item(index)

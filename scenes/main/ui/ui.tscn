@@ -28,17 +28,19 @@ noise = SubResource("FastNoiseLite_hnkmo")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_uypi5"]
 shader = ExtResource("7_vb4k3")
 shader_parameter/corner_radius = 32.0
+shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
 shader_parameter/blur_amount = 3.0
-shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
 shader_parameter/noise_amount = 0.0
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_a7tfl")
-shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/size = Vector2(88, 296)
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
 content_margin_left = 12.0
@@ -155,6 +157,7 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_tnos5")
 script = ExtResource("3_hkhhe")
 corner_radius = 32.0
+blur_amount = 3.0
 noise_texture = SubResource("NoiseTexture2D_a7tfl")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
@@ -216,8 +219,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -158.0
-offset_top = -218.0
+offset_top = -227.0
 offset_right = 158.0
+offset_bottom = -9.0
 grow_horizontal = 2
 grow_vertical = 0
 alignment = 2
@@ -231,10 +235,12 @@ size_flags_horizontal = 4
 
 [node name="MusicModule" parent="." unique_id=1778345012 node_paths=PackedStringArray("_ui") instance=ExtResource("1_2q31f")]
 layout_mode = 1
-offset_left = 799.0
-offset_top = -77.0
-offset_right = 1133.0
-offset_bottom = -12.0
+anchors_preset = 3
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -334.0
+offset_right = 0.0
+grow_horizontal = 0
 _ui = NodePath("..")
 
 [node name="CharacterInteractor" parent="." unique_id=1482575657 instance=ExtResource("5_fhd3w")]

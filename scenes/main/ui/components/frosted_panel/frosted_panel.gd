@@ -8,6 +8,11 @@ extends PanelContainer
 		corner_radius = value
 		_update_shader_params()
 
+@export var show_border: bool = true:
+	set(value):
+		show_border = value
+		_update_shader_params()
+
 @export var border_width: float = 1.0:
 	set(value):
 		border_width = value
@@ -19,12 +24,12 @@ extends PanelContainer
 		_update_shader_params()
 
 @export_group("Frosted Effect")
-@export_range(0.0, 5.0) var blur_amount: float = 3.0:
+@export_range(0.0, 5.0) var blur_amount: float = 4:
 	set(value):
 		blur_amount = value
 		_update_shader_params()
 
-@export var tint_color: Color = Color(0, 0, 0, 0.4):
+@export var tint_color: Color = Color(0.23, 0.23, 0.23, 0.4):
 	set(value):
 		tint_color = value
 		_update_shader_params()
@@ -40,7 +45,13 @@ extends PanelContainer
 		_update_shader_params()
 
 @export_group("Shadow")
-@export var shadow_color: Color = Color(0, 0, 0, 0.3):
+@export var show_shadow: bool = true:
+	set(value):
+		show_shadow = value
+		_update_shadow_padding()
+		_update_shader_params()
+
+@export var shadow_color: Color = Color(0.1, 0.1, 0.1, 0.3):
 	set(value):
 		shadow_color = value
 		_update_shader_params()
@@ -84,7 +95,10 @@ func _ready() -> void:
 
 func _update_shadow_padding() -> void:
 	# Calculate padding needed for shadow
-	_shadow_padding = shadow_size + max(abs(shadow_offset.x), abs(shadow_offset.y))
+	if show_shadow:
+		_shadow_padding = shadow_size + max(abs(shadow_offset.x), abs(shadow_offset.y))
+	else:
+		_shadow_padding = 0.0
 	
 	# Apply padding as theme override for content margin
 	var style = get_theme_stylebox("panel")
@@ -115,12 +129,14 @@ func _on_resized() -> void:
 func _update_shader_params() -> void:
 	if material:
 		material.set_shader_parameter("corner_radius", corner_radius)
+		material.set_shader_parameter("show_border", show_border)
 		material.set_shader_parameter("border_width", border_width)
 		material.set_shader_parameter("border_color", border_color)
 		material.set_shader_parameter("blur_amount", blur_amount)
 		material.set_shader_parameter("tint_color", tint_color)
 		material.set_shader_parameter("noise_amount", noise_amount)
 		material.set_shader_parameter("noise_texture", noise_texture)
+		material.set_shader_parameter("show_shadow", show_shadow)
 		material.set_shader_parameter("shadow_color", shadow_color)
 		material.set_shader_parameter("shadow_size", shadow_size)
 		material.set_shader_parameter("shadow_offset", shadow_offset)
