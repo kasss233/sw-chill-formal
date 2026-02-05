@@ -28,6 +28,7 @@ config/icon="uid://bpa56ysux4bmi"
 GuiTransitions="*res://addons/simple-gui-transitions/singleton.gd"
 MusicState="*res://scenes/main/audio_player/music_state.gd"
 AudioPlayer="*res://scenes/main/audio_player/audio_player.tscn"
+AIService="*res://scenes/main/ai_service/ai_service.tscn"
 
 [display]
 

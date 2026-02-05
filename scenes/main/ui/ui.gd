@@ -24,6 +24,9 @@ signal task_deadline_reached(task_id: int, task_title: String)
 ## 截止时间剩余15分钟警告信号
 signal task_deadline_warning(task_id: int, task_title: String)
 
+## AI 对话相关信号
+signal ai_response_completed(full_response: String)
+
 # --- 节点引用 ---
 ## 音乐管理模块
 @export var music_module: MusicModule
@@ -33,8 +36,9 @@ signal task_deadline_warning(task_id: int, task_title: String)
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
 @export var pomodoro_module: PomodoroTechniqueModule # 番茄钟模块引用
-@export var dialogue_box: DialogueBox 
+@export var dialogue_box: DialogueBox
 @export var input_box: InputBox
+@export var chat_controller: ChatController
 
 # --- 层级管理 ---
 ## 当前最高层级（用于模块 Z-order 管理）
@@ -64,6 +68,11 @@ func _connect_signals() -> void:
 	if MusicState:
 		MusicState.track_changed.connect(_on_track_changed)
 		MusicState.playback_state_changed.connect(_on_playback_state_changed)
+
+	# 连接 ChatController 信号（转发给外部监听者）
+	if chat_controller:
+		chat_controller.response_completed.connect(_on_chat_response_completed)
+		chat_controller.text_submitted.connect(_on_chat_text_submitted)
 
 
 # --- 公有 API (音乐模块包装) ---
@@ -373,5 +382,48 @@ func _on_pomodoro_technique_module_work_continued() -> void:
 	work_continued.emit()
 
 signal text_submitted
-func _on_input_box_text_submitted(text: String, attachments: Array) -> void:
+
+# --- ChatController 信号回调 ---
+func _on_chat_text_submitted(_text: String, _attachments: Array) -> void:
 	text_submitted.emit()
+
+func _on_chat_response_completed(full_response: String) -> void:
+	ai_response_completed.emit(full_response)
+
+# --- 公有 API (AI 服务包装，委托给 ChatController) ---
+## Agent API: 发送 AI 消息
+func agent_send_ai_message(text: String, images: Array = []) -> bool:
+	if chat_controller:
+		return chat_controller.send_message(text, images)
+	return false
+
+## Agent API: 取消 AI 请求
+func agent_cancel_ai_request() -> void:
+	if chat_controller:
+		chat_controller.cancel_request()
+
+## Agent API: 清空 AI 对话历史
+func agent_clear_ai_history() -> void:
+	if chat_controller:
+		chat_controller.clear_history()
+
+## Agent API: 获取 AI 服务状态
+func agent_get_ai_status() -> Dictionary:
+	if chat_controller:
+		return chat_controller.get_status()
+	return {"error": "ChatController 不可用", "is_requesting": false}
+
+## Agent API: 设置 AI 系统提示词
+func agent_set_ai_system_prompt(prompt: String) -> void:
+	if AIService:
+		AIService.system_prompt = prompt
+
+## Agent API: 设置 AI 模型
+func agent_set_ai_model(model_name: String) -> void:
+	if AIService:
+		AIService.model = model_name
+
+## Agent API: 设置 AI 温度
+func agent_set_ai_temperature(temp: float) -> void:
+	if AIService:
+		AIService.temperature = clampf(temp, 0.0, 2.0)

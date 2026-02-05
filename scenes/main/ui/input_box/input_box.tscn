@@ -47,7 +47,7 @@ shader_parameter/shadow_offset = Vector2(0, 0)
 shader_parameter/size = Vector2(316, 76)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kuivi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bqtvt"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -406,7 +406,7 @@ script = ExtResource("1_o8rmt")
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=375968268]
 material = SubResource("ShaderMaterial_kuivi")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_kuivi")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bqtvt")
 script = ExtResource("2_t5fk1")
 corner_radius = 27.0
 show_border = false

@@ -15,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://daa0dvlkhliq6" path="res://scenes/main/ui/debug/test_panel.tscn" id="8_test_panel"]
 [ext_resource type="PackedScene" uid="uid://bmsmfccv7kma" path="res://scenes/main/ui/notebook_module/note_book.tscn" id="9_uumow"]
 [ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="11_uypi5"]
+[ext_resource type="Script" uid="uid://b3d8t5hha36c1" path="res://scenes/main/ai_service/chat_controller.gd" id="14_tnos5"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="15_khr3h"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_hnkmo"]
@@ -25,7 +26,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_hnkmo")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_uypi5"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w2hwp"]
 shader = ExtResource("7_vb4k3")
 shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
@@ -42,7 +43,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(88, 296)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -54,7 +55,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -65,7 +66,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -76,7 +77,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -87,7 +88,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rx81l"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -98,7 +99,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rv47i"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -124,7 +125,7 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module", "dialogue_box", "input_box")]
+[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module", "dialogue_box", "input_box", "chat_controller")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -140,6 +141,7 @@ env_setter = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSe
 pomodoro_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule")
 dialogue_box = NodePath("VBoxContainer/DialogueBox")
 input_box = NodePath("VBoxContainer/InputBox")
+chat_controller = NodePath("ChatController")
 
 [node name="TabPanel" type="MarginContainer" parent="." unique_id=1423112940]
 layout_mode = 1
@@ -152,9 +154,9 @@ offset_bottom = 148.0
 grow_vertical = 2
 
 [node name="FrostedPanel" type="PanelContainer" parent="TabPanel" unique_id=1817169302]
-material = SubResource("ShaderMaterial_uypi5")
+material = SubResource("ShaderMaterial_w2hwp")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_tnos5")
+theme_override_styles/panel = SubResource("StyleBoxFlat_3ru4j")
 script = ExtResource("3_hkhhe")
 corner_radius = 32.0
 blur_amount = 3.0
@@ -185,11 +187,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_w2hwp")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_3ru4j")
-theme_override_styles/hover = SubResource("StyleBoxFlat_uumow")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_djxf0")
-theme_override_styles/focus = SubResource("StyleBoxFlat_87oeu")
+theme_override_styles/normal = SubResource("StyleBoxFlat_uumow")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_djxf0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_87oeu")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_rx81l")
+theme_override_styles/focus = SubResource("StyleBoxFlat_rv47i")
 script = ExtResource("5_uypi5")
 states = Array[ExtResource("6_tnos5")]([SubResource("Resource_ln37o"), SubResource("Resource_mnnl2")])
 button_size = 3
@@ -233,6 +235,11 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 4
 
+[node name="ChatController" type="Node" parent="." unique_id=1856388684 node_paths=PackedStringArray("input_box", "dialogue_box")]
+script = ExtResource("14_tnos5")
+input_box = NodePath("../VBoxContainer/InputBox")
+dialogue_box = NodePath("../VBoxContainer/DialogueBox")
+
 [node name="MusicModule" parent="." unique_id=1778345012 node_paths=PackedStringArray("_ui") instance=ExtResource("1_2q31f")]
 layout_mode = 1
 anchors_preset = 3
@@ -267,5 +274,4 @@ ui = NodePath("..")
 [connection signal="work_stopped" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_stopped"]
 [connection signal="env_time_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]
 [connection signal="env_weather_changed" from="TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter" to="." method="_on_env_setter_env_weather_changed"]
-[connection signal="text_submitted" from="VBoxContainer/InputBox" to="." method="_on_input_box_text_submitted"]
 [connection signal="character_interacted" from="CharacterInteractor" to="." method="_on_character_interactor_character_interacted"]
