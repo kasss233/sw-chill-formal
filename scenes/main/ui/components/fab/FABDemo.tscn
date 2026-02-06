@@ -105,3 +105,4 @@ mouse_default_cursor_shape = 2
 script = ExtResource("2_fab")
 fab_icon = ExtResource("3_kuc34")
 fab_text = "新建任务"
+background_color = Color(0.3515, 0.65075, 0.95, 0)

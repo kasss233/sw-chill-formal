@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**sw-chill-formal** is a Godot 4.5 project (Mobile platform) that combines 3D character interaction with a rich UI system for music management, task tracking, and text input. The project emphasizes a relaxing, chill-focused experience with Material Design UI components.
+**sw-chill-formal** is a Godot 4.6 project (Mobile platform) that combines 3D character interaction with a rich UI system for music management, task tracking, AI conversation, and pomodoro timer. The project emphasizes a relaxing, chill-focused experience with Material Design UI components.
 
 ## Development Commands
 
@@ -19,7 +19,7 @@ This is a Godot project - there are no traditional build/test commands. Developm
 
 ### Autoload Singletons (Global Services)
 
-The project has two critical autoload singletons defined in `project.godot`:
+The project has four critical autoload singletons defined in `project.godot`:
 
 #### **GuiTransitions** (`addons/simple-gui-transitions/singleton.gd`)
 - Manages global UI layout switching with animated transitions
@@ -36,6 +36,27 @@ The project has two critical autoload singletons defined in `project.godot`:
 - Key methods: `play_bgm()`, `change_bgm()`, `switch_bgm()`, `toggle_bgm_playback()`, `set_bgm_volume()`, `crossfade_to_bgm()`
 - Signals: `music_changed`, `music_finished`
 - **Important**: The `is_paused` state is separate from the current track - allows switching BGM while preserving playback state
+
+#### **MusicState** (`scenes/main/audio_player/music_state.gd`)
+- Centralized music state management singleton
+- Acts as the single source of truth for all music-related state
+- State variables: `current_track`, `is_playing`, `play_mode`, `current_playlist`, `current_track_index`
+- Play modes: SEQUENTIAL (0), RANDOM (1), SINGLE_LOOP (2)
+- Signals: `track_changed`, `playback_state_changed`, `play_mode_changed`, `playlist_changed`, `track_finished`
+- Key methods: `set_track()`, `set_playing()`, `toggle_playback()`, `set_play_mode()`, `cycle_play_mode()`
+- **Architecture**: UI and AudioPlayer both read/write state through this singleton
+
+#### **AIService** (`scenes/main/ai_service/ai_service.tscn`)
+- OpenAI-compatible API service with Server-Sent Events (SSE) streaming support
+- Key features:
+  - Stream-based chat completions with real-time text output
+  - Multimodal support (text + images via base64 encoding)
+  - Configurable API endpoint, model, max_tokens, temperature
+  - Message history management for contextual conversations
+  - Thread-based HTTP requests to avoid blocking main thread
+- Signals: `stream_chunk_received`, `stream_completed`, `request_started`, `request_failed`, `connection_state_changed`
+- Key methods: `send_message()`, `send_single_message()`, `cancel_request()`, `clear_history()`
+- Components: `ai_service.gd` (main), `adapters/` (OpenAI, custom API adapters), `context_collector.gd`, `agent_executor.gd`, `tts_player.gd`
 
 ### Resource Management Pattern
 
@@ -100,6 +121,29 @@ The UI is organized as modular, loosely-coupled components in `scenes/main/ui/`:
 - Weather setter (sunny, rainy, snowy, sync)
 - Uses MaterialToggleButton for state switching
 
+#### **PomodoroTechniqueModule** (`scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.gd`)
+- Pomodoro timer implementation for focus/break management
+- Configurable work duration, rest duration, and loop times
+- CanvasLayer-based UI with dynamic layer management via `_request_top_layer()`
+- Signals: `work_started`, `work_completed`, `work_paused`, `work_stopped`, `work_continued`
+- Agent API methods:
+  - `agent_start_pomodoro(work_duration, rest_duration, loop_times)` - Start timer
+  - `agent_set_work_duration(minutes)` / `agent_set_rest_duration(minutes)` - Configure durations
+  - `agent_toggle_pause()` / `agent_stop()` - Control playback
+  - `agent_get_status()` / `agent_is_running()` / `agent_is_paused()` - Query state
+- Components: `pomodoro_technique.gd` (core timer), `work.gd`, `rest.gd`, `loop.gd`
+
+#### **DialogueBox** (`scenes/main/ui/dialogue_box/dialogue_box.gd`)
+- AI conversation dialogue box with streaming text display
+- Features:
+  - Character-by-character streaming animation with configurable speed (`char_display_interval`)
+  - Auto-adjusting height with smooth Tween animation (`min_height`, `max_height`)
+  - BBCode support via RichTextLabel
+  - Up to 3 action buttons with customizable text
+- Signals: `dialogue_started`, `dialogue_finished`, `dialogue_stopped`, `button_pressed(button_index)`
+- Key methods: `start_dialogue(text)`, `stop_dialogue()`, `skip_to_end()`, `append_text()`, `set_buttons()`, `show_module()`, `hide_module()`
+- Integrates with GuiTransitions for show/hide animations
+
 ### Material Design UI Components
 
 All custom components are in `scenes/main/ui/components/`:
@@ -111,6 +155,7 @@ All custom components are in `scenes/main/ui/components/`:
 - **MaterialDialog**: Full-featured modal dialog with types (INFO, WARNING, ERROR, QUESTION), animation, callbacks
 - **MaterialMenu**: Context menu with check items, separators, keyboard shortcuts
 - **MaterialMenuButton**: Button with integrated dropdown menu
+- **MaterialContextMenu**: Right-click context menu that attaches to target controls, extends MaterialMenu with automatic popup on right-click, supports `attach_to()` and `detach()` methods
 - **MaterialSegmentedButton**: Material Design segmented selector with capsule-shaped container, blue highlight on selected item, sliding animation
 - **MaterialSwitch**: Material Design toggle switch with acceleration animation and background color gradient, single size
 - **MaterialTextField**: Material Design text input with pill-shaped full rounded corners, supports solid/transparent/frosted background styles
@@ -175,7 +220,15 @@ All custom components are in `scenes/main/ui/components/`:
 ```
 scenes/main/
 ├── 3d/                      # 3D components (character, room, buildings)
+├── ai_service/              # AI API service (autoload)
+│   ├── adapters/            # AI provider adapters (OpenAI, custom)
+│   ├── ai_service.gd        # Main AI service class
+│   ├── context_collector.gd # Context collection for AI
+│   ├── agent_executor.gd    # Agent execution logic
+│   └── tts_player.gd        # Text-to-speech player
 ├── audio_player/            # Autoload audio manager
+│   ├── audio_player.tscn    # AudioPlayer singleton
+│   └── music_state.gd       # MusicState singleton
 └── ui/                      # UI modules and components
 	├── components/          # Reusable Material Design UI components
 	│   ├── button/          # MaterialButton
@@ -188,7 +241,7 @@ scenes/main/
 	│   ├── fab/             # MaterialFAB
 	│   ├── frosted_panel/   # Shader-based frosted glass panel
 	│   ├── inner_panel/     # InnerPanel (shader-based panel with rounded corners)
-	│   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
+	│   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialContextMenu, MaterialMenuItem
 	│   ├── progress_indicator/ # MaterialProgressIndicator
 	│   ├── segmented_button/# MaterialSegmentedButton
 	│   ├── shared/          # MaterialRippleMixin, MaterialSizeConfig
@@ -198,11 +251,14 @@ scenes/main/
 	│   ├── text_field/      # MaterialTextField
 	│   └── toggle_button/   # MaterialToggleButton
 	├── character_interactor/# Character interaction trigger
+	├── debug/               # Debug and test panels
+	├── dialogue_box/        # AI conversation dialogue box
 	├── env_setter/          # Environment time and weather setter
 	├── input_box/           # ChatGPT-style AI conversation input
 	├── music_module/        # Music player UI and playlist management
 	├── note_module/         # Sticky note system
 	├── notebook_module/     # Multi-page notebook
+	├── pomodoro_technique_module/ # Pomodoro timer module
 	└── task_module_new/     # Task/todo management
 
 addons/                      # Third-party plugins
@@ -220,9 +276,9 @@ resource/audio_res/          # Audio resource management
 
 ## Important Notes
 
-- **Godot Version**: This project uses Godot 4.5 with Mobile rendering method
+- **Godot Version**: This project uses Godot 4.6 with Mobile rendering method
 - **Language Convention**: All conversations, documentation, comments, and commit messages should be in Chinese (中文). The codebase contains Chinese comments throughout.
-- **Enabled Plugins**: vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d, calendar_library
+- **Enabled Plugins**: vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d
 - **Color Organization**: The project uses folder colors in the editor (addons=purple, assets=yellow, scenes=green, main=pink, scripts=teal)
 - **Signal Pattern**: When adding new UI features, always follow the signal-based pattern: component emits → parent listens → controller coordinates → singleton executes
 - **State Preservation**: The AudioPlayer's `is_paused` state is intentionally separate from the current track to allow seamless BGM switching while maintaining play/pause state

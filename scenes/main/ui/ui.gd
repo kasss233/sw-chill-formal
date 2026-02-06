@@ -3,6 +3,7 @@ extends Control
 
 ## 主 UI 控制器，负责协调各模块信号并与全局服务层交互
 ## 音乐状态由 MusicState 单例管理
+## 任务数据由 TaskState 单例管理
 
 # --- 信号 ---
 ## 当音乐切换时发出
@@ -68,6 +69,12 @@ func _connect_signals() -> void:
 	if MusicState:
 		MusicState.track_changed.connect(_on_track_changed)
 		MusicState.playback_state_changed.connect(_on_playback_state_changed)
+
+	# 连接 TaskState 信号（数据层）
+	if TaskState:
+		TaskState.task_state_changed.connect(_on_task_state_changed_from_state)
+		TaskState.task_deadline_reached.connect(_on_task_deadline_reached_from_state)
+		TaskState.task_deadline_warning.connect(_on_task_deadline_warning_from_state)
 
 	# 连接 ChatController 信号（转发给外部监听者）
 	if chat_controller:
@@ -161,58 +168,18 @@ func set_env_time(mode: int) -> void:
 	if env_setter:
 		env_setter.set_time(mode)
 
-# --- 公有 API (任务模块包装) ---
-## Agent API: 添加新任务（带动画）
-## @param title: 任务标题
-## @param due_timestamp: 截止时间戳（可选）
-## @return: 新任务的 ID
-func agent_add_task(title: String, due_timestamp: int = 0) -> int:
-	task_module.show_module()
+# --- 公有 API (任务模块 UI 包装) ---
+## Agent API: 添加新任务（带打字动画，纯 UI 行为）
+func agent_add_task(title: String, due_timestamp: int = 0, typing_speed: float = 0.05) -> int:
 	if task_module:
-		return task_module.agent_add_task(title, due_timestamp)
+		return await task_module.agent_add_task(title, due_timestamp, typing_speed)
 	return -1
 
-## Agent API: 修改任务名称（模拟打字效果）
-## @param id: 任务 ID
-## @param new_title: 新标题
-## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
-## @return: 是否成功
+## Agent API: 修改任务名称（模拟打字效果，纯 UI 行为）
 func agent_update_task_title(id: int, new_title: String, typing_speed: float = 0.05) -> bool:
 	if task_module:
 		return await task_module.agent_update_task_title(id, new_title, typing_speed)
 	return false
-
-## Agent API: 标记任务完成状态
-## @param id: 任务 ID
-## @param completed: 是否完成
-## @return: 是否成功
-func agent_mark_task_completed(id: int, completed: bool) -> bool:
-	if task_module:
-		return task_module.agent_mark_task_completed(id, completed)
-	return false
-
-## Agent API: 删除任务
-## @param id: 任务 ID
-## @return: 是否成功
-func agent_remove_task(id: int) -> bool:
-	if task_module:
-		return task_module.agent_remove_task(id)
-	return false
-
-## Agent API: 获取任务信息
-## @param id: 任务 ID
-## @return: 任务信息字典
-func agent_get_task_info(id: int) -> Dictionary:
-	if task_module:
-		return task_module.agent_get_task_info(id)
-	return {}
-
-## Agent API: 获取所有任务信息
-## @return: 任务信息数组
-func agent_get_all_tasks() -> Array[Dictionary]:
-	if task_module:
-		return task_module.agent_get_all_tasks()
-	return []
 
 
 # --- 公有 API (番茄钟模块包装) ---
@@ -350,15 +317,16 @@ func _on_env_setter_env_time_changed(mode: int) -> void:
 func _on_character_interactor_character_interacted() -> void:
 	character_interacted.emit()
 
-# --- TaskModule 信号回调 ---
-func _on_task_completed(task_id: int, task_title: String) -> void:
-	task_completed.emit(task_id, task_title)
+# --- TaskState 信号回调 ---
+func _on_task_state_changed_from_state(task: TaskData) -> void:
+	if task.is_completed:
+		task_completed.emit(task.id, task.title)
 
-func _on_task_deadline_reached(task_id: int, task_title: String) -> void:
-	task_deadline_reached.emit(task_id, task_title)
+func _on_task_deadline_reached_from_state(task: TaskData) -> void:
+	task_deadline_reached.emit(task.id, task.title)
 
-func _on_task_deadline_warning(task_id: int, task_title: String) -> void:
-	task_deadline_warning.emit(task_id, task_title)
+func _on_task_deadline_warning_from_state(task: TaskData) -> void:
+	task_deadline_warning.emit(task.id, task.title)
 
 # --- 番茄钟回调 ---
 signal work_completed
