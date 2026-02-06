@@ -27,6 +27,10 @@ func _ready() -> void:
 	separator_index = finished_check_box.get_index()
 	finished_check_box.toggled.connect(_on_separator_toggled)
 
+	# 连接拖拽动画信号
+	v_box_container.drag_started.connect(_on_drag_started)
+	v_box_container.drag_ended.connect(_on_drag_ended)
+
 	# 连接 TaskState 信号
 	TaskState.task_added.connect(_on_state_task_added)
 	TaskState.task_removed.connect(_on_state_task_removed)
@@ -211,6 +215,19 @@ func _on_task_item_due_time_changed(task_id: int, timestamp: int) -> void:
 	TaskState.set_task_due_time(task_id, timestamp)
 
 # ======================== 动画 ========================
+
+func _on_drag_started(child: Control) -> void:
+	child.pivot_offset = child.size / 2.0
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(child, "scale", Vector2(1.05, 1.05), 0.2)
+
+func _on_drag_ended(child: Control) -> void:
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(child, "scale", Vector2.ONE, 0.2)
 
 func _play_add_animation(item: Control) -> void:
 	# 等待一帧让布局计算完成，确保 size 有效

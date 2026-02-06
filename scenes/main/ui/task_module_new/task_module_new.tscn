@@ -37,8 +37,8 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(308, 494)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v7y2w"]
 content_margin_left = 12.0
@@ -246,6 +246,7 @@ padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=243079631]
+clip_contents = true
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 8
@@ -253,6 +254,7 @@ theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer" unique_id=854459190]
+clip_contents = false
 custom_minimum_size = Vector2(252, 400)
 layout_mode = 2
 horizontal_scroll_mode = 0
