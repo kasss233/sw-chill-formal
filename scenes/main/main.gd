@@ -12,16 +12,36 @@ extends Node
 @export_category("项目演示")
 @export var animation_player: AnimationPlayer
 @export var snack_bar:MaterialSnackbar
+@onready var ui: UI = $UI
+@onready var ui_mobile: UI = $UI_mobile
 func _ready() -> void:
+	_init_ui()
 	_init_time()
-	_init_weather()
+	_init_weather() 
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
 	time_of_day.system_sync = false
 	time_of_day.game_time_enabled = false
 	time_of_day.current_time = TIME_OF_DAYTIME
-
+#这里根据设备切换ui，视口
+#TODO:判断手机pad
+func _init_ui():
+	if OS.has_feature("mobile"):
+	#if OS.has_feature("pc"):
+		get_window().size = Vector2i(648, 1152) 
+		get_window().content_scale_size = Vector2i(648, 1152)
+		get_tree().root.content_scale_factor = 1.8
+		ui.queue_free()
+		ui_mobile.visible = true
+		return
+	if OS.has_feature("pc"):
+		ui_mobile.queue_free()
+		ui.visible = true
+		return
+	
+	
+		
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
 func set_env_weather_rain():
 	rain_particle.visible = true

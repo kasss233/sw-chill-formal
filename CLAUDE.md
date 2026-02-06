@@ -8,18 +8,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-This is a Godot project - there are no traditional build/test commands. Development is done through the Godot Editor:
-
-- **Open Project**: Launch Godot Editor and open the `project.godot` file
-- **Run Project**: Press F5 in Godot Editor or click the "Play" button
-- **Run Current Scene**: Press F6 in Godot Editor
-- **Export**: Use Project → Export in Godot Editor menu
+This is a Godot project - there are no traditional build/test commands. Development is done through the Godot Editor
 
 ## Architecture
 
+### Three-Layer Architecture (核心架构)
+
+```
+Data Autoload (单例) → UI Module (模块) → UI Component (组件)
+```
+
+- **Data Autoload**：继承 `Node`，注册为 Autoload 单例，唯一数据源，每次修改后自动持久化到 `user://`，通过信号通知 UI 层。命名：`XxxState`
+- **UI Module**：监听 Data Autoload 信号，响应式更新 UI。用户操作 → 调用 State API → State 发射信号 → Module 更新 UI。禁止直接修改数据。Agent API 仅保留纯 UI 行为（动画、显示/隐藏）
+- **UI Component**：纯展示 + 交互，不持有业务数据。用户操作通过信号上报（传 ID 不传 self），提供 `update_display(data)` 方法
+
 ### Autoload Singletons (Global Services)
 
-The project has four critical autoload singletons defined in `project.godot`:
+The project has critical autoload singletons defined in `project.godot`:
 
 #### **GuiTransitions** (`addons/simple-gui-transitions/singleton.gd`)
 - Manages global UI layout switching with animated transitions
@@ -38,13 +43,22 @@ The project has four critical autoload singletons defined in `project.godot`:
 - **Important**: The `is_paused` state is separate from the current track - allows switching BGM while preserving playback state
 
 #### **MusicState** (`scenes/main/audio_player/music_state.gd`)
-- Centralized music state management singleton
+- Centralized music state management singleton (Data Autoload)
 - Acts as the single source of truth for all music-related state
 - State variables: `current_track`, `is_playing`, `play_mode`, `current_playlist`, `current_track_index`
 - Play modes: SEQUENTIAL (0), RANDOM (1), SINGLE_LOOP (2)
 - Signals: `track_changed`, `playback_state_changed`, `play_mode_changed`, `playlist_changed`, `track_finished`
 - Key methods: `set_track()`, `set_playing()`, `toggle_playback()`, `set_play_mode()`, `cycle_play_mode()`
 - **Architecture**: UI and AudioPlayer both read/write state through this singleton
+
+#### **TaskState** (`scenes/main/data/task_state.gd`)
+- Centralized task data management singleton (Data Autoload)
+- Single source of truth for all task data, auto-persists to `user://task_data.json`
+- Signals: `task_added`, `task_removed`, `task_updated`, `task_state_changed`, `tasks_reordered`, `data_loaded`, `task_deadline_reached`, `task_deadline_warning`
+- Query API: `get_all_tasks()`, `get_incomplete_tasks()`, `get_completed_tasks()`, `get_task_by_id()`
+- Mutation API: `add_task()`, `remove_task()`, `update_task_title()`, `set_task_completed()`, `set_task_due_time()`, `reorder_task()`
+- Persistence: `save_data()`, `load_data()`, `export_data()`, `import_data()`
+- Deadline checking: `_check_deadlines()` runs every 60 seconds
 
 #### **AIService** (`scenes/main/ai_service/ai_service.tscn`)
 - OpenAI-compatible API service with Server-Sent Events (SSE) streaming support
@@ -78,8 +92,9 @@ The UI is organized as modular, loosely-coupled components in `scenes/main/ui/`:
 
 #### **Main UI Controller** (`ui.gd`)
 - Acts as UI coordinator, manages child module signals
-- Provides unified API wrapping music_module functionality
-- Signal forwarding layer for global UI events
+- Signal forwarding layer for global UI events (music, task, environment, pomodoro, AI)
+- Provides non-agent public API wrapping music/note/env module functionality
+- **Does NOT contain Agent API** — Agent/Parser directly calls modules and State singletons
 
 #### **MusicModule** (`scenes/main/ui/music_module/music_module.gd`)
 - Core orchestrator for music playback UI
@@ -194,26 +209,47 @@ All custom components are in `scenes/main/ui/components/`:
 
 ### Key Architectural Patterns
 
-1. **Signal-Based Communication**: Almost all UI communication flows through signals. Components emit signals for user actions → parent containers listen and coordinate → root UI controller forwards critical signals upward.
+1. **Three-Layer Data Flow**: Data Autoload (State singleton) → UI Module → UI Component. All data mutations go through State singletons; UI reacts to State signals. Never modify data directly in UI.
 
-2. **State Synchronization**:
-   - MusicModule maintains UI state (`current_list_index`, `is_playing`, `play_mode`)
-   - AudioPlayer maintains audio state (`current_bgm_name`, `is_paused`)
-   - Methods like `_sync_play_status()` keep them in sync
+2. **State Singleton Conventions**:
+   - Naming: `XxxState` (e.g. `TaskState`, `MusicState`)
+   - Signal naming: `xxx_added(data)`, `xxx_removed(id)`, `xxx_updated(data)`, `xxx_state_changed(data)`, `xxxs_reordered`, `data_loaded`
+   - Persistence format: `{"version": 1, "next_id": N, "items": [...]}`
+   - Data models must implement `to_dict() -> Dictionary` and `static from_dict(d) -> XxxData`
 
-3. **Module Independence**: UI modules (MusicModule, TaskModule, TextModule) are largely independent. New modules can be added without affecting existing ones—follow the same signal-based pattern.
+3. **Agent API Rules**:
+   - Agent data operations (CRUD) call State singletons directly, not through UI layer
+   - Agent UI operations (animations, show/hide) call UI Module methods directly
+   - Parser (`agent/godot_paser/paser.gd`) holds direct references to modules and State singletons
+   - `ui.gd` does NOT wrap agent APIs
 
-4. **Separation of Concerns**:
+4. **Signal-Based Communication**: Components emit signals for user actions → parent containers listen and coordinate → root UI controller forwards critical signals upward.
+
+5. **UI Layer Rules**:
+   - Never directly modify data properties (e.g. `task_data.title = "xxx"`)
+   - All data changes go through State singleton API
+   - UI component signals pass ID, not self reference
+   - UI Modules respond to State signals reactively
+
+6. **Module Independence**: UI modules (MusicModule, TaskModule, etc.) are largely independent. New modules can be added without affecting existing ones—follow the same signal-based pattern.
+
+7. **Separation of Concerns**:
+   - State singletons = data + persistence (no UI logic)
    - AudioPlayer = playback engine (no UI logic)
-   - MusicModule = UI control logic (no audio logic)
+   - UI Modules = UI control logic (no data ownership)
    - MaterialButton/Dialog/Menu = reusable UI primitives
 
-5. **Scene Composition**: Rather than deeply nesting scenes, components use `instance()` to load PackedScene components dynamically (easier to debug and modify).
+8. **Dual Layout Support**:
+   - Two `.tscn` scenes (portrait/landscape) share the same UI Module scripts
+   - Startup loads the corresponding scene based on LayoutState
+   - Module scripts reference nodes via `@onready`; node names must be consistent across layouts
 
-6. **Animation Consistency**:
-   - Tasks: Tween with back easing, 0.4s
-   - Dialogs: scale + alpha fade, 0.2s
-   - Audio: Tween for fade in/out with configurable duration and curves
+9. **Scene Composition**: Components use `instance()` to load PackedScene components dynamically.
+
+10. **Animation Consistency**:
+	- Tasks: Tween with back easing, 0.4s
+	- Dialogs: scale + alpha fade, 0.2s
+	- Audio: Tween for fade in/out with configurable duration and curves
 
 ## Project Structure
 
@@ -229,6 +265,8 @@ scenes/main/
 ├── audio_player/            # Autoload audio manager
 │   ├── audio_player.tscn    # AudioPlayer singleton
 │   └── music_state.gd       # MusicState singleton
+├── data/                    # Data Autoload singletons
+│   └── task_state.gd        # TaskState singleton
 └── ui/                      # UI modules and components
 	├── components/          # Reusable Material Design UI components
 	│   ├── button/          # MaterialButton
@@ -272,13 +310,22 @@ addons/                      # Third-party plugins
 └── markdownlabel/           # Markdown text rendering
 
 resource/audio_res/          # Audio resource management
+
+agent/                       # AI Agent interface layer
+└── godot_paser/             # JSON parser for Agent operations
+	└── paser.gd             # Parses Agent JSON and calls modules/State singletons directly
+
+docs/                        # Project documentation
+└── REFACTOR_GUIDE.md        # Three-layer architecture refactoring guide
 ```
 
 ## Important Notes
 
 - **Godot Version**: This project uses Godot 4.6 with Mobile rendering method
 - **Language Convention**: All conversations, documentation, comments, and commit messages should be in Chinese (中文). The codebase contains Chinese comments throughout.
+- **Refactoring Guide**: See `docs/REFACTOR_GUIDE.md` for the canonical three-layer architecture rules. All new code must follow Data Autoload → UI Module → UI Component pattern
 - **Enabled Plugins**: vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d
 - **Color Organization**: The project uses folder colors in the editor (addons=purple, assets=yellow, scenes=green, main=pink, scripts=teal)
-- **Signal Pattern**: When adding new UI features, always follow the signal-based pattern: component emits → parent listens → controller coordinates → singleton executes
+- **Signal Pattern**: When adding new UI features, always follow: component emits (with ID) → module listens → module calls State API → State emits signal → module updates UI
 - **State Preservation**: The AudioPlayer's `is_paused` state is intentionally separate from the current track to allow seamless BGM switching while maintaining play/pause state
+- **Agent API Placement**: Agent data operations go directly to State singletons; Agent UI operations (animations) go to UI Modules. Never add agent API wrappers in `ui.gd`

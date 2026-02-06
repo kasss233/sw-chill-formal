@@ -1,0 +1,177 @@
+[gd_scene format=3 uid="uid://07lk48fmlnxb"]
+
+[ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_rt1al"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="2_0d2yd"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_fb1sj"]
+[ext_resource type="PackedScene" uid="uid://ov68toccadt" path="res://scenes/main/ui/task_module_new/task_module.tscn" id="4_4g6qf"]
+[ext_resource type="PackedScene" uid="uid://o8cxkfnpu5ug" path="res://scenes/main/ui/note_module/note_module.tscn" id="8_yvysw"]
+[ext_resource type="PackedScene" uid="uid://bmsmfccv7kma" path="res://scenes/main/ui/notebook_module/note_book.tscn" id="9_8o7o8"]
+[ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="10_mdnhd"]
+[ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/env_setter/env_setter.tscn" id="11_vbxtl"]
+[ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="12_7rk1v"]
+[ext_resource type="PackedScene" uid="uid://bro0lt35ms0j1" path="res://scenes/main/ui/input_box/input_box.tscn" id="13_gfesi"]
+[ext_resource type="Script" uid="uid://b3d8t5hha36c1" path="res://scenes/main/ai_service/chat_controller.gd" id="14_k6c0a"]
+[ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="15_kffqu"]
+[ext_resource type="PackedScene" uid="uid://b6bxw47hgr5em" path="res://scenes/main/ui/character_interactor/character_interactor.tscn" id="16_rugay"]
+[ext_resource type="PackedScene" uid="uid://daa0dvlkhliq6" path="res://scenes/main/ui/debug/test_panel.tscn" id="17_w75tq"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_hnkmo"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_a7tfl"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_hnkmo")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rt1al"]
+shader = ExtResource("2_0d2yd")
+shader_parameter/corner_radius = 32.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.0
+shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_a7tfl")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0d2yd"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module", "dialogue_box", "input_box", "chat_controller")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_rt1al")
+music_module = NodePath("MarginContainer/VBoxContainer/MusicModule")
+note_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteModule")
+note_book = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteBook")
+task_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/TaskModule")
+env_setter = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter")
+pomodoro_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule")
+dialogue_box = NodePath("MarginContainer/VBoxContainer/DialogueBox")
+input_box = NodePath("MarginContainer/VBoxContainer/InputBox")
+chat_controller = NodePath("ChatController")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1636200697]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -167.0
+offset_top = -209.0
+offset_right = 167.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1647146671]
+layout_mode = 2
+alignment = 2
+
+[node name="DialogueBox" parent="MarginContainer/VBoxContainer" unique_id=2128522262 instance=ExtResource("12_7rk1v")]
+layout_mode = 2
+
+[node name="MusicModule" parent="MarginContainer/VBoxContainer" unique_id=1778345012 node_paths=PackedStringArray("_ui") instance=ExtResource("15_kffqu")]
+layout_mode = 2
+_ui = NodePath("../../..")
+
+[node name="InputBox" parent="MarginContainer/VBoxContainer" unique_id=374615679 instance=ExtResource("13_gfesi")]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="TabPanel" type="MarginContainer" parent="MarginContainer/VBoxContainer" unique_id=1423112940]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="FrostedPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabPanel" unique_id=1817169302]
+material = SubResource("ShaderMaterial_rt1al")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0d2yd")
+script = ExtResource("3_fb1sj")
+corner_radius = 32.0
+blur_amount = 3.0
+noise_texture = SubResource("NoiseTexture2D_a7tfl")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel" unique_id=338894952]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer" unique_id=196935134]
+layout_mode = 2
+
+[node name="TaskModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=413867089 node_paths=PackedStringArray("_ui") instance=ExtResource("4_4g6qf")]
+layout_mode = 2
+_ui = NodePath("../../../../../../..")
+
+[node name="NoteModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1774986962 node_paths=PackedStringArray("_ui") instance=ExtResource("8_yvysw")]
+layout_mode = 2
+_ui = NodePath("../../../../../../..")
+
+[node name="NoteBook" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=356447481 node_paths=PackedStringArray("_ui") instance=ExtResource("9_8o7o8")]
+layout_mode = 2
+_ui = NodePath("../../../../../../..")
+
+[node name="PomodoroTechniqueModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=215700460 node_paths=PackedStringArray("_ui") instance=ExtResource("10_mdnhd")]
+layout_mode = 2
+_ui = NodePath("../../../../../../..")
+
+[node name="EnvSetter" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1982143006 node_paths=PackedStringArray("_ui") instance=ExtResource("11_vbxtl")]
+layout_mode = 2
+_ui = NodePath("../../../../../../..")
+
+[node name="ChatController" type="Node" parent="." unique_id=1856388684 node_paths=PackedStringArray("input_box", "dialogue_box")]
+script = ExtResource("14_k6c0a")
+input_box = NodePath("../MarginContainer/VBoxContainer/InputBox")
+dialogue_box = NodePath("../MarginContainer/VBoxContainer/DialogueBox")
+
+[node name="CharacterInteractor" parent="." unique_id=1482575657 instance=ExtResource("16_rugay")]
+layout_mode = 0
+offset_left = 642.0
+offset_top = 115.0
+offset_right = 642.0
+offset_bottom = 115.0
+
+[node name="TestPanel" parent="." unique_id=665107662 node_paths=PackedStringArray("ui") instance=ExtResource("17_w75tq")]
+visible = false
+layout_mode = 0
+offset_left = 833.0
+offset_top = 13.0
+offset_right = 1139.0
+offset_bottom = 427.0
+ui = NodePath("..")
+
+[node name="Control" type="Control" parent="." unique_id=785924238]
+visible = false
+anchors_preset = 0
+
+[connection signal="work_completed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_completed"]
+[connection signal="work_continued" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_continued"]
+[connection signal="work_paused" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_paused"]
+[connection signal="work_started" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_started"]
+[connection signal="work_stopped" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_stopped"]
+[connection signal="env_time_changed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]
+[connection signal="env_weather_changed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter" to="." method="_on_env_setter_env_weather_changed"]
+[connection signal="character_interacted" from="CharacterInteractor" to="." method="_on_character_interactor_character_interacted"]

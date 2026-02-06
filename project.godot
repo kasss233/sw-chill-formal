@@ -34,6 +34,8 @@ TaskState="*res://scenes/main/data/task_state.gd"
 [display]
 
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [editor_plugins]
 

@@ -40,8 +40,8 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(88, 296)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
 content_margin_left = 12.0
@@ -258,6 +258,7 @@ offset_right = 642.0
 offset_bottom = 115.0
 
 [node name="TestPanel" parent="." unique_id=665107662 node_paths=PackedStringArray("ui") instance=ExtResource("8_test_panel")]
+visible = false
 layout_mode = 0
 offset_left = 833.0
 offset_top = 13.0
