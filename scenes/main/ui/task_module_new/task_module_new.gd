@@ -25,6 +25,7 @@ var is_agent_operating: bool = false
 func _ready() -> void:
 	# 初始化分隔符位置（从编辑器中的 FinishedCheckBox 获取索引）
 	separator_index = finished_check_box.get_index()
+	finished_check_box.set_meta("reorderable_exclude", true)
 	finished_check_box.toggled.connect(_on_separator_toggled)
 
 	# 连接拖拽动画信号

@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://bq7r8k5vn1xqy"]
+[gd_scene format=3 uid="uid://bq7r8k5vn1xqy"]
 
 [ext_resource type="Script" uid="uid://88ngm0nvl4um" path="res://scenes/main/ui/components/chip/ChipDemo.gd" id="1_demo"]
 
-[node name="ChipDemo" type="Control"]
+[node name="ChipDemo" type="Control" unique_id=1115436881]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_demo")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1291573934]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.1, 0.12, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1715975338]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,83 +33,83 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=943072324]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "MaterialChip 演示"
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer" unique_id=632224995]
 layout_mode = 2
 
-[node name="SuggestionSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="SuggestionSection" type="VBoxContainer" parent="VBoxContainer" unique_id=1703179555]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SuggestionLabel" type="Label" parent="VBoxContainer/SuggestionSection"]
+[node name="SuggestionLabel" type="Label" parent="VBoxContainer/SuggestionSection" unique_id=1450307466]
 layout_mode = 2
 text = "Suggestion Chips (建议类型)"
 
-[node name="SuggestionChips" type="HFlowContainer" parent="VBoxContainer/SuggestionSection"]
+[node name="SuggestionChips" type="HFlowContainer" parent="VBoxContainer/SuggestionSection" unique_id=1807671563]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="FilterSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="FilterSection" type="VBoxContainer" parent="VBoxContainer" unique_id=3193076]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="FilterLabel" type="Label" parent="VBoxContainer/FilterSection"]
+[node name="FilterLabel" type="Label" parent="VBoxContainer/FilterSection" unique_id=1028888548]
 layout_mode = 2
 text = "Filter Chips (筛选类型) - 点击切换选中状态"
 
-[node name="FilterChips" type="HFlowContainer" parent="VBoxContainer/FilterSection"]
+[node name="FilterChips" type="HFlowContainer" parent="VBoxContainer/FilterSection" unique_id=986681247]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="InputSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="InputSection" type="VBoxContainer" parent="VBoxContainer" unique_id=1613368661]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="InputLabel" type="Label" parent="VBoxContainer/InputSection"]
+[node name="InputLabel" type="Label" parent="VBoxContainer/InputSection" unique_id=1918990555]
 layout_mode = 2
 text = "Input Chips (输入类型) - 点击 × 删除"
 
-[node name="InputChips" type="HFlowContainer" parent="VBoxContainer/InputSection"]
+[node name="InputChips" type="HFlowContainer" parent="VBoxContainer/InputSection" unique_id=178133280]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="AssistSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="AssistSection" type="VBoxContainer" parent="VBoxContainer" unique_id=1987431166]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="AssistLabel" type="Label" parent="VBoxContainer/AssistSection"]
+[node name="AssistLabel" type="Label" parent="VBoxContainer/AssistSection" unique_id=955672299]
 layout_mode = 2
 text = "Assist Chips (辅助类型)"
 
-[node name="AssistChips" type="HFlowContainer" parent="VBoxContainer/AssistSection"]
+[node name="AssistChips" type="HFlowContainer" parent="VBoxContainer/AssistSection" unique_id=2111793167]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="StyleSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="StyleSection" type="VBoxContainer" parent="VBoxContainer" unique_id=1746378172]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="StyleLabel" type="Label" parent="VBoxContainer/StyleSection"]
+[node name="StyleLabel" type="Label" parent="VBoxContainer/StyleSection" unique_id=771544457]
 layout_mode = 2
 text = "样式对比 (Outlined vs Filled)"
 
-[node name="StyleChips" type="HFlowContainer" parent="VBoxContainer/StyleSection"]
+[node name="StyleChips" type="HFlowContainer" parent="VBoxContainer/StyleSection" unique_id=1894503208]
 layout_mode = 2
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 
-[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer" unique_id=1278071930]
 layout_mode = 2
 
-[node name="LogLabel" type="Label" parent="VBoxContainer"]
+[node name="LogLabel" type="Label" parent="VBoxContainer" unique_id=1620314605]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.8, 0.5, 1)
 text = "点击 Chip 查看交互日志..."

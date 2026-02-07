@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://cv8n4k2mxhqrp"]
+[gd_scene format=3 uid="uid://cv8n4k2mxhqrp"]
 
 [ext_resource type="Script" uid="uid://d0jbfkayewh8m" path="res://scenes/main/ui/components/segmented_button/SegmentedButtonDemo.gd" id="SegmentedButtonDemoScript"]
 
-[node name="SegmentedButtonDemo" type="Control"]
+[node name="SegmentedButtonDemo" type="Control" unique_id=999607662]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
