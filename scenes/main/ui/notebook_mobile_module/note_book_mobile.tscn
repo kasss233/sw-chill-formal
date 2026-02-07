@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_pna0s"]
 [ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="4_aguge"]
 [ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="5_kyho3"]
+[ext_resource type="Texture2D" uid="uid://c7ck2hhjgnsuf" path="res://assets/ui/icons/add_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="5_rimwk"]
 [ext_resource type="Script" uid="uid://b71ahu6gbysxo" path="res://scenes/main/ui/components/text_field/MaterialTextField.gd" id="6_rimwk"]
 [ext_resource type="Texture2D" uid="uid://mtqjyn8vx6a8" path="res://assets/ui/icons/search_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="7_xswc4"]
 [ext_resource type="Script" uid="uid://3xl08c2pg3qt" path="res://scenes/main/ui/components/chip/MaterialChip.gd" id="8_pna0s"]
@@ -49,59 +50,59 @@ corner_radius_bottom_left = 3
 corner_detail = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kyho3"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rimwk"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dej4g"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f82j1"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w4rb6"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="Resource" id="Resource_xw33p"]
 script = ExtResource("5_kyho3")
@@ -194,7 +195,7 @@ text = "笔记"
 
 [node name="MaterialButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1587114148]
 clip_contents = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_kyho3")
@@ -203,6 +204,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_dej4g")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_f82j1")
 theme_override_styles/focus = SubResource("StyleBoxFlat_w4rb6")
 script = ExtResource("3_pna0s")
+button_icon = ExtResource("5_rimwk")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
