@@ -28,10 +28,15 @@ config/icon="uid://bpa56ysux4bmi"
 GuiTransitions="*res://addons/simple-gui-transitions/singleton.gd"
 MusicState="*res://scenes/main/audio_player/music_state.gd"
 AudioPlayer="*res://scenes/main/audio_player/audio_player.tscn"
+AIService="*res://scenes/main/ai_service/ai_service.tscn"
+TaskState="*res://scenes/main/data/task_state.gd"
+NoteState="*res://scenes/main/data/note_state.gd"
 
 [display]
 
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [editor_plugins]
 

@@ -1,10 +1,8 @@
 
 extends Control
 
-# 信号定义
-signal task_completed(task_id: int, task_title: String) # 任务完成信号
-signal task_deadline_reached(task_id: int, task_title: String) # 截止时间到信号
-signal task_deadline_warning(task_id: int, task_title: String) # 截止时间剩余15分钟警告信号
+# 信号定义（保留，供上层连接）
+signal task_completed(task_id: int, task_title: String)
 
 @export var task_item: PackedScene
 @onready var scroll_container: ScrollContainer = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer
@@ -12,14 +10,11 @@ signal task_deadline_warning(task_id: int, task_title: String) # 截止时间剩
 @onready var module_title_label: Label = $PanelContainer/VBoxContainer/MarginContainer2/HBoxContainer/ModuleTitleLabel
 @onready var finished_check_box: CheckBox = $PanelContainer/VBoxContainer/MarginContainer/ScrollContainer/VBoxContainer/FinishedCheckBox
 
-# 数据源 - 统一的任务列表，按顺序排列（未完成在前，已完成在后）
-var task_cnt: int = 0
-var finished_task_cnt: int = 0
-var all_tasks_data_list: Array[TaskData] = [] # 统一管理所有任务
-var task_id: int = 1 # 控制自增id
+# UI 节点映射：task_id → TaskItem 节点
+var _task_items: Dictionary = {}
 
 # 分隔符节点 - 用于视觉分隔已完成和未完成任务
-var separator_index: int = 0 # 分隔符在容器中的索引位置
+var separator_index: int = 0
 
 # 防止递归调用的标志
 var _is_programmatic_reorder: bool = false
@@ -30,520 +25,303 @@ var is_agent_operating: bool = false
 func _ready() -> void:
 	# 初始化分隔符位置（从编辑器中的 FinishedCheckBox 获取索引）
 	separator_index = finished_check_box.get_index()
+	finished_check_box.set_meta("reorderable_exclude", true)
 	finished_check_box.toggled.connect(_on_separator_toggled)
 
-	# 连接 ReorderableVBox 的 reordered 信号
-	#v_box_container.reordered.connect(_on_v_box_container_reordered)
+	# 连接拖拽动画信号
+	v_box_container.drag_started.connect(_on_drag_started)
+	v_box_container.drag_ended.connect(_on_drag_ended)
 
-	# 初始化task_id为当前最大ID+1
-	_initialize_task_id()
+	# 连接 TaskState 信号
+	TaskState.task_added.connect(_on_state_task_added)
+	TaskState.task_removed.connect(_on_state_task_removed)
+	TaskState.task_updated.connect(_on_state_task_updated)
+	TaskState.task_state_changed.connect(_on_state_task_state_changed)
+	TaskState.tasks_reordered.connect(_on_state_tasks_reordered)
+	TaskState.data_loaded.connect(_on_state_data_loaded)
 
-	#add_task(TaskData.create_example(task_id))
+	# 如果 TaskState 已经有数据（autoload 先于场景 _ready），立即渲染
+	if TaskState.get_task_count() > 0:
+		_render_all()
 
-#============API==============
-func add_task(task: TaskData) -> void:
-	# 创建任务项
-	var t = task_item.instantiate() as InnerPanel
-	
-	# 设置初始状态为不可见（用于动画）
-	t.modulate.a = 0.0
-	t.scale = Vector2(0.8, 0.8)
-	t.pivot_offset = t.size / 2.0 # 设置缩放中心点
-	
-	# 先添加到场景树，确保 @onready 节点已初始化
-	v_box_container.add_child(t)
-	
-	# 设置数据（在连接信号之前，避免初始化时触发状态变化）
-	t.set_task(task)
-	
-	# 根据任务状态决定插入位置
-	if task.is_completed:
-		# 已完成任务添加到末尾
-		all_tasks_data_list.append(task)
-		finished_task_cnt += 1
-		# 已经在末尾，不需要移动
-	else:
-		# 未完成任务添加到第一个位置
-		all_tasks_data_list.insert(0, task)
-		v_box_container.reorder_child_to(t, 0, false)
-		separator_index += 1
-		task_cnt += 1
-	
-	# 最后连接信号（在数据完全设置好之后）
-	t.content_changed.connect(_on_task_item_content_changed)
-	t.delete_requested.connect(_on_item_delete_requested)
-	t.state_changed.connect(_on_task_state_changed)
-	t.task_completed.connect(_on_task_completed)
-	t.task_deadline_reached.connect(_on_task_deadline_reached)
-	t.task_deadline_warning.connect(_on_task_deadline_warning)
-	
-	# 播放添加动画
-	_play_add_animation(t)
-	
-	print("[%s]Added a Task(id: %s title: %s, completed: %s)" % [self.name, task.id, task.title, task.is_completed])
+# ======================== TaskState 信号回调 ========================
+
+func _on_state_task_added(task: TaskData) -> void:
+	_create_task_item(task)
 	_update_ui()
 	_update_separator_position()
 
-# 播放添加任务的动画
-func _play_add_animation(item: Control) -> void:
-	# 创建淡入动画
-	var tween = create_tween()
-	tween.set_parallel(true) # 并行执行多个动画
-	tween.set_trans(Tween.TRANS_BACK) # 使用回弹效果
-	tween.set_ease(Tween.EASE_OUT)
-	
-	# 淡入效果
-	tween.tween_property(item, "modulate:a", 1.0, 0.4)
-	
-	# 缩放效果
-	tween.tween_property(item, "scale", Vector2.ONE, 0.4)
+func _on_state_task_removed(task_id: int) -> void:
+	_remove_task_item(task_id)
+	_update_ui()
+	_update_separator_position()
 
-#删除task
-func remove_task(id: int) -> void:
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == id:
-			var task_data = all_tasks_data_list[i]
-			var was_completed = task_data.is_completed
-			
-			# 移除数据
-			all_tasks_data_list.remove_at(i)
-			
-			# 找到并移除UI节点（跳过分隔符）
-			var ui_index = _get_ui_index_for_task(i)
-			if ui_index >= 0 and ui_index < v_box_container.get_child_count():
-				var item = v_box_container.get_child(ui_index)
-				if item.has_method("set_task"):
-					v_box_container.remove_child(item)
-					item.queue_free()
-			
-			# 更新计数
-			if was_completed:
-				finished_task_cnt -= 1
-			else:
-				task_cnt -= 1
-				separator_index -= 1
-			
-			_update_ui()
-			_update_separator_position()
-			print("[%s]Removed Task(id: %s)" % [self.name, id])
-			return
-	
-	print("[%s]Task with id %s not found" % [self.name, id])
+func _on_state_task_updated(task: TaskData) -> void:
+	# title / due_time 等字段变化，更新对应的 UI
+	var item = _task_items.get(task.id)
+	if item and is_instance_valid(item):
+		item.update_display(task)
 
-func get_task_from_id(id: int) -> TaskData:
-	for task in all_tasks_data_list:
-		if task.id == id:
-			return task
-	return null
+func _on_state_task_state_changed(task: TaskData) -> void:
+	var item = _task_items.get(task.id)
+	if not item or not is_instance_valid(item):
+		# 兜底：节点丢失时完整重建
+		_render_all()
+		return
 
-func get_task_from_name(name: String) -> TaskData:
-	for task in all_tasks_data_list:
-		if task.title == name:
-			return task
-	return null
+	# 更新 item 显示
+	item.update_display(task)
 
-func get_task_list() -> Array[TaskData]:
-	var uncompleted: Array[TaskData] = []
-	for task in all_tasks_data_list:
-		if not task.is_completed:
-			uncompleted.append(task)
-	return uncompleted
-
-func get_finished_task_list() -> Array[TaskData]:
-	var completed: Array[TaskData] = []
-	for task in all_tasks_data_list:
+	if _is_programmatic_reorder:
+		# 拖拽引起的状态变化 —— item 已经在正确位置，只需同步 separator
+		separator_index = finished_check_box.get_index()
+		_update_ui()
 		if task.is_completed:
-			completed.append(task)
-	return completed
+			task_completed.emit(task.id, task.title)
+		return
 
-## 批量加载任务（用于从外部数据源恢复任务）
-## @param tasks: TaskData数组
-func load_tasks(tasks: Array[TaskData]) -> void:
-	# 清空现有任务
+	# 勾选/取消勾选 —— 用 reorder_child_to 带动画移动
+	var current_index = item.get_index()
+	var sep_index = finished_check_box.get_index()
+
+	if task.is_completed and current_index < sep_index:
+		# 未完成 → 已完成：移到分隔符后面（即当前 sep_index 位置）
+		_is_programmatic_reorder = true
+		v_box_container.reorder_child_to(item, sep_index, true)
+		_is_programmatic_reorder = false
+		separator_index = finished_check_box.get_index()
+	elif not task.is_completed and current_index > sep_index:
+		# 已完成 → 未完成：移到第一个位置
+		_is_programmatic_reorder = true
+		v_box_container.reorder_child_to(item, 0, true)
+		_is_programmatic_reorder = false
+		separator_index = finished_check_box.get_index()
+
+	_update_ui()
+
+	if task.is_completed:
+		task_completed.emit(task.id, task.title)
+
+func _on_state_tasks_reordered() -> void:
+	# 同区域拖拽 —— VBox 已经是正确顺序，只需同步 separator_index
+	separator_index = finished_check_box.get_index()
+
+func _on_state_data_loaded() -> void:
+	_render_all()
+	_update_ui()
+
+# ======================== 渲染方法 ========================
+
+## 清空并重建所有 TaskItem
+func _render_all() -> void:
+	# 清空现有 UI 节点（保留 FinishedCheckBox）
 	for child in v_box_container.get_children():
 		if child.has_method("set_task"):
 			v_box_container.remove_child(child)
 			child.queue_free()
+	_task_items.clear()
 
-	all_tasks_data_list.clear()
-	task_cnt = 0
-	finished_task_cnt = 0
-	separator_index = finished_check_box.get_index()
+	# 获取所有任务（TaskState 保证顺序：未完成在前，已完成在后）
+	var all_tasks = TaskState.get_all_tasks()
+	var incomplete_count = 0
 
-	# 添加所有任务
-	for task in tasks:
-		add_task(task)
+	# 创建所有任务 UI 节点（add_child 追加到末尾）
+	for task in all_tasks:
+		var t = task_item.instantiate() as InnerPanel
+		v_box_container.add_child(t)
+		t.set_task(task)
+		_task_items[task.id] = t
+		_connect_task_item_signals(t)
+		if not task.is_completed:
+			incomplete_count += 1
 
-	# 重新初始化task_id
-	_initialize_task_id()
+	# 移动分隔符到正确位置（未完成任务之后）
+	separator_index = incomplete_count
+	_update_separator_position()
 
-	print("[%s]Loaded %d tasks" % [self.name, tasks.size()])
+	# 同步已完成任务的可见性
+	var show_completed = finished_check_box.button_pressed
+	for i in range(finished_check_box.get_index() + 1, v_box_container.get_child_count()):
+		var child = v_box_container.get_child(i)
+		if child.has_method("set_task"):
+			child.visible = show_completed
 
-func mark_task_as_completed(id: int) -> void:
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == id and not all_tasks_data_list[i].is_completed:
-			var task_data = all_tasks_data_list[i]
-			task_data.is_completed = true
-			task_data.finish_timestamp = Time.get_unix_time_from_system()
+	_update_ui()
 
-			# 移动任务到已完成区域（分隔符之后）
-			var ui_index = _get_ui_index_for_task(i)
-			var item = v_box_container.get_child(ui_index)
+## 创建任务 UI 节点（带动画）
+func _create_task_item(task: TaskData) -> void:
+	var t = task_item.instantiate() as InnerPanel
 
-			# 临时断开信号，避免触发其他任务的状态变化
-			if item.has_method("set_task") and item.state_changed.is_connected(_on_task_state_changed):
-				item.state_changed.disconnect(_on_task_state_changed)
+	# 先添加到场景树、设置数据、移动位置
+	v_box_container.add_child(t)
+	t.set_task(task)
 
-			# 更新数据列表顺序
-			all_tasks_data_list.remove_at(i)
-			all_tasks_data_list.append(task_data)
+	# 根据任务状态决定插入位置
+	if task.is_completed:
+		pass
+	else:
+		# 未完成任务添加到第一个位置（不带动画，避免和入场动画冲突）
+		_is_programmatic_reorder = true
+		v_box_container.reorder_child_to(t, 0, false)
+		_is_programmatic_reorder = false
+		separator_index += 1
 
-			# 更新UI顺序
-			v_box_container.reorder_child_by_index(ui_index, v_box_container.get_child_count() - 1)
+	# 注册到映射
+	_task_items[task.id] = t
 
-			# 更新计数
-			task_cnt -= 1
-			finished_task_cnt += 1
+	# 连接信号
+	_connect_task_item_signals(t)
+
+	# 所有布局完成后，再设置动画初始状态并播放
+	t.modulate.a = 0.0
+	t.scale = Vector2(0.8, 0.8)
+	_play_add_animation(t)
+
+	print("[%s]Created TaskItem(id: %s, title: %s)" % [self.name, task.id, task.title])
+
+## 连接 TaskItem 信号
+func _connect_task_item_signals(item: Control) -> void:
+	item.completed_changed.connect(_on_task_item_completed_changed)
+	item.content_changed.connect(_on_task_item_content_changed)
+	item.delete_requested.connect(_on_task_item_delete_requested)
+	item.due_time_changed.connect(_on_task_item_due_time_changed)
+
+## 移除任务 UI 节点
+func _remove_task_item(task_id: int) -> void:
+	var item = _task_items.get(task_id)
+	if item and is_instance_valid(item):
+		# 检查是否需要更新分隔符
+		var ui_index = item.get_index()
+		var sep_index = finished_check_box.get_index()
+		if ui_index < sep_index:
 			separator_index -= 1
 
-			# 更新UI节点的task_data和checkbox状态
-			if item.has_method("set_task"):
-				# 直接调用set_task让TaskItem自己处理所有更新
-				item.set_task(task_data)
-				print("[%s]Updated task item for task %d: completed=true" % [self.name, id])
+		v_box_container.remove_child(item)
+		item.queue_free()
+		_task_items.erase(task_id)
+		print("[%s]Removed TaskItem(id: %s)" % [self.name, task_id])
 
-			# 重新连接信号
-			if item.has_method("set_task") and not item.state_changed.is_connected(_on_task_state_changed):
-				item.state_changed.connect(_on_task_state_changed)
+# ======================== TaskItem 信号回调 ========================
 
-			_update_ui()
-			_update_separator_position()
-			print("[%s]Task(id: %s) marked as completed" % [self.name, id])
-			return
+func _on_task_item_completed_changed(task_id: int, completed: bool) -> void:
+	TaskState.set_task_completed(task_id, completed)
 
-	print("[%s]Task with id %s not found in active tasks" % [self.name, id])
+func _on_task_item_content_changed(task_id: int, new_content: String) -> void:
+	TaskState.update_task_title(task_id, new_content)
 
-func mark_task_as_uncompleted(id: int) -> void:
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == id and all_tasks_data_list[i].is_completed:
-			var task_data = all_tasks_data_list[i]
-			task_data.is_completed = false
-			task_data.finish_timestamp = 0
+func _on_task_item_delete_requested(task_id: int) -> void:
+	TaskState.remove_task(task_id)
 
-			# 移动任务到未完成区域（分隔符之前）
-			var ui_index = _get_ui_index_for_task(i)
-			var item = v_box_container.get_child(ui_index)
+func _on_task_item_due_time_changed(task_id: int, timestamp: int) -> void:
+	TaskState.set_task_due_time(task_id, timestamp)
 
-			# 临时断开信号，避免触发其他任务的状态变化
-			if item.has_method("set_task") and item.state_changed.is_connected(_on_task_state_changed):
-				item.state_changed.disconnect(_on_task_state_changed)
+# ======================== 动画 ========================
 
-			# 更新数据列表顺序
-			all_tasks_data_list.remove_at(i)
-			all_tasks_data_list.insert(separator_index, task_data)
+func _on_drag_started(child: Control) -> void:
+	child.pivot_offset = child.size / 2.0
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(child, "scale", Vector2(1.05, 1.05), 0.2)
 
-			# 更新UI顺序
-			v_box_container.reorder_child_by_index(ui_index, separator_index)
+func _on_drag_ended(child: Control) -> void:
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(child, "scale", Vector2.ONE, 0.2)
 
-			# 更新计数
-			finished_task_cnt -= 1
-			task_cnt += 1
-			separator_index += 1
+func _play_add_animation(item: Control) -> void:
+	# 等待一帧让布局计算完成，确保 size 有效
+	await get_tree().process_frame
+	if not is_instance_valid(item):
+		return
+	item.pivot_offset = item.size / 2.0
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(item, "modulate:a", 1.0, 0.4)
+	tween.tween_property(item, "scale", Vector2.ONE, 0.4)
 
-			# 更新UI节点的task_data和checkbox状态
-			if item.has_method("set_task"):
-				# 直接调用set_task让TaskItem自己处理所有更新
-				item.set_task(task_data)
-				print("[%s]Updated task item for task %d: completed=false" % [self.name, id])
+# ======================== UI 按钮事件 ========================
 
-			# 重新连接信号
-			if item.has_method("set_task") and not item.state_changed.is_connected(_on_task_state_changed):
-				item.state_changed.connect(_on_task_state_changed)
+func _on_add_button_pressed() -> void:
+	TaskState.add_task("新任务")
 
-			_update_ui()
-			_update_separator_position()
-			print("[%s]Task(id: %s) marked as not completed" % [self.name, id])
-			return
+# ======================== 拖拽重排序 ========================
 
-	print("[%s]Task with id %s not found in finished tasks" % [self.name, id])
+func _on_v_box_container_reordered(from: int, to: int) -> void:
+	if _is_programmatic_reorder:
+		return
 
+	_is_programmatic_reorder = true
 
-#============Agent API===========
-## Agent API: 添加新任务（带动画）
-## @param title: 任务标题
-## @param due_timestamp: 截止时间戳（可选）
-## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
-## @return: 新任务的 ID
+	if to >= v_box_container.get_child_count():
+		_is_programmatic_reorder = false
+		return
+	var child = v_box_container.get_child(to)
+	if child == finished_check_box:
+		_is_programmatic_reorder = false
+		return
+
+	if not child.has_method("set_task"):
+		_is_programmatic_reorder = false
+		return
+
+	var item = child
+	var task_data = item.task_data
+
+	if task_data == null:
+		print("[%s]Warning: task_data is null during reorder" % [self.name])
+		_is_programmatic_reorder = false
+		return
+
+	# 确定新状态
+	var separator_pos = finished_check_box.get_index()
+	var should_be_completed = (to > separator_pos)
+
+	print("[%s]Reorder: from=%d, to=%d, separator_pos=%d, should_be_completed=%s" % [self.name, from, to, separator_pos, should_be_completed])
+
+	# 计算新的数据索引
+	var new_data_index = _get_data_index_for_ui(to)
+
+	# 通过 TaskState 处理
+	TaskState.reorder_by_drag(task_data.id, new_data_index, should_be_completed)
+
+	_is_programmatic_reorder = false
+
+# ======================== Agent API（纯 UI 行为）========================
+
+## Agent API: 添加新任务（带打字动画）
 func agent_add_task(title: String, due_timestamp: int = 0, typing_speed: float = 0.05) -> int:
-	var new_id = _generate_task_id()
+	var task = TaskState.add_task("", due_timestamp)
 
-	# 先创建空标题的任务
-	var task_data = TaskData.new(new_id, "", due_timestamp, false)
-	add_task(task_data) # 添加到UI，已包含淡入动画
-
-	# 如果标题不为空，启动打字动画（不阻塞返回）
+	# 如果标题不为空，等待打字动画完成
 	if not title.is_empty():
-		_start_typing_animation(new_id, title, typing_speed)
+		await _start_typing_animation(task.id, title, typing_speed)
 
-	return new_id
+	return task.id
 
 ## 启动打字动画（异步执行，不阻塞）
-func _start_typing_animation(task_id: int, title: String, typing_speed: float) -> void:
-	# 等待淡入动画完成（0.4秒）
+func _start_typing_animation(p_task_id: int, title: String, typing_speed: float) -> void:
+	# 等待淡入动画完成
 	await get_tree().create_timer(0.4).timeout
 
-	var item = _get_task_item_from_id(task_id)
-	if item != null:
+	var item = _task_items.get(p_task_id)
+	if item and is_instance_valid(item):
 		await _simulate_typing_effect(item, title, typing_speed)
 
 ## Agent API: 修改任务名称（模拟打字效果）
-## @param id: 任务 ID
-## @param new_title: 新标题
-## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
-## @return: 是否成功
 func agent_update_task_title(id: int, new_title: String, typing_speed: float = 0.05) -> bool:
 	_lock_module()
-	var item = _get_task_item_from_id(id)
-	if item == null:
+	var item = _task_items.get(id)
+	if item == null or not is_instance_valid(item):
 		_unlock_module()
 		return false
 
-	# 不展开编辑模式，直接模拟打字
 	await _simulate_typing_effect(item, new_title, typing_speed)
 	_unlock_module()
 	return true
-
-## Agent API: 标记任务完成状态
-## @param id: 任务 ID
-## @param completed: 是否完成
-## @return: 是否成功
-func agent_mark_task_completed(id: int, completed: bool) -> bool:
-	_lock_module()
-	if completed:
-		mark_task_as_completed(id)
-	else:
-		mark_task_as_uncompleted(id)
-	_unlock_module()
-	return true
-
-## Agent API: 删除任务
-## @param id: 任务 ID
-## @return: 是否成功
-func agent_remove_task(id: int) -> bool:
-	_lock_module()
-	remove_task(id)
-	_unlock_module()
-	return true
-
-## Agent API: 获取任务信息
-## @param id: 任务 ID
-## @return: 任务信息字典
-func agent_get_task_info(id: int) -> Dictionary:
-	var task_data = get_task_from_id(id)
-	if task_data == null:
-		return {}
-	return {
-		"id": task_data.id,
-		"title": task_data.title,
-		"is_completed": task_data.is_completed,
-		"due_timestamp": task_data.due_timestamp,
-		"finish_timestamp": task_data.finish_timestamp
-	}
-
-## Agent API: 获取所有任务信息
-## @return: 任务信息数组
-func agent_get_all_tasks() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for task_data in all_tasks_data_list:
-		result.append({
-			"id": task_data.id,
-			"title": task_data.title,
-			"is_completed": task_data.is_completed,
-			"due_timestamp": task_data.due_timestamp,
-			"finish_timestamp": task_data.finish_timestamp
-		})
-	return result
-
-## Agent API: 调整任务顺序
-## @param id: 任务 ID
-## @param new_position: 新位置索引（在同类别任务中的位置，0-based）
-## @return: 是否成功
-func agent_reorder_task(id: int, new_position: int) -> bool:
-	_lock_module()
-
-	# 查找任务
-	var task_data = get_task_from_id(id)
-	if task_data == null:
-		print("[%s]Error: Task with id %d not found" % [self.name, id])
-		_unlock_module()
-		return false
-
-	# 找到任务在数据列表中的当前索引
-	var current_data_index = -1
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == id:
-			current_data_index = i
-			break
-
-	if current_data_index == -1:
-		print("[%s]Error: Task data not found" % [self.name])
-		_unlock_module()
-		return false
-
-	# 确定任务类别（已完成/未完成）
-	var is_completed = task_data.is_completed
-
-	# 计算目标数据索引
-	var target_data_index: int
-	if is_completed:
-		# 已完成任务：new_position 是在已完成任务中的索引
-		# 已完成任务从 separator_index 开始
-		target_data_index = separator_index + new_position
-
-		# 验证位置有效性
-		if target_data_index < separator_index or target_data_index >= all_tasks_data_list.size():
-			print("[%s]Error: Invalid position %d for completed task (valid range: 0-%d)" % [self.name, new_position, finished_task_cnt - 1])
-			_unlock_module()
-			return false
-	else:
-		# 未完成任务：new_position 是在未完成任务中的索引
-		target_data_index = new_position
-
-		# 验证位置有效性
-		if target_data_index < 0 or target_data_index >= separator_index:
-			print("[%s]Error: Invalid position %d for uncompleted task (valid range: 0-%d)" % [self.name, new_position, task_cnt - 1])
-			_unlock_module()
-			return false
-
-	# 如果位置没有变化，直接返回
-	if current_data_index == target_data_index:
-		print("[%s]Task %d already at position %d" % [self.name, id, new_position])
-		_unlock_module()
-		return true
-
-	# 移动数据列表中的任务
-	var moved_task = all_tasks_data_list[current_data_index]
-	all_tasks_data_list.remove_at(current_data_index)
-	all_tasks_data_list.insert(target_data_index, moved_task)
-
-	# 移动UI中的任务
-	var current_ui_index = _get_ui_index_for_task(current_data_index)
-	var target_ui_index = _get_ui_index_for_task(target_data_index)
-	v_box_container.reorder_child_by_index(current_ui_index, target_ui_index)
-
-	print("[%s]Task %d reordered from position %d to %d (category: %s)" % [self.name, id, current_data_index, target_data_index, "completed" if is_completed else "uncompleted"])
-
-	_unlock_module()
-	return true
-
-## Agent API: 设置任务截止时间
-## @param id: 任务 ID
-## @param due_timestamp: 截止时间戳（Unix时间戳）
-## @return: 是否成功
-func agent_set_task_due_time(id: int, due_timestamp: int) -> bool:
-	_lock_module()
-	var task_data = get_task_from_id(id)
-	if task_data == null:
-		print("[%s]Error: Task with id %d not found" % [self.name, id])
-		_unlock_module()
-		return false
-
-	# 更新任务数据
-	task_data.due_timestamp = due_timestamp
-
-	# 更新UI显示
-	var item = _get_task_item_from_id(id)
-	if item != null:
-		item.due_time_label.text = task_data.get_formatted_due_time()
-		item.due_time_label.visible = true
-		# 检查并更新过期状态
-		item._check_and_update_overdue_status()
-
-	print("[%s]Task %d due time set to %d" % [self.name, id, due_timestamp])
-	_unlock_module()
-	return true
-
-## Agent API: 获取过期任务列表
-## @return: 过期任务信息数组
-func agent_get_overdue_tasks() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	var now = Time.get_unix_time_from_system()
-
-	for task_data in all_tasks_data_list:
-		if task_data.due_timestamp > 0 and now > task_data.due_timestamp and not task_data.is_completed:
-			result.append({
-				"id": task_data.id,
-				"title": task_data.title,
-				"is_completed": task_data.is_completed,
-				"due_timestamp": task_data.due_timestamp,
-				"finish_timestamp": task_data.finish_timestamp,
-				"overdue_seconds": now - task_data.due_timestamp
-			})
-
-	return result
-
-## Agent API: 检查任务是否过期
-## @param id: 任务 ID
-## @return: 是否过期（如果任务不存在或没有截止时间，返回 false）
-func agent_is_task_overdue(id: int) -> bool:
-	var task_data = get_task_from_id(id)
-	if task_data == null or task_data.due_timestamp == 0:
-		return false
-
-	var now = Time.get_unix_time_from_system()
-	return now > task_data.due_timestamp and not task_data.is_completed
-
-#============Agent API END===========
-
-#============内部辅助方法===========
-## 初始化task_id为当前最大ID+1
-func _initialize_task_id() -> void:
-	var max_id = 0
-	for task in all_tasks_data_list:
-		if task.id > max_id:
-			max_id = task.id
-	task_id = max_id + 1
-	print("[%s]Initialized task_id to %d" % [self.name, task_id])
-
-## 生成新的唯一任务ID
-func _generate_task_id() -> int:
-	var new_id = task_id
-	task_id += 1
-
-	# 安全检查：确保ID不冲突
-	while _id_exists(new_id):
-		print("[%s]Warning: ID %d already exists, incrementing" % [self.name, new_id])
-		new_id = task_id
-		task_id += 1
-
-	return new_id
-
-## 检查ID是否已存在
-func _id_exists(id: int) -> bool:
-	for task in all_tasks_data_list:
-		if task.id == id:
-			return true
-	return false
-
-## 锁定模块（Agent 操作时禁止用户交互）
-func _lock_module() -> void:
-	is_agent_operating = true
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	print("[%s]Module locked for agent operation" % [self.name])
-
-## 解锁模块（Agent 操作完成后恢复用户交互）
-func _unlock_module() -> void:
-	is_agent_operating = false
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	print("[%s]Module unlocked" % [self.name])
-
-## 根据任务ID获取对应的UI节点
-func _get_task_item_from_id(id: int) -> Control:
-	for i in range(v_box_container.get_child_count()):
-		var child = v_box_container.get_child(i)
-		if child.has_method("set_task") and child.task_data and child.task_data.id == id:
-			return child
-	return null
 
 ## 模拟打字效果（逐字符显示）
 func _simulate_typing_effect(item: Control, text: String, speed: float) -> void:
@@ -555,291 +333,47 @@ func _simulate_typing_effect(item: Control, text: String, speed: float) -> void:
 		line_edit.text = current_text
 		await get_tree().create_timer(speed).timeout
 
-	# 更新 TaskData
-	var task_data = item.task_data
-	task_data.title = text
+	# 通过 TaskState 更新数据
+	TaskState.update_task_title(item.task_data.id, text)
 
-	# 更新数据列表
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == task_data.id:
-			all_tasks_data_list[i] = task_data
-			break
+# ======================== 内部辅助方法 ========================
 
-# 获取任务在UI中的实际索引（考虑分隔符）
-func _get_ui_index_for_task(data_index: int) -> int:
-	# 如果任务在分隔符之前（未完成任务），UI索引 = 数据索引
-	if data_index < separator_index:
-		return data_index
-	# 如果任务在分隔符之后（已完成任务），UI索引 = 数据索引 + 1（因为有分隔符）
-	else:
-		return data_index + 1
+func _lock_module() -> void:
+	is_agent_operating = true
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	print("[%s]Module locked for agent operation" % [self.name])
 
-# 获取UI索引对应的数据索引
+func _unlock_module() -> void:
+	is_agent_operating = false
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	print("[%s]Module unlocked" % [self.name])
+
 func _get_data_index_for_ui(ui_index: int) -> int:
-	var sep_ui_index = separator_index
-	# 如果UI索引是分隔符，返回-1
+	var sep_ui_index = finished_check_box.get_index()
 	if ui_index == sep_ui_index:
 		return -1
-	# 如果UI索引在分隔符之前，数据索引 = UI索引
 	elif ui_index < sep_ui_index:
 		return ui_index
-	# 如果UI索引在分隔符之后，数据索引 = UI索引 - 1
 	else:
 		return ui_index - 1
 
-# 更新分隔符位置（确保分隔符在正确的位置）
 func _update_separator_position() -> void:
-	# 计算分隔符应该在的UI位置
 	var target_sep_ui_index = separator_index
-	
-	# 如果分隔符不在正确位置，移动它
 	var sep_current_index = finished_check_box.get_index()
 	if sep_current_index != target_sep_ui_index:
-		# 确保目标索引在有效范围内
 		var max_index = v_box_container.get_child_count() - 1
 		var safe_index = min(target_sep_ui_index, max_index)
 		if safe_index >= 0:
-			v_box_container.move_child(finished_check_box, safe_index)
+			_is_programmatic_reorder = true
+			v_box_container.reorder_child_to(finished_check_box, safe_index, false)
+			_is_programmatic_reorder = false
 
-# 更新UI显示
 func _update_ui() -> void:
-	module_title_label.text = "     Tasks(%d)" % [task_cnt]
-	finished_check_box.text = "已完成(%d)" % [finished_task_cnt]
-
-# ReorderableVBox的reordered信号处理函数 - 拖拽重排序逻辑
-func _on_v_box_container_reordered(from: int, to: int) -> void:
-	# 忽略程序性的重排序（非拖拽触发）
-	if _is_programmatic_reorder:
-		return
-	
-	# 设置标志防止递归
-	_is_programmatic_reorder = true
-	
-	# 忽略分隔符本身的移动
-	if to >= v_box_container.get_child_count():
-		_is_programmatic_reorder = false
-		return
-	var child = v_box_container.get_child(to)
-	if child == finished_check_box:
-		_is_programmatic_reorder = false
-		return
-	
-	# 获取被移动的任务项
-	if not child.has_method("set_task"):
-		_is_programmatic_reorder = false
-		return
-	
-	var item = child
-	var task_data = item.task_data
-	
-	# 检查 task_data 是否有效
-	if task_data == null:
-		print("[%s]Warning: task_data is null during reorder" % [self.name])
-		_is_programmatic_reorder = false
-		return
-	
-	# 确定任务的新状态（根据是否跨越分隔符）
-	# 使用分隔符的实时位置而不是 separator_index 变量
-	var separator_pos = finished_check_box.get_index()
-	var was_completed = task_data.is_completed
-	var should_be_completed = (to > separator_pos)
-	
-	print("[%s]Reorder: from=%d, to=%d, separator_pos=%d, should_be_completed=%s" % [self.name, from, to, separator_pos, should_be_completed])
-	
-	# 找到任务在数据列表中的旧索引
-	var old_data_index = -1
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == task_data.id:
-			old_data_index = i
-			break
-	
-	if old_data_index == -1:
-		print("[%s]Error: Task data not found during reorder" % [self.name])
-		_is_programmatic_reorder = false
-		return
-	
-	# 更新数据列表
-	var moved_task = all_tasks_data_list[old_data_index]
-	all_tasks_data_list.remove_at(old_data_index)
-	
-	# 计算新的数据索引
-	var new_data_index = _get_data_index_for_ui(to)
-	if new_data_index >= 0 and new_data_index <= all_tasks_data_list.size():
-		all_tasks_data_list.insert(new_data_index, moved_task)
-	else:
-		all_tasks_data_list.append(moved_task)
-	
-	# 如果任务状态改变
-	if was_completed != should_be_completed:
-		moved_task.is_completed = should_be_completed
-		
-		# 临时断开 state_changed 信号，避免触发重复的状态变化逻辑
-		if item.state_changed.is_connected(_on_task_state_changed):
-			item.state_changed.disconnect(_on_task_state_changed)
-		
-		# 更新任务数据和UI
-		item.task_data = moved_task
-		item.complete_check_box.set_checked_no_signal(should_be_completed)
-		item.line_edit.is_completed = should_be_completed
-		
-		# 重新连接信号
-		item.state_changed.connect(_on_task_state_changed)
-		
-		if should_be_completed:
-			# 未完成 -> 已完成
-			task_cnt -= 1
-			finished_task_cnt += 1
-			separator_index -= 1
-			if should_be_completed:
-				moved_task.finish_timestamp = Time.get_unix_time_from_system()
-			print("[%s]Task(id: %s) marked as completed by dragging" % [self.name, task_data.id])
-		else:
-			# 已完成 -> 未完成
-			finished_task_cnt -= 1
-			task_cnt += 1
-			separator_index += 1
-			moved_task.finish_timestamp = 0
-			print("[%s]Task(id: %s) marked as not completed by dragging" % [self.name, task_data.id])
-		
-		_update_ui()
-		_update_separator_position()
-	else:
-		print("[%s]Task(id: %s) reordered from %d to %d (same status)" % [self.name, task_data.id, from, to])
-	
-	_is_programmatic_reorder = false
-
-func _on_add_button_pressed() -> void:
-	var new_id = _generate_task_id()
-	add_task(TaskData.create_example(new_id))
-
-func _on_task_item_content_changed(item: InnerPanel) -> void:
-	# 查找并更新对应的任务数据
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == item.task_data.id:
-			all_tasks_data_list[i] = item.task_data
-			break
-
-func _on_item_delete_requested(item: InnerPanel):
-	var task_data = item.task_data
-	var ui_index = item.get_index()
-	
-	# 查找数据索引
-	var data_index = -1
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == task_data.id:
-			data_index = i
-			break
-	
-	if data_index >= 0:
-		# 移除数据
-		all_tasks_data_list.remove_at(data_index)
-		
-		# 更新计数
-		if task_data.is_completed:
-			finished_task_cnt -= 1
-		else:
-			task_cnt -= 1
-			separator_index -= 1
-		
-		# 移除UI
-		v_box_container.remove_child(item)
-		item.queue_free()
-		
-		_update_ui()
-		_update_separator_position()
-		print("[%s]Deleted Task(id: %s) at ui_index %d" % [self.name, task_data.id, ui_index])
-
-func _on_task_state_changed(item: InnerPanel):
-	var task_data = item.task_data
-	var ui_index = item.get_index()
-	
-	# 检查 task_data 是否有效
-	if task_data == null:
-		print("[%s]Warning: task_data is null in state change" % [self.name])
-		return
-	
-	# 查找数据索引
-	var data_index = -1
-	for i in range(all_tasks_data_list.size()):
-		if all_tasks_data_list[i].id == task_data.id:
-			data_index = i
-			break
-	
-	if data_index < 0:
-		print("[%s]Error: Task data not found in state change" % [self.name])
-		return
-	
-	# 设置标志防止递归
-	_is_programmatic_reorder = true
-	
-	if task_data.is_completed:
-		# 任务被标记为已完成 - 移动到分隔符之后的第一个位置
-		var moved_task = all_tasks_data_list[data_index]
-		
-		# 计算插入位置（在移除之前）
-		# 如果任务在分隔符之前（未完成区域），移除后分隔符位置会前移
-		var insert_index = separator_index
-		if data_index < separator_index:
-			insert_index = separator_index - 1
-		
-		all_tasks_data_list.remove_at(data_index)
-		all_tasks_data_list.insert(insert_index, moved_task)
-		
-		# 更新计数
-		finished_task_cnt += 1
-		task_cnt -= 1
-		separator_index -= 1
-		
-		# 移动UI到分隔符后的第一个位置
-		var target_ui_index = separator_index + 1 # +1 是因为分隔符本身占一个位置
-		if target_ui_index < v_box_container.get_child_count():
-			v_box_container.reorder_child_by_index(ui_index, target_ui_index)
-		
-		print("[%s]Task(id: %s) marked as completed" % [self.name, task_data.id])
-	else:
-		# 任务被标记为未完成 - 移动到第一个位置
-		var moved_task = all_tasks_data_list[data_index]
-
-		# 从原位置移除，插入到第一个位置
-		all_tasks_data_list.remove_at(data_index)
-		all_tasks_data_list.insert(0, moved_task)
-
-		# 更新计数
-		finished_task_cnt -= 1
-		task_cnt += 1
-		separator_index += 1
-
-		# 移动UI到第一个位置
-		v_box_container.reorder_child_by_index(ui_index, 0)
-
-		print("[%s]Task(id: %s) marked as not completed" % [self.name, task_data.id])
-	
-	_is_programmatic_reorder = false
-	
-	_update_ui()
-	_update_separator_position()
+	module_title_label.text = "     Tasks(%d)" % TaskState.get_incomplete_count()
+	finished_check_box.text = "已完成(%d)" % TaskState.get_completed_count()
 
 func _on_separator_toggled(toggled_on: bool) -> void:
-	# 控制已完成任务的可见性
-	for i in range(separator_index + 1, v_box_container.get_child_count()):
+	for i in range(finished_check_box.get_index() + 1, v_box_container.get_child_count()):
 		var child = v_box_container.get_child(i)
 		if child.has_method("set_task"):
 			child.visible = toggled_on
-
-## 任务完成信号处理
-func _on_task_completed(item: InnerPanel) -> void:
-	if item.task_data:
-		task_completed.emit(item.task_data.id, item.task_data.title)
-		print("[%s]Task completed signal forwarded: id=%d, title=%s" % [self.name, item.task_data.id, item.task_data.title])
-
-## 截止时间到信号处理
-func _on_task_deadline_reached(item: InnerPanel) -> void:
-	if item.task_data:
-		task_deadline_reached.emit(item.task_data.id, item.task_data.title)
-		print("[%s]Task deadline reached signal forwarded: id=%d, title=%s" % [self.name, item.task_data.id, item.task_data.title])
-
-## 截止时间剩余15分钟警告信号处理
-func _on_task_deadline_warning(item: InnerPanel) -> void:
-	if item.task_data:
-		task_deadline_warning.emit(item.task_data.id, item.task_data.title)
-		print("[%s]Task deadline warning signal forwarded: id=%d, title=%s" % [self.name, item.task_data.id, item.task_data.title])

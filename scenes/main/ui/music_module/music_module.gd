@@ -93,12 +93,25 @@ func _deferred_init() -> void:
 	_init_first_music()
 	_update_play_button()
 
-## 初始化第一首歌
+## 初始化第一首歌（优先恢复上次播放的曲目）
 func _init_first_music() -> void:
 	var current_list = get_current_list()
 	if not current_list or current_list.get_music_count() == 0:
 		return
 
+	# 尝试恢复上次播放的曲目
+	if MusicState and MusicState.last_track != "":
+		for i in range(current_list.get_music_count()):
+			var child = current_list.vbox.get_child(i)
+			if child is MusicItem and child.get_music_name() == MusicState.last_track:
+				current_list.current_playing_index = i
+				current_list.current_playing_name = MusicState.last_track
+				MusicState.set_track(MusicState.last_track, i)
+				tab_button.text = MusicState.last_track
+				print("[Music Module] Restored last track: %s" % MusicState.last_track)
+				return
+
+	# 回退到第一首
 	var first_music_item = current_list.vbox.get_child(0) as MusicItem
 	if first_music_item:
 		var first_music = first_music_item.get_music_name()
@@ -111,21 +124,79 @@ func _init_first_music() -> void:
 
 # --- 初始化设置 ---
 
-## 初始化默认列表并加载音乐
+## 初始化默认列表并加载音乐（从 MusicState 恢复持久化数据）
 func _setup_initial_music() -> void:
-	# 添加默认播放列表
-	var all_music_list = _playlist_manager.add_playlist("全部音乐")
-	_playlist_manager.add_playlist("收藏")
+	# MusicState.load_data() 已在 MusicState._ready() 中完成
 
-	# 加载所有音乐到"全部音乐"列表
+	# 1. 重新加载导入的音乐到 AudioRes
+	var imported_tracks = MusicState.get_imported_tracks()
+	for track_name in imported_tracks.keys():
+		var file_path: String = imported_tracks[track_name]
+		if FileAccess.file_exists(file_path):
+			# 加载音频流到 AudioRes（但暂时断开 bgm_added 信号，避免重复添加到全部音乐）
+			if audio_res and audio_res.get_bgm_item_by_name(track_name) == null:
+				audio_res.add_bgm(track_name, file_path)
+		else:
+			push_warning("[Music Module] Imported track file missing, removing: %s -> %s" % [track_name, file_path])
+			MusicState.remove_imported_track(track_name)
+
+	# 2. 创建"全部音乐"歌单，过滤掉用户删除的内置曲目
+	var all_music_list = _playlist_manager.add_playlist("全部音乐")
 	if all_music_list and audio_res:
+		var removed_builtins = MusicState.get_removed_builtin_tracks()
 		for item in audio_res.BGM:
-			all_music_list.add_music(item.name)
-			print("[Music Module] Loaded music item: %s" % item.name)
+			if item.name not in removed_builtins:
+				all_music_list.add_music(item.name)
+
+	# 3. 创建"收藏"歌单并恢复曲目
+	_playlist_manager.add_playlist("收藏")
+	var favorite_tracks = MusicState.get_playlist_tracks("收藏")
+	for track_name in favorite_tracks:
+		# 验证曲目存在于 AudioRes 中
+		if audio_res and audio_res.get_bgm_item_by_name(track_name):
+			_playlist_manager.add_music_to_playlist("收藏", track_name)
+		else:
+			push_warning("[Music Module] Track '%s' in playlist '收藏' not found in AudioRes, skipping" % track_name)
+
+	# 4. 创建用户自建歌单并恢复曲目
+	var saved_playlist_names = MusicState.get_all_playlist_names()
+	for playlist_name in saved_playlist_names:
+		if playlist_name == "收藏":
+			continue  # 已在第 3 步处理
+		_playlist_manager.add_playlist(playlist_name)
+		var tracks = MusicState.get_playlist_tracks(playlist_name)
+		for track_name in tracks:
+			if audio_res and audio_res.get_bgm_item_by_name(track_name):
+				_playlist_manager.add_music_to_playlist(playlist_name, track_name)
+			else:
+				push_warning("[Music Module] Track '%s' in playlist '%s' not found in AudioRes, skipping" % [track_name, playlist_name])
+
+	# 5. 同步所有歌单的分类勾选状态（恢复曲目后，回写到"全部音乐"等列表的 MusicItem 上）
+	var all_playlist_names = _playlist_manager.get_all_playlist_names()
+	for pname in all_playlist_names:
+		if pname == "全部音乐":
+			continue
+		var tracks_in_list = _playlist_manager.get_playlist_music_names(pname)
+		for tname in tracks_in_list:
+			_playlist_manager.sync_music_category_state(tname, pname, true)
+
+	# 6. 恢复播放模式
+	if MusicState:
+		mode_button.set_state_no_signal(MusicState.play_mode)
+
+	# 7. 恢复当前歌单选择
+	if MusicState and MusicState.current_playlist != "":
+		var names = _playlist_manager.get_all_playlist_names()
+		for i in range(names.size()):
+			if names[i] == MusicState.current_playlist:
+				_switch_to_list(i)
+				break
 
 	# 连接音频资源的 bgm_added 信号
 	if audio_res:
 		audio_res.bgm_added.connect(_on_bgm_added)
+
+	print("[Music Module] Setup initial music completed (with persistence restore)")
 
 ## 设置歌单切换菜单
 func _setup_list_menu() -> void:
@@ -265,6 +336,7 @@ func _show_delete_playlist_dialog(playlist_name: String) -> void:
 ## 删除歌单
 func _delete_playlist(playlist_name: String) -> void:
 	if _playlist_manager.remove_playlist(playlist_name):
+		MusicState.delete_playlist(playlist_name)
 		# 如果删除的是当前选中的歌单，切换到第一个歌单
 		if current_list_index >= _playlist_manager.get_playlist_count():
 			current_list_index = 0
@@ -297,6 +369,7 @@ func _on_add_playlist_confirmed() -> void:
 		return
 
 	_playlist_manager.add_playlist(playlist_name)
+	MusicState.create_playlist(playlist_name)
 
 # --- 播放列表管理信号回调 ---
 
@@ -325,6 +398,7 @@ func _on_playlist_removed(playlist_name: String) -> void:
 
 ## 当音乐被导入时
 func _on_music_imported(music_name: String, file_path: String) -> void:
+	MusicState.add_imported_track(music_name, file_path)
 	print("[Music Module] Music imported: %s" % music_name)
 
 ## 当 BGM 被添加到资源时
@@ -479,15 +553,19 @@ func _on_music_options_requested(p_music_name: String, p_list_name: String) -> v
 func _on_music_option_changed(p_list_name: String, p_music_name: String, p_toggled_on: bool) -> void:
 	if p_toggled_on:
 		_playlist_manager.add_music_to_playlist(p_list_name, p_music_name)
+		MusicState.add_track_to_playlist(p_list_name, p_music_name)
 	else:
 		_playlist_manager.remove_music_from_playlist(p_list_name, p_music_name)
+		MusicState.remove_track_from_playlist(p_list_name, p_music_name)
 	_playlist_manager.sync_music_category_state(p_music_name, p_list_name, p_toggled_on)
 
 func _on_music_category_changed(p_music_name: String, category: String, checked: bool) -> void:
 	if checked:
 		_playlist_manager.add_music_to_playlist(category, p_music_name)
+		MusicState.add_track_to_playlist(category, p_music_name)
 	else:
 		_playlist_manager.remove_music_from_playlist(category, p_music_name)
+		MusicState.remove_track_from_playlist(category, p_music_name)
 	_playlist_manager.sync_music_category_state(p_music_name, category, checked)
 
 func _on_music_removed(p_music_name: String, p_list_name: String) -> void:
@@ -505,6 +583,12 @@ func _on_music_removed(p_music_name: String, p_list_name: String) -> void:
 		var confirm_btn = _delete_dialog.add_button("确定")
 		confirm_btn.pressed.connect(func():
 			_playlist_manager.remove_music_from_all_playlists(p_music_name)
+			MusicState.remove_track_from_all_playlists(p_music_name)
+			# 判断是导入曲目还是内置曲目
+			if MusicState.is_imported_track(p_music_name):
+				MusicState.remove_imported_track(p_music_name)
+			else:
+				MusicState.add_removed_builtin(p_music_name)
 			var item = audio_res.get_bgm_item_by_name(p_music_name)
 			if item:
 				audio_res.remove_bgm(p_music_name)
@@ -515,6 +599,7 @@ func _on_music_removed(p_music_name: String, p_list_name: String) -> void:
 		return
 
 	_playlist_manager.remove_music_from_playlist(p_list_name, p_music_name)
+	MusicState.remove_track_from_playlist(p_list_name, p_music_name)
 
 # --- 公有 API ---
 
@@ -637,14 +722,18 @@ func agent_switch_to_list(list_name: String) -> bool:
 func agent_add_music_to_list(list_name: String, music_name: String) -> bool:
 	_lock_module()
 	var success = _playlist_manager.add_music_to_playlist(list_name, music_name)
-	if success and list_name == "收藏":
-		_playlist_manager.sync_music_category_state(music_name, list_name, true)
+	if success:
+		MusicState.add_track_to_playlist(list_name, music_name)
+		if list_name == "收藏":
+			_playlist_manager.sync_music_category_state(music_name, list_name, true)
 	_unlock_module()
 	return success
 
 func agent_remove_music_from_list(list_name: String, music_name: String) -> bool:
 	_lock_module()
 	var success = _playlist_manager.remove_music_from_playlist(list_name, music_name)
+	if success:
+		MusicState.remove_track_from_playlist(list_name, music_name)
 	_unlock_module()
 	return success
 
@@ -673,6 +762,7 @@ func agent_create_playlist(list_name: String) -> bool:
 		_unlock_module()
 		return false
 	_playlist_manager.add_playlist(list_name)
+	MusicState.create_playlist(list_name)
 	_unlock_module()
 	return true
 

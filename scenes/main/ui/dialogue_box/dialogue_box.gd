@@ -154,10 +154,9 @@ func clear_dialogue() -> void:
 func append_text(text: String) -> void:
 	_full_text += text
 
-	# 如果没有在流式显示，立即显示追加的文本
-	if not _is_streaming:
-		rich_text_label.text = _full_text
-		_update_height()
+	# 直接显示追加的文本（用于 API 流式响应）
+	rich_text_label.text = _full_text
+	_update_height()
 
 
 ## 设置按钮文本

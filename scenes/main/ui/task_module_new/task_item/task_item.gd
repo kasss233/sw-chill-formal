@@ -1,16 +1,15 @@
 @tool
 extends InnerPanel
 
-signal state_changed(item: InnerPanel)
+# --- 信号（传 ID 代替 self）---
+signal completed_changed(task_id: int, completed: bool)
+signal content_changed(task_id: int, new_content: String)
+signal delete_requested(task_id: int)
+signal due_time_changed(task_id: int, timestamp: int)
 signal edit_requested(id)
-signal delete_requested(item: InnerPanel)
-signal content_changed(item: InnerPanel)
 signal drag_started(item: InnerPanel)
 signal drag_ended(item: InnerPanel)
-signal task_overdue(item: InnerPanel)  # 任务过期信号
-signal task_completed(item: InnerPanel)  # 任务完成信号
-signal task_deadline_reached(item: InnerPanel)  # 截止时间到信号
-signal task_deadline_warning(item: InnerPanel)  # 截止时间剩余15分钟警告信号
+signal task_overdue(item: InnerPanel)  # 纯 UI 视觉信号
 
 @onready var complete_check_box: CheckBox = $MarginContainer/VBoxContainer/HBoxContainer/CompleteCheckBox
 @onready var due_time_label: Label = $MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/DueTimeLabel
@@ -23,15 +22,10 @@ signal task_deadline_warning(item: InnerPanel)  # 截止时间剩余15分钟警�
 
 var is_pressing: bool = false
 var is_dragging: bool = false
-var is_editing: bool = false # 新增：用于判断当前状态
+var is_editing: bool = false
+var _is_updating_display: bool = false
 
 var task_data: TaskData
-
-# 截止时间检查相关
-var deadline_check_timer: Timer = null
-var has_warned_15min: bool = false  # 是否已发出15分钟警告
-var has_warned_deadline: bool = false  # 是否已发出截止时间到警告
-var should_warn_15min: bool = false  # 是否应该发出15分钟警告（总时间>30分钟时为true）
 
 func _ready() -> void:
 	super._ready()  # 调用父类 InnerPanel 的 _ready()，确保 shader 初始化
@@ -58,13 +52,7 @@ func _ready() -> void:
 	if long_press_timer:
 		long_press_timer.timeout.connect(_on_long_press_timer_timeout)
 
-	# 创建并配置截止时间检查定时器
-	deadline_check_timer = Timer.new()
-	deadline_check_timer.wait_time = 60.0  # 每60秒检查一次
-	deadline_check_timer.autostart = false
-	deadline_check_timer.timeout.connect(_on_deadline_check_timer_timeout)
-	add_child(deadline_check_timer)
-
+## 设置任务数据（只读取数据设置 UI，不修改数据）
 func set_task(data: TaskData):
 	self.task_data = data
 
@@ -77,38 +65,47 @@ func set_task(data: TaskData):
 
 	line_edit.text = task_data.title
 	complete_check_box.button_pressed = task_data.is_completed
-
-	# 重置警告标志
-	has_warned_15min = false
-	has_warned_deadline = false
-	should_warn_15min = false
+	line_edit.is_completed = task_data.is_completed
 
 	# 已完成任务不显示截止时间
 	if task_data.is_completed:
 		due_time_label.visible = false
-		# 停止定时器
-		if deadline_check_timer:
-			deadline_check_timer.stop()
-	# 没有设置截止时间时也不显示
 	elif task_data.due_timestamp == 0:
 		due_time_label.visible = false
-		# 停止定时器
-		if deadline_check_timer:
-			deadline_check_timer.stop()
 	else:
-		# 有截止时间且未完成，显示并检查过期状态
 		due_time_label.text = task_data.get_formatted_due_time()
 		due_time_label.visible = true
 		_check_and_update_overdue_status()
 
-		# 判断是否应该发出15分钟警告（检查当前剩余时间是否大于30分钟）
-		var now = Time.get_unix_time_from_system()
-		var time_remaining = task_data.due_timestamp - now
-		should_warn_15min = (time_remaining > 1800)
+## 外部调用更新显示（TaskState 数据变化时）
+func update_display(task: TaskData) -> void:
+	self.task_data = task
 
-		# 启动定时器
-		if deadline_check_timer:
-			deadline_check_timer.start()
+	if not is_instance_valid(task_data):
+		return
+
+	_is_updating_display = true
+	line_edit.text = task_data.title
+	complete_check_box.button_pressed = task_data.is_completed
+	line_edit.is_completed = task_data.is_completed
+	_is_updating_display = false
+
+	if task_data.is_completed:
+		due_time_label.visible = false
+		if is_editing:
+			_disable_edit_mode()
+	elif task_data.due_timestamp == 0:
+		due_time_label.visible = false
+	else:
+		due_time_label.text = task_data.get_formatted_due_time()
+		due_time_label.visible = true
+		_check_and_update_overdue_status()
+
+## 返回当前绑定的 task_id
+func get_task_id() -> int:
+	if task_data:
+		return task_data.id
+	return -1
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -146,20 +143,18 @@ func _gui_input(event: InputEvent) -> void:
 func _enable_edit_mode() -> void:
 	is_editing = true
 	h_box_container_2.visible = true
-	
+
 	# 启用 LineEdit 鼠标交互，允许选中文字
-	line_edit.mouse_filter = Control.MOUSE_FILTER_STOP 
-	# 可选：如果你想点开就自动聚焦输入框
-	# line_edit.grab_focus() 
+	line_edit.mouse_filter = Control.MOUSE_FILTER_STOP
 
 # 关闭编辑模式
 func _disable_edit_mode() -> void:
 	is_editing = false
 	h_box_container_2.visible = false
-	
+
 	# 禁用 LineEdit 鼠标交互，让点击事件能穿透到 PanelContainer (背景)
-	line_edit.mouse_filter = Control.MOUSE_FILTER_IGNORE 
-	
+	line_edit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	# 清除焦点（如果在输入状态下）
 	if line_edit.has_focus():
 		line_edit.release_focus()
@@ -178,8 +173,8 @@ func _on_long_press_timer_timeout() -> void:
 
 func _on_line_edit_text_changed(new_text: String) -> void:
 	print("[%s]Task title change to \"%s\"" %[self.name,new_text])
-	task_data.title = new_text
-	content_changed.emit(self)
+	# 不直接修改 task_data，发射信号让外部处理
+	content_changed.emit(task_data.id, new_text)
 
 
 func _on_line_edit_editing_toggled(toggled_on: bool) -> void:
@@ -187,47 +182,26 @@ func _on_line_edit_editing_toggled(toggled_on: bool) -> void:
 	if new_text == task_data.title:
 		return
 	print("[%s]Task title change to \"%s\"" %[self.name,new_text])
-	task_data.title = new_text
-	content_changed.emit(self)
+	content_changed.emit(task_data.id, new_text)
 
 func _on_del_button_pressed() -> void:
-	delete_requested.emit(self)
+	delete_requested.emit(task_data.id)
 
 func _on_complete_check_box_toggled(toggled_on: bool) -> void:
-	task_data.is_completed = toggled_on
+	# 防止 update_display 设置 button_pressed 触发的信号回路
+	if _is_updating_display:
+		return
+	# 不直接修改 task_data，发射信号让外部处理
 	line_edit.is_completed = toggled_on
 
 	if toggled_on:
-		# 标记为完成
-		task_data.finish_timestamp = Time.get_unix_time_from_system()
 		due_time_label.visible = false
 		# 退出编辑模式
 		if is_editing:
 			_disable_edit_mode()
-		# 发出任务完成信号
-		task_completed.emit(self)
-	else:
-		# 取消完成
-		task_data.finish_timestamp = 0
 
-		# 检查截止时间是否已过期
-		if task_data.due_timestamp > 0:
-			var now = Time.get_unix_time_from_system()
-			if now > task_data.due_timestamp:
-				# 已过期，重置截止时间
-				task_data.due_timestamp = 0
-				# 没有截止时间就不显示
-				due_time_label.visible = false
-			else:
-				# 未过期，恢复显示截止时间
-				due_time_label.text = task_data.get_formatted_due_time()
-				due_time_label.visible = true
-				_check_and_update_overdue_status()
-		else:
-			# 没有截止时间，不显示
-			due_time_label.visible = false
-
-	state_changed.emit(self)
+	# 发射带 ID 的完成状态变化信号
+	completed_changed.emit(task_data.id, toggled_on)
 
 ## 处理时间设置按钮点击
 func _on_time_set_button_pressed() -> void:
@@ -239,10 +213,8 @@ func _show_datetime_picker() -> void:
 	var timezone_offset = 8 * 3600  # UTC+8
 	var current_timestamp: int
 	if task_data.due_timestamp > 0:
-		# 如果已有截止时间，使用已有的
 		current_timestamp = task_data.due_timestamp
 	else:
-		# 如果没有截止时间，默认设置当前时刻+1h
 		current_timestamp = Time.get_unix_time_from_system() + 3600  # +1小时
 	var local_timestamp = current_timestamp + timezone_offset
 	var datetime_dict = Time.get_datetime_dict_from_unix_time(local_timestamp)
@@ -369,66 +341,22 @@ func _show_datetime_picker() -> void:
 		# 转换为UTC时间戳（减去时区偏移）
 		var new_timestamp = new_local_timestamp - timezone_offset
 
-		# 更新任务数据
-		task_data.due_timestamp = new_timestamp
+		# 不直接修改 task_data，发射信号
+		due_time_changed.emit(task_data.id, new_timestamp)
+
+		# 先更新本地显示（UI 反馈）
 		due_time_label.text = task_data.get_formatted_due_time()
 		due_time_label.visible = true
-
-		# 检查是否过期
 		_check_and_update_overdue_status()
-
-		# 重置警告标志（因为设置了新的截止时间）
-		has_warned_15min = false
-		has_warned_deadline = false
-
-		# 判断总时间是否大于30分钟（1800秒）
-		var now = Time.get_unix_time_from_system()
-		var total_time = new_timestamp - now
-		should_warn_15min = (total_time > 1800)
-
-		# 启动定时器
-		if deadline_check_timer and not task_data.is_completed:
-			deadline_check_timer.start()
-
-		# 触发内容变化信号
-		content_changed.emit(self)
 
 		dialog.hide_dialog()
 	)
 
 	dialog.show_dialog()
 
-## 截止时间检查定时器超时处理
-func _on_deadline_check_timer_timeout() -> void:
-	# 如果任务已完成或没有截止时间，停止定时器
-	if task_data.is_completed or task_data.due_timestamp == 0:
-		deadline_check_timer.stop()
-		return
-
-	var now = Time.get_unix_time_from_system()
-	var time_remaining = task_data.due_timestamp - now
-
-	# 检查是否到达截止时间
-	if time_remaining <= 0 and not has_warned_deadline:
-		has_warned_deadline = true
-		task_deadline_reached.emit(self)
-		print("[%s]Task(id: %s) deadline reached!" % [self.name, task_data.id])
-		# 更新过期状态显示
-		_check_and_update_overdue_status()
-		return
-
-	# 检查是否剩余15分钟（900秒）
-	# 只有当总时间大于30分钟时才发出15分钟警告
-	if not has_warned_15min and should_warn_15min:
-		if time_remaining <= 900 and time_remaining > 0:
-			has_warned_15min = true
-			task_deadline_warning.emit(self)
-			print("[%s]Task(id: %s) has 15 minutes remaining!" % [self.name, task_data.id])
-
-## 检查并更新过期状态
+## 检查并更新过期状态（纯视觉）
 func _check_and_update_overdue_status() -> void:
 	if task_data.due_timestamp == 0:
-		# 没有设置截止时间
 		due_time_label.add_theme_color_override("font_color", Color.WHITE)
 		return
 
@@ -436,7 +364,6 @@ func _check_and_update_overdue_status() -> void:
 	if now > task_data.due_timestamp and not task_data.is_completed:
 		# 已过期且未完成
 		due_time_label.add_theme_color_override("font_color", Color.RED)
-		# 发出过期信号
 		task_overdue.emit(self)
 	else:
 		# 未过期或已完成

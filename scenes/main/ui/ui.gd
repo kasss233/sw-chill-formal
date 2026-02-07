@@ -3,6 +3,7 @@ extends Control
 
 ## 主 UI 控制器，负责协调各模块信号并与全局服务层交互
 ## 音乐状态由 MusicState 单例管理
+## 任务数据由 TaskState 单例管理
 
 # --- 信号 ---
 ## 当音乐切换时发出
@@ -24,6 +25,9 @@ signal task_deadline_reached(task_id: int, task_title: String)
 ## 截止时间剩余15分钟警告信号
 signal task_deadline_warning(task_id: int, task_title: String)
 
+## AI 对话相关信号
+signal ai_response_completed(full_response: String)
+
 # --- 节点引用 ---
 ## 音乐管理模块
 @export var music_module: MusicModule
@@ -33,8 +37,9 @@ signal task_deadline_warning(task_id: int, task_title: String)
 @export var test_panel: TestPanel # 测试面板引用
 @export var env_setter: EnvSetter
 @export var pomodoro_module: PomodoroTechniqueModule # 番茄钟模块引用
-@export var dialogue_box: DialogueBox 
+@export var dialogue_box: DialogueBox
 @export var input_box: InputBox
+@export var chat_controller: ChatController
 
 # --- 层级管理 ---
 ## 当前最高层级（用于模块 Z-order 管理）
@@ -64,6 +69,17 @@ func _connect_signals() -> void:
 	if MusicState:
 		MusicState.track_changed.connect(_on_track_changed)
 		MusicState.playback_state_changed.connect(_on_playback_state_changed)
+
+	# 连接 TaskState 信号（数据层）
+	if TaskState:
+		TaskState.task_state_changed.connect(_on_task_state_changed_from_state)
+		TaskState.task_deadline_reached.connect(_on_task_deadline_reached_from_state)
+		TaskState.task_deadline_warning.connect(_on_task_deadline_warning_from_state)
+
+	# 连接 ChatController 信号（转发给外部监听者）
+	if chat_controller:
+		chat_controller.response_completed.connect(_on_chat_response_completed)
+		chat_controller.text_submitted.connect(_on_chat_text_submitted)
 
 
 # --- 公有 API (音乐模块包装) ---
@@ -152,150 +168,6 @@ func set_env_time(mode: int) -> void:
 	if env_setter:
 		env_setter.set_time(mode)
 
-# --- 公有 API (任务模块包装) ---
-## Agent API: 添加新任务（带动画）
-## @param title: 任务标题
-## @param due_timestamp: 截止时间戳（可选）
-## @return: 新任务的 ID
-func agent_add_task(title: String, due_timestamp: int = 0) -> int:
-	task_module.show_module()
-	if task_module:
-		return task_module.agent_add_task(title, due_timestamp)
-	return -1
-
-## Agent API: 修改任务名称（模拟打字效果）
-## @param id: 任务 ID
-## @param new_title: 新标题
-## @param typing_speed: 打字速度（秒/字符），默认 0.05 秒
-## @return: 是否成功
-func agent_update_task_title(id: int, new_title: String, typing_speed: float = 0.05) -> bool:
-	if task_module:
-		return await task_module.agent_update_task_title(id, new_title, typing_speed)
-	return false
-
-## Agent API: 标记任务完成状态
-## @param id: 任务 ID
-## @param completed: 是否完成
-## @return: 是否成功
-func agent_mark_task_completed(id: int, completed: bool) -> bool:
-	if task_module:
-		return task_module.agent_mark_task_completed(id, completed)
-	return false
-
-## Agent API: 删除任务
-## @param id: 任务 ID
-## @return: 是否成功
-func agent_remove_task(id: int) -> bool:
-	if task_module:
-		return task_module.agent_remove_task(id)
-	return false
-
-## Agent API: 获取任务信息
-## @param id: 任务 ID
-## @return: 任务信息字典
-func agent_get_task_info(id: int) -> Dictionary:
-	if task_module:
-		return task_module.agent_get_task_info(id)
-	return {}
-
-## Agent API: 获取所有任务信息
-## @return: 任务信息数组
-func agent_get_all_tasks() -> Array[Dictionary]:
-	if task_module:
-		return task_module.agent_get_all_tasks()
-	return []
-
-
-# --- 公有 API (番茄钟模块包装) ---
-## Agent API: 启动番茄钟
-## @param work_duration: 工作时间（分钟）
-## @param rest_duration: 休息时间（分钟）
-## @param loop_times: 循环次数（默认1次）
-## @return: 是否成功启动
-func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: int = 1) -> bool:
-	if pomodoro_module:
-		pomodoro_module.show_module()
-		return pomodoro_module.agent_start_pomodoro(work_duration, rest_duration, loop_times)
-	return false
-
-## Agent API: 设置工作时间
-## @param minutes: 工作时间（分钟）
-## @return: 是否成功设置
-func agent_set_pomodoro_work_duration(minutes: int) -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_set_work_duration"):
-		return pomodoro_module.agent_set_work_duration(minutes)
-	return false
-
-## Agent API: 设置休息时间
-## @param minutes: 休息时间（分钟）
-## @return: 是否成功设置
-func agent_set_pomodoro_rest_duration(minutes: int) -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_set_rest_duration"):
-		return pomodoro_module.agent_set_rest_duration(minutes)
-	return false
-
-## Agent API: 暂停/继续番茄钟
-## @return: 是否成功切换状态
-func agent_toggle_pomodoro_pause() -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_toggle_pause"):
-		return pomodoro_module.agent_toggle_pause()
-	return false
-
-## Agent API: 停止番茄钟
-## @return: 是否成功停止
-func agent_stop_pomodoro() -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_stop"):
-		return pomodoro_module.agent_stop()
-	return false
-
-## Agent API: 获取番茄钟状态信息
-## @return: 状态信息字典
-func agent_get_pomodoro_status() -> Dictionary:
-	if pomodoro_module and pomodoro_module.has_method("agent_get_status"):
-		return pomodoro_module.agent_get_status()
-	return {
-		"error": "pomodoro_module 不可用",
-		"is_running": false,
-		"is_paused": false,
-		"is_work_mode": false
-	}
-
-## Agent API: 获取剩余时间
-## @return: 剩余时间字典（包含小时、分钟、秒）
-func agent_get_pomodoro_remaining_time() -> Dictionary:
-	if pomodoro_module and pomodoro_module.has_method("agent_get_remaining_time"):
-		return pomodoro_module.agent_get_remaining_time()
-	return {
-		"error": "pomodoro_module 不可用",
-		"hour": 0,
-		"minute": 0,
-		"second": 0
-	}
-
-## Agent API: 检查是否正在运行
-## @return: 是否正在运行
-func agent_is_pomodoro_running() -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_is_running"):
-		return pomodoro_module.agent_is_running()
-	return false
-
-## Agent API: 检查是否暂停
-## @return: 是否暂停
-func agent_is_pomodoro_paused() -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_is_paused"):
-		return pomodoro_module.agent_is_paused()
-	return false
-
-## Agent API: 检查是否在工作模式
-## @return: 是否在工作模式
-func agent_is_pomodoro_work_mode() -> bool:
-	if pomodoro_module and pomodoro_module.has_method("agent_is_work_mode"):
-		return pomodoro_module.agent_is_work_mode()
-	return false
-## dialogue box api
-func agent_start_dialogue(text:String):
-	dialogue_box.show_module()
-	dialogue_box.start_dialogue(text)
 # --- 测试面板控制 ---
 ## 切换测试面板显示/隐藏
 func toggle_test_panel() -> void:
@@ -341,15 +213,16 @@ func _on_env_setter_env_time_changed(mode: int) -> void:
 func _on_character_interactor_character_interacted() -> void:
 	character_interacted.emit()
 
-# --- TaskModule 信号回调 ---
-func _on_task_completed(task_id: int, task_title: String) -> void:
-	task_completed.emit(task_id, task_title)
+# --- TaskState 信号回调 ---
+func _on_task_state_changed_from_state(task: TaskData) -> void:
+	if task.is_completed:
+		task_completed.emit(task.id, task.title)
 
-func _on_task_deadline_reached(task_id: int, task_title: String) -> void:
-	task_deadline_reached.emit(task_id, task_title)
+func _on_task_deadline_reached_from_state(task: TaskData) -> void:
+	task_deadline_reached.emit(task.id, task.title)
 
-func _on_task_deadline_warning(task_id: int, task_title: String) -> void:
-	task_deadline_warning.emit(task_id, task_title)
+func _on_task_deadline_warning_from_state(task: TaskData) -> void:
+	task_deadline_warning.emit(task.id, task.title)
 
 # --- 番茄钟回调 ---
 signal work_completed
@@ -373,5 +246,10 @@ func _on_pomodoro_technique_module_work_continued() -> void:
 	work_continued.emit()
 
 signal text_submitted
-func _on_input_box_text_submitted(text: String, attachments: Array) -> void:
+
+# --- ChatController 信号回调 ---
+func _on_chat_text_submitted(_text: String, _attachments: Array) -> void:
 	text_submitted.emit()
+
+func _on_chat_response_completed(full_response: String) -> void:
+	ai_response_completed.emit(full_response)

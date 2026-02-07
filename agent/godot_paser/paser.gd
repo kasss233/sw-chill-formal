@@ -168,7 +168,7 @@ func _execute_operation(operation: Dictionary) -> Dictionary:
 	
 	match action:
 		"create_task":
-			return _handle_create_task(operation)
+			return await _handle_create_task(operation)
 		"update_task":
 			return await _handle_update_task(operation)
 		"delete_task":
@@ -218,7 +218,7 @@ func _handle_create_task(operation: Dictionary) -> Dictionary:
 		due_timestamp = _parse_datetime_to_timestamp(task_data["start_time"])
 	
 	# 调用本脚本内的方法（抽象层）
-	var task_id = _create_task_internal(description, due_timestamp)
+	var task_id = await _create_task_internal(description, due_timestamp)
 	
 	if task_id > 0:
 		result["success"] = true
@@ -233,11 +233,15 @@ func _handle_create_task(operation: Dictionary) -> Dictionary:
 	return result
 
 func _create_task_internal(title: String, due_timestamp: int) -> int:
-	# 抽象层：本脚本内的处理方法
+	# 优先通过 UI 模块添加任务（带打字动画）
 	if task_module != null and task_module.has_method("agent_add_task"):
-		return task_module.agent_add_task(title, due_timestamp)
+		return await task_module.agent_add_task(title, due_timestamp)
+	# 降级：直接通过 TaskState 单例添加任务（无动画）
+	elif TaskState:
+		var task = TaskState.add_task(title, due_timestamp)
+		return task.id
 	else:
-		print("[Parser] 警告: 任务管理模块不可用，任务创建功能未实现")
+		print("[Parser] 警告: TaskState 单例不可用，任务创建功能未实现")
 		return 0
 
 func _handle_update_task(operation: Dictionary) -> Dictionary:
@@ -276,19 +280,19 @@ func _handle_update_task(operation: Dictionary) -> Dictionary:
 	return result
 
 func _update_task_internal(task_id: int, new_title: String, due_timestamp: int) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if task_module == null:
-		print("[Parser] 警告: 任务管理模块不可用，任务更新功能未实现")
+	# 通过 TaskState 单例和 UI 模块更新任务
+	if not TaskState:
+		print("[Parser] 警告: TaskState 单例不可用，任务更新功能未实现")
 		return false
-	
-	# 更新标题
-	if new_title != "" and task_module.has_method("agent_update_task_title"):
+
+	# 更新标题（带打字动画通过 UI 层）
+	if new_title != "" and task_module != null and task_module.has_method("agent_update_task_title"):
 		await task_module.agent_update_task_title(task_id, new_title)
-	
-	# 更新截止时间
-	if due_timestamp > 0 and task_module.has_method("agent_set_task_due_time"):
-		return task_module.agent_set_task_due_time(task_id, due_timestamp)
-	
+
+	# 更新截止时间（通过 TaskState）
+	if due_timestamp > 0:
+		return TaskState.set_task_due_time(task_id, due_timestamp)
+
 	return true
 
 func _handle_delete_task(operation: Dictionary) -> Dictionary:
@@ -314,11 +318,11 @@ func _handle_delete_task(operation: Dictionary) -> Dictionary:
 	return result
 
 func _delete_task_internal(task_id: int) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if task_module != null and task_module.has_method("agent_remove_task"):
-		return task_module.agent_remove_task(task_id)
+	# 通过 TaskState 单例删除任务
+	if TaskState:
+		return TaskState.remove_task(task_id)
 	else:
-		print("[Parser] 警告: 任务管理模块不可用，任务删除功能未实现")
+		print("[Parser] 警告: TaskState 单例不可用，任务删除功能未实现")
 		return false
 
 func _handle_complete_task(operation: Dictionary) -> Dictionary:
@@ -342,11 +346,11 @@ func _handle_complete_task(operation: Dictionary) -> Dictionary:
 	return result
 
 func _complete_task_internal(task_id: int) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if task_module != null and task_module.has_method("agent_mark_task_completed"):
-		return task_module.agent_mark_task_completed(task_id, true)
+	# 通过 TaskState 单例完成任务
+	if TaskState:
+		return TaskState.set_task_completed(task_id, true)
 	else:
-		print("[Parser] 警告: 任务管理模块不可用，任务完成功能未实现")
+		print("[Parser] 警告: TaskState 单例不可用，任务完成功能未实现")
 		return false
 
 # ====== 项目相关操作处理 ======
@@ -685,13 +689,13 @@ func _get_or_create_task_id(task_id_str: String) -> int:
 	if _task_id_map.has(task_id_str):
 		return _task_id_map[task_id_str]
 	else:
-		# 如果任务模块可用，尝试查找现有任务
-		if task_module != null and task_module.has_method("agent_get_all_tasks"):
-			var all_tasks = task_module.agent_get_all_tasks()
+		# 如果 TaskState 可用，尝试查找现有任务
+		if TaskState:
+			var all_tasks = TaskState.get_all_tasks()
 			# 这里可以根据其他信息匹配任务（如标题）
 			# 暂时生成新ID
 			pass
-		
+
 		# 创建新的映射
 		var new_id = _task_id_counter
 		_task_id_counter += 1

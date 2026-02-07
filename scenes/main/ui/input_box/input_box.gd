@@ -100,13 +100,9 @@ func _on_line_edit_submitted(new_text: String) -> void:
 	if new_text.strip_edges().is_empty():
 		return
 
-	# 设置生成状态
-	_is_generating = true
-	submit_button.current_state = 1  # 切换到停止状态
-
-	# 触发提交信号
-	text_submitted.emit(new_text, _attachments)
-	clear_text()
+	# 通过按钮状态切换触发提交（_handle_submit 会处理后续逻辑）
+	# 不要在这里直接 emit text_submitted，否则会重复触发
+	submit_button.current_state = 1
 
 
 func _on_line_edit_gui_input(event: InputEvent) -> void:
@@ -140,13 +136,8 @@ func _on_text_edit_gui_input(event: InputEvent) -> void:
 			# 普通回车提交
 			var current_text := text_edit.text.strip_edges()
 			if not current_text.is_empty():
-				# 设置生成状态
-				_is_generating = true
-				submit_button.current_state = 1  # 切换到停止状态
-
-				# 触发提交信号
-				text_submitted.emit(current_text, _attachments)
-				clear_text()
+				# 通过按钮状态切换触发提交（_handle_submit 会处理后续逻辑）
+				submit_button.current_state = 1
 			get_viewport().set_input_as_handled()
 
 

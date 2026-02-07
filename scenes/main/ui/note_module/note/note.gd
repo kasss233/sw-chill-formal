@@ -1,7 +1,7 @@
 class_name Note
 extends Control
 @onready var text_edit: TextEdit =$FrostedPanel/MarginContainer/VBoxContainer/TextEdit
-
+@onready var material_menu: MaterialMenu = $MaterialMenu
 
 signal note_closed
 func _ready() -> void:
@@ -28,9 +28,6 @@ func _ready() -> void:
 	tween.tween_property(self, "modulate:a", 1.0, 0.5)
 	tween.tween_property(self, "position:y", target_pos_y, 0.5)
 
-
-func _on_close_button_pressed() -> void:
-	close()
 
 
 func close() -> void:
@@ -95,3 +92,10 @@ func set_text(text: String) -> void:
 		text.length(),
 		duration
 	)
+
+
+func _on_menu_button_menu_item_pressed(index: int, item: MaterialMenuItem) -> void:
+	if index == 1:
+		close()
+	elif index == 0:
+		pass

@@ -1,228 +1,134 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
-**sw-chill-formal** is a Godot 4.5 project (Mobile platform) that combines 3D character interaction with a rich UI system for music management, task tracking, and text input. The project emphasizes a relaxing, chill-focused experience with Material Design UI components.
+Godot 4.6 项目（Mobile 渲染），3D 角色互动 + Material Design UI 系统（音乐、任务、AI 对话、番茄钟、笔记）。
 
 ## Development Commands
 
-This is a Godot project - there are no traditional build/test commands. Development is done through the Godot Editor:
-
-- **Open Project**: Launch Godot Editor and open the `project.godot` file
-- **Run Project**: Press F5 in Godot Editor or click the "Play" button
-- **Run Current Scene**: Press F6 in Godot Editor
-- **Export**: Use Project → Export in Godot Editor menu
+Godot 项目，无传统构建/测试命令，通过 Godot Editor 开发。
 
 ## Architecture
 
-### Autoload Singletons (Global Services)
+### 三层架构
 
-The project has two critical autoload singletons defined in `project.godot`:
-
-#### **GuiTransitions** (`addons/simple-gui-transitions/singleton.gd`)
-- Manages global UI layout switching with animated transitions
-- Key methods: `go_to(id, callback)`, `show(id)`, `hide(id)`
-- Handles all GUI state transitions across the application
-
-#### **AudioPlayer** (`scenes/main/audio_player/audio_player.tscn`)
-- Centralized audio management for BGM and SFX
-- Key features:
-  - Volume control with fade-in/fade-out animations
-  - Play/pause state preservation across track switches
-  - Dynamic BGM loading from `AudioRes` resource
-  - Crossfade support between tracks
-- Key methods: `play_bgm()`, `change_bgm()`, `switch_bgm()`, `toggle_bgm_playback()`, `set_bgm_volume()`, `crossfade_to_bgm()`
-- Signals: `music_changed`, `music_finished`
-- **Important**: The `is_paused` state is separate from the current track - allows switching BGM while preserving playback state
-
-### Resource Management Pattern
-
-#### **AudioRes** (`resource/audio_res/audio_res.gd`)
-- Custom Resource class that acts as centralized audio inventory
-- Contains arrays of `AudioItem` resources: `BGM` and `sound_effect`
-- Supports dynamic loading: `add_bgm(name, path)` emits `bgm_added` signal
-- Methods: `remove_bgm()`, `get_bgm_item_by_name()`
-- AudioPlayer subscribes to this signal to add AudioStreamPlayer nodes dynamically
-
-**Data Flow**:
 ```
-AudioRes (data source) → AudioPlayer (audio engine) → MusicModule (UI controller) → MusicList (playlist view) → MusicItem (track representation)
+Data Autoload (单例) → UI Module (模块) → UI Component (组件)
 ```
 
-### UI Module System
+- **Data Autoload**：继承 `Node`，注册为 Autoload 单例，唯一数据源，修改后自动持久化到 `user://`，通过信号通知 UI 层。命名：`XxxState`
+- **UI Module**：监听 State 信号响应式更新 UI。用户操作 → State API → State 信号 → Module 更新。禁止直接修改数据
+- **UI Component**：纯展示 + 交互，不持有业务数据。信号上报传 ID 不传 self，提供 `update_display(data)`
 
-The UI is organized as modular, loosely-coupled components in `scenes/main/ui/`:
+### 架构规则
 
-#### **Main UI Controller** (`ui.gd`)
-- Acts as UI coordinator, manages child module signals
-- Provides unified API wrapping music_module functionality
-- Signal forwarding layer for global UI events
+1. **数据流向**：所有数据变更必须通过 State 单例 API，UI 响应 State 信号更新，禁止在 UI 层直接修改数据属性
+2. **信号通信**：Component 信号（传 ID）→ Module 监听 → Module 调 State API → State 发信号 → Module 更新 UI
+3. **Agent API**：数据操作直接调用 State 单例；UI 操作（动画）调用 Module 方法。Parser (`agent/godot_paser/paser.gd`) 直接持有 Module 和 State 引用，`ui.gd` 不封装 Agent API
+4. **State 单例规范**：
+   - 信号命名：`xxx_added(data)`, `xxx_removed(id)`, `xxx_updated(data)`, `xxx_state_changed(data)`, `xxxs_reordered`, `data_loaded`
+   - 持久化格式：`{"version": 1, "next_id": N, "items": [...]}`
+   - 数据模型实现 `to_dict() -> Dictionary` 和 `static from_dict(d) -> XxxData`
+5. **双布局**：横竖屏两套 `.tscn` 共享同一 Module 脚本，节点命名跨布局一致
+6. **动画一致性**：Task: Tween + back easing 0.4s；Dialog: scale + alpha 0.2s；Audio: Tween fade
 
-#### **MusicModule** (`scenes/main/ui/music_module/music_module.gd`)
-- Core orchestrator for music playback UI
-- Manages multiple playlists (MusicList instances) with dynamic switching
-- Play modes: sequential (0), random (1), single loop (2)
-- Key state: `current_list_index`, `is_playing`, `next_play_mode`
-- Signal flow: MusicModule → AudioPlayer.change_bgm() → AudioPlayer emits music_changed → UI updates
+### Autoload 单例
 
-#### **TaskModule** (`scenes/main/ui/task_module_new/task_module_new.gd`)
-- Todo/task management with completion tracking
-- Uses ReorderableVBox for drag-to-reorder
-- Tasks separated by completion state with visual separator
-- Entry animations: fade + scale with back easing (0.4s)
-- Components: TaskItem, TaskData, LineEdit
+| 单例 | 路径 | 职责 |
+|---|---|---|
+| GuiTransitions | `addons/simple-gui-transitions/singleton.gd` | UI 布局切换动画，`go_to()` / `show()` / `hide()` |
+| AudioPlayer | `scenes/main/audio_player/audio_player.tscn` | BGM/SFX 引擎，音量淡入淡出，crossfade。`is_paused` 独立于当前曲目 |
+| MusicState | `scenes/main/audio_player/music_state.gd` | 音乐状态数据源：曲目、播放状态、模式(SEQUENTIAL/RANDOM/SINGLE_LOOP)、播放列表 |
+| TaskState | `scenes/main/data/task_state.gd` | 任务数据管理，持久化 `user://task_data.json`，60s 检查截止时间 |
+| AIService | `scenes/main/ai_service/ai_service.tscn` | OpenAI 兼容 SSE 流式 API，多模态，线程化 HTTP |
 
-#### **NoteModule** (`scenes/main/ui/note_module/note_module.gd`)
-- Sticky note system with limit of 20 notes
-- Creates draggable note windows
-- API: `take_note(text)` for programmatic note creation
+### 音频数据流
 
-#### **NotebookModule** (`scenes/main/ui/notebook_module/note_book.gd`)
-- Multi-page notebook with page management
-- Components: PageButton (page selector), Page (content area)
-- Saves page content in dictionary
+```
+AudioRes (resource/audio_res/) → AudioPlayer → MusicModule → MusicList → MusicItem
+```
 
-#### **InputBox** (`scenes/main/ui/input_box/input_box.gd`)
-- ChatGPT-style AI conversation input box
-- Auto-switches between LineEdit (single-line) and TextEdit (multi-line)
-- Supports image attachments (max 2)
-- Smooth height animations and transitions
-- Integrated with MaterialMenu, MaterialChip, MaterialSnackbar
+### UI Modules (`scenes/main/ui/`)
 
-#### **CharacterInteractor** (`scenes/main/ui/character_interactor/character_interactor.gd`)
-- Simple button that emits signal after 3 clicks
-- Used for character interaction triggers
-
-#### **EnvSetter** (`scenes/main/ui/env_setter/env_setter.gd`)
-- Environment time setter (daytime, afternoon, dusk, evening, sync)
-- Weather setter (sunny, rainy, snowy, sync)
-- Uses MaterialToggleButton for state switching
-
-### Material Design UI Components
-
-All custom components are in `scenes/main/ui/components/`:
-
-#### **Core Components**:
-- **MaterialButton**: Base button with ripple effect, multiple size presets, icon+text layout, text scrolling animation
-- **MaterialCheckBox**: Custom checkbox with Material Design styling
-- **MaterialToggleButton**: Multi-state button with cycle modes (forward/backward/ping-pong)
-- **MaterialDialog**: Full-featured modal dialog with types (INFO, WARNING, ERROR, QUESTION), animation, callbacks
-- **MaterialMenu**: Context menu with check items, separators, keyboard shortcuts
-- **MaterialMenuButton**: Button with integrated dropdown menu
-- **MaterialSegmentedButton**: Material Design segmented selector with capsule-shaped container, blue highlight on selected item, sliding animation
-- **MaterialSwitch**: Material Design toggle switch with acceleration animation and background color gradient, single size
-- **MaterialTextField**: Material Design text input with pill-shaped full rounded corners, supports solid/transparent/frosted background styles
-- **MaterialChip**: Material Design Chip component (tags/filters) with four types (ASSIST, FILTER, INPUT, SUGGESTION), three sizes (SMALL/STANDARD/LARGE), two styles (FILLED/OUTLINED), supports icons, selection state, deletion
-- **MaterialFAB**: Floating Action Button with three sizes (SMALL/STANDARD/LARGE), supports Extended mode with text, customizable background and icon colors
-- **MaterialSnackbar**: Bottom toast notification system with seven position options, five types (DEFAULT/INFO/SUCCESS/WARNING/ERROR), auto-dismiss with configurable duration, optional action button
-- **MaterialSlider**: Material Design slider for volume/progress control, supports horizontal and vertical orientations, configurable min/max/step values
-- **MaterialProgressIndicator**: Two types (LINEAR/CIRCULAR), two modes (DETERMINATE/INDETERMINATE), animated progress transitions
-- **MaterialDragHandle**: Drag handle for moving parent nodes, four boundary modes (SCREEN/CUSTOM_RECT/PARENT_CONTAINER/NONE), visual feedback during drag
-- **FrostedPanel**: Shader-based frosted glass effect panel (used in music module)
-- **InnerPanel**: Inner sub-panel component with rounded corners, border, and semi-transparent background (shader-based)
-- **Calendar**: Calendar widget using calendar_library plugin, supports year/month navigation and date selection
-- **DatePicker**: Button that pops up a calendar picker for date selection
-
-#### **Usage Pattern**:
-- All components extend Godot primitives (Button, CheckBox, etc.) marked with `@tool` for editor preview
-- Material Design applied as wrapper styling, not core framework change
-- Components use composition (mixins) for shared behavior like ripple effects
+| 模块 | 脚本 | 职责 |
+|---|---|---|
+| Main UI Controller | `ui.gd` | UI 协调器，信号转发，不含 Agent API |
+| MusicModule | `music_module/music_module.gd` | 音乐播放 UI，多播放列表 |
+| TaskModule | `task_module_new/task_module_new.gd` | 任务管理，ReorderableVBox 拖拽排序 |
+| NoteModule | `note_module/note_module.gd` | 便签系统（上限 20），`take_note(text)` |
+| NotebookModule | `notebook_module/note_book.gd` | 多页笔记本 |
+| InputBox | `input_box/input_box.gd` | AI 对话输入框，单行/多行切换，图片附件(max 2) |
+| DialogueBox | `dialogue_box/dialogue_box.gd` | AI 对话展示，逐字流式动画，BBCode，3 个操作按钮 |
+| EnvSetter | `env_setter/env_setter.gd` | 环境时间/天气设置 |
+| PomodoroModule | `pomodoro_technique_module/pomodoro_technique_module.gd` | 番茄钟，CanvasLayer UI |
+| CharacterInteractor | `character_interactor/character_interactor.gd` | 角色交互触发（3 次点击） |
 
 ### 3D Components
 
-#### **Character** (`scenes/main/3d/character/character.gd`)
-- Node3D with VRM character model support
-- Dual AnimationTree system: `action_tree` (poses) and `emotion_tree` (emotions)
-- Pose methods: `set_typing_pose()`, `set_watch_pose()`, `set_cheer_pose()`, `set_disbelief_pose()`, `set_dodge_pose()`, `set_angry_pose()`, `set_clap_pose()`, `set_laughing_pose()`
-- Emotion methods: `set_happy()`, `set_sad()`, `set_surprised()`, `set_angry()`
-- Dialogue methods: `start_saying()`, `stop_saying()`
+- **Character** (`scenes/main/3d/character/character.gd`)：VRM 角色，双 AnimationTree（action_tree 姿势 + emotion_tree 表情），支持对话动画
+- **Room** (`scenes/main/3d/room/`)：环境道具
+- **Environment**：`outdoor/` / `rain/` / `snow/`
 
-#### **Room Components** (`scenes/main/3d/room/`)
-- 3D environment props (alarm clock, cup, dolls, etc.)
+## UI Components 与 Skill 工具
 
-#### **Environment Components**
-- `outdoor/` - Outdoor environment
-- `rain/` - Rain effects
-- `snow/` - Snow effects
+Material Design 组件位于 `scenes/main/ui/components/`，继承 Godot 原语，`@tool` 标记，mixin 共享行为。另有 Calendar（日历）和 DatePicker（日期选择器）两个非 Material 组件。
 
-### Key Architectural Patterns
+**规则：使用或配置以下组件时，必须优先调用对应 Skill 工具获取规范，而非搜索源码。仅当 Skill 不足时才读源码补充。**
 
-1. **Signal-Based Communication**: Almost all UI communication flows through signals. Components emit signals for user actions → parent containers listen and coordinate → root UI controller forwards critical signals upward.
-
-2. **State Synchronization**:
-   - MusicModule maintains UI state (`current_list_index`, `is_playing`, `play_mode`)
-   - AudioPlayer maintains audio state (`current_bgm_name`, `is_paused`)
-   - Methods like `_sync_play_status()` keep them in sync
-
-3. **Module Independence**: UI modules (MusicModule, TaskModule, TextModule) are largely independent. New modules can be added without affecting existing ones—follow the same signal-based pattern.
-
-4. **Separation of Concerns**:
-   - AudioPlayer = playback engine (no UI logic)
-   - MusicModule = UI control logic (no audio logic)
-   - MaterialButton/Dialog/Menu = reusable UI primitives
-
-5. **Scene Composition**: Rather than deeply nesting scenes, components use `instance()` to load PackedScene components dynamically (easier to debug and modify).
-
-6. **Animation Consistency**:
-   - Tasks: Tween with back easing, 0.4s
-   - Dialogs: scale + alpha fade, 0.2s
-   - Audio: Tween for fade in/out with configurable duration and curves
+| Skill | 组件 |
+|---|---|
+| `material-button` | MaterialButton |
+| `material-checkbox` | MaterialCheckbox |
+| `material-chip` | MaterialChip |
+| `material-context-menu` | MaterialContextMenu |
+| `material-dialog` | MaterialDialog |
+| `material-drag-handle` | MaterialDragHandle |
+| `material-fab` | MaterialFAB |
+| `material-menu` | MaterialMenu |
+| `material-menu-button` | MaterialMenuButton |
+| `material-progress-indicator` | MaterialProgressIndicator |
+| `material-segmented-button` | MaterialSegmentedButton |
+| `material-slider` | MaterialSlider |
+| `material-snackbar` | MaterialSnackbar |
+| `material-switch` | MaterialSwitch |
+| `material-text-field` | MaterialTextField |
+| `material-toggle-button` | MaterialToggleButton |
+| `frosted-panel` | FrostedPanel |
+| `inner-panel` | InnerPanel |
 
 ## Project Structure
 
 ```
 scenes/main/
-├── 3d/                      # 3D components (character, room, buildings)
-├── audio_player/            # Autoload audio manager
-└── ui/                      # UI modules and components
-	├── components/          # Reusable Material Design UI components
-	│   ├── button/          # MaterialButton
-	│   ├── calendar/        # Calendar widget
-	│   ├── checkbox/        # MaterialCheckBox
-	│   ├── chip/            # MaterialChip
-	│   ├── date_picker/     # DatePicker button
-	│   ├── dialog/          # MaterialDialog
-	│   ├── drag_handle/     # MaterialDragHandle
-	│   ├── fab/             # MaterialFAB
-	│   ├── frosted_panel/   # Shader-based frosted glass panel
-	│   ├── inner_panel/     # InnerPanel (shader-based panel with rounded corners)
-	│   ├── menu/            # MaterialMenu, MaterialMenuButton, MaterialMenuItem
-	│   ├── progress_indicator/ # MaterialProgressIndicator
-	│   ├── segmented_button/# MaterialSegmentedButton
-	│   ├── shared/          # MaterialRippleMixin, MaterialSizeConfig
-	│   ├── slider/          # MaterialSlider
-	│   ├── snackbar/        # MaterialSnackbar
-	│   ├── switch/          # MaterialSwitch
-	│   ├── text_field/      # MaterialTextField
-	│   └── toggle_button/   # MaterialToggleButton
-	├── character_interactor/# Character interaction trigger
-	├── env_setter/          # Environment time and weather setter
-	├── input_box/           # ChatGPT-style AI conversation input
-	├── music_module/        # Music player UI and playlist management
-	├── note_module/         # Sticky note system
-	├── notebook_module/     # Multi-page notebook
-	└── task_module_new/     # Task/todo management
+├── 3d/                      # Character, Room, Environment
+├── ai_service/              # AIService autoload (adapters/, context, agent, tts)
+├── audio_player/            # AudioPlayer + MusicState autoload
+├── data/                    # Data Autoload singletons (TaskState, NoteState, etc.)
+└── ui/
+    ├── components/          # Material Design 组件 (→ 用 Skill 工具查询)
+    ├── music_module/
+    ├── task_module_new/
+    ├── note_module/
+    ├── notebook_module/
+    ├── notebook_mobile_module/
+    ├── input_box/
+    ├── dialogue_box/
+    ├── env_setter/
+    ├── pomodoro_technique_module/
+    ├── character_interactor/
+    └── debug/
 
-addons/                      # Third-party plugins
-├── vrm/                     # VRM character support
-├── Godot-MToon-Shader/      # MToon shader for VRM
-├── sky_3d/                  # 3D sky rendering
-├── simple-gui-transitions/  # GUI transition system (autoload)
-├── SmoothScroll/            # Smooth scrolling container
-├── ReorderableContainer/    # Drag-to-reorder container
-├── calendar_library/        # Calendar UI component
-└── markdownlabel/           # Markdown text rendering
-
-resource/audio_res/          # Audio resource management
+addons/                      # vrm, Godot-MToon-Shader, sky_3d,
+                             # simple-gui-transitions, SmoothScroll,
+                             # ReorderableContainer, calendar_library, markdownlabel
+resource/audio_res/          # AudioRes 音频资源
+agent/godot_paser/paser.gd   # Agent JSON → modules/State
+docs/REFACTOR_GUIDE.md       # 三层架构重构指南（权威规则）
 ```
 
 ## Important Notes
 
-- **Godot Version**: This project uses Godot 4.5 with Mobile rendering method
-- **Language Convention**: All conversations, documentation, comments, and commit messages should be in Chinese (中文). The codebase contains Chinese comments throughout.
-- **Enabled Plugins**: vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d, calendar_library
-- **Color Organization**: The project uses folder colors in the editor (addons=purple, assets=yellow, scenes=green, main=pink, scripts=teal)
-- **Signal Pattern**: When adding new UI features, always follow the signal-based pattern: component emits → parent listens → controller coordinates → singleton executes
-- **State Preservation**: The AudioPlayer's `is_paused` state is intentionally separate from the current track to allow seamless BGM switching while maintaining play/pause state
+- **Godot 4.6**，Mobile 渲染
+- **语言约定**：所有对话、文档、注释、commit message 使用中文
+- **重构指南**：`docs/REFACTOR_GUIDE.md` 为三层架构权威规则文档
+- **启用插件**：vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d

@@ -15,14 +15,25 @@
 [ext_resource type="Texture2D" uid="uid://cfkbg6r6pkpu8" path="res://assets/ui/icons/stat_1_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="12_ji0d4"]
 [ext_resource type="Texture2D" uid="uid://bmjaa8f3sscwa" path="res://assets/ui/icons/stat_minus_1_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="13_lwmwt"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_lwmwt"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_x5yqf"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_lwmwt")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lwmwt"]
 shader = ExtResource("3_lwmwt")
 shader_parameter/corner_radius = 21.555
+shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.0
+shader_parameter/blur_amount = 4.0
 shader_parameter/tint_color = Color(0.3, 0.3, 0.3, 0.39215687)
 shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_x5yqf")
+shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
@@ -118,7 +129,7 @@ content_margin_left = 162.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.1)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -184,6 +195,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_x5yqf")
 script = ExtResource("5_ji0d4")
 corner_radius = 21.555
 tint_color = Color(0.3, 0.3, 0.3, 0.39215687)
+noise_texture = SubResource("NoiseTexture2D_x5yqf")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=989263620]
@@ -234,6 +246,7 @@ padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" unique_id=243079631]
+clip_contents = true
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 8
@@ -241,6 +254,7 @@ theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 8
 
 [node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer/MarginContainer" unique_id=854459190]
+clip_contents = false
 custom_minimum_size = Vector2(252, 400)
 layout_mode = 2
 horizontal_scroll_mode = 0
@@ -249,7 +263,7 @@ script = ExtResource("7_pg22x")
 wheel_scroll_damper = SubResource("Resource_68max")
 dragging_scroll_damper = SubResource("Resource_ji0d4")
 hide_scrollbar_over_time = true
-scrollbar_hide_time = 1.0
+scrollbar_hide_time = 0.5
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="VBoxContainer" type="Container" parent="PanelContainer/VBoxContainer/MarginContainer/ScrollContainer" unique_id=1401571241 node_paths=PackedStringArray("scroll_container")]
