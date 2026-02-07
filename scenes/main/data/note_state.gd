@@ -42,7 +42,7 @@ func get_note_by_id(id: int) -> NoteData:
 func get_notes_by_category(category: String) -> Array[NoteData]:
 	var result: Array[NoteData] = []
 	for note in _notes:
-		if note.category == category:
+		if category in note.categories:
 			result.append(note)
 	return result
 
@@ -70,7 +70,10 @@ func search_notes(query: String) -> Array[NoteData]:
 
 ## 添加笔记（新笔记插入到列表最前面）
 func add_note(title: String = "", content: String = "", category: String = "") -> NoteData:
-	var note = NoteData.new(_next_id, title, content, category)
+	var cats: Array[String] = []
+	if category != "":
+		cats.append(category)
+	var note = NoteData.new(_next_id, title, content, cats)
 	_next_id += 1
 	_notes.insert(0, note)
 	_save_data()
@@ -124,12 +127,29 @@ func update_note(id: int, title: String, content: String) -> bool:
 	note_updated.emit(note)
 	return true
 
-## 设置笔记分类
+## 切换笔记分类（已有则移除，没有则添加）
+func toggle_note_category(id: int, category: String) -> bool:
+	var note = get_note_by_id(id)
+	if note == null:
+		return false
+	var idx = note.categories.find(category)
+	if idx >= 0:
+		note.categories.remove_at(idx)
+	else:
+		note.categories.append(category)
+	note.updated_at = int(Time.get_unix_time_from_system())
+	_save_data()
+	note_updated.emit(note)
+	return true
+
+## 设置笔记分类（替换所有分类，兼容旧调用）
 func set_note_category(id: int, category: String) -> bool:
 	var note = get_note_by_id(id)
 	if note == null:
 		return false
-	note.category = category
+	note.categories.clear()
+	if category != "":
+		note.categories.append(category)
 	note.updated_at = int(Time.get_unix_time_from_system())
 	_save_data()
 	note_updated.emit(note)
@@ -150,16 +170,17 @@ func add_category(cat_name: String) -> bool:
 	print("[NoteState] Added category: %s" % cat_name)
 	return true
 
-## 删除分类（同时清除使用该分类的笔记的分类字段）
+## 删除分类（同时从笔记的分类列表中移除该分类）
 func remove_category(cat_name: String) -> bool:
 	var idx = _categories.find(cat_name)
 	if idx < 0:
 		return false
 	_categories.remove_at(idx)
-	# 清除使用该分类的笔记
+	# 从所有笔记的分类列表中移除该分类
 	for note in _notes:
-		if note.category == cat_name:
-			note.category = ""
+		var cat_idx = note.categories.find(cat_name)
+		if cat_idx >= 0:
+			note.categories.remove_at(cat_idx)
 			note.updated_at = int(Time.get_unix_time_from_system())
 	_save_data()
 	category_removed.emit(cat_name)

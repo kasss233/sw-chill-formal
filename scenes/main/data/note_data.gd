@@ -10,19 +10,19 @@ var id: int = 0
 var title: String = ""
 # 正文内容
 var content: String = ""
-# 分类名称（空字符串表示无分类）
-var category: String = ""
+# 分类列表（空数组表示无分类，一个笔记可属于多个分类）
+var categories: Array[String] = []
 # 创建时间戳
 var created_at: int = 0
 # 最后修改时间戳
 var updated_at: int = 0
 
 
-func _init(p_id: int = 0, p_title: String = "", p_content: String = "", p_category: String = ""):
+func _init(p_id: int = 0, p_title: String = "", p_content: String = "", p_categories: Array[String] = []):
 	id = p_id
 	title = p_title
 	content = p_content
-	category = p_category
+	categories = p_categories.duplicate()
 	created_at = int(Time.get_unix_time_from_system())
 	updated_at = created_at
 
@@ -74,19 +74,25 @@ func to_dict() -> Dictionary:
 		"id": id,
 		"title": title,
 		"content": content,
-		"category": category,
+		"categories": categories.duplicate(),
 		"created_at": created_at,
 		"updated_at": updated_at
 	}
 
 
-## 从字典反序列化
+## 从字典反序列化（兼容旧版单分类数据）
 static func from_dict(d: Dictionary) -> NoteData:
+	var cats: Array[String] = []
+	if d.has("categories") and d["categories"] is Array:
+		for c in d["categories"]:
+			cats.append(str(c))
+	elif d.has("category") and d["category"] is String and d["category"] != "":
+		cats.append(d["category"])
 	var note = NoteData.new(
 		d.get("id", 0),
 		d.get("title", ""),
 		d.get("content", ""),
-		d.get("category", "")
+		cats
 	)
 	note.created_at = d.get("created_at", 0)
 	note.updated_at = d.get("updated_at", 0)

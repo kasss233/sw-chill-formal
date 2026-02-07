@@ -70,6 +70,7 @@ func _ready() -> void:
 	# 连接菜单信号
 	_note_menu.item_pressed.connect(_on_note_menu_item_pressed)
 	_list_menu.item_pressed.connect(_on_list_menu_item_pressed)
+	_note_menu.menu_opened.connect(_on_note_menu_opened)
 	_note_menu.menu_closed.connect(_on_note_menu_closed)
 	_list_menu.menu_closed.connect(_on_list_menu_closed)
 
@@ -280,14 +281,13 @@ func _setup_dialogs() -> void:
 	_add_category_dialog.dialog_confirmed.connect(_on_add_category_confirmed)
 
 
-## 重建分类子菜单项
+## 重建分类子菜单项（使用 check item）
 func _rebuild_category_submenu() -> void:
 	if not _category_submenu:
 		return
 	_category_submenu.clear_items()
-	_category_submenu.add_item("无分类")
 	for cat in NoteState.get_categories():
-		_category_submenu.add_item(cat)
+		_category_submenu.add_check_item(cat, false)
 
 
 ## 重建删除分类子菜单项
@@ -314,15 +314,12 @@ func _on_list_menu_item_pressed(index: int, _item: MaterialMenuItem) -> void:
 			_add_category_dialog.show_confirm_dialog("添加分类", "")
 
 
-## 分类子菜单点击回调（设置笔记分类）
-func _on_category_submenu_item_pressed(index: int, item: MaterialMenuItem) -> void:
+## 分类子菜单点击回调（切换笔记分类）
+func _on_category_submenu_item_pressed(_index: int, item: MaterialMenuItem) -> void:
 	if _current_page == null:
 		return
 	var note_id = _current_page.get_note_id()
-	if index == 0:
-		NoteState.set_note_category(note_id, "")
-	else:
-		NoteState.set_note_category(note_id, item.label_text)
+	NoteState.toggle_note_category(note_id, item.label_text)
 
 
 ## 删除分类子菜单点击回调
@@ -352,6 +349,23 @@ func _on_add_category_confirmed() -> void:
 	var cat_name = _add_category_input.text.strip_edges()
 	if cat_name != "":
 		NoteState.add_category(cat_name)
+
+
+## 笔记页菜单打开时，同步分类子菜单的勾选状态
+func _on_note_menu_opened() -> void:
+	_update_category_submenu_checks()
+
+
+## 更新分类子菜单的 check 状态
+func _update_category_submenu_checks() -> void:
+	if _current_page == null or not _category_submenu:
+		return
+	var note = NoteState.get_note_by_id(_current_page.get_note_id())
+	if note == null:
+		return
+	var categories = NoteState.get_categories()
+	for i in range(categories.size()):
+		_category_submenu.set_item_checked(i, categories[i] in note.categories)
 
 
 ## 笔记页菜单关闭后，将子菜单从 MenuCanvasLayer 救回
