@@ -11,12 +11,14 @@ extends Control
 @onready var _header_button: Button = $FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/MaterialButton
 @onready var _scroll_container: ScrollContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer
 @onready var _search_field: Control = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/MaterialTextField
-@onready var _chips_container: HBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer2
-@onready var _all_chip: Control = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer2/AllChip
+@onready var _chips_container: HBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer/HBoxContainer2
+@onready var _all_chip: Control = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer/HBoxContainer2/AllChip
 @onready var _items_container: VBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/VBoxContainer
 @onready var _list_container: VBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer
 @onready var _note_container: VBoxContainer = $FrostedPanel/MarginContainer/NoteVBoxContainer
 @onready var _back_button: Button = $FrostedPanel/MarginContainer/NoteVBoxContainer/HBoxContainer/BackButton
+@onready var _note_menu: MaterialMenu = $CanvasLayer/MaterialMenu
+@onready var _list_menu: MaterialMenu = $CanvasLayer/MaterialMenu2
 
 # --- 场景资源 ---
 var _note_item_scene: PackedScene = preload("res://scenes/main/ui/notebook_mobile_module/note_item/note_item.tscn")
@@ -29,6 +31,14 @@ var _search_query: String = ""
 var _is_page_open: bool = false
 var _category_chips: Dictionary = {} # {category_name: MaterialChip}
 var _save_timer: Timer = null
+var _category_submenu: MaterialMenu = null
+var _delete_category_submenu: MaterialMenu = null
+var _delete_category_dialog: MaterialDialog = null
+var _pending_delete_category: String = ""
+var _delete_dialog: MaterialDialog = null
+var _add_category_dialog: MaterialDialog = null
+var _add_category_input: LineEdit = null
+var _updating_chips: bool = false
 
 
 func _ready() -> void:
@@ -56,6 +66,17 @@ func _ready() -> void:
 	NoteState.data_loaded.connect(_on_data_loaded)
 	NoteState.category_added.connect(_on_category_added)
 	NoteState.category_removed.connect(_on_category_removed)
+
+	# 连接菜单信号
+	_note_menu.item_pressed.connect(_on_note_menu_item_pressed)
+	_list_menu.item_pressed.connect(_on_list_menu_item_pressed)
+	_note_menu.menu_closed.connect(_on_note_menu_closed)
+	_list_menu.menu_closed.connect(_on_list_menu_closed)
+
+	# 初始化子菜单和对话框
+	_setup_category_submenu()
+	_setup_delete_category_submenu()
+	_setup_dialogs()
 
 	# 初始加载
 	_refresh_categories()
@@ -162,19 +183,20 @@ func _open_page(note_id: int) -> void:
 
 
 ## 关闭编辑页，返回列表
-func _close_page() -> void:
+func _close_page(skip_save: bool = false) -> void:
 	if _current_page == null:
 		return
 
-	var note_id = _current_page.get_note_id()
-	var title = _current_page.get_title()
-	var content = _current_page.get_content()
+	if not skip_save:
+		var note_id = _current_page.get_note_id()
+		var title = _current_page.get_title()
+		var content = _current_page.get_content()
 
-	# 自动删除空笔记
-	if title.strip_edges() == "" and content.strip_edges() == "":
-		NoteState.remove_note(note_id)
-	else:
-		NoteState.update_note(note_id, title, content)
+		# 自动删除空笔记
+		if title.strip_edges() == "" and content.strip_edges() == "":
+			NoteState.remove_note(note_id)
+		else:
+			NoteState.update_note(note_id, title, content)
 
 	# 停止防抖定时器
 	_save_timer.stop()
@@ -201,6 +223,156 @@ func _save_current_page() -> void:
 	NoteState.update_note(note_id, title, content)
 
 
+# ======================== 菜单与对话框 ========================
+
+## 初始化笔记页"分类"子菜单（悬停显示）
+func _setup_category_submenu() -> void:
+	_category_submenu = MaterialMenu.new()
+	_category_submenu.min_width = 160
+	add_child(_category_submenu)
+	_category_submenu.item_pressed.connect(_on_category_submenu_item_pressed)
+	_rebuild_category_submenu()
+
+	# 将编辑器中的"分类"项（index 3）设置为子菜单类型
+	var category_item = _note_menu.get_item(3) as MaterialMenuItem
+	if category_item:
+		category_item.set_submenu(_category_submenu, _note_menu.default_submenu_arrow)
+		_category_submenu._parent_menu = _note_menu
+		_category_submenu.visible = false
+
+
+## 初始化列表"删除分类"子菜单（悬停显示）
+func _setup_delete_category_submenu() -> void:
+	_delete_category_submenu = MaterialMenu.new()
+	_delete_category_submenu.min_width = 160
+	add_child(_delete_category_submenu)
+	_delete_category_submenu.item_pressed.connect(_on_delete_category_submenu_item_pressed)
+	_rebuild_delete_category_submenu()
+
+	# 将编辑器中的"删除分类"项（index 1）设置为子菜单类型
+	var delete_cat_item = _list_menu.get_item(1) as MaterialMenuItem
+	if delete_cat_item:
+		delete_cat_item.set_submenu(_delete_category_submenu, _list_menu.default_submenu_arrow)
+		_delete_category_submenu._parent_menu = _list_menu
+		_delete_category_submenu.visible = false
+
+
+## 初始化对话框
+func _setup_dialogs() -> void:
+	# 删除笔记确认对话框
+	_delete_dialog = MaterialDialog.new()
+	add_child(_delete_dialog)
+	_delete_dialog.dialog_confirmed.connect(_on_delete_note_confirmed)
+
+	# 删除分类确认对话框
+	_delete_category_dialog = MaterialDialog.new()
+	add_child(_delete_category_dialog)
+	_delete_category_dialog.dialog_confirmed.connect(_on_delete_category_confirmed)
+
+	# 添加分类对话框
+	_add_category_dialog = MaterialDialog.new()
+	add_child(_add_category_dialog)
+
+	_add_category_input = LineEdit.new()
+	_add_category_input.placeholder_text = "输入分类名称"
+	_add_category_input.custom_minimum_size = Vector2(0, 36)
+	_add_category_dialog.set_custom_content(_add_category_input)
+	_add_category_dialog.dialog_confirmed.connect(_on_add_category_confirmed)
+
+
+## 重建分类子菜单项
+func _rebuild_category_submenu() -> void:
+	if not _category_submenu:
+		return
+	_category_submenu.clear_items()
+	_category_submenu.add_item("无分类")
+	for cat in NoteState.get_categories():
+		_category_submenu.add_item(cat)
+
+
+## 重建删除分类子菜单项
+func _rebuild_delete_category_submenu() -> void:
+	if not _delete_category_submenu:
+		return
+	_delete_category_submenu.clear_items()
+	for cat in NoteState.get_categories():
+		_delete_category_submenu.add_item(cat)
+
+
+## 笔记页菜单点击回调
+func _on_note_menu_item_pressed(index: int, _item: MaterialMenuItem) -> void:
+	match index:
+		1:  # 删除
+			_delete_dialog.show_confirm_dialog("删除笔记", "确定要删除这篇笔记吗？")
+
+
+## 列表菜单点击回调
+func _on_list_menu_item_pressed(index: int, _item: MaterialMenuItem) -> void:
+	match index:
+		0:  # 添加分类
+			_add_category_input.text = ""
+			_add_category_dialog.show_confirm_dialog("添加分类", "")
+
+
+## 分类子菜单点击回调（设置笔记分类）
+func _on_category_submenu_item_pressed(index: int, item: MaterialMenuItem) -> void:
+	if _current_page == null:
+		return
+	var note_id = _current_page.get_note_id()
+	if index == 0:
+		NoteState.set_note_category(note_id, "")
+	else:
+		NoteState.set_note_category(note_id, item.label_text)
+
+
+## 删除分类子菜单点击回调
+func _on_delete_category_submenu_item_pressed(_index: int, item: MaterialMenuItem) -> void:
+	_pending_delete_category = item.label_text
+	_delete_category_dialog.show_confirm_dialog("删除分类", "确定要删除分类「%s」吗？\n该分类下的笔记不会被删除。" % item.label_text)
+
+
+## 删除分类确认回调
+func _on_delete_category_confirmed() -> void:
+	if _pending_delete_category != "":
+		NoteState.remove_category(_pending_delete_category)
+		_pending_delete_category = ""
+
+
+## 删除笔记确认回调
+func _on_delete_note_confirmed() -> void:
+	if _current_page == null:
+		return
+	var note_id = _current_page.get_note_id()
+	NoteState.remove_note(note_id)
+	_close_page(true)
+
+
+## 添加分类确认回调
+func _on_add_category_confirmed() -> void:
+	var cat_name = _add_category_input.text.strip_edges()
+	if cat_name != "":
+		NoteState.add_category(cat_name)
+
+
+## 笔记页菜单关闭后，将子菜单从 MenuCanvasLayer 救回
+func _on_note_menu_closed() -> void:
+	_rescue_submenu(_category_submenu)
+
+
+## 列表菜单关闭后，将子菜单从 MenuCanvasLayer 救回
+func _on_list_menu_closed() -> void:
+	_rescue_submenu(_delete_category_submenu)
+
+
+## 将子菜单从即将销毁的 MenuCanvasLayer 移回 self
+func _rescue_submenu(submenu: MaterialMenu) -> void:
+	if submenu and is_instance_valid(submenu) and submenu.get_parent() != self:
+		if submenu.get_parent():
+			submenu.get_parent().remove_child(submenu)
+		add_child(submenu)
+		submenu.visible = false
+
+
 # ======================== UI 信号回调 ========================
 
 func _on_header_button_pressed() -> void:
@@ -222,6 +394,9 @@ func _on_search_text_changed(new_text: String) -> void:
 
 
 func _on_all_chip_selected(is_selected: bool) -> void:
+	if _updating_chips:
+		return
+	_updating_chips = true
 	if is_selected:
 		_current_category = ""
 		for cat_name in _category_chips:
@@ -230,9 +405,13 @@ func _on_all_chip_selected(is_selected: bool) -> void:
 	else:
 		# 不允许取消选中"全部"（至少一个选中）
 		_all_chip.set_selected_no_signal(true)
+	_updating_chips = false
 
 
 func _on_category_chip_selected(is_selected: bool, category: String) -> void:
+	if _updating_chips:
+		return
+	_updating_chips = true
 	if is_selected:
 		_current_category = category
 		_all_chip.set_selected_no_signal(false)
@@ -245,6 +424,7 @@ func _on_category_chip_selected(is_selected: bool, category: String) -> void:
 		_current_category = ""
 		_all_chip.set_selected_no_signal(true)
 		_refresh_note_list()
+	_updating_chips = false
 
 
 func _on_page_title_changed(_new_title: String) -> void:
@@ -279,6 +459,8 @@ func _on_data_loaded() -> void:
 
 func _on_category_added(_category: String) -> void:
 	_refresh_categories()
+	_rebuild_category_submenu()
+	_rebuild_delete_category_submenu()
 
 
 func _on_category_removed(_category: String) -> void:
@@ -287,6 +469,8 @@ func _on_category_removed(_category: String) -> void:
 		_all_chip.set_selected_no_signal(true)
 	_refresh_categories()
 	_refresh_note_list()
+	_rebuild_category_submenu()
+	_rebuild_delete_category_submenu()
 
 
 # ======================== Agent API（UI 操作）========================

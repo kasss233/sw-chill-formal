@@ -36,9 +36,11 @@ theme_override_font_sizes/font_size = 12
 text = "2025年1月14日 5:14 | 191字"
 
 [node name="TextEdit" type="TextEdit" parent="VBoxContainer" unique_id=543010098]
-custom_minimum_size = Vector2(0, 200)
+custom_minimum_size = Vector2(250, 250)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxEmpty_g48wb")
 theme_override_styles/focus = SubResource("StyleBoxEmpty_5c3yt")
 theme_override_styles/read_only = SubResource("StyleBoxEmpty_5m4ti")
 placeholder_text = "开始书写"
+wrap_mode = 1
+scroll_smooth = true
