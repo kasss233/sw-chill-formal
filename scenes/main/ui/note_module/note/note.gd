@@ -7,6 +7,7 @@ signal note_closed
 func _ready() -> void:
 	# 确保父节点 Note 大小正确，以便 NoteModule 居中计算
 	size = $FrostedPanel.size
+	
 	# 设置缩放中心为中心点
 	pivot_offset = size / 2.0
 	

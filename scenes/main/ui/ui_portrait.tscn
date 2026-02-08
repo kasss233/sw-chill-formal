@@ -23,7 +23,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_hnkmo")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rt1al"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_or4il"]
 shader = ExtResource("2_0d2yd")
 shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
@@ -37,10 +37,10 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/size = Vector2(296, 88)
+shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0d2yd"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rpfk5"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -103,9 +103,9 @@ layout_mode = 2
 size_flags_horizontal = 4
 
 [node name="FrostedPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabPanel" unique_id=1817169302]
-material = SubResource("ShaderMaterial_rt1al")
+material = SubResource("ShaderMaterial_or4il")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_0d2yd")
+theme_override_styles/panel = SubResource("StyleBoxFlat_rpfk5")
 script = ExtResource("3_fb1sj")
 corner_radius = 32.0
 blur_amount = 3.0
