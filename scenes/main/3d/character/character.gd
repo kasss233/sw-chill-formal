@@ -12,8 +12,30 @@ extends Node3D
 @export var angry: bool = true
 var action_playback: AnimationNodeStateMachinePlayback
 func _ready() -> void:
+	_sanitize_animations(emotion_animation)
+	_sanitize_animations(action_animation)
 	action_tree.active = true
+	emotion_tree.active = true
 	action_playback = action_tree.get("parameters/playback")
+
+func _sanitize_animations(player: AnimationPlayer):
+	if not player: return
+	var library_names = player.get_animation_library_list()
+	for lib_name in library_names:
+		var library = player.get_animation_library(lib_name)
+		for anim_name in library.get_animation_list():
+			var anim = library.get_animation(anim_name)
+			for i in range(anim.get_track_count() - 1, -1, -1):
+				if anim.track_get_type(i) == Animation.TYPE_BLEND_SHAPE:
+					var path = anim.track_get_path(i)
+					var node = player.get_node_or_null(path)
+					if node is MeshInstance3D:
+						if node.mesh == null or node.mesh.get_blend_shape_count() == 0:
+							anim.remove_track(i)
+						else:
+							# Optional: check if index is out of bounds
+							# But usually size=0 is the issue here.
+							pass
 ## 对话接口
 func start_saying():
 	saying = true
