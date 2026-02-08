@@ -105,22 +105,22 @@ scenes/main/
 ├── audio_player/            # AudioPlayer + MusicState autoload
 ├── data/                    # Data Autoload singletons (TaskState, NoteState, etc.)
 └── ui/
-    ├── components/          # Material Design 组件 (→ 用 Skill 工具查询)
-    ├── music_module/
-    ├── task_module_new/
-    ├── note_module/
-    ├── notebook_module/
-    ├── notebook_mobile_module/
-    ├── input_box/
-    ├── dialogue_box/
-    ├── env_setter/
-    ├── pomodoro_technique_module/
-    ├── character_interactor/
-    └── debug/
+	├── components/          # Material Design 组件 (→ 用 Skill 工具查询)
+	├── music_module/
+	├── task_module_new/
+	├── note_module/
+	├── notebook_module/
+	├── notebook_mobile_module/
+	├── input_box/
+	├── dialogue_box/
+	├── env_setter/
+	├── pomodoro_technique_module/
+	├── character_interactor/
+	└── debug/
 
 addons/                      # vrm, Godot-MToon-Shader, sky_3d,
-                             # simple-gui-transitions, SmoothScroll,
-                             # ReorderableContainer, calendar_library, markdownlabel
+							 # simple-gui-transitions, SmoothScroll,
+							 # ReorderableContainer, calendar_library, markdownlabel
 resource/audio_res/          # AudioRes 音频资源
 agent/godot_paser/paser.gd   # Agent JSON → modules/State
 docs/REFACTOR_GUIDE.md       # 三层架构重构指南（权威规则）

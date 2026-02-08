@@ -1,19 +1,19 @@
-extends PanelContainer
+extends MarginContainer
 
-@onready var hh = $running/VBoxContainer/hh_mm_dd/hh
-@onready var mm = $running/VBoxContainer/hh_mm_dd/mm
-@onready var ss = $running/VBoxContainer/hh_mm_dd/ss
+@onready var hh = %running/VBoxContainer/hh_mm_dd/hh
+@onready var mm = %running/VBoxContainer/hh_mm_dd/mm
+@onready var ss = %running/VBoxContainer/hh_mm_dd/ss
 
-@onready var progress_bar = $MaterialProgressIndicator
-@onready var loop_info = $idle/VBoxContainer/loop
-@onready var work_info = $idle/VBoxContainer/HBoxContainer/work
-@onready var rest_info = $idle/VBoxContainer/HBoxContainer/rest
+@onready var progress_bar = $FrostedPanel/MaterialProgressIndicator
+@onready var loop_info = %idle/VBoxContainer/loop
+@onready var work_info = %idle/VBoxContainer/HBoxContainer/work
+@onready var rest_info = %idle/VBoxContainer/HBoxContainer/rest
 
-@onready var loop_progress_label = $running/VBoxContainer/numbers         # n/N
-@onready var status_label = $running/VBoxContainer/status                	# 工作中/休息中
+@onready var loop_progress_label = %running/VBoxContainer/numbers         # n/N
+@onready var status_label = %running/VBoxContainer/status                	# 工作中/休息中
 
-@onready var idle_view = $idle
-@onready var running_view = $running
+@onready var idle_view = %idle
+@onready var running_view = %running
 
 # 信号定义
 signal work_started()        
