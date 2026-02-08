@@ -1,14 +1,17 @@
+class_name Main3d
 extends Node3D
 @export var time_of_day: TimeOfDay
 @export var sky3d: Sky3D
 @export var rain_particle: Node3D
 @export var snow_particle: Node3D
 @export var character: Character
+@export var camera:Camera3D
 @export var TIME_OF_DAYTIME: float = 8
 @export var TIME_OF_DUSK: float = 17
 @export var TIME_OF_EVENING: float = 21
 @export var RAINY_LIGHT_ENERGY := 0.2
 @export var SUNNY_LIGHT_ENERGY := 0.7
+
 func _ready() -> void:
 	_init_time()
 	_init_weather() 
@@ -18,7 +21,10 @@ func _init_time():
 	time_of_day.system_sync = false
 	time_of_day.game_time_enabled = false
 	time_of_day.current_time = TIME_OF_DAYTIME
-		
+
+func set_camera_fov(_fov:int):
+	camera.fov=_fov
+	pass
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
 func set_env_weather_rain():
 	rain_particle.visible = true
@@ -48,7 +54,6 @@ func _animate_time(target_time: float):
 	time_tween.set_ease(Tween.EASE_IN_OUT)
 	time_tween.set_trans(Tween.TRANS_SINE)
 	time_tween.tween_property(time_of_day, "current_time", target_time, 2.0)
-
 func set_env_time_daytime():
 	_animate_time(TIME_OF_DAYTIME)
 func set_env_time_dusk():
@@ -86,7 +91,6 @@ func _on_ui_env_weather_changed(mode: int) -> void:
 			set_env_weather_snowy()
 		3:
 			set_env_weather_sync()
-
 var cur_pose = 4;
 func _on_ui_character_interacted() -> void:
 	# rand2
@@ -107,8 +111,6 @@ func _on_ui_character_interacted() -> void:
 		6:
 			character.set_disbelief_pose()
 	#cur_pose = (cur_pose + 1) % 7
-
-
 func _on_ui_work_completed() -> void:
 	character.set_typing_pose(false)
 
