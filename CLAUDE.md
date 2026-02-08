@@ -59,7 +59,7 @@ AudioRes (resource/audio_res/) → AudioPlayer → MusicModule → MusicList →
 | NotebookModule | `notebook_module/note_book.gd` | 多页笔记本 |
 | InputBox | `input_box/input_box.gd` | AI 对话输入框，单行/多行切换，图片附件(max 2) |
 | DialogueBox | `dialogue_box/dialogue_box.gd` | AI 对话展示，逐字流式动画，BBCode，3 个操作按钮 |
-| EnvSetter | `env_setter/env_setter.gd` | 环境时间/天气设置 |
+| Setting | `setting/setting.gd` | 环境时间/天气/抗锯齿设置，持久化到 `user://settings.cfg` |
 | PomodoroModule | `pomodoro_technique_module/pomodoro_technique_module.gd` | 番茄钟，CanvasLayer UI |
 | CharacterInteractor | `character_interactor/character_interactor.gd` | 角色交互触发（3 次点击） |
 
@@ -86,6 +86,7 @@ Material Design 组件位于 `scenes/main/ui/components/`，继承 Godot 原语�
 | `material-fab` | MaterialFAB |
 | `material-menu` | MaterialMenu |
 | `material-menu-button` | MaterialMenuButton |
+| `material-dropdown` | MaterialDropdown |
 | `material-progress-indicator` | MaterialProgressIndicator |
 | `material-segmented-button` | MaterialSegmentedButton |
 | `material-slider` | MaterialSlider |
@@ -113,7 +114,7 @@ scenes/main/
 	├── notebook_mobile_module/
 	├── input_box/
 	├── dialogue_box/
-	├── env_setter/
+	├── setting/
 	├── pomodoro_technique_module/
 	├── character_interactor/
 	└── debug/

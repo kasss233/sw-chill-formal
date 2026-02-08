@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
 [ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_hkhhe"]
-[ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/env_setter/env_setter.tscn" id="4_ex8bf"]
+[ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/setting/setting.tscn" id="4_ex8bf"]
 [ext_resource type="PackedScene" uid="uid://ov68toccadt" path="res://scenes/main/ui/task_module_new/task_module.tscn" id="4_khr3h"]
 [ext_resource type="PackedScene" uid="uid://b6bxw47hgr5em" path="res://scenes/main/ui/character_interactor/character_interactor.tscn" id="5_fhd3w"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="5_uypi5"]

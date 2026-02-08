@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://o8cxkfnpu5ug" path="res://scenes/main/ui/note_module/note_module.tscn" id="8_yvysw"]
 [ext_resource type="PackedScene" uid="uid://bmsmfccv7kma" path="res://scenes/main/ui/notebook_module/note_book.tscn" id="9_8o7o8"]
 [ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="10_mdnhd"]
-[ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/env_setter/env_setter.tscn" id="11_vbxtl"]
+[ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/setting/setting.tscn" id="11_vbxtl"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="12_7rk1v"]
 [ext_resource type="PackedScene" uid="uid://bro0lt35ms0j1" path="res://scenes/main/ui/input_box/input_box.tscn" id="13_gfesi"]
 [ext_resource type="Script" uid="uid://b3d8t5hha36c1" path="res://scenes/main/ai_service/chat_controller.gd" id="14_k6c0a"]
