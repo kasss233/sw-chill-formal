@@ -68,7 +68,3 @@ func set_surprised(enable: bool):
 	surprised = enable
 func set_angry(enable: bool):
 	angry = enable
-
-
-func _on_area_3d_input_event(camera: Node, event: InputEvent, event_position: Vector3, normal: Vector3, shape_idx: int) -> void:
-	print("Character clicked,shape_idx:", shape_idx)
