@@ -180,7 +180,7 @@ shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
-shader_parameter/size = Vector2(282, 368)
+shader_parameter/size = Vector2(16, 16)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hfbqt"]
 content_margin_left = 8.0

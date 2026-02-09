@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://o8cxkfnpu5ug"]
+[gd_scene format=3 uid="uid://o8cxkfnpu5ug"]
 
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_naere"]
 [ext_resource type="Script" uid="uid://dwgyqssx4w8o4" path="res://scenes/main/ui/note_module/note_module.gd" id="1_tvr07"]
@@ -60,13 +60,13 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[node name="NoteModule" type="MarginContainer"]
+[node name="NoteModule" type="MarginContainer" unique_id=106579566]
 offset_right = 40.0
 offset_bottom = 48.0
 script = ExtResource("1_tvr07")
 note = ExtResource("2_r3pkf")
 
-[node name="MaterialButton" type="Button" parent="."]
+[node name="MaterialButton" type="Button" parent="." unique_id=1553035616]
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -85,6 +85,6 @@ padding_horizontal = 20
 padding_vertical = 10
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1258783608]
 
 [connection signal="pressed" from="MaterialButton" to="." method="_on_material_button_pressed"]

@@ -13,6 +13,7 @@ func _ready() -> void:
 #这里根据设备切换ui，视口
 #TODO:判断手机pad
 func _init_ui():
+
 	if OS.has_feature("mobile"):
 	#if OS.has_feature("pc"):
 		get_window().size = Vector2i(648, 1152) 
