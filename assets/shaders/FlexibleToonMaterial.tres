@@ -1,0 +1,30 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://b1poe45am0c5i"]
+
+[ext_resource type="Shader" uid="uid://bobil77738mdb" path="res://assets/shaders/flexible_toon.gdshader" id="1"]
+[ext_resource type="Shader" uid="uid://c2v4y7k23kf0g" path="res://assets/shaders/outline.gdshader" id="1_uv07y"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_67mwt"]
+render_priority = 0
+shader = ExtResource("1_uv07y")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_width = 15.0
+
+[resource]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_67mwt")
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.678431, 0.678431, 0.678431, 1)
+shader_parameter/clamp_diffuse_to_max = true
+shader_parameter/cuts = 4
+shader_parameter/wrap = 0.0
+shader_parameter/steepness = 1.0
+shader_parameter/use_attenuation = true
+shader_parameter/use_specular = true
+shader_parameter/specular_strength = 0.1750000083125
+shader_parameter/specular_shininess = 3.8090001809275
+shader_parameter/use_rim = true
+shader_parameter/rim_width = 8.0
+shader_parameter/rim_color = Color(1, 1, 1, 1)
+shader_parameter/use_ramp = false
+shader_parameter/use_borders = false
+shader_parameter/border_width = 0.01

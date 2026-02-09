@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://v6iy44md1r4i"]
+[gd_scene format=3 uid="uid://v6iy44md1r4i"]
 
 [ext_resource type="Script" uid="uid://d134p80w63xx7" path="res://scenes/main/ui/music_module/music_option_board/music_option_item/music_option_item.gd" id="1_3ax4r"]
 [ext_resource type="Texture2D" uid="uid://do5k1eix63y7d" path="res://assets/ui/music_icons/check_box_100dp_E3E3E3_FILL0_wght400_GRAD0_opsz48 (1).svg" id="2_kaqxx"]

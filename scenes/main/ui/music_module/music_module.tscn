@@ -1,4 +1,4 @@
-[gd_scene load_steps=83 format=3 uid="uid://do56ajkuwsf0t"]
+[gd_scene format=3 uid="uid://do56ajkuwsf0t"]
 
 [ext_resource type="Script" uid="uid://b7qsxbprouywv" path="res://scenes/main/ui/music_module/music_module.gd" id="1_t37u8"]
 [ext_resource type="Resource" uid="uid://dweygfwutymm5" path="res://resource/audio_res/audio_res.tres" id="2_jnxsf"]
@@ -37,16 +37,18 @@ noise = SubResource("FastNoiseLite_vq68n")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bihbd"]
 shader = ExtResource("20_bihbd")
 shader_parameter/corner_radius = 20.0
+shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.0
-shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/blur_amount = 4.0
+shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
 shader_parameter/noise_amount = 0.0
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_62hhh")
-shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(334, 65)
+shader_parameter/size = Vector2(334, 61)
 shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_50xrc"]
@@ -388,13 +390,15 @@ noise = SubResource("FastNoiseLite_btupq")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tooop"]
 shader = ExtResource("20_bihbd")
 shader_parameter/corner_radius = 20.0
+shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.0
-shader_parameter/tint_color = Color(0, 0, 0, 0.4)
+shader_parameter/blur_amount = 4.0
+shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
 shader_parameter/noise_amount = 0.0
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_00qru")
-shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(288, 365)
@@ -608,7 +612,7 @@ text = "添加歌单"
 icon = ExtResource("13_00qru")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
-[node name="MusicModule" type="MarginContainer"]
+[node name="MusicModule" type="MarginContainer" unique_id=1367296249]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -621,7 +625,7 @@ option_board_scene = ExtResource("4_cfhda")
 audio_res = ExtResource("2_jnxsf")
 metadata/_edit_horizontal_guides_ = [279.0, 277.0]
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=862494518]
 material = SubResource("ShaderMaterial_bihbd")
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_50xrc")
@@ -630,15 +634,15 @@ corner_radius = 20.0
 noise_texture = SubResource("NoiseTexture2D_62hhh")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=87646170]
 layout_mode = 2
 alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1736713377]
 layout_mode = 2
 alignment = 1
 
-[node name="TabButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="TabButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=338292044]
 clip_contents = true
 custom_minimum_size = Vector2(150, 36)
 layout_mode = 2
@@ -667,7 +671,7 @@ scroll_speed = 20.0
 scroll_end_delay = 0.0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="ModeButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="ModeButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=782184890]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -685,7 +689,7 @@ script = ExtResource("21_4fln3")
 states = Array[ExtResource("22_bj3ck")]([SubResource("Resource_7pnhy"), SubResource("Resource_5lrqg"), SubResource("Resource_w252y")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="LastButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="LastButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=292191377]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -701,7 +705,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="StatusButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="StatusButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=158934501]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -722,7 +726,7 @@ script = ExtResource("21_4fln3")
 states = Array[ExtResource("22_bj3ck")]([SubResource("Resource_g0jrd"), SubResource("Resource_60cfw")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="NextButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="NextButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1264861408]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -738,9 +742,9 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1231948188]
 
-[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer"]
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=1245255195]
 visible = false
 material = SubResource("ShaderMaterial_tooop")
 custom_minimum_size = Vector2(288, 365)
@@ -761,18 +765,18 @@ corner_radius = 20.0
 noise_texture = SubResource("NoiseTexture2D_00qru")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel" unique_id=1658643280]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1733455733]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="TitleLabel" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=1560242306]
 visible = false
 layout_mode = 2
 text = "Music List"
 
-[node name="ListMenuButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="ListMenuButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=1477576619]
 clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -800,7 +804,7 @@ scroll_gap = 1.0
 scroll_repeat_count = 50
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="AddMenuButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("menu")]
+[node name="AddMenuButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=1101702825 node_paths=PackedStringArray("menu")]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -827,7 +831,7 @@ scroll_gap = 1.0
 scroll_repeat_count = 50
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="AddButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer"]
+[node name="AddButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=918146094]
 visible = false
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
@@ -855,13 +859,13 @@ scroll_gap = 1.0
 scroll_repeat_count = 50
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
-[node name="ListContainer" type="MarginContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer"]
+[node name="ListContainer" type="MarginContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=195703017]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_right = 4
 
-[node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer"]
+[node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=1383688521]
 visible = false
 custom_minimum_size = Vector2(200, 0)
 offset_left = 277.0
@@ -873,7 +877,7 @@ script = ExtResource("10_bj3ck")
 editor_items = Array[ExtResource("11_btupq")]([SubResource("Resource_t1xwq"), SubResource("Resource_732up")])
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
-[node name="GuiTransition" type="Node" parent="CanvasLayer"]
+[node name="GuiTransition" type="Node" parent="CanvasLayer" unique_id=1892176726]
 script = ExtResource("30_00qru")
 auto_start = 0
 animation_enter = 3

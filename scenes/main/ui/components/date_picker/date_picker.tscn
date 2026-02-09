@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://vono11rha05n"]
+[gd_scene format=3 uid="uid://vono11rha05n"]
 
 [ext_resource type="Script" uid="uid://7xupisoryagf" path="res://scenes/main/ui/components/date_picker/date_picker.gd" id="1_37ynt"]
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="2_calendar"]

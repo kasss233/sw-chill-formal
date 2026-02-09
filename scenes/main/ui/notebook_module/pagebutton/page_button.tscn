@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bwkofikr0rnvr"]
+[gd_scene format=3 uid="uid://bwkofikr0rnvr"]
 
 [ext_resource type="Script" uid="uid://cql2sc6pub7wo" path="res://scenes/main/ui/notebook_module/pagebutton/page_button.gd" id="1_mbis7"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="1_sxwfx"]
