@@ -13,7 +13,7 @@ uniform bool use_vertex_color = false;
 uniform int cuts : hint_range(1, 8) = 3;
 uniform float wrap : hint_range(-2.0, 2.0) = 0.1; // 调整受光范围
 uniform float steepness : hint_range(1.0, 8.0) = 1.0;
-uniform float shadow_brightness : hint_range(0.0, 1.0) = 0.2; // 阴影处的基础亮度
+uniform float shadow_brightness : hint_range(0.0, 1.0) = 0.5; // 阴影处的基础亮度
 
 // --- 辅助功能 ---
 uniform bool use_attenuation = true;
