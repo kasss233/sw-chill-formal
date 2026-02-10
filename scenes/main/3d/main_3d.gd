@@ -5,7 +5,7 @@ extends Node3D
 @export var rain_particle: Node3D
 @export var snow_particle: Node3D
 @export var character: Character
-@export var camera:Camera3D
+@export var camera: Camera3D
 @export var TIME_OF_DAYTIME: float = 8
 @export var TIME_OF_DUSK: float = 17
 @export var TIME_OF_EVENING: float = 21
@@ -13,8 +13,48 @@ extends Node3D
 @export var SUNNY_LIGHT_ENERGY := 0.7
 
 func _ready() -> void:
+	# 在编辑器模式下不初始化，避免信号连接错误
+	if Engine.is_editor_hint():
+		return
+	
+	_connect_signals()
 	_init_time()
-	_init_weather() 
+	_init_weather()
+
+func _connect_signals() -> void:
+	# 从 State 单例连接信号，而不是从场景文件连接
+	if CharacterInteractorState and CharacterInteractorState.has_signal("character_interacted"):
+		if not CharacterInteractorState.character_interacted.is_connected(_on_character_interacted):
+			CharacterInteractorState.character_interacted.connect(_on_character_interacted)
+	
+	if SettingState and SettingState.has_signal("env_time_changed"):
+		if not SettingState.env_time_changed.is_connected(_on_env_time_changed):
+			SettingState.env_time_changed.connect(_on_env_time_changed)
+	
+	if SettingState and SettingState.has_signal("env_weather_changed"):
+		if not SettingState.env_weather_changed.is_connected(_on_env_weather_changed):
+			SettingState.env_weather_changed.connect(_on_env_weather_changed)
+	
+	if PomodoroState and PomodoroState.has_signal("work_started"):
+		if not PomodoroState.work_started.is_connected(_on_work_started):
+			PomodoroState.work_started.connect(_on_work_started)
+	
+	if PomodoroState and PomodoroState.has_signal("work_completed"):
+		if not PomodoroState.work_completed.is_connected(_on_work_completed):
+			PomodoroState.work_completed.connect(_on_work_completed)
+	
+	if PomodoroState and PomodoroState.has_signal("work_paused"):
+		if not PomodoroState.work_paused.is_connected(_on_work_paused):
+			PomodoroState.work_paused.connect(_on_work_paused)
+	
+	if PomodoroState and PomodoroState.has_signal("work_stopped"):
+		if not PomodoroState.work_stopped.is_connected(_on_work_stopped):
+			PomodoroState.work_stopped.connect(_on_work_stopped)
+	
+	if PomodoroState and PomodoroState.has_signal("work_continued"):
+		if not PomodoroState.work_continued.is_connected(_on_work_continued):
+			PomodoroState.work_continued.connect(_on_work_continued)
+
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
@@ -22,8 +62,8 @@ func _init_time():
 	time_of_day.game_time_enabled = false
 	time_of_day.current_time = TIME_OF_DAYTIME
 
-func set_camera_fov(_fov:int):
-	camera.fov=_fov
+func set_camera_fov(_fov: int):
+	camera.fov = _fov
 	pass
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
 func set_env_weather_rain():
@@ -71,7 +111,7 @@ func set_env_time_sync():
 	time_of_day.game_time_enabled = true
 	time_of_day.system_sync = true
 ## --- UI 信号回调 ---
-func _on_ui_env_time_changed(mode: int) -> void:
+func _on_env_time_changed(mode: int) -> void:
 	match mode:
 		0:
 			set_env_time_daytime()
@@ -81,7 +121,7 @@ func _on_ui_env_time_changed(mode: int) -> void:
 			set_env_time_evening()
 		3:
 			set_env_time_sync()
-func _on_ui_env_weather_changed(mode: int) -> void:
+func _on_env_weather_changed(mode: int) -> void:
 	match mode:
 		0:
 			set_env_weather_sunny()
@@ -92,7 +132,7 @@ func _on_ui_env_weather_changed(mode: int) -> void:
 		3:
 			set_env_weather_sync()
 var cur_pose = 4;
-func _on_ui_character_interacted() -> void:
+func _on_character_interacted() -> void:
 	# rand2
 	#var rand = randi() % 7
 	match cur_pose:
@@ -111,21 +151,21 @@ func _on_ui_character_interacted() -> void:
 		6:
 			character.set_disbelief_pose()
 	#cur_pose = (cur_pose + 1) % 7
-func _on_ui_work_completed() -> void:
+func _on_work_completed() -> void:
 	character.set_typing_pose(false)
 
 
-func _on_ui_work_started() -> void:
+func _on_work_started() -> void:
 	character.set_typing_pose(true)
 
 
-func _on_ui_work_paused() -> void:
+func _on_work_paused() -> void:
 	character.set_typing_pose(false)
 
 
-func _on_ui_work_stopped() -> void:
+func _on_work_stopped() -> void:
 	character.set_typing_pose(false)
 
 
-func _on_ui_work_continued() -> void:
+func _on_work_continued() -> void:
 	character.set_typing_pose(true)
