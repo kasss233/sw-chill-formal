@@ -36,17 +36,8 @@ func _initialize_test_panels() -> void:
 		print("[TestPanel] 错误: UI未设置，无法初始化测试页")
 		return
 
-	# 初始化TaskModule测试页
+	# 初始化各测试页模块引用
 	for child in tab_container.get_children():
-		if child.has_method("set_task_module") and ui.task_module:
-			child.set_task_module(ui.task_module)
-			print("[TestPanel] 已为 %s 设置TaskModule引用" % child.name)
-
-		# 初始化MusicModule测试页
-		if child.has_method("set_music_module") and ui.music_module:
-			child.set_music_module(ui.music_module)
-			print("[TestPanel] 已为 %s 设置MusicModule引用" % child.name)
-
 		# 初始化InputBox测试页
 		if child.has_method("set_input_box") and ui.input_box:
 			child.set_input_box(ui.input_box)

@@ -1,7 +1,5 @@
 class_name PomodoroTechniqueModule
 extends Control
-## UI 引用（用于层级管理）
-@export var _ui: UI = null
 
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
 @onready var pomodoro_technique = $CanvasLayer/PomodoroTechnique
@@ -29,44 +27,33 @@ func _connect_pomodoro_signals() -> void:
 		if not pomodoro_technique.work_continued.is_connected(_on_pomodoro_technique_work_continued):
 			pomodoro_technique.work_continued.connect(_on_pomodoro_technique_work_continued)
 
-## 请求新的顶层层级
-func _request_top_layer() -> void:
-	if _ui:
-		canvas_layer.layer = _ui.request_top_layer()
-	else:
-		# 降级方案：使用固定的高层级
-		canvas_layer.layer = 100
-
-
 func _on_pomodoro_button_state_changed(_old_state: int, new_state: int) -> void:
-	_request_top_layer()
+	LayerManager.bring_to_front(canvas_layer)
 	if new_state==0:
 		GuiTransitions.hide("pomodorotechnique")
 	else:
-		# 请求新的顶层层级
-		_request_top_layer()
 		GuiTransitions.show("pomodorotechnique")
 
 signal work_started
 func _on_pomodoro_technique_work_started() -> void:
-	work_started.emit()
+	PomodoroState.notify_work_started()
 
 
 signal work_completed
 func _on_pomodoro_technique_work_completed() -> void:
-	work_completed.emit()
+	PomodoroState.notify_work_completed()
 
 signal work_paused
 func _on_pomodoro_technique_work_paused() -> void:
-	work_paused.emit()
+	PomodoroState.notify_work_paused()
 
 signal work_stopped
 func _on_pomodoro_technique_work_stopped() -> void:
-	work_stopped.emit()
+	PomodoroState.notify_work_stopped()
 
 signal work_continued
 func _on_pomodoro_technique_work_continued() -> void:
-	work_continued.emit()
+	PomodoroState.notify_work_continued()
 
 # ====== Agent API ======
 ## Agent API: 启动番茄钟
@@ -76,7 +63,7 @@ func _on_pomodoro_technique_work_continued() -> void:
 ## @return: 是否成功启动
 func show_module():
 	if !pomodoro_technique.visible:
-		_request_top_layer()
+		LayerManager.bring_to_front(canvas_layer)
 		pomodoro_button.set_state_no_signal(1)
 func agent_start_pomodoro(work_duration: int, rest_duration: int, loop_times: int = 1) -> bool:
 	if pomodoro_technique == null:

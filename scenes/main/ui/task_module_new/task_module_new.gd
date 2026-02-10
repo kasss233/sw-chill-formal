@@ -1,4 +1,3 @@
-
 extends Control
 
 # 信号定义（保留，供上层连接）
@@ -18,9 +17,6 @@ var separator_index: int = 0
 
 # 防止递归调用的标志
 var _is_programmatic_reorder: bool = false
-
-# Agent 操作锁定标志
-var is_agent_operating: bool = false
 
 func _ready() -> void:
 	# 初始化分隔符位置（从编辑器中的 FinishedCheckBox 获取索引）
@@ -290,63 +286,7 @@ func _on_v_box_container_reordered(from: int, to: int) -> void:
 
 	_is_programmatic_reorder = false
 
-# ======================== Agent API（纯 UI 行为）========================
-
-## Agent API: 添加新任务（带打字动画）
-func agent_add_task(title: String, due_timestamp: int = 0, typing_speed: float = 0.05) -> int:
-	var task = TaskState.add_task("", due_timestamp)
-
-	# 如果标题不为空，等待打字动画完成
-	if not title.is_empty():
-		await _start_typing_animation(task.id, title, typing_speed)
-
-	return task.id
-
-## 启动打字动画（异步执行，不阻塞）
-func _start_typing_animation(p_task_id: int, title: String, typing_speed: float) -> void:
-	# 等待淡入动画完成
-	await get_tree().create_timer(0.4).timeout
-
-	var item = _task_items.get(p_task_id)
-	if item and is_instance_valid(item):
-		await _simulate_typing_effect(item, title, typing_speed)
-
-## Agent API: 修改任务名称（模拟打字效果）
-func agent_update_task_title(id: int, new_title: String, typing_speed: float = 0.05) -> bool:
-	_lock_module()
-	var item = _task_items.get(id)
-	if item == null or not is_instance_valid(item):
-		_unlock_module()
-		return false
-
-	await _simulate_typing_effect(item, new_title, typing_speed)
-	_unlock_module()
-	return true
-
-## 模拟打字效果（逐字符显示）
-func _simulate_typing_effect(item: Control, text: String, speed: float) -> void:
-	var line_edit = item.get_node("MarginContainer/VBoxContainer/HBoxContainer/VBoxContainer/LineEdit")
-	var current_text = ""
-
-	for i in range(text.length()):
-		current_text += text[i]
-		line_edit.text = current_text
-		await get_tree().create_timer(speed).timeout
-
-	# 通过 TaskState 更新数据
-	TaskState.update_task_title(item.task_data.id, text)
-
 # ======================== 内部辅助方法 ========================
-
-func _lock_module() -> void:
-	is_agent_operating = true
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	print("[%s]Module locked for agent operation" % [self.name])
-
-func _unlock_module() -> void:
-	is_agent_operating = false
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	print("[%s]Module unlocked" % [self.name])
 
 func _get_data_index_for_ui(ui_index: int) -> int:
 	var sep_ui_index = finished_check_box.get_index()

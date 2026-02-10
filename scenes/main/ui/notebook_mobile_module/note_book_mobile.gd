@@ -66,6 +66,10 @@ func _ready() -> void:
 	NoteState.data_loaded.connect(_on_data_loaded)
 	NoteState.category_added.connect(_on_category_added)
 	NoteState.category_removed.connect(_on_category_removed)
+	NoteState.agent_note_created.connect(_on_agent_note_created)
+	NoteState.agent_content_written.connect(_on_agent_content_written)
+	NoteState.agent_open_note_requested.connect(_on_agent_open_note_requested)
+	NoteState.agent_close_note_requested.connect(_on_agent_close_note_requested)
 
 	# 连接菜单信号
 	_note_menu.item_pressed.connect(_on_note_menu_item_pressed)
@@ -159,6 +163,14 @@ func _open_page(note_id: int) -> void:
 	var note = NoteState.get_note_by_id(note_id)
 	if note == null:
 		return
+
+	# 清理已有页面（防止资源泄漏）
+	if _current_page:
+		_save_current_page()
+		_save_timer.stop()
+		_current_page.stop_typing()
+		_current_page.queue_free()
+		_current_page = null
 
 	_is_page_open = true
 
@@ -446,6 +458,9 @@ func _on_page_title_changed(_new_title: String) -> void:
 
 
 func _on_page_content_changed(_new_content: String) -> void:
+	# 打字动画期间不启动保存（避免保存部分内容）
+	if _current_page and _current_page.is_typing():
+		return
 	_save_timer.start()
 
 
@@ -461,7 +476,13 @@ func _on_note_removed(_note_id: int) -> void:
 		_refresh_note_list()
 
 
-func _on_note_updated(_note: NoteData) -> void:
+func _on_note_updated(note: NoteData) -> void:
+	if _is_page_open and _current_page and _current_page.get_note_id() == note.id:
+		# 页面打开时，仅在内容确实不同时才刷新（避免 save_timer 保存后的循环）
+		if _current_page.get_title() != note.title or _current_page.get_content() != note.content:
+			_current_page.stop_typing()
+			_current_page.load_note(note)
+		return
 	if not _is_page_open:
 		_refresh_note_list()
 
@@ -487,57 +508,30 @@ func _on_category_removed(_category: String) -> void:
 	_rebuild_delete_category_submenu()
 
 
-# ======================== Agent API（UI 操作）========================
+func _on_agent_note_created(note: NoteData) -> void:
+	_open_page(note.id)
+	# 等一帧让 NotePage @onready 初始化
+	await get_tree().process_frame
+	if _current_page and note.content != "":
+		_current_page.set_content(note.content, true)
 
-## 打开指定笔记的编辑页
-func agent_open_note(note_id: int) -> void:
-	if _is_page_open:
-		_close_page()
+
+func _on_agent_content_written(note_id: int, content: String) -> void:
+	# 如果当前正在编辑这个笔记，直接播放打字动画
+	if _is_page_open and _current_page and _current_page.get_note_id() == note_id:
+		_current_page.set_content(content, true)
+		return
+	# 否则先打开笔记再播放
+	_open_page(note_id)
+	await get_tree().process_frame
+	if _current_page:
+		_current_page.set_content(content, true)
+
+
+func _on_agent_open_note_requested(note_id: int) -> void:
 	_open_page(note_id)
 
 
-## 关闭编辑页回到列表
-func agent_close_note() -> void:
+func _on_agent_close_note_requested() -> void:
 	if _is_page_open:
 		_close_page()
-
-
-## 创建新笔记并打开编辑页
-func agent_create_and_open(title: String = "", content: String = "", category: String = "") -> int:
-	var note = NoteState.add_note(title, content, category)
-	_open_page(note.id)
-	return note.id
-
-
-## 获取当前打开的笔记 id（未打开返回 -1）
-func agent_get_current_note_id() -> int:
-	if _current_page:
-		return _current_page.get_note_id()
-	return -1
-
-
-## 编辑页是否打开
-func agent_is_page_open() -> bool:
-	return _is_page_open
-
-
-## 设置搜索关键词
-func agent_search(query: String) -> void:
-	_search_query = query
-	_search_field.set_text(query)
-	_refresh_note_list()
-
-
-## 设置当前分类筛选
-func agent_set_category_filter(category: String) -> void:
-	if category == "":
-		_current_category = ""
-		_all_chip.set_selected_no_signal(true)
-		for cat_name in _category_chips:
-			_category_chips[cat_name].set_selected_no_signal(false)
-	elif category in _category_chips:
-		_current_category = category
-		_all_chip.set_selected_no_signal(false)
-		for cat_name in _category_chips:
-			_category_chips[cat_name].set_selected_no_signal(cat_name == category)
-	_refresh_note_list()

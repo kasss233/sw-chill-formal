@@ -63,6 +63,7 @@ var play_mode: int = PlayMode.SEQUENTIAL:
 		if play_mode != value:
 			play_mode = clamp(value, 0, 2)
 			play_mode_changed.emit(play_mode)
+			_reset_shuffle()
 			_save_data()
 
 ## 当前播放列表名称
@@ -71,10 +72,19 @@ var current_playlist: String = "":
 		if current_playlist != value:
 			current_playlist = value
 			playlist_changed.emit(value)
+			_reset_shuffle()
 			_save_data()
 
 ## 当前播放列表中的曲目索引
 var current_track_index: int = -1
+
+# --- 运行时导航状态（不持久化） ---
+## 运行时歌单 {name: Array[String]}，由 MusicModule 注册
+var _runtime_playlists: Dictionary = {}
+## 随机播放顺序
+var _shuffled_tracks: Array[String] = []
+## 当前随机播放位置
+var _shuffle_index: int = -1
 
 # --- 持久化数据 ---
 ## 用户创建的歌单 {歌单名: Array[String] 曲目名列表}
@@ -91,6 +101,12 @@ var _loading: bool = false
 # --- 公有 API ---
 ## 设置当前曲目（不触发播放，只更新状态）
 func set_track(track_name: String, track_index: int = -1) -> void:
+	# 自动索引解析：当未传 index 时，从当前歌单中查找
+	if track_index == -1 and current_playlist != "":
+		var tracks = _get_track_list(current_playlist)
+		var found_index = tracks.find(track_name)
+		if found_index != -1:
+			track_index = found_index
 	current_track = track_name
 	current_track_index = track_index
 	last_track = track_name
@@ -119,6 +135,7 @@ func set_playlist(playlist_name: String) -> void:
 ## 通知曲目播放完毕
 func notify_track_finished() -> void:
 	track_finished.emit()
+	play_next()
 
 ## 获取下一个播放模式的名称（用于 UI 显示）
 func get_play_mode_name() -> String:
@@ -131,6 +148,153 @@ func get_play_mode_name() -> String:
 			return "单曲循环"
 		_:
 			return "未知"
+
+# ======================== 运行时歌单 API ========================
+
+## 注册/更新运行时歌单（不持久化），由 MusicModule 调用
+func register_runtime_playlist(p_name: String, tracks: Array[String]) -> void:
+	_runtime_playlists[p_name] = tracks
+	# 若为当前歌单则重置 shuffle
+	if p_name == current_playlist:
+		_reset_shuffle()
+	print("[MusicState] Registered runtime playlist '%s' with %d tracks" % [p_name, tracks.size()])
+
+## 获取歌单曲目列表（优先查运行时歌单，再查持久化歌单）
+func _get_track_list(playlist_name: String) -> Array[String]:
+	if _runtime_playlists.has(playlist_name):
+		var result: Array[String] = []
+		for track in _runtime_playlists[playlist_name]:
+			result.append(track)
+		return result
+	if _playlists.has(playlist_name):
+		var result: Array[String] = []
+		for track in _playlists[playlist_name]:
+			result.append(track)
+		return result
+	return [] as Array[String]
+
+# ======================== 播放导航 API ========================
+
+## 播放下一首（根据 play_mode 分发）
+func play_next() -> bool:
+	var tracks = _get_track_list(current_playlist)
+	if tracks.is_empty():
+		return false
+	match play_mode:
+		PlayMode.SEQUENTIAL:
+			return _play_next_sequential(tracks)
+		PlayMode.RANDOM:
+			return _play_next_random(tracks)
+		PlayMode.SINGLE_LOOP:
+			replay_current()
+			return true
+		_:
+			return false
+
+## 播放上一首（根据 play_mode 分发）
+func play_previous() -> bool:
+	var tracks = _get_track_list(current_playlist)
+	if tracks.is_empty():
+		return false
+	match play_mode:
+		PlayMode.SEQUENTIAL, PlayMode.SINGLE_LOOP:
+			return _play_prev_sequential(tracks)
+		PlayMode.RANDOM:
+			return _play_prev_random(tracks)
+		_:
+			return false
+
+## 重新播放当前曲目（绕过 setter 的相同值守卫）
+func replay_current() -> void:
+	if current_track != "":
+		track_changed.emit(current_track)
+
+# --- 导航内部实现 ---
+
+func _play_next_sequential(tracks: Array[String]) -> bool:
+	if current_track_index == -1 and tracks.size() > 0:
+		set_track(tracks[0], 0)
+		return true
+	var next_index = (current_track_index + 1) % tracks.size()
+	set_track(tracks[next_index], next_index)
+	return true
+
+func _play_prev_sequential(tracks: Array[String]) -> bool:
+	if current_track_index == -1 and tracks.size() > 0:
+		set_track(tracks[tracks.size() - 1], tracks.size() - 1)
+		return true
+	var prev_index = (current_track_index - 1 + tracks.size()) % tracks.size()
+	set_track(tracks[prev_index], prev_index)
+	return true
+
+func _play_next_random(tracks: Array[String]) -> bool:
+	if tracks.is_empty():
+		return false
+	# 如果 shuffle 列表为空或与当前歌单不匹配，重新生成
+	if _shuffled_tracks.is_empty() or _shuffled_tracks.size() != tracks.size():
+		_generate_shuffled_tracks(tracks)
+		# 已在播放某首歌，移到下一首
+		if _shuffle_index >= 0:
+			_shuffle_index += 1
+			if _shuffle_index >= _shuffled_tracks.size():
+				_shuffle_index = 0
+		else:
+			_shuffle_index = 0
+	else:
+		_shuffle_index += 1
+		if _shuffle_index >= _shuffled_tracks.size():
+			_shuffle_index = 0
+	var target_name = _shuffled_tracks[_shuffle_index]
+	var target_index = tracks.find(target_name)
+	set_track(target_name, target_index)
+	return true
+
+func _play_prev_random(tracks: Array[String]) -> bool:
+	if tracks.is_empty():
+		return false
+	if _shuffled_tracks.is_empty() or _shuffled_tracks.size() != tracks.size():
+		_generate_shuffled_tracks(tracks)
+		if _shuffle_index >= 0:
+			_shuffle_index -= 1
+			if _shuffle_index < 0:
+				_shuffle_index = _shuffled_tracks.size() - 1
+		else:
+			_shuffle_index = 0
+	else:
+		_shuffle_index -= 1
+		if _shuffle_index < 0:
+			_shuffle_index = _shuffled_tracks.size() - 1
+	var target_name = _shuffled_tracks[_shuffle_index]
+	var target_index = tracks.find(target_name)
+	set_track(target_name, target_index)
+	return true
+
+## Fisher-Yates 洗牌生成随机播放顺序
+func _generate_shuffled_tracks(tracks: Array[String]) -> void:
+	_shuffled_tracks.clear()
+	for track in tracks:
+		_shuffled_tracks.append(track)
+	# Fisher-Yates 洗牌
+	for i in range(_shuffled_tracks.size() - 1, 0, -1):
+		var j = randi() % (i + 1)
+		var temp = _shuffled_tracks[i]
+		_shuffled_tracks[i] = _shuffled_tracks[j]
+		_shuffled_tracks[j] = temp
+	# 如果当前正在播放某首歌，找到它在随机列表中的位置
+	if current_track != "":
+		var pos = _shuffled_tracks.find(current_track)
+		if pos != -1:
+			_shuffle_index = pos
+		else:
+			_shuffle_index = -1
+	else:
+		_shuffle_index = -1
+	print("[MusicState] Generated shuffled tracks, size: %d" % _shuffled_tracks.size())
+
+## 重置 shuffle 状态
+func _reset_shuffle() -> void:
+	_shuffled_tracks.clear()
+	_shuffle_index = -1
 
 # ======================== 歌单管理 API ========================
 
@@ -145,8 +309,11 @@ func create_playlist(p_name: String) -> bool:
 	print("[MusicState] Created playlist: %s" % p_name)
 	return true
 
-## 删除歌单
+## 删除歌单（"收藏"歌单受保护，不可删除）
 func delete_playlist(p_name: String) -> bool:
+	if p_name == "收藏":
+		push_warning("[MusicState] Cannot delete protected playlist '收藏'")
+		return false
 	if not _playlists.has(p_name):
 		push_warning("[MusicState] Playlist '%s' not found" % p_name)
 		return false
@@ -166,6 +333,8 @@ func add_track_to_playlist(playlist_name: String, track_name: String) -> bool:
 		return true
 	tracks.append(track_name)
 	_playlists[playlist_name] = tracks
+	if playlist_name == current_playlist:
+		_reset_shuffle()
 	_save_data()
 	track_added_to_playlist.emit(playlist_name, track_name)
 	return true
@@ -180,6 +349,8 @@ func remove_track_from_playlist(playlist_name: String, track_name: String) -> bo
 		return false
 	tracks.erase(track_name)
 	_playlists[playlist_name] = tracks
+	if playlist_name == current_playlist:
+		_reset_shuffle()
 	_save_data()
 	track_removed_from_playlist.emit(playlist_name, track_name)
 	return true

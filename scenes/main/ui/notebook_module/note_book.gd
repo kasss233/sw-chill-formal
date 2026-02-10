@@ -8,8 +8,6 @@ extends Control
 @export var vbox: VBoxContainer
 @export var inner_panel: InnerPanel
 @export var panel: FrostedPanel
-## UI 引用（用于层级管理）
-@export var _ui: UI = null
 
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
 
@@ -30,18 +28,9 @@ func _ready() -> void:
 	#panel.visible = true
 	#add_page_and_open("欢迎页", "欢迎使用笔记本模块！\n\n点击"+"按钮添加新页面。")
 
-## 请求新的顶层层级
-func _request_top_layer() -> void:
-	if _ui:
-		canvas_layer.layer = _ui.request_top_layer()
-	else:
-		# 降级方案：使用固定的高层级
-		canvas_layer.layer = 100
-
 func show_module():
 	if !panel.visible:
-		# 请求新的顶层层级
-		_request_top_layer()
+		LayerManager.bring_to_front(canvas_layer)
 		GuiTransitions.show("notebook")
 		button.set_state_no_signal(1)
 func add_page_and_open(_name: String, _content: String) -> void:
@@ -127,7 +116,7 @@ func _on_page_removed(_name: String, btn: PageButton) -> void:
 	btn.queue_free()
 
 func _on_material_button_state_changed(old_state: int, new_state: int) -> void:
-	_request_top_layer()
+	LayerManager.bring_to_front(canvas_layer)
 	if GuiTransitions.in_transition():
 		return
 	if new_state == 1:

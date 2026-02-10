@@ -1,0 +1,154 @@
+[gd_scene format=3 uid="uid://bnm7x2k4qaqwe"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/notebook_mobile_test_panel.gd" id="1_note_test"]
+
+[node name="NoteBookMobileTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_note_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="NoteTitleInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "笔记标题 (用于添加/更新/搜索)"
+
+[node name="NoteContentInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "笔记内容 (用于添加/更新/Agent写入)"
+
+[node name="NoteIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "笔记ID (用于更新/删除/查询)"
+
+[node name="CategoryInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "分类名称 (用于分类操作)"
+
+[node name="DataSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "NoteState 数据操作:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "添加笔记 (add_note)"
+
+[node name="UpdateNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "更新笔记 (update_note)"
+
+[node name="RemoveNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "删除笔记 (remove_note)"
+
+[node name="GetNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "获取笔记 (get_note_by_id)"
+
+[node name="GetAllNotesBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "获取所有笔记 (get_all_notes)"
+
+[node name="SearchNotesBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/DataSection"]
+layout_mode = 2
+text = "搜索笔记 (search_notes)"
+
+[node name="CategorySection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/CategorySection"]
+layout_mode = 2
+text = "分类管理:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddCategoryBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/CategorySection"]
+layout_mode = 2
+text = "添加分类 (add_category)"
+
+[node name="RemoveCategoryBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/CategorySection"]
+layout_mode = 2
+text = "删除分类 (remove_category)"
+
+[node name="ToggleNoteCategoryBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/CategorySection"]
+layout_mode = 2
+text = "切换笔记分类 (toggle_note_category)"
+
+[node name="GetAllCategoriesBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/CategorySection"]
+layout_mode = 2
+text = "获取所有分类 (get_categories)"
+
+[node name="AgentSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent 操作 (带打字动画):"
+theme_override_font_sizes/font_size = 16
+
+[node name="AgentCreateNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent创建笔记 (agent_create_note)"
+
+[node name="AgentWriteContentBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent写入内容 (agent_write_content)"
+
+[node name="AgentOpenNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent打开笔记页 (agent_open_note)"
+
+[node name="AgentCloseNoteBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent关闭笔记页 (agent_close_note)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]测试日志将显示在这里...[/color]"
+scroll_following = true

@@ -4,12 +4,10 @@ extends Node
 # ====== 节点引用 ======
 # 这些节点引用在初始化时设置，用于调用实际的功能模块
 @export var ui_node: UI = null  # UI 主节点引用（包含所有模块）
-@export var task_module: TaskModule = null  # 任务管理模块节点引用
 @export var music_module: MusicModule = null  # 音乐管理模块节点引用
 @export var note_module: NoteModule = null  # 笔记模块节点引用
 @export var note_book: NoteBook = null  # 笔记本模块节点引用
 @export var pomodoro_module: PomodoroTechniqueModule = null  # 番茄钟模块节点引用（使用class_name）
-@export var env_setter: EnvSetter = null  # 环境设置模块节点引用（待实现）
 
 # 任务ID生成器（用于将字符串ID转换为整数ID）
 var _task_id_counter: int = 1
@@ -52,21 +50,17 @@ func _initialize_node_references() -> void:
 		return
 	
 	# 从 UI 节点获取各个模块引用
-	task_module = ui_node.task_module
 	music_module = ui_node.music_module
 	note_module = ui_node.note_module
 	note_book = ui_node.note_book
 	pomodoro_module = ui_node.pomodoro_module
-	env_setter = ui_node.env_setter
-	
+
 	# 打印初始化结果
 	print("[Parser] 模块初始化完成:")
-	print("  - 任务模块: ", "✓" if task_module else "✗")
 	print("  - 音乐模块: ", "✓" if music_module else "✗")
 	print("  - 笔记模块: ", "✓" if note_module else "✗")
 	print("  - 笔记本模块: ", "✓" if note_book else "✗")
 	print("  - 番茄钟模块: ", "✓" if pomodoro_module else "✗")
-	print("  - 环境设置模块: ", "✓" if env_setter else "✗")
 
 ## 递归查找 UI 节点
 func _find_ui_node_recursive(node: Node) -> UI:
@@ -168,9 +162,9 @@ func _execute_operation(operation: Dictionary) -> Dictionary:
 	
 	match action:
 		"create_task":
-			return await _handle_create_task(operation)
+			return _handle_create_task(operation)
 		"update_task":
-			return await _handle_update_task(operation)
+			return _handle_update_task(operation)
 		"delete_task":
 			return _handle_delete_task(operation)
 		"complete_task":
@@ -218,7 +212,7 @@ func _handle_create_task(operation: Dictionary) -> Dictionary:
 		due_timestamp = _parse_datetime_to_timestamp(task_data["start_time"])
 	
 	# 调用本脚本内的方法（抽象层）
-	var task_id = await _create_task_internal(description, due_timestamp)
+	var task_id = _create_task_internal(description, due_timestamp)
 	
 	if task_id > 0:
 		result["success"] = true
@@ -233,11 +227,8 @@ func _handle_create_task(operation: Dictionary) -> Dictionary:
 	return result
 
 func _create_task_internal(title: String, due_timestamp: int) -> int:
-	# 优先通过 UI 模块添加任务（带打字动画）
-	if task_module != null and task_module.has_method("agent_add_task"):
-		return await task_module.agent_add_task(title, due_timestamp)
-	# 降级：直接通过 TaskState 单例添加任务（无动画）
-	elif TaskState:
+	# 通过 TaskState 单例添加任务
+	if TaskState:
 		var task = TaskState.add_task(title, due_timestamp)
 		return task.id
 	else:
@@ -269,7 +260,7 @@ func _handle_update_task(operation: Dictionary) -> Dictionary:
 		due_timestamp = _parse_datetime_to_timestamp(task_data["start_time"])
 	
 	# 调用协程函数需要使用 await
-	var success = await _update_task_internal(task_id, new_title, due_timestamp)
+	var success = _update_task_internal(task_id, new_title, due_timestamp)
 	
 	if success:
 		result["success"] = true
@@ -280,16 +271,16 @@ func _handle_update_task(operation: Dictionary) -> Dictionary:
 	return result
 
 func _update_task_internal(task_id: int, new_title: String, due_timestamp: int) -> bool:
-	# 通过 TaskState 单例和 UI 模块更新任务
+	# 通过 TaskState 单例更新任务
 	if not TaskState:
 		print("[Parser] 警告: TaskState 单例不可用，任务更新功能未实现")
 		return false
 
-	# 更新标题（带打字动画通过 UI 层）
-	if new_title != "" and task_module != null and task_module.has_method("agent_update_task_title"):
-		await task_module.agent_update_task_title(task_id, new_title)
+	# 更新标题
+	if new_title != "":
+		TaskState.update_task_title(task_id, new_title)
 
-	# 更新截止时间（通过 TaskState）
+	# 更新截止时间
 	if due_timestamp > 0:
 		return TaskState.set_task_due_time(task_id, due_timestamp)
 
@@ -494,19 +485,22 @@ func _update_bgm_volume_internal(volume: float) -> bool:
 	return true  # 待实现
 
 func _switch_bgm_track_internal(track_id: String) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if music_module != null and music_module.has_method("agent_play_music"):
-		return music_module.agent_play_music(track_id)
+	# 通过 MusicState 单例切换曲目
+	if MusicState:
+		MusicState.set_track(track_id)
+		MusicState.set_playing(true)
+		return true
 	else:
-		print("[Parser] 警告: 音乐管理模块不可用，切换歌曲功能未实现")
+		print("[Parser] 警告: MusicState 单例不可用，切换歌曲功能未实现")
 		return false
 
 func _toggle_bgm_playback_internal(play: bool) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if music_module != null and music_module.has_method("agent_set_playing"):
-		return music_module.agent_set_playing(play)
+	# 通过 MusicState 单例控制播放
+	if MusicState:
+		MusicState.set_playing(play)
+		return true
 	else:
-		print("[Parser] 警告: 音乐管理模块不可用，播放控制功能未实现")
+		print("[Parser] 警告: MusicState 单例不可用，播放控制功能未实现")
 		return false
 
 # ====== 环境白噪音操作处理 ======

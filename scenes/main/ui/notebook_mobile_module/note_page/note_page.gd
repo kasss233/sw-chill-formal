@@ -9,6 +9,7 @@ signal title_changed(text: String)
 signal content_changed(text: String)
 
 var _note_id: int = -1
+var _tween: Tween = null
 
 @onready var _title_edit: LineEdit = $VBoxContainer/TitleEdit
 @onready var _info_label: Label = $VBoxContainer/Label
@@ -73,3 +74,41 @@ func _on_title_changed(new_text: String) -> void:
 func _on_content_changed() -> void:
 	_update_info_label()
 	content_changed.emit(_text_edit.text)
+
+
+## 设置内容（可选打字动画，15字符/秒）
+func set_content(text: String, animate: bool = false) -> void:
+	stop_typing()
+	if not animate or text.is_empty():
+		_text_edit.text = text
+		_update_info_label()
+		return
+	_text_edit.editable = false
+	_text_edit.text = ""
+	var char_count = text.length()
+	var duration = char_count / 15.0
+	_tween = create_tween()
+	_tween.tween_method(func(progress: float) -> void:
+		var count = int(progress * char_count)
+		_text_edit.text = text.left(count)
+		_update_info_label()
+	, 0.0, 1.0, duration)
+	_tween.finished.connect(func() -> void:
+		_text_edit.text = text
+		_text_edit.editable = true
+		_tween = null
+		_update_info_label()
+	)
+
+
+## 是否正在播放打字动画
+func is_typing() -> bool:
+	return _tween != null and _tween.is_running()
+
+
+## 停止打字动画
+func stop_typing() -> void:
+	if _tween != null:
+		_tween.kill()
+		_tween = null
+	_text_edit.editable = true

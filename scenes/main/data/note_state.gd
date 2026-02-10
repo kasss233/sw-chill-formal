@@ -11,6 +11,10 @@ signal note_updated(note: NoteData)
 signal data_loaded
 signal category_added(category: String)
 signal category_removed(category: String)
+signal agent_note_created(note: NoteData)
+signal agent_content_written(note_id: int, content: String)
+signal agent_open_note_requested(note_id: int)
+signal agent_close_note_requested
 
 # --- 内部状态 ---
 var _notes: Array[NoteData] = []
@@ -154,6 +158,42 @@ func set_note_category(id: int, category: String) -> bool:
 	_save_data()
 	note_updated.emit(note)
 	return true
+
+
+# ======================== Agent API ========================
+
+## Agent: 创建笔记（触发 UI 打开页面 + 打字动画）
+func agent_create_note(title: String, content: String, category: String = "") -> NoteData:
+	var note = add_note(title, content, category)
+	agent_note_created.emit(note)
+	return note
+
+
+## Agent: 写入笔记内容（触发 UI 打字动画）
+## 直接修改数据，只发 agent_content_written 信号（不发 note_updated，避免双信号冲突）
+func agent_write_content(note_id: int, content: String) -> bool:
+	var note = get_note_by_id(note_id)
+	if note == null:
+		return false
+	note.content = content
+	note.updated_at = int(Time.get_unix_time_from_system())
+	_save_data()
+	agent_content_written.emit(note_id, content)
+	return true
+
+
+## Agent: 打开笔记页（仅打开，不写入内容）
+func agent_open_note(note_id: int) -> bool:
+	var note = get_note_by_id(note_id)
+	if note == null:
+		return false
+	agent_open_note_requested.emit(note_id)
+	return true
+
+
+## Agent: 关闭当前笔记页（返回列表视图）
+func agent_close_note() -> void:
+	agent_close_note_requested.emit()
 
 
 # ======================== 分类管理 ========================

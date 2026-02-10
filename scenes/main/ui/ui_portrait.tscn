@@ -52,7 +52,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module", "dialogue_box", "input_box", "chat_controller")]
+[node name="UI2" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "pomodoro_module", "dialogue_box", "input_box")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,11 +64,9 @@ music_module = NodePath("MarginContainer/VBoxContainer/MusicModule")
 note_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteModule")
 note_book = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteBook")
 task_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/TaskModule")
-env_setter = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter")
 pomodoro_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule")
 dialogue_box = NodePath("MarginContainer/VBoxContainer/DialogueBox")
 input_box = NodePath("MarginContainer/VBoxContainer/InputBox")
-chat_controller = NodePath("ChatController")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1636200697]
 layout_mode = 1
@@ -90,9 +88,8 @@ alignment = 2
 [node name="DialogueBox" parent="MarginContainer/VBoxContainer" unique_id=2128522262 instance=ExtResource("12_7rk1v")]
 layout_mode = 2
 
-[node name="MusicModule" parent="MarginContainer/VBoxContainer" unique_id=1778345012 node_paths=PackedStringArray("_ui") instance=ExtResource("15_kffqu")]
+[node name="MusicModule" parent="MarginContainer/VBoxContainer" unique_id=1778345012 instance=ExtResource("15_kffqu")]
 layout_mode = 2
-_ui = NodePath("../../..")
 
 [node name="InputBox" parent="MarginContainer/VBoxContainer" unique_id=374615679 instance=ExtResource("13_gfesi")]
 layout_mode = 2
@@ -122,25 +119,20 @@ theme_override_constants/margin_bottom = 8
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer" unique_id=196935134]
 layout_mode = 2
 
-[node name="TaskModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=413867089 node_paths=PackedStringArray("_ui") instance=ExtResource("4_4g6qf")]
+[node name="TaskModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=413867089 instance=ExtResource("4_4g6qf")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="NoteModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1774986962 node_paths=PackedStringArray("_ui") instance=ExtResource("8_yvysw")]
+[node name="NoteModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1774986962 instance=ExtResource("8_yvysw")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="NoteBook" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=356447481 node_paths=PackedStringArray("_ui") instance=ExtResource("9_8o7o8")]
+[node name="NoteBook" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=356447481 instance=ExtResource("9_8o7o8")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="PomodoroTechniqueModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=215700460 node_paths=PackedStringArray("_ui") instance=ExtResource("10_mdnhd")]
+[node name="PomodoroTechniqueModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=215700460 instance=ExtResource("10_mdnhd")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="EnvSetter" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1982143006 node_paths=PackedStringArray("_ui") instance=ExtResource("11_vbxtl")]
+[node name="EnvSetter" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1982143006 instance=ExtResource("11_vbxtl")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
 [node name="ChatController" type="Node" parent="." unique_id=1856388684 node_paths=PackedStringArray("input_box", "dialogue_box")]
 script = ExtResource("14_k6c0a")
@@ -166,12 +158,3 @@ ui = NodePath("..")
 [node name="Control" type="Control" parent="." unique_id=785924238]
 visible = false
 anchors_preset = 0
-
-[connection signal="work_completed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_completed"]
-[connection signal="work_continued" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_continued"]
-[connection signal="work_paused" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_paused"]
-[connection signal="work_started" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_started"]
-[connection signal="work_stopped" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_stopped"]
-[connection signal="env_time_changed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]
-[connection signal="env_weather_changed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter" to="." method="_on_env_setter_env_weather_changed"]
-[connection signal="character_interacted" from="CharacterInteractor" to="." method="_on_character_interactor_character_interacted"]
