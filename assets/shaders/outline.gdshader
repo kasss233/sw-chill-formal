@@ -2,7 +2,7 @@ shader_type spatial;
 render_mode cull_front, unshaded; // 依然使用背面剔除
 
 uniform vec4 outline_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);
-uniform float outline_width : hint_range(0.0, 1.0) = 0.05; // 建议给很小的值，比如 0.02
+uniform float outline_width : hint_range(0.0, 1.0) = 0.005; // 建议给很小的值，比如 0.02
 
 void vertex() {
 	// 1. 将顶点和法线转换到视图空间（相机的视角）
