@@ -24,7 +24,7 @@ Data Autoload (单例) → UI Module (模块) → UI Component (组件)
 
 1. **数据流向**：所有数据变更必须通过 State 单例 API，UI 响应 State 信号更新，禁止在 UI 层直接修改数据属性
 2. **信号通信**：Component 信号（传 ID）→ Module 监听 → Module 调 State API → State 发信号 → Module 更新 UI
-3. **Agent API**：数据操作直接调用 State 单例；UI 操作（动画）调用 Module 方法。Parser (`agent/godot_paser/paser.gd`) 直接持有 Module 和 State 引用，`ui.gd` 不封装 Agent API
+3. **Agent API**：统一在 State 单例中定义（`agent_*` 命名），通过专用信号通知 UI。UI Module 只负责外观，监听 State 信号自动响应（含动画），不定义 `agent_*` 方法。Parser 调用 State 单例完成所有 Agent 操作
 4. **State 单例规范**：
    - 信号命名：`xxx_added(data)`, `xxx_removed(id)`, `xxx_updated(data)`, `xxx_state_changed(data)`, `xxxs_reordered`, `data_loaded`
    - 持久化格式：`{"version": 1, "next_id": N, "items": [...]}`

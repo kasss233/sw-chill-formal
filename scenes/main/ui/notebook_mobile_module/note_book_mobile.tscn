@@ -41,8 +41,8 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(224, 364)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ka36"]
 content_margin_left = 12.0
@@ -361,16 +361,14 @@ text = "删除分类"
 icon = ExtResource("17_qt744")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
-[node name="NoteBookMobile" type="Control" unique_id=425110055]
-layout_mode = 3
-anchors_preset = 0
+[node name="NoteBookMobile" type="MarginContainer" unique_id=1653565754]
+offset_right = 224.0
+offset_bottom = 364.0
 script = ExtResource("9_module")
 
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=1059877106]
 material = SubResource("ShaderMaterial_5skq3")
-layout_mode = 0
-offset_right = 24.0
-offset_bottom = 24.0
+layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_3ka36")
 script = ExtResource("2_xswc4")
 noise_texture = SubResource("NoiseTexture2D_w4rb6")
@@ -460,6 +458,7 @@ layout_mode = 2
 [node name="AllChip" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer/HBoxContainer2" unique_id=448150874]
 custom_minimum_size = Vector2(76, 32)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("8_pna0s")
 chip_type = 1

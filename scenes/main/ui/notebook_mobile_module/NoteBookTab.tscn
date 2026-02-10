@@ -1,0 +1,128 @@
+[gd_scene format=3 uid="uid://c8l76gjafw6xh"]
+
+[ext_resource type="Script" uid="uid://25wsrqnmbu46" path="res://scenes/main/ui/notebook_mobile_module/note_book_tab.gd" id="1_si8fm"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_u2l48"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="3_x7vga"]
+[ext_resource type="Texture2D" uid="uid://bd6svjhok0cub" path="res://assets/ui/icons/event_note_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="4_u26uo"]
+[ext_resource type="PackedScene" uid="uid://ctcecak2jj03b" path="res://scenes/main/ui/notebook_mobile_module/note_book_mobile.tscn" id="5_j1x2x"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="6_ip46s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_si8fm"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u2l48"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x7vga"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u26uo"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j1x2x"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Resource" id="Resource_vko70"]
+script = ExtResource("3_x7vga")
+icon = ExtResource("4_u26uo")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_pe8qk"]
+script = ExtResource("3_x7vga")
+icon = ExtResource("4_u26uo")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="NoteBookTab" type="MarginContainer" unique_id=2043863668]
+offset_right = 32.0
+offset_bottom = 36.0
+script = ExtResource("1_si8fm")
+
+[node name="ToggleButton" type="Button" parent="." unique_id=640972691]
+clip_contents = true
+custom_minimum_size = Vector2(36, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_si8fm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_u2l48")
+theme_override_styles/hover = SubResource("StyleBoxFlat_x7vga")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_u26uo")
+theme_override_styles/focus = SubResource("StyleBoxFlat_j1x2x")
+script = ExtResource("2_u2l48")
+states = Array[ExtResource("3_x7vga")]([SubResource("Resource_vko70"), SubResource("Resource_pe8qk")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=727201464]
+
+[node name="NoteBookMobile" parent="CanvasLayer" unique_id=425110055 instance=ExtResource("5_j1x2x")]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -112.0
+offset_top = -182.0
+offset_right = 112.0
+offset_bottom = 182.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+
+[node name="GuiTransition" type="Node" parent="." unique_id=2100097188]
+script = ExtResource("6_ip46s")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.39999999999999997
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/NoteBookMobile")
+layout_id = "notebookmobile"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[connection signal="state_changed" from="ToggleButton" to="." method="_on_toggle_button_state_changed"]

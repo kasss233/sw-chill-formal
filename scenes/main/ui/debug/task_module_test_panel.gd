@@ -1,9 +1,8 @@
 extends Control
 
-## TaskModule测试页 - 测试 TaskState 单例和 TaskModule 的 UI API
+## TaskModule测试页 - 测试 TaskState 单例
 
 # UI节点引用
-var task_module: TaskModule = null  # 需要从外部设置（仅用于 UI 操作）
 
 @onready var info_label: RichTextLabel = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InfoLabel
 @onready var task_title_input: LineEdit = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection/TaskTitleInput
@@ -41,12 +40,7 @@ func _ready() -> void:
 	is_task_overdue_btn.pressed.connect(_on_is_task_overdue_pressed)
 
 	_log_info("TaskModule测试面板已就绪")
-	_log_info("数据操作通过 TaskState 单例执行")
-
-## 设置要测试的TaskModule实例（仅用于 UI 操作如打字动画）
-func set_task_module(module: TaskModule) -> void:
-	task_module = module
-	_log_info("已连接到TaskModule: %s" % module.name)
+	_log_info("所有数据操作通过 TaskState 单例执行")
 
 ## 测试: 添加任务
 func _on_add_task_pressed() -> void:
@@ -54,18 +48,11 @@ func _on_add_task_pressed() -> void:
 	if title.is_empty():
 		title = "测试任务 " + str(Time.get_ticks_msec())
 
-	if task_module:
-		_log_info("调用 agent_add_task(title='%s')" % title)
-		var task_id = await task_module.agent_add_task(title, 0, 0.05)
-		last_added_task_id = task_id
-		_log_success("任务已添加（带打字动画），ID: %d" % task_id)
-		task_id_input.text = str(task_id)
-	else:
-		_log_info("调用 TaskState.add_task(title='%s')" % title)
-		var task = TaskState.add_task(title)
-		last_added_task_id = task.id
-		_log_success("任务已添加，ID: %d" % task.id)
-		task_id_input.text = str(task.id)
+	_log_info("调用 TaskState.add_task(title='%s')" % title)
+	var task = TaskState.add_task(title)
+	last_added_task_id = task.id
+	_log_success("任务已添加，ID: %d" % task.id)
+	task_id_input.text = str(task.id)
 
 ## 测试: 更新任务标题
 func _on_update_title_pressed() -> void:
@@ -76,20 +63,12 @@ func _on_update_title_pressed() -> void:
 		_log_error("请输入新标题")
 		return
 
-	if task_module:
-		_log_info("调用 agent_update_task_title(id=%d, new_title='%s')" % [id, new_title])
-		var success = await task_module.agent_update_task_title(id, new_title, 0.05)
-		if success:
-			_log_success("任务标题已更新（带打字动画）")
-		else:
-			_log_error("更新失败，任务ID不存在")
+	_log_info("调用 TaskState.update_task_title(id=%d, title='%s')" % [id, new_title])
+	var success = TaskState.update_task_title(id, new_title)
+	if success:
+		_log_success("任务标题已更新")
 	else:
-		_log_info("调用 TaskState.update_task_title(id=%d, title='%s')" % [id, new_title])
-		var success = TaskState.update_task_title(id, new_title)
-		if success:
-			_log_success("任务标题已更新")
-		else:
-			_log_error("更新失败，任务ID不存在")
+		_log_error("更新失败，任务ID不存在")
 
 ## 测试: 标记任务为已完成
 func _on_mark_completed_pressed() -> void:
@@ -162,13 +141,6 @@ func _on_get_all_tasks_pressed() -> void:
 	_log_success("共有 %d 个任务:" % all_tasks.size())
 	for task in all_tasks:
 		_log_data("  - [%d] %s (完成: %s)" % [task.id, task.title, task.is_completed])
-
-## 检查TaskModule是否已设置（仅用于需要 UI 操作的测试）
-func _check_module() -> bool:
-	if task_module == null:
-		_log_error("TaskModule未设置，请先调用set_task_module()")
-		return false
-	return true
 
 ## 日志输出 - 普通信息
 func _log_info(message: String) -> void:

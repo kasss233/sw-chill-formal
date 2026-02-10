@@ -2,7 +2,16 @@ class_name UI
 extends Control
 
 # --- 节点引用 ---
-@export var test_panel: TestPanel # 测试面板引用 
+## 音乐管理模块
+@export var music_module: MusicModule
+@export var note_module: NoteModule
+@export var note_book: NoteBook
+@export var task_module: TaskModule
+@export var test_panel: TestPanel # 测试面板引用
+@export var pomodoro_module: PomodoroTechniqueModule # 番茄钟模块引用
+@export var dialogue_box: DialogueBox
+@export var input_box: InputBox
+
 
 # --- 内置函数 ---
 func _ready() -> void:
