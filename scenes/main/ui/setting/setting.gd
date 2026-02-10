@@ -1,9 +1,6 @@
 class_name EnvSetter
 extends Control
 
-## UI 引用（用于层级管理）
-@export var _ui: UI = null
-
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
 @onready var panel = $CanvasLayer/FrostedPanel
 @onready var _msaa_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow/MsaaDropdown
@@ -21,14 +18,6 @@ func set_weather(mode: int) -> void:
 func set_time(mode: int) -> void:
 	SettingState.set_time(mode)
 
-## 请求新的顶层层级
-func _request_top_layer() -> void:
-	if _ui:
-		canvas_layer.layer = _ui.request_top_layer()
-	else:
-		# 降级方案：使用固定的高层级
-		canvas_layer.layer = 100
-
 func _on_time_button_state_changed(_old_state: int, new_state: int) -> void:
 	SettingState.set_time(new_state)
 
@@ -39,8 +28,7 @@ func _on_setting_button_pressed() -> void:
 	if panel.visible:
 		GuiTransitions.hide("setter")
 	else:
-		# 请求新的顶层层级
-		_request_top_layer()
+		LayerManager.bring_to_front(canvas_layer)
 		GuiTransitions.show("setter")
 
 

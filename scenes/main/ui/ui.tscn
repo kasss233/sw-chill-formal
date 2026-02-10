@@ -125,7 +125,7 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "pomodoro_module", "dialogue_box", "input_box")]
+[node name="UI" type="Control" unique_id=117400708]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -133,13 +133,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_nf0va")
-music_module = NodePath("MusicModule")
-note_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteModule")
-note_book = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/NoteBook")
-task_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/TaskModule")
-pomodoro_module = NodePath("TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule")
-dialogue_box = NodePath("VBoxContainer/DialogueBox")
-input_box = NodePath("VBoxContainer/InputBox")
 
 [node name="TabPanel" type="MarginContainer" parent="." unique_id=1423112940]
 layout_mode = 1
@@ -171,9 +164,8 @@ theme_override_constants/margin_bottom = 8
 [node name="VBoxContainer" type="VBoxContainer" parent="TabPanel/FrostedPanel/MarginContainer" unique_id=1260995757]
 layout_mode = 2
 
-[node name="TaskModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=413867089 node_paths=PackedStringArray("_ui") instance=ExtResource("4_khr3h")]
+[node name="TaskModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=413867089 instance=ExtResource("4_khr3h")]
 layout_mode = 2
-_ui = NodePath("../../../../..")
 
 [node name="NoteButton" type="Button" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1522244772]
 visible = false
@@ -195,21 +187,17 @@ states = Array[ExtResource("6_tnos5")]([SubResource("Resource_ln37o"), SubResour
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="NoteModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1774986962 node_paths=PackedStringArray("_ui") instance=ExtResource("8_3ru4j")]
+[node name="NoteModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1774986962 instance=ExtResource("8_3ru4j")]
 layout_mode = 2
-_ui = NodePath("../../../../..")
 
-[node name="NoteBook" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=356447481 node_paths=PackedStringArray("_ui") instance=ExtResource("9_uumow")]
+[node name="NoteBook" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=356447481 instance=ExtResource("9_uumow")]
 layout_mode = 2
-_ui = NodePath("../../../../..")
 
-[node name="PomodoroTechniqueModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=215700460 node_paths=PackedStringArray("_ui") instance=ExtResource("11_uypi5")]
+[node name="PomodoroTechniqueModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=215700460 instance=ExtResource("11_uypi5")]
 layout_mode = 2
-_ui = NodePath("../../../../..")
 
-[node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1982143006 node_paths=PackedStringArray("_ui") instance=ExtResource("4_ex8bf")]
+[node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1982143006 instance=ExtResource("4_ex8bf")]
 layout_mode = 2
-_ui = NodePath("../../../../..")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1647146671]
 layout_mode = 1
@@ -238,7 +226,7 @@ script = ExtResource("14_tnos5")
 input_box = NodePath("../VBoxContainer/InputBox")
 dialogue_box = NodePath("../VBoxContainer/DialogueBox")
 
-[node name="MusicModule" parent="." unique_id=1778345012 node_paths=PackedStringArray("_ui") instance=ExtResource("1_2q31f")]
+[node name="MusicModule" parent="." unique_id=1778345012 instance=ExtResource("1_2q31f")]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -246,7 +234,6 @@ anchor_right = 1.0
 offset_left = -334.0
 offset_right = 0.0
 grow_horizontal = 0
-_ui = NodePath("..")
 
 [node name="CharacterInteractor" parent="." unique_id=1482575657 instance=ExtResource("5_fhd3w")]
 layout_mode = 0

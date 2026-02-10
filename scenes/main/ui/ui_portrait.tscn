@@ -88,9 +88,8 @@ alignment = 2
 [node name="DialogueBox" parent="MarginContainer/VBoxContainer" unique_id=2128522262 instance=ExtResource("12_7rk1v")]
 layout_mode = 2
 
-[node name="MusicModule" parent="MarginContainer/VBoxContainer" unique_id=1778345012 node_paths=PackedStringArray("_ui") instance=ExtResource("15_kffqu")]
+[node name="MusicModule" parent="MarginContainer/VBoxContainer" unique_id=1778345012 instance=ExtResource("15_kffqu")]
 layout_mode = 2
-_ui = NodePath("../../..")
 
 [node name="InputBox" parent="MarginContainer/VBoxContainer" unique_id=374615679 instance=ExtResource("13_gfesi")]
 layout_mode = 2
@@ -120,25 +119,20 @@ theme_override_constants/margin_bottom = 8
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer" unique_id=196935134]
 layout_mode = 2
 
-[node name="TaskModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=413867089 node_paths=PackedStringArray("_ui") instance=ExtResource("4_4g6qf")]
+[node name="TaskModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=413867089 instance=ExtResource("4_4g6qf")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="NoteModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1774986962 node_paths=PackedStringArray("_ui") instance=ExtResource("8_yvysw")]
+[node name="NoteModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1774986962 instance=ExtResource("8_yvysw")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="NoteBook" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=356447481 node_paths=PackedStringArray("_ui") instance=ExtResource("9_8o7o8")]
+[node name="NoteBook" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=356447481 instance=ExtResource("9_8o7o8")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="PomodoroTechniqueModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=215700460 node_paths=PackedStringArray("_ui") instance=ExtResource("10_mdnhd")]
+[node name="PomodoroTechniqueModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=215700460 instance=ExtResource("10_mdnhd")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
-[node name="EnvSetter" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1982143006 node_paths=PackedStringArray("_ui") instance=ExtResource("11_vbxtl")]
+[node name="EnvSetter" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1982143006 instance=ExtResource("11_vbxtl")]
 layout_mode = 2
-_ui = NodePath("../../../../../../..")
 
 [node name="ChatController" type="Node" parent="." unique_id=1856388684 node_paths=PackedStringArray("input_box", "dialogue_box")]
 script = ExtResource("14_k6c0a")

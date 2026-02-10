@@ -45,8 +45,6 @@ var current_list_index: int = 0
 var option_board_opened: bool = false
 ## 防止按钮状态更新时触发重入
 var _updating_button_state: bool = false
-## UI 引用（用于层级管理）
-@export var _ui: UI = null
 
 func _ready() -> void:
 	_init_managers()
@@ -493,7 +491,7 @@ func _on_mode_button_pressed() -> void:
 		MusicState.cycle_play_mode()
 
 func _on_tab_button_pressed() -> void:
-	_request_top_layer()
+	LayerManager.bring_to_front(canvas_layer)
 
 	if frosted_panel.visible:
 		GuiTransitions.hide("musiclist")
@@ -628,20 +626,11 @@ func _build_all_music_track_names() -> Array[String]:
 				result.append(child.get_music_name())
 	return result
 
-# --- Agent API（纯 UI 方法） ---
-
-## 请求新的顶层层级
-func _request_top_layer() -> void:
-	if _ui:
-		canvas_layer.layer = _ui.request_top_layer()
-	else:
-		# 降级方案：使用固定的高层级
-		canvas_layer.layer = 100
+## ---api---
 
 func show_module():
 	if !frosted_panel.visible:
-		# 请求新的顶层层级
-		_request_top_layer()
+		LayerManager.bring_to_front(canvas_layer)
 		GuiTransitions.show("musiclist")
 
 func hide_module():
