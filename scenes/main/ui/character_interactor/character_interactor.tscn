@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b6bxw47hgr5em"]
+[gd_scene format=3 uid="uid://b6bxw47hgr5em"]
 
 [ext_resource type="Script" uid="uid://cmo8aeqofv0jc" path="res://scenes/main/ui/character_interactor/character_interactor.gd" id="1_l7jq4"]
 
@@ -12,12 +12,12 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w3pib"]
 
-[node name="CharacterInteractor" type="Control"]
+[node name="CharacterInteractor" type="Control" unique_id=1184762133]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_l7jq4")
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="." unique_id=1882040447]
 layout_mode = 0
 offset_left = 35.0
 offset_top = -53.0

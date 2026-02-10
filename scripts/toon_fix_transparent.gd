@@ -62,7 +62,7 @@ func apply_toon_to_mesh(mesh_instance: MeshInstance3D):
 			# 针对实心物体的描边 (Next Pass)
 			var outline_mat = ShaderMaterial.new()
 			outline_mat.shader = OUTLINE_SHADER
-			outline_mat.set_shader_parameter("outline_width", 0.01) # 甚至可以根据物体大小动态调整
+			outline_mat.set_shader_parameter("outline_width", 0.005) # 甚至可以根据物体大小动态调整
 			outline_mat.set_shader_parameter("outline_color", Color(0.0, 0.0, 0.0, 1.0))
 			new_mat.next_pass = outline_mat
 		

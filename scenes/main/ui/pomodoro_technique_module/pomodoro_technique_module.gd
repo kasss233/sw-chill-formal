@@ -49,24 +49,24 @@ func _on_pomodoro_button_state_changed(_old_state: int, new_state: int) -> void:
 
 signal work_started
 func _on_pomodoro_technique_work_started() -> void:
-	work_started.emit()
+	PomodoroState.notify_work_started()
 
 
 signal work_completed
 func _on_pomodoro_technique_work_completed() -> void:
-	work_completed.emit()
+	PomodoroState.notify_work_completed()
 
 signal work_paused
 func _on_pomodoro_technique_work_paused() -> void:
-	work_paused.emit()
+	PomodoroState.notify_work_paused()
 
 signal work_stopped
 func _on_pomodoro_technique_work_stopped() -> void:
-	work_stopped.emit()
+	PomodoroState.notify_work_stopped()
 
 signal work_continued
 func _on_pomodoro_technique_work_continued() -> void:
-	work_continued.emit()
+	PomodoroState.notify_work_continued()
 
 # ====== Agent API ======
 ## Agent API: 启动番茄钟

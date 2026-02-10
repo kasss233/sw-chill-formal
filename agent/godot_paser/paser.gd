@@ -9,7 +9,6 @@ extends Node
 @export var note_module: NoteModule = null  # 笔记模块节点引用
 @export var note_book: NoteBook = null  # 笔记本模块节点引用
 @export var pomodoro_module: PomodoroTechniqueModule = null  # 番茄钟模块节点引用（使用class_name）
-@export var env_setter: EnvSetter = null  # 环境设置模块节点引用（待实现）
 
 # 任务ID生成器（用于将字符串ID转换为整数ID）
 var _task_id_counter: int = 1
@@ -57,8 +56,7 @@ func _initialize_node_references() -> void:
 	note_module = ui_node.note_module
 	note_book = ui_node.note_book
 	pomodoro_module = ui_node.pomodoro_module
-	env_setter = ui_node.env_setter
-	
+
 	# 打印初始化结果
 	print("[Parser] 模块初始化完成:")
 	print("  - 任务模块: ", "✓" if task_module else "✗")
@@ -66,7 +64,6 @@ func _initialize_node_references() -> void:
 	print("  - 笔记模块: ", "✓" if note_module else "✗")
 	print("  - 笔记本模块: ", "✓" if note_book else "✗")
 	print("  - 番茄钟模块: ", "✓" if pomodoro_module else "✗")
-	print("  - 环境设置模块: ", "✓" if env_setter else "✗")
 
 ## 递归查找 UI 节点
 func _find_ui_node_recursive(node: Node) -> UI:
@@ -494,19 +491,22 @@ func _update_bgm_volume_internal(volume: float) -> bool:
 	return true  # 待实现
 
 func _switch_bgm_track_internal(track_id: String) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if music_module != null and music_module.has_method("agent_play_music"):
-		return music_module.agent_play_music(track_id)
+	# 通过 MusicState 单例切换曲目
+	if MusicState:
+		MusicState.set_track(track_id)
+		MusicState.set_playing(true)
+		return true
 	else:
-		print("[Parser] 警告: 音乐管理模块不可用，切换歌曲功能未实现")
+		print("[Parser] 警告: MusicState 单例不可用，切换歌曲功能未实现")
 		return false
 
 func _toggle_bgm_playback_internal(play: bool) -> bool:
-	# 抽象层：本脚本内的处理方法
-	if music_module != null and music_module.has_method("agent_set_playing"):
-		return music_module.agent_set_playing(play)
+	# 通过 MusicState 单例控制播放
+	if MusicState:
+		MusicState.set_playing(play)
+		return true
 	else:
-		print("[Parser] 警告: 音乐管理模块不可用，播放控制功能未实现")
+		print("[Parser] 警告: MusicState 单例不可用，播放控制功能未实现")
 		return false
 
 # ====== 环境白噪音操作处理 ======

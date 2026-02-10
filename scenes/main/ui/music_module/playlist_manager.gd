@@ -112,8 +112,6 @@ func add_music_to_playlist(playlist_name: String, music_name: String, init_categ
 		return true
 
 	target_list.add_music(music_name)
-	# 重置随机播放列表
-	target_list.reset_shuffled_playlist()
 
 	# 初始化新添加音乐的分类选项
 	if init_categories:
@@ -131,8 +129,6 @@ func remove_music_from_playlist(playlist_name: String, music_name: String) -> bo
 		return false
 
 	target_list.remove_music(music_name)
-	# 重置随机播放列表
-	target_list.reset_shuffled_playlist()
 
 	music_removed_from_playlist.emit(playlist_name, music_name)
 	print("[PlaylistManager] Removed music '%s' from playlist '%s'" % [music_name, playlist_name])
@@ -146,11 +142,10 @@ func remove_music_from_all_playlists(music_name: String) -> void:
 	for child in list_container.get_children():
 		if child is MusicList:
 			child.remove_music(music_name)
-			child.reset_shuffled_playlist()
 
 	print("[PlaylistManager] Removed music '%s' from all playlists" % music_name)
 
-## 检查音乐是否在播放列表中
+## 检查音乐是否在播放列表中（内部使用）
 func is_music_in_playlist(playlist_name: String, music_name: String) -> bool:
 	var target_list = get_playlist(playlist_name)
 	if not target_list:
@@ -161,35 +156,6 @@ func is_music_in_playlist(playlist_name: String, music_name: String) -> bool:
 		if child is MusicItem and child.get_music_name() == music_name:
 			return true
 	return false
-
-## 获取播放列表中的所有音乐名称
-func get_playlist_music_names(playlist_name: String) -> Array[String]:
-	var names: Array[String] = []
-	var target_list = get_playlist(playlist_name)
-	if not target_list:
-		return names
-
-	for i in range(target_list.get_music_count()):
-		var child = target_list.vbox.get_child(i)
-		if child is MusicItem:
-			names.append(child.get_music_name())
-	return names
-
-## 获取所有播放列表及其音乐
-func get_all_playlists_music() -> Dictionary:
-	var result: Dictionary = {}
-	if not list_container:
-		return result
-
-	for child in list_container.get_children():
-		if child is MusicList:
-			var music_names: Array[String] = []
-			for i in range(child.get_music_count()):
-				var music_item = child.vbox.get_child(i)
-				if music_item is MusicItem:
-					music_names.append(music_item.get_music_name())
-			result[child.name] = music_names
-	return result
 
 # --- 分类管理 ---
 

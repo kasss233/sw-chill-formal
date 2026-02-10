@@ -52,7 +52,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="UI" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "env_setter", "pomodoro_module", "dialogue_box", "input_box", "chat_controller")]
+[node name="UI2" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "pomodoro_module", "dialogue_box", "input_box")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,11 +64,9 @@ music_module = NodePath("MarginContainer/VBoxContainer/MusicModule")
 note_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteModule")
 note_book = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteBook")
 task_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/TaskModule")
-env_setter = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter")
 pomodoro_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule")
 dialogue_box = NodePath("MarginContainer/VBoxContainer/DialogueBox")
 input_box = NodePath("MarginContainer/VBoxContainer/InputBox")
-chat_controller = NodePath("ChatController")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1636200697]
 layout_mode = 1
@@ -166,12 +164,3 @@ ui = NodePath("..")
 [node name="Control" type="Control" parent="." unique_id=785924238]
 visible = false
 anchors_preset = 0
-
-[connection signal="work_completed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_completed"]
-[connection signal="work_continued" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_continued"]
-[connection signal="work_paused" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_paused"]
-[connection signal="work_started" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_started"]
-[connection signal="work_stopped" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule" to="." method="_on_pomodoro_technique_module_work_stopped"]
-[connection signal="env_time_changed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter" to="." method="_on_env_setter_env_time_changed"]
-[connection signal="env_weather_changed" from="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/EnvSetter" to="." method="_on_env_setter_env_weather_changed"]
-[connection signal="character_interacted" from="CharacterInteractor" to="." method="_on_character_interactor_character_interacted"]
