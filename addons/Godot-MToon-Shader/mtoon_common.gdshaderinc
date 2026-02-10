@@ -379,7 +379,7 @@ void light() {
 	} else {
 		vec3 addCol = vec3(0.0);
 		float addTmp;
-		vec3 addLighting = calculateLighting(mainUv, addDotNL, 1.0, vec4(0.0), lit, LIGHT_COLOR, addCol, addTmp);
+		vec3 addLighting = calculateLighting(mainUv, addDotNL, 1.0, shade, lit, LIGHT_COLOR, addCol, addTmp);
 		vec3 specLight;
 		// addLighting *= step(0, addDotNL); // darken if transparent. Because Unity's transparent material can't receive shadowAttenuation.
 		float attenuation_multiplier = pow(length(vec3(ATTENUATION))/length(vec3(1.0)), 0.1); // Godot specific code to prevent clustering artifacts.
