@@ -244,5 +244,3 @@ min_width = 150
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [connection signal="menu_item_pressed" from="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/MenuButton" to="." method="_on_menu_button_menu_item_pressed"]
-[connection signal="menu_item_pressed" from="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/MenuButton" to="." method="_on_close_button_menu_item_pressed"]
-[connection signal="pressed" from="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/MenuButton" to="." method="_on_close_button_pressed"]

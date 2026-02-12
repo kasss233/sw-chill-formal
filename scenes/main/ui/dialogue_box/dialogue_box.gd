@@ -77,6 +77,16 @@ func _ready() -> void:
 	# 监听 RichTextLabel 的尺寸变化
 	rich_text_label.resized.connect(_on_rich_text_label_resized)
 
+	# 监听 ChatState 信号
+	ChatState.response_started.connect(_on_response_started)
+	ChatState.response_text_delta.connect(_on_response_text_delta)
+	ChatState.response_text_set.connect(_on_response_text_set)
+	ChatState.response_completed.connect(_on_response_completed)
+	ChatState.response_error.connect(_on_response_error)
+	ChatState.response_cleared.connect(_on_response_cleared)
+	ChatState.function_call_started.connect(_on_function_call_started)
+	ChatState.function_call_completed.connect(_on_function_call_completed)
+
 ##显示/隐藏
 ##由agent模块调用
 func show_module() -> void:
@@ -276,3 +286,48 @@ func _update_buttons() -> void:
 ## 按钮点击回调
 func _on_button_pressed(button_index: int) -> void:
 	button_pressed.emit(button_index)
+
+
+# ============ ChatState 响应式回调 ============
+
+func _on_response_started() -> void:
+	print("[DialogueBox] _on_response_started")
+	show_module()
+	clear_dialogue()
+
+
+func _on_response_text_delta(delta: String) -> void:
+	append_text(delta)
+
+
+func _on_response_text_set(text: String) -> void:
+	print("[DialogueBox] _on_response_text_set len=%d" % text.length())
+	set_text(text)
+
+
+func _on_response_completed(_full_text: String) -> void:
+	print("[DialogueBox] _on_response_completed len=%d" % _full_text.length())
+	pass
+
+
+func _on_response_error(message: String) -> void:
+	print("[DialogueBox] _on_response_error: %s" % message)
+	show_module()
+	append_text("\n[color=red]" + message + "[/color]")
+
+
+func _on_response_cleared() -> void:
+	print("[DialogueBox] _on_response_cleared")
+	clear_dialogue()
+
+
+## 预留扩展：函数调用开始
+func _on_function_call_started(_call_id: String, _name: String) -> void:
+	print("[DialogueBox] _on_function_call_started: %s" % _name)
+	pass
+
+
+## 预留扩展：函数调用完成
+func _on_function_call_completed(_call_id: String, _name: String, _success: bool) -> void:
+	print("[DialogueBox] _on_function_call_completed: %s success=%s" % [_name, _success])
+	pass

@@ -36,8 +36,6 @@ var _is_transitioning: bool = false   # 是否正在切换动画中
 var _current_tween: Tween = null      # 当前动画 Tween
 var _height_tween: Tween = null       # 高度调整动画 Tween
 var _attachments: Array = []          # 附件列表（最多2个）
-var _is_generating: bool = false      # 是否正在生成
-var is_agent_operating: bool = false  # Agent 是否正在操作
 
 # LineEdit 的原始最小宽度，用于保持布局稳定
 var _line_edit_min_width: float = 0.0
@@ -83,6 +81,11 @@ func _ready() -> void:
 	smooth_scroll_container.visible = false
 	material_chip1.visible = false
 	material_chip2.visible = false
+
+	# 监听 ChatState
+	ChatState.chat_status_changed.connect(_on_chat_status_changed)
+	ChatState.input_text_requested.connect(_on_input_text_requested)
+	ChatState.input_clear_requested.connect(_on_input_clear_requested)
 
 
 func _on_line_edit_text_changed(new_text: String) -> void:
@@ -162,10 +165,9 @@ func _handle_submit() -> void:
 		submit_button.current_state = 0
 		return
 
-	# 设置生成状态
-	_is_generating = true
-
-	# 触发提交信号
+	# 通过 ChatState 中介提交（ChatController 监听此信号）
+	ChatState.submit_text(current_text, _attachments)
+	# 保留本地信号（兼容其他监听者）
 	text_submitted.emit(current_text, _attachments)
 
 	# 清空输入
@@ -174,10 +176,12 @@ func _handle_submit() -> void:
 
 ## 处理停止生成
 func _handle_stop() -> void:
-	if not _is_generating:
+	if ChatState.status == ChatState.Status.IDLE:
 		return
 
-	_is_generating = false
+	# 通过 ChatState 中介请求停止（ChatController 监听此信号）
+	ChatState.request_stop_generation()
+	# 保留本地信号（兼容其他监听者）
 	generation_stopped.emit()
 
 
@@ -529,128 +533,25 @@ func get_attachments() -> Array:
 	return _attachments.duplicate()
 
 
-## ============ 锁定机制 ============
+## ============ ChatState 响应式回调 ============
 
-## 锁定模块（Agent 操作时）
-func _lock_module() -> void:
-	is_agent_operating = true
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-
-## 解锁模块（Agent 操作完成）
-func _unlock_module() -> void:
-	is_agent_operating = false
-	mouse_filter = Control.MOUSE_FILTER_STOP
+## 聊天状态变化 -> 更新按钮状态
+func _on_chat_status_changed(new_status: ChatState.Status) -> void:
+	print("[InputBox] _on_chat_status_changed: %s" % ChatState.Status.keys()[new_status])
+	match new_status:
+		ChatState.Status.GENERATING, ChatState.Status.EXECUTING_FUNCTION:
+			submit_button.current_state = 1  # 停止状态
+		ChatState.Status.IDLE, ChatState.Status.ERROR:
+			submit_button.current_state = 0  # 发送状态
 
 
-## ============ Agent API ============
-
-## 发送消息（触发对话）
-func agent_send_message(text: String, attachments: Array = []) -> bool:
-	_lock_module()
-
-	# 检查是否正在生成
-	if _is_generating:
-		snackbar.show_warning("请等待当前响应完成")
-		_unlock_module()
-		return false
-
-	# 参数验证
-	if text.strip_edges().is_empty():
-		snackbar.show_warning("消息文本不能为空")
-		_unlock_module()
-		return false
-
-	if attachments.size() > 2:
-		snackbar.show_warning("最多只能添加两张图片")
-		_unlock_module()
-		return false
-
-	# 验证附件
-	for attachment in attachments:
-		if not FileAccess.file_exists(attachment):
-			snackbar.show_error("附件文件不存在: " + attachment)
-			_unlock_module()
-			return false
-
-		var ext = attachment.get_extension().to_lower()
-		if not ext in ["png", "jpg", "jpeg", "gif", "bmp", "webp"]:
-			snackbar.show_warning("不支持的文件格式，请选择图片文件")
-			_unlock_module()
-			return false
-
-	# 设置生成状态
-	_is_generating = true
-	submit_button.current_state = 1  # 切换到停止状态
-
-	# 触发提交信号
-	text_submitted.emit(text, attachments)
-
-	_unlock_module()
-	return true
-
-
-## 停止生成
-func agent_stop_generation() -> bool:
-	_lock_module()
-
-	if not _is_generating:
-		snackbar.show_info("当前没有正在进行的生成")
-		_unlock_module()
-		return false
-
-	_is_generating = false
-	submit_button.current_state = 0  # 切换回发送状态
-	generation_stopped.emit()
-
-	_unlock_module()
-	return true
-
-
-## 重置到就绪状态
-func agent_reset_to_ready() -> bool:
-	_lock_module()
-	_is_generating = false
-	submit_button.current_state = 0
-	_unlock_module()
-	return true
-
-
-## 获取状态
-func agent_get_status() -> Dictionary:
-	return {
-		"is_generating": _is_generating,
-		"current_text": get_text(),
-		"text_length": get_text().length(),
-		"attachment_count": _attachments.size(),
-		"attachments": get_attachments(),
-		"mode": "multiline" if _is_multiline_mode else "singleline",
-		"has_focus": text_edit.has_focus() if _is_multiline_mode else line_edit.has_focus(),
-		"is_empty": get_text().is_empty() and _attachments.is_empty()
-	}
-
-
-## 检查是否正在生成
-func agent_is_generating() -> bool:
-	return _is_generating
-
-
-## 检查是否就绪
-func agent_is_ready() -> bool:
-	return not _is_generating
-
-
-## 设置文本（彩蛋功能）
-func agent_set_text(text: String) -> bool:
-	_lock_module()
+## Agent 请求设置文本
+func _on_input_text_requested(text: String) -> void:
+	print("[InputBox] _on_input_text_requested: '%s'" % text)
 	set_text(text)
-	_unlock_module()
-	return true
 
 
-## 清空输入（彩蛋功能）
-func agent_clear_input() -> bool:
-	_lock_module()
+## Agent 请求清空
+func _on_input_clear_requested() -> void:
+	print("[InputBox] _on_input_clear_requested")
 	clear_text()
-	_unlock_module()
-	return true

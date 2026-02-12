@@ -1,5 +1,8 @@
 extends MarginContainer
 
+## 番茄钟 UI 组件（纯展示 + 交互）
+## 所有业务逻辑由 PomodoroState 单例管理，本组件仅监听信号驱动显示
+
 @onready var hh = %running/VBoxContainer/hh_mm_dd/hh
 @onready var mm = %running/VBoxContainer/hh_mm_dd/mm
 @onready var ss = %running/VBoxContainer/hh_mm_dd/ss
@@ -9,243 +12,149 @@ extends MarginContainer
 @onready var work_info = %idle/VBoxContainer/HBoxContainer/work
 @onready var rest_info = %idle/VBoxContainer/HBoxContainer/rest
 
-@onready var loop_progress_label = %running/VBoxContainer/numbers         # n/N
-@onready var status_label = %running/VBoxContainer/status                	# 工作中/休息中
+@onready var loop_progress_label = %running/VBoxContainer/numbers
+@onready var status_label = %running/VBoxContainer/status
 
 @onready var idle_view = %idle
 @onready var running_view = %running
 
-# 信号定义
-signal work_started()        
-signal rest_started()        
-signal work_completed()      
-signal rest_completed()      
-signal work_tick(remaining_seconds: int, total_seconds: int, progress: float)  
-signal rest_tick(remaining_seconds: int, total_seconds: int, progress: float)  
-signal loop_completed(current_loop: int, total_loops: int)  # 完成一个工作+休息循环
-signal all_completed()  # 所有循环完成
-
-# 配置参数（分钟）
-@export var work_duration: int = 1    
-@export var rest_duration: int = 1     
-
-# 循环相关
-var total_loops: int = 1       # 总循环次数
-var current_loop: int = 1      # 当前循环（从1开始）
-
-# 内部状态
-var remaining_seconds: int = 0         
-var current_mode_total: int = 0        
-var is_running: bool = false
-var is_work_mode: bool = true
-var timer: Timer
 
 func _ready() -> void:
-	timer = Timer.new()
-	timer.wait_time = 1.0
-	timer.one_shot = false
-	timer.timeout.connect(_on_timer_tick)
-	add_child(timer)
-	
-	# 初始化显示
-	_update_loop_display()
-	_update_status_display()
-	
 	_idle_view()
-	
+	# 连接 PomodoroState 信号
+	PomodoroState.pomodoro_started.connect(_on_pomodoro_started)
+	PomodoroState.pomodoro_stopped.connect(_on_pomodoro_stopped)
+	PomodoroState.pomodoro_paused.connect(_on_pomodoro_paused)
+	PomodoroState.pomodoro_continued.connect(_on_pomodoro_continued)
+	PomodoroState.tick.connect(_on_tick)
+	PomodoroState.work_phase_started.connect(_on_work_phase_started)
+	PomodoroState.rest_phase_started.connect(_on_rest_phase_started)
+	PomodoroState.loop_completed.connect(_on_loop_completed)
+	PomodoroState.all_completed.connect(_on_all_completed)
+	PomodoroState.config_changed.connect(_on_config_changed)
+	PomodoroState.data_loaded.connect(_on_data_loaded)
+	# 防止 State 先启动而 UI 后加载
+	_sync_from_state()
+
+
+# ======================== 视图切换 ========================
+
 func _running_view() -> void:
-	idle_view.visible = false;
-	running_view.visible = true;
+	idle_view.visible = false
+	running_view.visible = true
+
 
 func _idle_view() -> void:
-	idle_view.visible = true;
-	running_view.visible = false;
+	idle_view.visible = true
+	running_view.visible = false
 
 
-func _on_timer_tick() -> void:
-	if remaining_seconds > 0:
-		remaining_seconds -= 1
-		_update_display()
-		_emit_tick_signal()
-	else:
-		_on_timer_complete()
+# ======================== 显示更新 ========================
 
-func _on_timer_complete() -> void:
-	timer.stop()
-	is_running = false
-	
-	if is_work_mode:
-		work_completed.emit()
-		# 工作完成，进入休息（同一次循环内）
-		start_rest()
-	else:
-		rest_completed.emit()
-		# 休息完成，检查是否继续下一个循环
-		if current_loop < total_loops:
-			current_loop += 1
-			loop_completed.emit(current_loop, total_loops)
-			_update_loop_display()
-			# 开始下一个循环的工作
-			is_work_mode = true
-			start_work()
-		else:
-			# 所有循环完成
-			all_completed.emit()
-			print("番茄钟全部完成！")
-			stop_timer()
-
-func _emit_tick_signal() -> void:
-	var progress = _get_progress()
-	if is_work_mode:
-		work_tick.emit(remaining_seconds, current_mode_total, progress)
-	else:
-		rest_tick.emit(remaining_seconds, current_mode_total, progress)
-
-func _get_progress() -> float:
-	if current_mode_total == 0:
-		return 0.0
-	return float(remaining_seconds) / float(current_mode_total)
-
-# 更新循环显示 n/N
-func _update_loop_display() -> void:
-	if loop_progress_label:
-		loop_progress_label.text = "%d/%d" % [current_loop, total_loops]
-
-# 更新状态标签
-func _update_status_display() -> void:
-	if status_label:
-		status_label.text = "工作中" if is_work_mode else "休息中"
-
-# 开始工作倒计时
-func start_work() -> void:
-	is_work_mode = true
-	current_mode_total = work_duration * 60
-	remaining_seconds = current_mode_total
-	is_running = true
-	timer.start()
-	_update_display()
-	_update_status_display()
-	work_started.emit()
-	print("工作开始 [", current_loop, "/", total_loops, "]: ", work_duration, "分钟")
-
-# 开始休息倒计时  
-func start_rest() -> void:
-	is_work_mode = false
-	current_mode_total = rest_duration * 60
-	remaining_seconds = current_mode_total
-	is_running = true
-	timer.start()
-	_update_display()
-	_update_status_display()
-	rest_started.emit()
-	print("休息开始 [", current_loop, "/", total_loops, "]: ", rest_duration, "分钟")
-signal work_paused
-signal work_continued
-func toggle_pause() -> void:
-	if is_running:
-		timer.stop()
-		is_running = false
-		if is_work_mode:
-			work_paused.emit()
-	else:
-		if remaining_seconds > 0:
-			timer.start()
-			is_running = true
-			if is_work_mode:
-				work_continued.emit()
-
-func stop_timer() -> void:
-	timer.stop()
-	is_running = false
-	is_work_mode = true  # 重置为工作模式
-	remaining_seconds = 0
-	_update_display()
-
-# 更新显示和进度条
-func _update_display() -> void:
-	var hours = remaining_seconds / 3600
-	var minutes = (remaining_seconds % 3600) / 60
-	var seconds = remaining_seconds % 60
-	
+func _update_display(remaining: int) -> void:
+	var hours = remaining / 3600
+	var minutes = (remaining % 3600) / 60
+	var seconds = remaining % 60
 	hh.text = "%02d" % hours
 	mm.text = "%02d" % minutes
 	ss.text = "%02d" % seconds
-	
-	if progress_bar:
-		progress_bar.set_progress_value(_get_progress())
 
-# 设置时长
-func set_work_duration(minutes: int) -> void:
-	work_duration = minutes
-	if not is_running and is_work_mode:
-		current_mode_total = work_duration * 60
-		remaining_seconds = current_mode_total
-		_update_display()
 
-func set_rest_duration(minutes: int) -> void:
-	rest_duration = minutes
-	if not is_running and not is_work_mode:
-		current_mode_total = rest_duration * 60
-		remaining_seconds = current_mode_total
-		_update_display()
+func _update_loop_display(current: int, total: int) -> void:
+	if loop_progress_label:
+		loop_progress_label.text = "%d/%d" % [current, total]
 
-# 获取状态
-func get_remaining_time() -> Dictionary:
-	return {
-		"hour": remaining_seconds / 3600,
-		"minute": (remaining_seconds % 3600) / 60,
-		"second": remaining_seconds % 60,
-		"is_work_mode": is_work_mode,
-		"current_loop": current_loop,
-		"total_loops": total_loops
-	}
 
-func is_working() -> bool:
-	return is_work_mode
+func _update_status_display(is_work: bool) -> void:
+	if status_label:
+		status_label.text = "工作中" if is_work else "休息中"
 
-func is_paused() -> bool:
-	return not is_running and remaining_seconds > 0
 
-func get_current_mode_progress() -> float:
-	return _get_progress()
+# ======================== PomodoroState 信号处理 ========================
 
-# 按钮回调
-
-func _on_pause_button_state_changed(old_state: int, new_state: int) -> void:
-	toggle_pause()
-signal work_stopped
-func _on_stop_button_pressed() -> void:
-	stop_timer()
-	_idle_view();
-	print("计时器已停止")
-	work_stopped.emit()
-
-# 启动番茄钟（带循环次数）
-func pomodoro_start(_work_duration: int, _rest_duration: int, _loop_times: int) -> void:
-	# 停止当前计时
-	stop_timer()
-	
-	# 重置循环计数
-	current_loop = 1
-	total_loops = max(1, _loop_times)  # 至少1次循环
-	
-	# 设置时长
-	work_duration = _work_duration
-	rest_duration = _rest_duration
-	
-	# 更新显示
-	_update_loop_display()
-	
-	# 开始第一个工作周期
-	is_work_mode = true
-	start_work()
+func _on_pomodoro_started(_data: Dictionary) -> void:
 	_running_view()
 
-func _on_start_button_pressed() -> void:
-	# 从UI获取参数启动
-	pomodoro_start(work_info.times, rest_info.times, loop_info.times)
+
+func _on_pomodoro_stopped() -> void:
+	_idle_view()
+	if progress_bar:
+		progress_bar.set_progress_value(0.0)
+
+
+func _on_tick(remaining: int, total: int, progress: float, is_work: bool) -> void:
+	_update_display(remaining)
+	_update_status_display(is_work)
+	if progress_bar:
+		progress_bar.set_progress_value(progress)
+
+
+func _on_work_phase_started() -> void:
+	_update_status_display(true)
+
+
+func _on_rest_phase_started() -> void:
+	_update_status_display(false)
+
+
+func _on_loop_completed(current: int, total: int) -> void:
+	_update_loop_display(current, total)
 
 
 func _on_all_completed() -> void:
-	_idle_view();
-	pass # Replace with function body.
+	_idle_view()
+	if progress_bar:
+		progress_bar.set_progress_value(0.0)
+
+
+func _on_pomodoro_paused() -> void:
+	pass
+
+
+func _on_pomodoro_continued() -> void:
+	pass
+
+
+func _on_config_changed(work_dur: int, rest_dur: int) -> void:
+	if not PomodoroState.is_active():
+		work_info.times = work_dur
+		work_info.flush_times_text()
+		rest_info.times = rest_dur
+		rest_info.flush_times_text()
+
+
+func _on_data_loaded() -> void:
+	_sync_from_state()
+
+
+# ======================== 状态同步 ========================
+
+func _sync_from_state() -> void:
+	if PomodoroState.is_active():
+		_running_view()
+		var status = PomodoroState.get_status()
+		_update_display(status.remaining_seconds)
+		_update_loop_display(status.current_loop, status.total_loops)
+		_update_status_display(status.is_work_mode)
+		if progress_bar:
+			progress_bar.set_progress_value(status.progress)
+	else:
+		_idle_view()
+		work_info.times = PomodoroState.work_duration
+		work_info.flush_times_text()
+		rest_info.times = PomodoroState.rest_duration
+		rest_info.flush_times_text()
+
+
+# ======================== 按钮回调（调用 PomodoroState）========================
+
+func _on_start_button_pressed() -> void:
+	PomodoroState.start_pomodoro(work_info.times, rest_info.times, loop_info.times)
+
+
+func _on_pause_button_state_changed(_old_state: int, _new_state: int) -> void:
+	PomodoroState.toggle_pause()
+
+
+func _on_stop_button_pressed() -> void:
+	PomodoroState.stop()

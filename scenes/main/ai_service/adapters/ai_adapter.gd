@@ -43,12 +43,10 @@ var supports_function_calling: bool = false
 ## 发送消息（由子类实现）
 ## @param messages 消息数组
 ## @param context 上下文字典（来自 ContextCollector）
-## @param functions 可调用函数定义数组（来自 AgentExecutor）
 ## @param stream 是否使用流式传输
 func send_request(
 	_messages: Array,
 	_context: Dictionary = {},
-	_functions: Array = [],
 	_stream: bool = true
 ) -> void:
 	push_error("AIAdapter.send_request() 必须由子类实现")
@@ -78,7 +76,6 @@ func build_system_prompt(base_prompt: String, context: Dictionary) -> String:
 ## @param context 上下文字典
 ## @return 格式化后的字符串
 func _format_context(context: Dictionary) -> String:
-	# TODO: 子类可重写以自定义格式
 	var parts: Array[String] = []
 
 	if context.has("datetime"):
@@ -108,11 +105,3 @@ func _format_context(context: Dictionary) -> String:
 		return ""
 
 	return "[当前状态]\n" + "\n".join(parts)
-
-
-## 将函数定义转换为 API 格式（由子类实现）
-## @param functions AgentExecutor 的函数定义数组
-## @return API 特定格式的函数定义
-func _format_functions(_functions: Array) -> Variant:
-	# 默认返回 OpenAI 格式
-	return _functions

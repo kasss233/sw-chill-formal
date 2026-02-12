@@ -40,9 +40,6 @@ signal playback_error(error: String)
 ## 是否启用队列模式（多段语音连续播放）
 @export var queue_enabled: bool = true
 
-## 角色节点路径（用于口型同步）
-@export var character_path: NodePath = ""
-
 ## 音频播放器
 var _audio_player: AudioStreamPlayer = null
 
@@ -58,7 +55,6 @@ var _character: Node = null
 
 func _ready() -> void:
 	_setup_audio_player()
-	call_deferred("_cache_character_reference")
 
 
 func _setup_audio_player() -> void:
@@ -68,9 +64,9 @@ func _setup_audio_player() -> void:
 	add_child(_audio_player)
 
 
-func _cache_character_reference() -> void:
-	if not character_path.is_empty():
-		_character = get_node_or_null(character_path)
+## 设置角色节点引用（由 3D 场景主动调用）
+func set_character(node: Node) -> void:
+	_character = node
 
 
 func _process(_delta: float) -> void:

@@ -1,39 +1,23 @@
 class_name CustomAPIAdapter extends AIAdapter
 ## 自定义后端 API 适配器
-## 用于对接用户自己的 AI 后端服务
+## 对接后端 AI 服务，支持 SSE 流式传输、Function Calling、TTS
 ##
-## 功能:
-##   1. 支持自定义请求/响应格式
-##   2. 支持 TTS 音频返回
-##   3. 支持 Function Calling / Agent 操作
-##   4. 支持上下文自动注入
+## SSE 事件协议:
+##   event: text_delta / text_done / function_call / tts / error / done
+##   data: {json}
 ##
-## 预期后端响应格式示例:
-##   {
-##     "type": "text" | "tts" | "function_call" | "done",
-##     "content": "文本内容",
-##     "tts": {
-##       "url": "https://...",      // 或
-##       "data": "base64...",
-##       "format": "mp3"
-##     },
-##     "function_call": {
-##       "id": "call_xxx",
-##       "name": "add_task",
-##       "arguments": { "title": "..." }
-##     }
-##   }
-##
-## 流式传输:
-##   使用 Server-Sent Events，每个事件包含上述格式的 JSON
+## 请求端点:
+##   POST /chat/messages — 发送消息（SSE 流）
+##   POST /chat/function-results — 回传函数执行结果（SSE 流）
 
 ## API 配置
 var api_url: String = ""
 var auth_token: String = ""
 var request_timeout: float = 120.0
 
-## 是否自动注入上下文
-var auto_inject_context: bool = true
+## 会话管理
+var _session_id: String = ""
+var _message_id: String = ""
 
 ## 内部状态
 var _http_client: HTTPClient = null
@@ -42,6 +26,8 @@ var _should_stop: bool = false
 var _buffer: String = ""
 var _stream_thread: Thread = null
 var _mutex: Mutex = null
+var _full_response: String = ""
+var _event_type: String = ""
 
 
 func _init() -> void:
@@ -60,33 +46,41 @@ func configure(config: Dictionary) -> void:
 		auth_token = config["auth_token"]
 	if config.has("request_timeout"):
 		request_timeout = config["request_timeout"]
-	if config.has("auto_inject_context"):
-		auto_inject_context = config["auto_inject_context"]
+
+
+## 获取/设置会话 ID
+func get_session_id() -> String:
+	return _session_id
+
+func set_session_id(id: String) -> void:
+	_session_id = id
 
 
 ## 发送请求
 func send_request(
 	messages: Array,
 	context: Dictionary = {},
-	functions: Array = [],
 	stream: bool = true
 ) -> void:
 	if _is_requesting:
-		request_failed.emit("已有请求正在进行中")
+		call_deferred("_emit_request_failed", "已有请求正在进行中")
 		return
 
 	if api_url.is_empty():
-		request_failed.emit("API URL 未设置")
+		call_deferred("_emit_request_failed", "API URL 未设置")
 		return
 
 	_is_requesting = true
 	_should_stop = false
 	_buffer = ""
+	_full_response = ""
+	_event_type = ""
 
-	# 构建请求体
-	var body = _build_request_body(messages, context, functions, stream)
+	var body = _build_request_body(messages, context, stream)
 
-	# 在线程中执行请求
+	# 更新 auth token
+	auth_token = AuthState.get_access_token()
+
 	_stream_thread = Thread.new()
 	_stream_thread.start(_execute_request.bind(body, stream))
 
@@ -103,67 +97,398 @@ func cancel_request() -> void:
 	_is_requesting = false
 
 
+## 回传函数执行结果
+func send_function_result(call_id: String, name: String, result: Variant) -> void:
+	if api_url.is_empty():
+		push_warning("[CustomAPIAdapter] API URL 未设置，无法回传函数结果")
+		return
+
+	var body = {
+		"session_id": _session_id,
+		"function_call_id": call_id,
+		"function_name": name,
+		"result": result
+	}
+
+	# 更新 auth token
+	auth_token = AuthState.get_access_token()
+
+	_stream_thread = Thread.new()
+	_stream_thread.start(_execute_function_result_request.bind(body))
+
+
 ## 构建请求体
 func _build_request_body(
 	messages: Array,
 	context: Dictionary,
-	functions: Array,
 	stream: bool
 ) -> Dictionary:
 	var body: Dictionary = {
-		"messages": messages,
+		"content": "",
 		"stream": stream
 	}
 
-	# 注入上下文
-	if auto_inject_context and not context.is_empty():
-		body["context"] = context
+	# 从 messages 中提取最新用户消息
+	for i in range(messages.size() - 1, -1, -1):
+		if messages[i].get("role") == "user":
+			body["content"] = messages[i].get("content", "")
+			break
 
-	# 添加可用函数
-	if not functions.is_empty():
-		body["functions"] = functions
+	# 附加会话 ID
+	if not _session_id.is_empty():
+		body["session_id"] = _session_id
+
+	# 处理附件（图片）
+	var content = body["content"]
+	if content is Array:
+		var attachments: Array = []
+		var text_content: String = ""
+		for part in content:
+			if part is Dictionary:
+				if part.get("type") == "text":
+					text_content = part.get("text", "")
+				elif part.get("type") == "image_url":
+					var url: String = part.get("image_url", {}).get("url", "")
+					if url.begins_with("data:"):
+						var parts = url.split(",", true, 1)
+						var mime = parts[0].replace("data:", "").replace(";base64", "")
+						attachments.append({
+							"type": "image",
+							"data": parts[1] if parts.size() > 1 else "",
+							"mime_type": mime
+						})
+		body["content"] = text_content
+		if not attachments.is_empty():
+			body["attachments"] = attachments
+
+	# 注入上下文（作为提示词格式化后附到 body）
+	if not context.is_empty():
+		body["context"] = context
 
 	return body
 
 
 ## 执行 HTTP 请求（在线程中）
-func _execute_request(_body: Dictionary, _stream: bool) -> void:
-	# TODO: 实现实际的 HTTP 请求逻辑
-	push_warning("CustomAPIAdapter: execute_request 尚未实现")
+func _execute_request(body: Dictionary, _stream: bool) -> void:
+	if auth_token.is_empty():
+		call_deferred("_emit_request_failed", "未登录，无法发送请求")
+		_is_requesting = false
+		return
+
+	var url_parts = _parse_url(api_url + "/chat/messages")
+	if url_parts.is_empty():
+		call_deferred("_emit_request_failed", "API URL 格式无效")
+		_is_requesting = false
+		return
+
+	_http_client = HTTPClient.new()
+	var err = _http_client.connect_to_host(url_parts["host"], url_parts["port"], url_parts["tls"])
+	if err != OK:
+		call_deferred("_emit_request_failed", "连接失败: %d" % err)
+		_is_requesting = false
+		return
+
+	# 等待连接
+	if not _wait_for_connection():
+		_is_requesting = false
+		return
+
+	# 构建请求头
+	var headers = PackedStringArray([
+		"Content-Type: application/json",
+		"Authorization: Bearer " + auth_token,
+		"Accept: text/event-stream"
+	])
+
+	var body_json = JSON.stringify(body)
+	err = _http_client.request(HTTPClient.METHOD_POST, url_parts["path"], headers, body_json)
+	if err != OK:
+		call_deferred("_emit_request_failed", "请求发送失败: %d" % err)
+		_http_client.close()
+		_is_requesting = false
+		return
+
+	# 读取 SSE 响应流
+	_read_sse_stream()
+
+	_http_client.close()
 	_is_requesting = false
 
 
-## 解析响应数据
-## @param data 响应 JSON 数据
-## @return AIResponse 对象
-func _parse_response_data(data: Dictionary) -> AIResponse:
-	var response_type = data.get("type", "text")
+## 执行函数结果回传请求（在线程中）
+func _execute_function_result_request(body: Dictionary) -> void:
+	if auth_token.is_empty():
+		call_deferred("_emit_request_failed", "未登录，无法回传函数结果")
+		return
 
-	match response_type:
-		"text":
-			return AIResponse.text(data.get("content", ""), data.get("is_delta", false))
+	var url_parts = _parse_url(api_url + "/chat/function-results")
+	if url_parts.is_empty():
+		call_deferred("_emit_request_failed", "API URL 格式无效")
+		return
 
-		"tts":
-			var tts_data = data.get("tts", {})
-			return AIResponse.tts(
-				tts_data.get("url", ""),
-				_decode_base64(tts_data.get("data", "")),
-				tts_data.get("format", "mp3")
-			)
+	var client = HTTPClient.new()
+	var err = client.connect_to_host(url_parts["host"], url_parts["port"], url_parts["tls"])
+	if err != OK:
+		call_deferred("_emit_request_failed", "连接失败: %d" % err)
+		return
+
+	# 等待连接
+	var timeout_ms = int(request_timeout * 1000)
+	var elapsed = 0
+	while client.get_status() == HTTPClient.STATUS_CONNECTING or \
+		  client.get_status() == HTTPClient.STATUS_RESOLVING:
+		client.poll()
+		OS.delay_msec(50)
+		elapsed += 50
+		if elapsed > timeout_ms:
+			call_deferred("_emit_request_failed", "函数结果回传连接超时")
+			client.close()
+			return
+
+	if client.get_status() != HTTPClient.STATUS_CONNECTED:
+		call_deferred("_emit_request_failed", "函数结果回传连接失败")
+		client.close()
+		return
+
+	var headers = PackedStringArray([
+		"Content-Type: application/json",
+		"Authorization: Bearer " + auth_token,
+		"Accept: text/event-stream"
+	])
+
+	var body_json = JSON.stringify(body)
+	err = client.request(HTTPClient.METHOD_POST, url_parts["path"], headers, body_json)
+	if err != OK:
+		call_deferred("_emit_request_failed", "函数结果回传请求失败: %d" % err)
+		client.close()
+		return
+
+	# 读取后续 SSE 流（后端可能基于函数结果继续生成回复）
+	_buffer = ""
+	_event_type = ""
+
+	while client.get_status() == HTTPClient.STATUS_REQUESTING:
+		client.poll()
+		OS.delay_msec(10)
+
+	if not client.has_response():
+		client.close()
+		return
+
+	var response_code = client.get_response_code()
+	if response_code != 200:
+		call_deferred("_emit_request_failed", "函数结果回传 HTTP 错误: %d" % response_code)
+		client.close()
+		return
+
+	while client.get_status() == HTTPClient.STATUS_BODY:
+		_mutex.lock()
+		var stopped = _should_stop
+		_mutex.unlock()
+		if stopped:
+			break
+
+		client.poll()
+		var chunk = client.read_response_body_chunk()
+		if chunk.size() > 0:
+			_process_sse_chunk(chunk.get_string_from_utf8())
+		OS.delay_msec(10)
+
+	client.close()
+
+
+## 等待连接建立
+func _wait_for_connection() -> bool:
+	var timeout_ms = int(request_timeout * 1000)
+	var elapsed = 0
+	while _http_client.get_status() == HTTPClient.STATUS_CONNECTING or \
+		  _http_client.get_status() == HTTPClient.STATUS_RESOLVING:
+		_http_client.poll()
+		OS.delay_msec(50)
+		elapsed += 50
+
+		_mutex.lock()
+		var stopped = _should_stop
+		_mutex.unlock()
+		if stopped:
+			call_deferred("_emit_request_failed", "请求已取消")
+			_http_client.close()
+			return false
+
+		if elapsed > timeout_ms:
+			call_deferred("_emit_request_failed", "连接超时")
+			_http_client.close()
+			return false
+
+	if _http_client.get_status() != HTTPClient.STATUS_CONNECTED:
+		call_deferred("_emit_request_failed", "连接失败，状态: %d" % _http_client.get_status())
+		_http_client.close()
+		return false
+
+	return true
+
+
+## 读取 SSE 事件流
+func _read_sse_stream() -> void:
+	# 等待请求发送完成
+	while _http_client.get_status() == HTTPClient.STATUS_REQUESTING:
+		_http_client.poll()
+		OS.delay_msec(10)
+
+	if not _http_client.has_response():
+		call_deferred("_emit_request_failed", "服务端无响应")
+		return
+
+	var response_code = _http_client.get_response_code()
+	if response_code != 200:
+		# 尝试读取错误体
+		var error_body = ""
+		while _http_client.get_status() == HTTPClient.STATUS_BODY:
+			_http_client.poll()
+			var chunk = _http_client.read_response_body_chunk()
+			if chunk.size() > 0:
+				error_body += chunk.get_string_from_utf8()
+			else:
+				break
+		call_deferred("_emit_request_failed", "HTTP 错误 %d: %s" % [response_code, error_body])
+		return
+
+	# 读取 SSE 数据流
+	while _http_client.get_status() == HTTPClient.STATUS_BODY:
+		_mutex.lock()
+		var stopped = _should_stop
+		_mutex.unlock()
+		if stopped:
+			break
+
+		_http_client.poll()
+		var chunk = _http_client.read_response_body_chunk()
+		if chunk.size() > 0:
+			_process_sse_chunk(chunk.get_string_from_utf8())
+		OS.delay_msec(10)
+
+
+## 处理 SSE 数据块
+func _process_sse_chunk(chunk: String) -> void:
+	_buffer += chunk
+	var lines = _buffer.split("\n")
+
+	# 如果最后没有换行，说明最后一行不完整，保留到 buffer
+	if not _buffer.ends_with("\n"):
+		_buffer = lines[-1]
+		lines = lines.slice(0, -1)
+	else:
+		_buffer = ""
+
+	for line in lines:
+		line = line.strip_edges()
+
+		if line.is_empty():
+			# 空行 = 事件分隔符
+			_event_type = ""
+			continue
+
+		if line.begins_with(":"):
+			# 注释行（心跳 :keepalive）
+			continue
+
+		if line.begins_with("event: "):
+			_event_type = line.substr(7).strip_edges()
+		elif line.begins_with("data: "):
+			var data_str = line.substr(6)
+			var json = JSON.new()
+			if json.parse(data_str) == OK:
+				_dispatch_event(_event_type, json.get_data())
+			else:
+				print("[CustomAPIAdapter] JSON 解析失败: %s" % data_str)
+
+
+## 分发 SSE 事件
+func _dispatch_event(event_type: String, data: Variant) -> void:
+	if not data is Dictionary:
+		return
+
+	match event_type:
+		"text_delta":
+			var content = data.get("content", "")
+			_full_response += content
+			var response = AIResponse.text(content, true)
+			call_deferred("_emit_stream_chunk", response)
+
+		"text_done":
+			# text_done 不需要特殊处理，text_delta 已逐步输出
+			pass
 
 		"function_call":
-			var fc = data.get("function_call", {})
-			return AIResponse.function_call(
-				fc.get("id", ""),
-				fc.get("name", ""),
-				fc.get("arguments", {})
+			var response = AIResponse.function_call(
+				data.get("id", ""),
+				data.get("name", ""),
+				data.get("arguments", {})
 			)
+			call_deferred("_emit_stream_chunk", response)
+
+		"tts":
+			var response: AIResponse
+			if data.has("url"):
+				response = AIResponse.tts(data.get("url", ""), [], data.get("format", "mp3"))
+			elif data.has("data"):
+				response = AIResponse.tts("", _decode_base64(data.get("data", "")), data.get("format", "mp3"))
+			else:
+				return
+			call_deferred("_emit_stream_chunk", response)
+
+		"error":
+			var response = AIResponse.error(data.get("message", "未知错误"), int(data.get("code", 0)))
+			call_deferred("_emit_stream_chunk", response)
 
 		"done":
-			return AIResponse.done()
+			_session_id = data.get("session_id", _session_id)
+			_message_id = data.get("message_id", "")
+			call_deferred("_emit_stream_done")
 
-		_:
-			return AIResponse.error("未知响应类型: " + response_type)
+
+## 线程安全的信号发射辅助方法
+func _emit_stream_chunk(response: AIResponse) -> void:
+	stream_chunk.emit(response)
+
+func _emit_stream_done() -> void:
+	stream_completed.emit(_full_response)
+
+func _emit_request_failed(error: String) -> void:
+	print("[CustomAPIAdapter] 错误: %s" % error)
+	request_failed.emit(error)
+
+
+## 解析 URL
+func _parse_url(url: String) -> Dictionary:
+	var tls = url.begins_with("https://")
+	var clean_url = url.replace("https://", "").replace("http://", "")
+
+	var path_start = clean_url.find("/")
+	var host_port: String
+	var path: String
+
+	if path_start == -1:
+		host_port = clean_url
+		path = "/"
+	else:
+		host_port = clean_url.substr(0, path_start)
+		path = clean_url.substr(path_start)
+
+	var port = 443 if tls else 80
+	var host = host_port
+
+	var colon = host_port.rfind(":")
+	if colon != -1:
+		host = host_port.substr(0, colon)
+		port = int(host_port.substr(colon + 1))
+
+	return {
+		"host": host,
+		"port": port,
+		"path": path,
+		"tls": tls
+	}
 
 
 ## 解码 Base64 字符串
@@ -171,13 +496,3 @@ func _decode_base64(base64_string: String) -> PackedByteArray:
 	if base64_string.is_empty():
 		return []
 	return Marshalls.base64_to_raw(base64_string)
-
-
-## 处理函数调用结果
-## 将函数执行结果发送回后端（用于多轮对话）
-## @param call_id 调用 ID
-## @param name 函数名
-## @param result 执行结果
-func send_function_result(_call_id: String, _name: String, _result: Variant) -> void:
-	# TODO: 实现函数结果回传
-	push_warning("CustomAPIAdapter: send_function_result 尚未实现")

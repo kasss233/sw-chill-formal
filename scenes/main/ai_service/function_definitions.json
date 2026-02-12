@@ -1,0 +1,473 @@
+[
+	{
+		"name": "add_task",
+		"description": "为用户创建一个新任务",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"title": {"type": "string", "description": "任务标题"},
+				"due_timestamp": {"type": "integer", "description": "截止时间戳（秒），0 表示无截止时间", "default": 0}
+			},
+			"required": ["title"]
+		}
+	},
+	{
+		"name": "remove_task",
+		"description": "删除一个任务",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"task_id": {"type": "integer", "description": "任务 ID"}
+			},
+			"required": ["task_id"]
+		}
+	},
+	{
+		"name": "update_task_title",
+		"description": "更新任务的标题",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"task_id": {"type": "integer", "description": "任务 ID"},
+				"title": {"type": "string", "description": "新标题"}
+			},
+			"required": ["task_id", "title"]
+		}
+	},
+	{
+		"name": "set_task_completed",
+		"description": "设置任务的完成状态",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"task_id": {"type": "integer", "description": "任务 ID"},
+				"completed": {"type": "boolean", "description": "目标状态，true 为完成，false 为未完成"}
+			},
+			"required": ["task_id", "completed"]
+		}
+	},
+	{
+		"name": "set_task_due_time",
+		"description": "设置任务的截止时间",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"task_id": {"type": "integer", "description": "任务 ID"},
+				"due_timestamp": {"type": "integer", "description": "截止时间戳（秒），0 表示取消截止时间"}
+			},
+			"required": ["task_id", "due_timestamp"]
+		}
+	},
+	{
+		"name": "clear_completed_tasks",
+		"description": "删除所有已完成的任务",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "get_all_tasks",
+		"description": "获取用户的所有任务列表",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "get_incomplete_tasks",
+		"description": "获取所有未完成的任务",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "get_completed_tasks",
+		"description": "获取所有已完成的任务",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "get_overdue_tasks",
+		"description": "获取所有已逾期但未完成的任务",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "reorder_task",
+		"description": "将任务移动到指定位置（在同类别列表中重新排序）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"task_id": {"type": "integer", "description": "任务 ID"},
+				"new_position": {"type": "integer", "description": "目标位置索引（从 0 开始）"},
+				"is_completed": {"type": "boolean", "description": "任务所在列表类型：true 在已完成列表中，false 在未完成列表中"}
+			},
+			"required": ["task_id", "new_position", "is_completed"]
+		}
+	},
+	{
+		"name": "create_note",
+		"description": "创建一条新笔记，会在笔记本中打开并显示打字动画",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"title": {"type": "string", "description": "笔记标题"},
+				"content": {"type": "string", "description": "笔记正文"},
+				"category": {"type": "string", "description": "分类名称（可选）"}
+			},
+			"required": ["content"]
+		}
+	},
+	{
+		"name": "write_note_content",
+		"description": "向已有笔记写入新内容，触发打字动画效果",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"note_id": {"type": "integer", "description": "笔记 ID"},
+				"content": {"type": "string", "description": "要写入的内容"}
+			},
+			"required": ["note_id", "content"]
+		}
+	},
+	{
+		"name": "open_note",
+		"description": "在笔记本中打开指定笔记（仅打开，不写入内容）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"note_id": {"type": "integer", "description": "笔记 ID"}
+			},
+			"required": ["note_id"]
+		}
+	},
+	{
+		"name": "close_note",
+		"description": "关闭当前打开的笔记页，返回列表视图",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "remove_note",
+		"description": "删除一条笔记",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"note_id": {"type": "integer", "description": "笔记 ID"}
+			},
+			"required": ["note_id"]
+		}
+	},
+	{
+		"name": "update_note",
+		"description": "更新笔记的标题和内容（静默更新，不触发打字动画）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"note_id": {"type": "integer", "description": "笔记 ID"},
+				"title": {"type": "string", "description": "新标题"},
+				"content": {"type": "string", "description": "新内容"}
+			},
+			"required": ["note_id"]
+		}
+	},
+	{
+		"name": "search_notes",
+		"description": "按关键词搜索笔记（匹配标题和内容）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"query": {"type": "string", "description": "搜索关键词"}
+			},
+			"required": ["query"]
+		}
+	},
+	{
+		"name": "get_all_notes",
+		"description": "获取用户的所有笔记列表",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "take_note",
+		"description": "快速创建一条浮动便签（上限 20 条，带弹出动画）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"text": {"type": "string", "description": "便签内容"}
+			},
+			"required": ["text"]
+		}
+	},
+	{
+		"name": "get_note_by_id",
+		"description": "根据 ID 获取单条笔记的详细信息",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"note_id": {"type": "integer", "description": "笔记 ID"}
+			},
+			"required": ["note_id"]
+		}
+	},
+	{
+		"name": "add_category",
+		"description": "添加一个新的笔记分类",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"category": {"type": "string", "description": "分类名称"}
+			},
+			"required": ["category"]
+		}
+	},
+	{
+		"name": "remove_category",
+		"description": "删除一个笔记分类，同时从所有笔记中移除该分类标签",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"category": {"type": "string", "description": "分类名称"}
+			},
+			"required": ["category"]
+		}
+	},
+	{
+		"name": "toggle_note_category",
+		"description": "切换笔记的分类标签（已有则移除，没有则添加）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"note_id": {"type": "integer", "description": "笔记 ID"},
+				"category": {"type": "string", "description": "分类名称"}
+			},
+			"required": ["note_id", "category"]
+		}
+	},
+	{
+		"name": "get_categories",
+		"description": "获取所有笔记分类列表",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "play_music",
+		"description": "播放指定曲目或恢复当前曲目播放",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"track_name": {"type": "string", "description": "曲目名称。不传则恢复当前曲目播放"}
+			}
+		}
+	},
+	{
+		"name": "pause_music",
+		"description": "暂停当前音乐播放",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "toggle_playback",
+		"description": "切换音乐播放/暂停状态",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "play_next",
+		"description": "播放下一首曲目（根据当前播放模式决定顺序）",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "play_previous",
+		"description": "播放上一首曲目",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "set_play_mode",
+		"description": "设置音乐播放模式",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"mode": {"type": "integer", "enum": [0, 1, 2], "description": "播放模式：0=顺序播放, 1=随机播放, 2=单曲循环"}
+			},
+			"required": ["mode"]
+		}
+	},
+	{
+		"name": "set_bgm_volume",
+		"description": "设置背景音乐播放音量",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"volume": {"type": "number", "minimum": 0.0, "maximum": 1.0, "description": "音量值 0.0（静音）- 1.0（最大）"}
+			},
+			"required": ["volume"]
+		}
+	},
+	{
+		"name": "get_music_state",
+		"description": "获取当前音乐播放的完整状态信息",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "switch_playlist",
+		"description": "切换当前播放列表",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"playlist_name": {"type": "string", "description": "播放列表名称"}
+			},
+			"required": ["playlist_name"]
+		}
+	},
+	{
+		"name": "create_playlist",
+		"description": "创建一个新的自定义播放列表（歌单）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"name": {"type": "string", "description": "歌单名称"}
+			},
+			"required": ["name"]
+		}
+	},
+	{
+		"name": "delete_playlist",
+		"description": "删除一个自定义播放列表（保护歌单\"收藏\"不可删除）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"name": {"type": "string", "description": "歌单名称"}
+			},
+			"required": ["name"]
+		}
+	},
+	{
+		"name": "add_track_to_playlist",
+		"description": "将一首曲目添加到指定播放列表",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"playlist_name": {"type": "string", "description": "播放列表名称"},
+				"track_name": {"type": "string", "description": "曲目名称"}
+			},
+			"required": ["playlist_name", "track_name"]
+		}
+	},
+	{
+		"name": "remove_track_from_playlist",
+		"description": "从指定播放列表中移除一首曲目",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"playlist_name": {"type": "string", "description": "播放列表名称"},
+				"track_name": {"type": "string", "description": "曲目名称"}
+			},
+			"required": ["playlist_name", "track_name"]
+		}
+	},
+	{
+		"name": "get_all_playlists",
+		"description": "获取所有用户创建的播放列表名称",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "get_playlist_tracks",
+		"description": "获取指定播放列表中的所有曲目",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"playlist_name": {"type": "string", "description": "播放列表名称"}
+			},
+			"required": ["playlist_name"]
+		}
+	},
+	{
+		"name": "get_all_playlists_data",
+		"description": "获取所有播放列表的完整数据（包含每个歌单的曲目列表）",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "start_pomodoro",
+		"description": "启动番茄钟专注计时",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"work_minutes": {"type": "integer", "description": "工作时间（分钟），最小 1", "default": 25},
+				"rest_minutes": {"type": "integer", "description": "休息时间（分钟），最小 1", "default": 5},
+				"loop_times": {"type": "integer", "description": "循环次数", "default": 1}
+			}
+		}
+	},
+	{
+		"name": "stop_pomodoro",
+		"description": "停止当前番茄钟",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "toggle_pomodoro_pause",
+		"description": "切换番茄钟的暂停/继续状态",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "set_work_duration",
+		"description": "设置番茄钟的工作时长",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"minutes": {"type": "integer", "description": "工作时间（分钟），必须大于 0"}
+			},
+			"required": ["minutes"]
+		}
+	},
+	{
+		"name": "set_rest_duration",
+		"description": "设置番茄钟的休息时长",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"minutes": {"type": "integer", "description": "休息时间（分钟），必须大于 0"}
+			},
+			"required": ["minutes"]
+		}
+	},
+	{
+		"name": "get_pomodoro_status",
+		"description": "获取番茄钟的完整运行状态",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "get_pomodoro_remaining_time",
+		"description": "获取番茄钟的剩余时间",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "set_time",
+		"description": "设置场景的时间模式（影响光照和天空）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"mode": {"type": "integer", "enum": [0, 1, 2, 3], "description": "时间模式：0=白天, 1=黄昏, 2=晚上, 3=同步系统时间"}
+			},
+			"required": ["mode"]
+		}
+	},
+	{
+		"name": "set_weather",
+		"description": "设置场景的天气效果",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"mode": {"type": "integer", "enum": [0, 1, 2, 3], "description": "天气模式：0=晴天, 1=雨天, 2=雪天, 3=同步系统"}
+			},
+			"required": ["mode"]
+		}
+	},
+	{
+		"name": "get_input_status",
+		"description": "查询前端输入框的当前状态（是否在生成、文本内容、附件等）",
+		"parameters": {"type": "object", "properties": {}}
+	},
+	{
+		"name": "set_input_text",
+		"description": "设置输入框的文本内容（用于建议或预填充输入）",
+		"parameters": {
+			"type": "object",
+			"properties": {
+				"text": {"type": "string", "description": "要设置的文本内容"}
+			},
+			"required": ["text"]
+		}
+	},
+	{
+		"name": "clear_input",
+		"description": "清空输入框中的所有文本",
+		"parameters": {"type": "object", "properties": {}}
+	}
+]

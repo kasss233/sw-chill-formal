@@ -1,29 +1,13 @@
 class_name ContextCollector extends Node
 ## 上下文收集器
-## 负责从各个模块收集当前状态信息，附加到 AI 请求中
+## 负责从各个 State 单例收集当前状态信息，附加到 AI 请求中
 ##
 ## 使用场景:
 ##   当用户发送消息时，自动收集任务完成情况、音乐状态、番茄钟状态等
 ##   让 AI 能够感知用户当前的工作状态，提供更智能的响应
-##
-## 扩展方式:
-##   1. 添加新的 _collect_xxx 方法
-##   2. 在 collect() 中调用新方法
-##   3. 如需自定义收集器，继承此类并重写相关方法
-##
-## 数据格式示例:
-##   {
-##     "timestamp": 1234567890,
-##     "tasks": { "total": 5, "completed": 2, "pending": 3 },
-##     "music": { "current_track": "song.mp3", "is_playing": true },
-##     "pomodoro": { "is_running": true, "is_work_mode": true, "remaining": 1500 }
-##   }
 
 ## 收集完成时发出
 signal collection_completed(context: Dictionary)
-
-## UI 节点路径（用于获取各模块引用）
-@export var ui_path: NodePath = "/root/Main/UI"
 
 ## 是否启用各项收集（可在编辑器中配置）
 @export_group("收集开关")
@@ -33,26 +17,11 @@ signal collection_completed(context: Dictionary)
 @export var collect_environment: bool = true
 @export var collect_notes: bool = false  ## 便签内容可能较大，默认关闭
 
-## 缓存的 UI 引用
-var _ui: Node = null
-
-
-func _ready() -> void:
-	# 延迟获取 UI 引用（确保场景树已就绪）
-	call_deferred("_cache_ui_reference")
-
-
-func _cache_ui_reference() -> void:
-	_ui = get_node_or_null(ui_path)
-	if not _ui:
-		push_warning("ContextCollector: 无法获取 UI 节点")
-
 
 ## 收集所有上下文信息
-## @return 上下文字典
 func collect() -> Dictionary:
 	var context: Dictionary = {
-		"timestamp": Time.get_unix_time_from_system(),
+		"timestamp": int(Time.get_unix_time_from_system()),
 		"datetime": Time.get_datetime_string_from_system()
 	}
 
@@ -76,57 +45,145 @@ func collect() -> Dictionary:
 
 
 ## 收集任务状态
-## @return 任务信息字典
 func _collect_tasks() -> Dictionary:
-	# TODO: 实现任务收集
-	# 预期返回: { total, completed, pending, recent_tasks[] }
-	return {}
+	var all = TaskState.get_all_tasks()
+	var incomplete = TaskState.get_incomplete_tasks()
+	var completed = TaskState.get_completed_tasks()
+	var overdue = TaskState.get_overdue_tasks()
+
+	var recent: Array = []
+	for t in incomplete.slice(0, 5):
+		var item: Dictionary = {"id": t.id, "title": t.title, "due_timestamp": t.due_timestamp}
+		recent.append(item)
+
+	return {
+		"total": all.size(),
+		"completed": completed.size(),
+		"pending": incomplete.size(),
+		"overdue": overdue.size(),
+		"recent_tasks": recent
+	}
 
 
 ## 收集音乐状态
-## @return 音乐信息字典
 func _collect_music() -> Dictionary:
-	# TODO: 实现音乐状态收集
-	# 预期返回: { current_track, is_playing, volume, play_mode }
-	return {}
+	return {
+		"current_track": MusicState.current_track,
+		"is_playing": MusicState.is_playing,
+		"play_mode": MusicState.play_mode,
+		"play_mode_name": MusicState.get_play_mode_name(),
+		"current_playlist": MusicState.current_playlist
+	}
 
 
 ## 收集番茄钟状态
-## @return 番茄钟信息字典
 func _collect_pomodoro() -> Dictionary:
-	# TODO: 实现番茄钟状态收集
-	# 预期返回: { is_running, is_paused, is_work_mode, remaining_seconds, current_loop }
-	return {}
+	if PomodoroState.is_active():
+		return PomodoroState.get_status()
+	return {"is_running": false}
 
 
 ## 收集环境状态
-## @return 环境信息字典
 func _collect_environment() -> Dictionary:
-	# TODO: 实现环境状态收集
-	# 预期返回: { time_mode, weather_mode }
-	return {}
+	return {
+		"time_mode": SettingState.get_time_mode(),
+		"weather_mode": SettingState.get_weather_mode()
+	}
 
 
-## 收集便签内容
-## @return 便签信息字典
+## 收集笔记/便签状态
 func _collect_notes() -> Dictionary:
-	# TODO: 实现便签收集
-	# 预期返回: { count, recent_notes[] }
-	return {}
+	var notes = NoteState.get_all_notes()
+	var recent: Array = []
+	for n in notes.slice(0, 5):
+		recent.append({"id": n.id, "title": n.title})
 
-
-## 获取 UI 引用（供子类使用）
-func _get_ui() -> Node:
-	if not _ui:
-		_ui = get_node_or_null(ui_path)
-	return _ui
+	return {
+		"count": notes.size(),
+		"sticky_count": StickyNoteState.get_count(),
+		"recent_notes": recent
+	}
 
 
 ## 格式化上下文为提示词片段
 ## 将收集的上下文转换为自然语言描述，可直接插入 system prompt
-## @param context 上下文字典
-## @return 格式化后的字符串
-func format_as_prompt(context: Dictionary) -> String:
-	# TODO: 实现上下文格式化
-	# 示例输出: "当前用户有 5 个任务，已完成 2 个。正在进行番茄钟工作阶段，剩余 15 分钟。"
-	return ""
+func format_as_prompt(context: Dictionary = {}) -> String:
+	if context.is_empty():
+		context = collect()
+
+	var parts: Array[String] = []
+
+	# 时间
+	if context.has("datetime"):
+		parts.append("当前时间: " + str(context["datetime"]))
+
+	# 任务
+	if context.has("tasks") and not context["tasks"].is_empty():
+		var tasks: Dictionary = context["tasks"]
+		var total: int = tasks.get("total", 0)
+		if total > 0:
+			var task_line = "任务: 共 %d 个，未完成 %d 个" % [total, tasks.get("pending", 0)]
+			var overdue_count: int = tasks.get("overdue", 0)
+			if overdue_count > 0:
+				task_line += "，逾期 %d 个" % overdue_count
+			parts.append(task_line)
+
+			# 列出最近的未完成任务
+			var recent: Array = tasks.get("recent_tasks", [])
+			for t in recent:
+				var item_text = "  - " + str(t.get("title", ""))
+				var due: int = t.get("due_timestamp", 0)
+				if due > 0:
+					var due_dict = Time.get_datetime_dict_from_unix_time(due)
+					item_text += "（截止: %d-%02d-%02d %02d:%02d）" % [
+						due_dict.get("year", 0), due_dict.get("month", 0), due_dict.get("day", 0),
+						due_dict.get("hour", 0), due_dict.get("minute", 0)
+					]
+				parts.append(item_text)
+
+	# 音乐
+	if context.has("music") and not context["music"].is_empty():
+		var music: Dictionary = context["music"]
+		if music.get("is_playing", false):
+			var mode_name: String = music.get("play_mode_name", "顺序播放")
+			parts.append("音乐: 正在播放 %s（%s）" % [music.get("current_track", "未知"), mode_name])
+		else:
+			if not music.get("current_track", "").is_empty():
+				parts.append("音乐: 已暂停（%s）" % music.get("current_track", ""))
+
+	# 番茄钟
+	if context.has("pomodoro") and not context["pomodoro"].is_empty():
+		var pomo: Dictionary = context["pomodoro"]
+		if pomo.get("is_running", false) or pomo.get("is_paused", false):
+			var mode_text = "工作" if pomo.get("is_work_mode", true) else "休息"
+			var remaining: int = pomo.get("remaining_seconds", 0)
+			var min_left: int = remaining / 60
+			var loop_text = "第 %d/%d 轮" % [pomo.get("current_loop", 1), pomo.get("total_loops", 1)]
+			if pomo.get("is_paused", false):
+				parts.append("番茄钟: %s阶段（已暂停），剩余 %d 分钟（%s）" % [mode_text, min_left, loop_text])
+			else:
+				parts.append("番茄钟: %s阶段，剩余 %d 分钟（%s）" % [mode_text, min_left, loop_text])
+
+	# 笔记
+	if context.has("notes") and not context["notes"].is_empty():
+		var notes: Dictionary = context["notes"]
+		var note_count: int = notes.get("count", 0)
+		var sticky_count: int = notes.get("sticky_count", 0)
+		if note_count > 0 or sticky_count > 0:
+			parts.append("笔记: %d 条笔记，%d 条便签" % [note_count, sticky_count])
+
+	# 环境
+	if context.has("environment") and not context["environment"].is_empty():
+		var env: Dictionary = context["environment"]
+		var time_names = ["白天", "黄昏", "夜晚", "同步系统"]
+		var weather_names = ["晴天", "雨天", "雪天", "同步系统"]
+		var time_mode: int = env.get("time_mode", 0)
+		var weather_mode: int = env.get("weather_mode", 0)
+		var time_text = time_names[time_mode] if time_mode < time_names.size() else "未知"
+		var weather_text = weather_names[weather_mode] if weather_mode < weather_names.size() else "未知"
+		parts.append("环境: %s / %s" % [time_text, weather_text])
+
+	if parts.is_empty():
+		return ""
+
+	return "[当前用户状态]\n" + "\n".join(parts)

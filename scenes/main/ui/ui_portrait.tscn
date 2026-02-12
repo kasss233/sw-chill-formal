@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/setting/setting.tscn" id="11_vbxtl"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="12_7rk1v"]
 [ext_resource type="PackedScene" uid="uid://bro0lt35ms0j1" path="res://scenes/main/ui/input_box/input_box.tscn" id="13_gfesi"]
-[ext_resource type="Script" uid="uid://b3d8t5hha36c1" path="res://scenes/main/ai_service/chat_controller.gd" id="14_k6c0a"]
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="15_kffqu"]
 [ext_resource type="PackedScene" uid="uid://b6bxw47hgr5em" path="res://scenes/main/ui/character_interactor/character_interactor.tscn" id="16_rugay"]
 [ext_resource type="PackedScene" uid="uid://daa0dvlkhliq6" path="res://scenes/main/ui/debug/test_panel.tscn" id="17_w75tq"]
@@ -52,7 +51,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="UI2" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "pomodoro_module", "dialogue_box", "input_box")]
+[node name="UI2" type="Control" unique_id=117400708 node_paths=PackedStringArray("music_module", "note_module", "note_book", "task_module", "pomodoro_module")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,8 +64,6 @@ note_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/Marg
 note_book = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/NoteBook")
 task_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/TaskModule")
 pomodoro_module = NodePath("MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule")
-dialogue_box = NodePath("MarginContainer/VBoxContainer/DialogueBox")
-input_box = NodePath("MarginContainer/VBoxContainer/InputBox")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1636200697]
 layout_mode = 1
@@ -133,11 +130,6 @@ layout_mode = 2
 
 [node name="EnvSetter" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/HBoxContainer" unique_id=1982143006 instance=ExtResource("11_vbxtl")]
 layout_mode = 2
-
-[node name="ChatController" type="Node" parent="." unique_id=1856388684 node_paths=PackedStringArray("input_box", "dialogue_box")]
-script = ExtResource("14_k6c0a")
-input_box = NodePath("../MarginContainer/VBoxContainer/InputBox")
-dialogue_box = NodePath("../MarginContainer/VBoxContainer/DialogueBox")
 
 [node name="CharacterInteractor" parent="." unique_id=1482575657 instance=ExtResource("16_rugay")]
 layout_mode = 0

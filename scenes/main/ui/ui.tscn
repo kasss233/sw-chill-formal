@@ -13,10 +13,8 @@
 [ext_resource type="Texture2D" uid="uid://elesx4e1jmm0" path="res://assets/ui/icons/note_stack_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="7_w2hwp"]
 [ext_resource type="PackedScene" uid="uid://o8cxkfnpu5ug" path="res://scenes/main/ui/note_module/note_module.tscn" id="8_3ru4j"]
 [ext_resource type="PackedScene" uid="uid://daa0dvlkhliq6" path="res://scenes/main/ui/debug/test_panel.tscn" id="8_test_panel"]
-[ext_resource type="PackedScene" uid="uid://bmsmfccv7kma" path="res://scenes/main/ui/notebook_module/note_book.tscn" id="9_uumow"]
 [ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="11_uypi5"]
 [ext_resource type="PackedScene" uid="uid://c8l76gjafw6xh" path="res://scenes/main/ui/notebook_mobile_module/NoteBookTab.tscn" id="12_w2hwp"]
-[ext_resource type="Script" uid="uid://b3d8t5hha36c1" path="res://scenes/main/ai_service/chat_controller.gd" id="14_tnos5"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="15_khr3h"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_hnkmo"]
@@ -27,7 +25,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_hnkmo")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_w2hwp"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uypi5"]
 shader = ExtResource("7_vb4k3")
 shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
@@ -41,10 +39,10 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(88, 336)
+shader_parameter/size = Vector2(88, 296)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tnos5"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -56,7 +54,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w2hwp"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -67,7 +65,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ru4j"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -78,7 +76,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uumow"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -89,7 +87,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rx81l"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -100,7 +98,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rv47i"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_87oeu"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -146,9 +144,9 @@ offset_bottom = 148.0
 grow_vertical = 2
 
 [node name="FrostedPanel" type="PanelContainer" parent="TabPanel" unique_id=1817169302]
-material = SubResource("ShaderMaterial_w2hwp")
+material = SubResource("ShaderMaterial_uypi5")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_3ru4j")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tnos5")
 script = ExtResource("3_hkhhe")
 corner_radius = 32.0
 blur_amount = 3.0
@@ -178,20 +176,17 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_uumow")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_djxf0")
-theme_override_styles/hover = SubResource("StyleBoxFlat_87oeu")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_rx81l")
-theme_override_styles/focus = SubResource("StyleBoxFlat_rv47i")
+theme_override_styles/normal = SubResource("StyleBoxFlat_w2hwp")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3ru4j")
+theme_override_styles/hover = SubResource("StyleBoxFlat_uumow")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_djxf0")
+theme_override_styles/focus = SubResource("StyleBoxFlat_87oeu")
 script = ExtResource("5_uypi5")
 states = Array[ExtResource("6_tnos5")]([SubResource("Resource_ln37o"), SubResource("Resource_mnnl2")])
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="NoteModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1774986962 instance=ExtResource("8_3ru4j")]
-layout_mode = 2
-
-[node name="NoteBook" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=356447481 instance=ExtResource("9_uumow")]
 layout_mode = 2
 
 [node name="PomodoroTechniqueModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=215700460 instance=ExtResource("11_uypi5")]
@@ -224,11 +219,6 @@ layout_mode = 2
 [node name="InputBox" parent="VBoxContainer" unique_id=374615679 instance=ExtResource("6_nswco")]
 layout_mode = 2
 size_flags_horizontal = 4
-
-[node name="ChatController" type="Node" parent="." unique_id=1856388684 node_paths=PackedStringArray("input_box", "dialogue_box")]
-script = ExtResource("14_tnos5")
-input_box = NodePath("../VBoxContainer/InputBox")
-dialogue_box = NodePath("../VBoxContainer/DialogueBox")
 
 [node name="MusicModule" parent="." unique_id=1778345012 instance=ExtResource("1_2q31f")]
 layout_mode = 1

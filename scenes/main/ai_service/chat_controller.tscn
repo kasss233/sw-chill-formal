@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://b3d8t5hha36c1" path="res://scenes/main/ai_service/chat_controller.gd" id="1_chat"]
+[ext_resource type="Script" uid="uid://cnl8g72d06ucg" path="res://scenes/main/ai_service/agent_executor.gd" id="2_agent"]
+[ext_resource type="Script" uid="uid://bta7qh77obvgy" path="res://scenes/main/ai_service/context_collector.gd" id="3_context"]
+[ext_resource type="Script" uid="uid://c3besiaqbi1eu" path="res://scenes/main/ai_service/tts_player.gd" id="4_tts"]
+
+[node name="ChatController" type="Node"]
+script = ExtResource("1_chat")
+
+[node name="AgentExecutor" type="Node" parent="."]
+script = ExtResource("2_agent")
+
+[node name="ContextCollector" type="Node" parent="."]
+script = ExtResource("3_context")
+
+[node name="TTSPlayer" type="Node" parent="."]
+script = ExtResource("4_tts")

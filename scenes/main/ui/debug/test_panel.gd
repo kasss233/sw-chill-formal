@@ -36,12 +36,7 @@ func _initialize_test_panels() -> void:
 		print("[TestPanel] 错误: UI未设置，无法初始化测试页")
 		return
 
-	# 初始化各测试页模块引用
-	for child in tab_container.get_children():
-		# 初始化InputBox测试页
-		if child.has_method("set_input_box") and ui.input_box:
-			child.set_input_box(ui.input_box)
-			print("[TestPanel] 已为 %s 设置InputBox引用" % child.name)
+	print("[TestPanel] 测试页初始化完成")
 
 ## 公共方法：切换到指定的测试页
 ## @param tab_name: Tab名称

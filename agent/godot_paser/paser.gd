@@ -560,17 +560,14 @@ func _start_focus_internal(focus_type: String, task_id: Variant) -> bool:
 	match focus_type:
 		"tomato":
 			# 番茄钟专注模式
-			if pomodoro_module != null:
-				# 默认25分钟工作，5分钟休息，1次循环
-				var success = pomodoro_module.agent_start_pomodoro(25, 5, 1)
-				if success:
-					print("[Parser] 成功启动番茄钟专注模式")
-					return true
-				else:
-					print("[Parser] 启动番茄钟专注模式失败")
-					return false
+			if pomodoro_module:
+				pomodoro_module.show_module()
+			var success = PomodoroState.agent_start_pomodoro(25, 5, 1)
+			if success:
+				print("[Parser] 成功启动番茄钟专注模式")
+				return true
 			else:
-				print("[Parser] 警告: 番茄钟模块不可用")
+				print("[Parser] 启动番茄钟专注模式失败")
 				return false
 		"free":
 			# 自由专注模式（待实现）
@@ -605,8 +602,8 @@ func _handle_end_focus(operation: Dictionary) -> Dictionary:
 func _end_focus_internal(focus_record_id: String) -> bool:
 	# 抽象层：本脚本内的处理方法
 	# 如果番茄钟正在运行，停止它
-	if pomodoro_module != null and pomodoro_module.agent_is_running():
-		return pomodoro_module.agent_stop()
+	if PomodoroState.agent_is_running():
+		return PomodoroState.agent_stop()
 	
 	# 专注模式结束功能待实现
 	print("[Parser] 警告: 结束专注模式功能未完全实现")
