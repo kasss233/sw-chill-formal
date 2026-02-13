@@ -19,7 +19,7 @@ const STARFIELD_NOISE: Texture2D = preload("res://addons/sky_3d/assets/textures/
 const CIRRUS_TEXTURE: Texture2D = preload("res://addons/sky_3d/assets/resources/SNoise.tres")
 const CUMULUS_TEXTURE: Texture2D = preload("res://addons/sky_3d/assets/textures/noiseClouds.png")
 const SUN_MOON_CURVE: Curve = preload("res://addons/sky_3d/assets/resources/SunMoonLightFade.tres")
-const DAY_NIGHT_TRANSITION_ANGLE: float = deg_to_rad(90)  # Horizon
+const DAY_NIGHT_TRANSITION_ANGLE: float = deg_to_rad(90) # Horizon
 
 var is_scene_built: bool = false
 var fog_mesh: MeshInstance3D
@@ -92,7 +92,7 @@ func _build_scene() -> void:
 	for prop in script.get_script_property_list():
 		if prop.usage & PROPERTY_USAGE_SCRIPT_VARIABLE and prop.usage & PROPERTY_USAGE_EDITOR:
 			var prop_name: String = prop.name
-			set(prop_name, get(prop_name))  # Triggers setter with current value
+			set(prop_name, get(prop_name)) # Triggers setter with current value
 
 
 #####################
@@ -133,21 +133,21 @@ func process_tick(delta: float) -> void:
 
 
 ## Controls the amount of tone mapping applied to bright areas of the sky. Higher values compress bright regions and increase contrast.
-@export_range(0.0, 1.0, 0.001) var tonemap_level: float = 0.0 :
+@export_range(0.0, 1.0, 0.001) var tonemap_level: float = 0.0:
 	set(value):
 		tonemap_level = value
 		_update_color_correction()
 
 
 ## Higher values make the sky brighter.
-@export var exposure: float = 1.0 :
+@export var exposure: float = 1.0:
 	set(value):
 		exposure = value
 		_update_color_correction()
 
 
 ## The color displayed below the horizon.
-@export var ground_color := Color(0.3, 0.3, 0.3, 1.0) :
+@export var ground_color := Color(0.3, 0.3, 0.3, 1.0):
 	set(value):
 		ground_color = value
 		if is_scene_built:
@@ -155,7 +155,7 @@ func process_tick(delta: float) -> void:
 
 
 ## Vertically shifts the horizon line up or down.
-@export var horizon_offset: float = 0.0 :
+@export var horizon_offset: float = 0.0:
 	set(value):
 		horizon_offset = value
 		if is_scene_built:
@@ -177,7 +177,7 @@ func _update_color_correction() -> void:
 
 
 ## Size of the sun disk.
-@export_range(0.0, 0.5, 0.001) var sun_disk_size: float = 0.02 :
+@export_range(0.0, 0.5, 0.001) var sun_disk_size: float = 0.02:
 	set(value):
 		sun_disk_size = value
 		if is_scene_built:
@@ -185,21 +185,21 @@ func _update_color_correction() -> void:
 
 
 ## Controls the horizontal direction of the sun in degrees. 0° is north, 90° is east, 180° is south, -90° is west.
-@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var sun_azimuth: float = deg_to_rad(0.) :
+@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var sun_azimuth: float = deg_to_rad(0.):
 	set(value):
 		sun_azimuth = value
 		_update_sun_coords()
 
 
 ## Controls the vertical angle of the sun in degrees. 0° is zenith (straight up), 90° is horizon, 180° is nadir (straight down).
-@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var sun_altitude: float = deg_to_rad(-27.387) :
+@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var sun_altitude: float = deg_to_rad(-27.387):
 	set(value):
 		sun_altitude = value
 		_update_sun_coords()
 
 
 ## The color of the sun disk when visible in the sky.
-@export var sun_disk_color := Color(0.996094, 0.541334, 0.140076) :
+@export var sun_disk_color := Color(0.996094, 0.541334, 0.140076):
 	set(value):
 		sun_disk_color = value
 		if is_scene_built:
@@ -207,7 +207,7 @@ func _update_color_correction() -> void:
 
 
 ## Higher values make the sun brighter.
-@export_range(0.0, 100.0) var sun_disk_intensity: float = 30.0 :
+@export_range(0.0, 100.0) var sun_disk_intensity: float = 30.0:
 	set(value):
 		sun_disk_intensity = value
 		if is_scene_built:
@@ -217,7 +217,7 @@ func _update_color_correction() -> void:
 var _day: bool = true
 var _sun_transform: Transform3D
 
-var sun_light_enabled: bool = true :
+var sun_light_enabled: bool = true:
 	set(value):
 		sun_light_enabled = value
 		if value:
@@ -277,28 +277,28 @@ var _sun_light_node: DirectionalLight3D
 
 
 ## Color of the sun DirectionalLight3D during midday
-@export var sun_light_color := Color.WHITE :
+@export var sun_light_color := Color.WHITE:
 	set(value):
 		sun_light_color = value
 		_update_sun_light_color()
 
 
 ## Color of the sun DirectionalLight3D during sunrise and sunset
-@export var sun_horizon_light_color := Color(.98, 0.523, 0.294, 1.0) :
+@export var sun_horizon_light_color := Color(.98, 0.523, 0.294, 1.0):
 	set(value):
 		sun_horizon_light_color = value
 		_update_sun_light_color()
 
 
 ## Maximum light energy of the sun DirectionalLight3D
-@export var sun_light_energy: float = 1.0 :
+@export var sun_light_energy: float = 1.0:
 	set(value):
 		sun_light_energy = value
 		_update_sun_light_energy()
 
 
 ## NodePath to the sun DirectionalLight3D node
-@export_node_path("DirectionalLight3D") var sun_light_path := NodePath("../SunLight") :
+@export_node_path("DirectionalLight3D") var sun_light_path := NodePath("../SunLight"):
 	set(value):
 		sun_light_path = value
 		if sun_light_path:
@@ -336,21 +336,21 @@ func _update_sun_light_energy() -> void:
 
 
 ## Horizontal angle of the moon
-@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var moon_azimuth: float = deg_to_rad(5.) :
+@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var moon_azimuth: float = deg_to_rad(5.):
 	set(value):
 		moon_azimuth = value
 		update_moon_coords()
 
 
 ## Vertical angle of the moon
-@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var moon_altitude: float = deg_to_rad(-80.) :
+@export_range(-180.0, 180.0, 0.00001, "radians_as_degrees") var moon_altitude: float = deg_to_rad(-80.):
 	set(value):
 		moon_altitude = value
 		update_moon_coords()
 
 
 ## Color tint applied to the moon surface texture.
-@export var moon_color := Color.WHITE :
+@export var moon_color := Color.WHITE:
 	set(value):
 		moon_color = value
 		if is_scene_built:
@@ -358,7 +358,7 @@ func _update_sun_light_energy() -> void:
 
 
 ## Larger values create a bigger moon.
-@export_range(0., .999) var moon_size: float = 0.07 :
+@export_range(0., .999) var moon_size: float = 0.07:
 	set(value):
 		moon_size = value
 		if is_scene_built:
@@ -366,28 +366,28 @@ func _update_sun_light_energy() -> void:
 
 
 ## The moon's surface texture
-@export var moon_texture: Texture2D = MOON_TEXTURE :
+@export var moon_texture: Texture2D = MOON_TEXTURE:
 	set(value):
 		moon_texture = value
 		_update_moon_texture()
 
 
 ## XYZ rotation angles for orienting the moon surface features
-@export_custom(PROPERTY_HINT_RANGE, "-180,180,0.1,radians_as_degrees") var moon_texture_alignment := Vector3(7.0, 1.4, 4.8) :
+@export_custom(PROPERTY_HINT_RANGE, "-180,180,0.1,radians_as_degrees") var moon_texture_alignment := Vector3(7.0, 1.4, 4.8):
 	set(value):
 		moon_texture_alignment = value
 		_update_moon_texture()
 
 
 ## Horizontally flips the moon texture
-@export var flip_moon_texture_u: bool = false :
+@export var flip_moon_texture_u: bool = false:
 	set(value):
 		flip_moon_texture_u = value
 		_update_moon_texture()
 
 
 ## Vertically flips the moon texture
-@export var flip_moon_texture_v: bool = false :
+@export var flip_moon_texture_v: bool = false:
 	set(value):
 		flip_moon_texture_v = value
 		_update_moon_texture()
@@ -447,14 +447,14 @@ func _update_moon_texture() -> void:
 
 
 ## Color of the moon DirectionalLight3D
-@export var moon_light_color := Color(0.572549, 0.776471, 0.956863, 1.0) :
+@export var moon_light_color := Color(0.572549, 0.776471, 0.956863, 1.0):
 	set(value):
 		moon_light_color = value
 		_update_moon_light_color()
 
 
 ## Maximum light energy of the moon DirectionalLight3D
-@export var moon_light_energy: float = 0.3 :
+@export var moon_light_energy: float = 0.3:
 	set(value):
 		moon_light_energy = value
 		_update_moon_light_energy()
@@ -490,7 +490,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## NodePath to the moon DirectionalLight3D node
-@export_node_path("DirectionalLight3D") var moon_light_path := NodePath("../MoonLight") :
+@export_node_path("DirectionalLight3D") var moon_light_path := NodePath("../MoonLight"):
 	set(value):
 		moon_light_path = value
 		if moon_light_path:
@@ -506,7 +506,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Affects the overall color of the sky and fog.
-@export var atm_wavelengths := Vector3(680.0, 550.0, 440.0) :
+@export var atm_wavelengths := Vector3(680.0, 550.0, 440.0):
 	set(value):
 		atm_wavelengths = value
 		if is_scene_built:
@@ -518,7 +518,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Higher values darken the atmosphere.
-@export_range(0.0, 1.0, 0.01) var atm_darkness: float = 0.5 :
+@export_range(0.0, 1.0, 0.01) var atm_darkness: float = 0.5:
 	set(value):
 		atm_darkness = value
 		if is_scene_built:
@@ -527,7 +527,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Higher values increase the sun's contribution to the atmosphere.
-@export var atm_sun_intensity: float = 18.0 :
+@export var atm_sun_intensity: float = 18.0:
 	set(value):
 		atm_sun_intensity = value
 		if is_scene_built:
@@ -536,7 +536,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Color tint applied to the daytime sky atmosphere.
-@export var atm_day_tint := Color(0.807843, 0.909804, 1.0) :
+@export var atm_day_tint := Color(0.807843, 0.909804, 1.0):
 	set(value):
 		atm_day_tint = value
 		if is_scene_built:
@@ -545,7 +545,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Color tint applied to atmosphere during sunrise and sunset.
-@export var atm_horizon_light_tint := Color(0.980392, 0.635294, 0.462745, 1.0) :
+@export var atm_horizon_light_tint := Color(0.980392, 0.635294, 0.462745, 1.0):
 	set(value):
 		atm_horizon_light_tint = value
 		if is_scene_built:
@@ -555,21 +555,21 @@ func _update_moon_light_energy() -> void:
 
 ## Use moon phase angle for night-time Mie scattering intensity instead of the sun position.
 ## Enabling this will prevent the moon from scattering light into the fog and sky atmosphere.
-@export var atm_enable_moon_scatter_mode: bool = false :
+@export var atm_enable_moon_scatter_mode: bool = false:
 	set(value):
 		atm_enable_moon_scatter_mode = value
 		_update_night_intensity()
 
 
 ## Color tint applied to the nighttime atmosphere
-@export var atm_night_tint := Color(0.168627, 0.2, 0.25098, 1.0) :
+@export var atm_night_tint := Color(0.168627, 0.2, 0.25098, 1.0):
 	set(value):
 		atm_night_tint = value
 		_update_night_intensity()
 
 
 ## Higher values create stronger atmospheric effects.
-@export_range(0.0, 100.0, 0.01) var atm_thickness: float = 0.7 :
+@export_range(0.0, 100.0, 0.01) var atm_thickness: float = 0.7:
 	set(value):
 		atm_thickness = value
 		if is_scene_built:
@@ -578,21 +578,21 @@ func _update_moon_light_energy() -> void:
 
 
 ## Sets the Mie scattering: the haze and white light diffusion around the sun.
-@export var atm_mie: float = 0.07 :
+@export var atm_mie: float = 0.07:
 	set(value):
 		atm_mie = value
 		_update_beta_mie()
 
 
 ## Sets the multiplier for [member atm_mie].
-@export var atm_turbidity: float = 0.001 :
+@export var atm_turbidity: float = 0.001:
 	set(value):
 		atm_turbidity = value
 		_update_beta_mie()
 
 
 ## Color tint of the Mie scattering around the sun.
-@export var atm_sun_mie_tint := Color(1.0, 1.0, 1.0, 1.0) :
+@export var atm_sun_mie_tint := Color(1.0, 1.0, 1.0, 1.0):
 	set(value):
 		atm_sun_mie_tint = value
 		if is_scene_built:
@@ -601,7 +601,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Sets the intensity of the Mie scattering around the sun.
-@export var atm_sun_mie_intensity: float = 1.0 :
+@export var atm_sun_mie_intensity: float = 1.0:
 	set(value):
 		atm_sun_mie_intensity = value
 		if is_scene_built:
@@ -610,7 +610,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Controls the directional bias (shape) of the Mie scattering around the sun.
-@export_range(0.0, 0.9999999, 0.0000001) var atm_sun_mie_anisotropy: float = 0.8 :
+@export_range(0.0, 0.9999999, 0.0000001) var atm_sun_mie_anisotropy: float = 0.8:
 	set(value):
 		atm_sun_mie_anisotropy = value
 		if is_scene_built:
@@ -620,7 +620,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Color tint for Mie scattering around the moon.
-@export var atm_moon_mie_tint := Color(0.137255, 0.184314, 0.292196) :
+@export var atm_moon_mie_tint := Color(0.137255, 0.184314, 0.292196):
 	set(value):
 		atm_moon_mie_tint = value
 		if is_scene_built:
@@ -629,7 +629,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Sets the intensity of the Mie scattering around the moon.
-@export var atm_moon_mie_intensity: float = 0.7 :
+@export var atm_moon_mie_intensity: float = 0.7:
 	set(value):
 		atm_moon_mie_intensity = value
 		if is_scene_built:
@@ -638,7 +638,7 @@ func _update_moon_light_energy() -> void:
 
 
 ## Controls the directional bias (shape) of the Mie scattering around the moon.
-@export_range(0.0, 0.9999999, 0.0000001) var atm_moon_mie_anisotropy: float = 0.8 : 
+@export_range(0.0, 0.9999999, 0.0000001) var atm_moon_mie_anisotropy: float = 0.8:
 	set(value):
 		atm_moon_mie_anisotropy = value
 		if is_scene_built:
@@ -651,7 +651,7 @@ func _update_moon_light_energy() -> void:
 ## X scales the height of Mie scattering layers (haze closer to the ground)
 ## Y scales Rayleigh scattering layers (bluer sky higher up)
 ## Z acts as a ground-level offset to adjust where the atmosphere "starts" relative to the horizon.
-@export var atm_level_params := Vector3(1.0, 0.0, 0.0) :
+@export var atm_level_params := Vector3(1.0, 0.0, 0.0):
 	set(value):
 		atm_level_params = value
 		if is_scene_built:
@@ -698,7 +698,7 @@ func _update_beta_mie() -> void:
 
 
 ## Set the fog's visibility
-@export var fog_visible: bool = true: 
+@export var fog_visible: bool = true:
 	set(value):
 		fog_visible = value
 		if is_scene_built:
@@ -706,7 +706,7 @@ func _update_beta_mie() -> void:
 
 
 ## Applies an exponential decay to fog density along the view ray, softening the transition from clear to foggy areas—lower values create sharp cutoffs for localized mist, higher for gradual blending into the distance.
-@export_range(0.0, 50.0, .01, "or_greater") var fog_falloff: float = 3.0 :
+@export_range(0.0, 50.0, .01, "or_greater") var fog_falloff: float = 3.0:
 	set(value):
 		fog_falloff = value
 		if is_scene_built:
@@ -714,7 +714,7 @@ func _update_beta_mie() -> void:
 
 
 ## Set the fog's density
-@export_exp_easing() var fog_density: float = 0.0007 :
+@export_exp_easing() var fog_density: float = 0.0007:
 	set(value):
 		fog_density = value
 		if is_scene_built:
@@ -722,7 +722,7 @@ func _update_beta_mie() -> void:
 
 
 ## Distance from the camera where fog begins to appear.
-@export_range(0.0, 5000.0) var fog_start: float = 0.0 :
+@export_range(0.0, 5000.0) var fog_start: float = 0.0:
 	set(value):
 		fog_start = value
 		if is_scene_built:
@@ -730,7 +730,7 @@ func _update_beta_mie() -> void:
 
 
 ## Distance from the camera where fog reaches maximum thickness.
-@export_range(0.0, 5000.0) var fog_end: float = 1000.0 :
+@export_range(0.0, 5000.0) var fog_end: float = 1000.0:
 	set(value):
 		fog_end = value
 		if is_scene_built:
@@ -739,7 +739,7 @@ func _update_beta_mie() -> void:
 
 ## Scales the Rayleigh (blue sky) component in fog's optical depth calculation, controlling how much
 ## scattering accumulates in distant fog.
-@export_exp_easing() var fog_rayleigh_depth: float = 0.115 :
+@export_exp_easing() var fog_rayleigh_depth: float = 0.115:
 	set(value):
 		fog_rayleigh_depth = value
 		if is_scene_built:
@@ -747,7 +747,7 @@ func _update_beta_mie() -> void:
 
 
 ## Adjusts the Mie (hazy around the sun/moon) depth in the fog.
-@export_exp_easing() var fog_mie_depth: float = 0.0001 :
+@export_exp_easing() var fog_mie_depth: float = 0.0001:
 	set(value):
 		fog_mie_depth = value
 		if is_scene_built:
@@ -755,7 +755,7 @@ func _update_beta_mie() -> void:
 
 
 ## Similar to [member atm_level_params] but for the fog shader.
-@export var fog_atm_level_params_offset := Vector3(0.0, 0.0, -1.0) :
+@export var fog_atm_level_params_offset := Vector3(0.0, 0.0, -1.0):
 	set(value):
 		fog_atm_level_params_offset = value
 		if is_scene_built:
@@ -763,7 +763,7 @@ func _update_beta_mie() -> void:
 
 
 ## Sets the rendering layers the screen space fog mesh renders on. See [VisualInstance3D.layers].
-@export_flags_3d_render var fog_layers: int = 524288 :
+@export_flags_3d_render var fog_layers: int = 524288:
 	set(value):
 		fog_layers = value
 		if is_scene_built:
@@ -771,7 +771,7 @@ func _update_beta_mie() -> void:
 
 
 ## Set the fog's render priority
-@export var fog_render_priority: int = 100 :
+@export var fog_render_priority: int = 100:
 	set(value):
 		fog_render_priority = value
 		if is_scene_built:
@@ -805,7 +805,7 @@ var _cumulus_position := Vector2.ZERO
 # Note that "realistic" is an estimate as there is no such thing as an altitude for these clouds.
 const WIND_SPEED_FACTOR: float = 0.01
 ## Sets the wind speed.
-@export_custom(PROPERTY_HINT_RANGE, "0,120,0.1,or_greater,or_less,suffix:m/s") var wind_speed: float = 1.0 :
+@export_custom(PROPERTY_HINT_RANGE, "0,120,0.1,or_greater,or_less,suffix:m/s") var wind_speed: float = 1.0:
 	set(value):
 		_cloud_speed = value * WIND_SPEED_FACTOR
 		_check_cloud_processing()
@@ -818,7 +818,7 @@ const WIND_SPEED_FACTOR: float = 0.01
 const WIND_DIRECTION_OFFSET: float = deg_to_rad(-90)
 ## Sets the wind direction. Zero means the wind is coming from the north, 90 from the east,
 ## 180 from the south and 270 (or -90) from the west.
-@export_custom(PROPERTY_HINT_RANGE, "-180,180,0.1,radians_as_degrees") var wind_direction: float = 0.0 :
+@export_custom(PROPERTY_HINT_RANGE, "-180,180,0.1,radians_as_degrees") var wind_direction: float = 0.0:
 	set(value):
 		wind_direction = value
 		_cloud_direction = Vector2.from_angle(value + WIND_DIRECTION_OFFSET)
@@ -844,14 +844,14 @@ const WIND_DIRECTION_OFFSET: float = deg_to_rad(-90)
 ## * Set negative to make the cirrus clouds move backwards, which is a real phenomenon called wind shear.[br]
 ## Finally, you can adjust [member cirrus_size] and [member cumulus_size] to adjust the scale of the 
 ## cloud noise map UVs, which has the effect of changing apparent height and speed. 
-@export_range(0.,1.,.01, "or_greater","or_less") var cirrus_speed_reduction: float = 0.2
+@export_range(0., 1., .01, "or_greater", "or_less") var cirrus_speed_reduction: float = 0.2
 
 
-enum { PHYSICS_PROCESS, PROCESS, MANUAL }
+enum {PHYSICS_PROCESS, PROCESS, MANUAL}
 ## Sky3D is updated in two parts. The sky, sun, moon, and stars are updated by the
 ## [member TimeOfDay.update_interval] timer. Cloud movement is updated by this method: your choice of
 ## _physics_process(), _process(), or by manually calling [method process_tick].
-@export_enum("Physics Process", "Process", "Manual") var process_method: int = PHYSICS_PROCESS :
+@export_enum("Physics Process", "Process", "Manual") var process_method: int = PHYSICS_PROCESS:
 	set(value):
 		process_method = value
 		_check_cloud_processing()
@@ -880,7 +880,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Toggles visibility of high-altitude cirrus clouds.
-@export var cirrus_visible: bool = true :
+@export var cirrus_visible: bool = true:
 	set(value):
 		cirrus_visible = value
 		if is_scene_built:
@@ -889,7 +889,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Set density for cirrus clouds.
-@export var cirrus_thickness: float = 1.7 :
+@export var cirrus_thickness: float = 1.7:
 	set(value):
 		cirrus_thickness = value
 		if is_scene_built:
@@ -897,7 +897,7 @@ func _check_cloud_processing() -> void:
 
 
 ## How much of the sky is covered by cirrus clouds.
-@export_range(0.0, 1.0, 0.001) var cirrus_coverage: float = 0.5 :
+@export_range(0.0, 1.0, 0.001) var cirrus_coverage: float = 0.5:
 	set(value):
 		cirrus_coverage = value
 		if is_scene_built:
@@ -905,7 +905,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Higher values create more opaque clouds.
-@export var cirrus_absorption: float = 2.0 :
+@export var cirrus_absorption: float = 2.0:
 	set(value):
 		cirrus_absorption = value
 		if is_scene_built:
@@ -913,7 +913,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Blends the sky's atmospheric color into cirrus clouds.
-@export_range(0.0, 1.0, 0.001) var cirrus_sky_tint_fade: float = 0.5 :
+@export_range(0.0, 1.0, 0.001) var cirrus_sky_tint_fade: float = 0.5:
 	set(value):
 		cirrus_sky_tint_fade = value
 		if is_scene_built:
@@ -921,15 +921,23 @@ func _check_cloud_processing() -> void:
 
 
 ## Adjusts the brightness of cirrus clouds. If covering the sky, this has a dramatic affect on lighting.
-@export var cirrus_intensity: float = 10.0 :
+@export var cirrus_intensity: float = 10.0:
 	set(value):
 		cirrus_intensity = value
 		if is_scene_built:
 			sky_material.set_shader_parameter("cirrus_intensity", cirrus_intensity)
 
 
+## Adjusts the brightness of cirrus clouds at night.
+@export var cirrus_intensity_night: float = 1.0:
+	set(value):
+		cirrus_intensity_night = value
+		if is_scene_built:
+			sky_material.set_shader_parameter("cirrus_intensity_night", cirrus_intensity_night)
+
+
 ## The noise texture used for generating cirrus cloud patterns.
-@export var cirrus_texture: Texture2D = CIRRUS_TEXTURE :
+@export var cirrus_texture: Texture2D = CIRRUS_TEXTURE:
 	set(value):
 		cirrus_texture = value
 		if is_scene_built:
@@ -937,7 +945,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Sets the aspect ratio of the cirrus texture used for the clouds.
-@export var cirrus_uv := Vector2(0.16, 0.11) :
+@export var cirrus_uv := Vector2(0.16, 0.11):
 	set(value):
 		cirrus_uv = value
 		if is_scene_built:
@@ -946,7 +954,7 @@ func _check_cloud_processing() -> void:
 
 ## Adjusts the scale of the noise texture, which indirectly affects the apparent height and 
 ## speed of the clouds. Use it with [member cirrus_speed_reduction] to refine cirrus speed and height.
-@export var cirrus_size: float = 1.0 :
+@export var cirrus_size: float = 1.0:
 	set(value):
 		cirrus_size = value
 		if is_scene_built:
@@ -961,7 +969,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Toggles visibility of the low-altitude cumulus clouds.
-@export var cumulus_visible: bool = true :
+@export var cumulus_visible: bool = true:
 	set(value):
 		cumulus_visible = value
 		if is_scene_built:
@@ -970,7 +978,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The daytime color tint for the cumulus clouds.
-@export var cumulus_day_color := Color(0.823529, 0.87451, 1.0, 1.0) :
+@export var cumulus_day_color := Color(0.823529, 0.87451, 1.0, 1.0):
 	set(value):
 		cumulus_day_color = value
 		if is_scene_built:
@@ -979,7 +987,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The warm color tint for the cumulus clouds during sunrise and sunset.
-@export var cumulus_horizon_light_color := Color(.98, 0.43, 0.15, 1.0) :
+@export var cumulus_horizon_light_color := Color(.98, 0.43, 0.15, 1.0):
 	set(value):
 		cumulus_horizon_light_color = value
 		if is_scene_built:
@@ -988,7 +996,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The nighttime color tint for the cumulus clouds.
-@export var cumulus_night_color := Color(0.090196, 0.094118, 0.129412, 1.0) :
+@export var cumulus_night_color := Color(0.090196, 0.094118, 0.129412, 1.0):
 	set(value):
 		cumulus_night_color = value
 		if is_scene_built:
@@ -997,7 +1005,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Controls the vertical depth and layering thickness of the cumulus clouds.
-@export var cumulus_thickness: float = 0.0243 :
+@export var cumulus_thickness: float = 0.0243:
 	set(value):
 		cumulus_thickness = value
 		if is_scene_built:
@@ -1005,7 +1013,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Sets how much of the sky is covered by the cumulus clouds.
-@export_range(0.0, 1.0, 0.001) var cumulus_coverage: float = 0.55 :
+@export_range(0.0, 1.0, 0.001) var cumulus_coverage: float = 0.55:
 	set(value):
 		cumulus_coverage = value
 		if is_scene_built:
@@ -1013,7 +1021,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Adjusts light absorption inside the cumulus clouds, increasing opacity and internal shadows for denser, more realistic volumes.
-@export var cumulus_absorption: float = 2.0 :
+@export var cumulus_absorption: float = 2.0:
 	set(value):
 		cumulus_absorption = value
 		if is_scene_built:
@@ -1021,7 +1029,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Changes the frequency of noise in the cumulus cloud generation; higher values create clouds with more detail.
-@export_range(0.0, 3.0, 0.001) var cumulus_noise_freq: float = 2.7 :
+@export_range(0.0, 3.0, 0.001) var cumulus_noise_freq: float = 2.7:
 	set(value):
 		cumulus_noise_freq = value
 		if is_scene_built:
@@ -1029,7 +1037,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Adjusts the brightness of cumulus clouds. If covering the sky, this has a dramatic affect on lighting.
-@export_range(0, 16, 0.005) var cumulus_intensity: float = 0.6 :
+@export_range(0, 16, 0.005) var cumulus_intensity: float = 0.6:
 	set(value):
 		cumulus_intensity = value
 		if is_scene_built:
@@ -1037,7 +1045,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Controls the strength of hazy light scattering around the cumulus clouds from the sun and moon, enhancing glow and diffusion near edges.
-@export var cumulus_mie_intensity: float = 1.0 :
+@export var cumulus_mie_intensity: float = 1.0:
 	set(value):
 		cumulus_mie_intensity = value
 		if is_scene_built:
@@ -1046,7 +1054,7 @@ func _check_cloud_processing() -> void:
 
 ## Sets the directionality of Mie scattering in cumulus clouds; low values spread light evenly (like fog),
 ## while high values focus it forward (like sharp haze beams through gaps).
-@export_range(0.0, 0.9999999, 0.0000001) var cumulus_mie_anisotropy: float = 0.206 :
+@export_range(0.0, 0.9999999, 0.0000001) var cumulus_mie_anisotropy: float = 0.206:
 	set(value):
 		cumulus_mie_anisotropy = value
 		if is_scene_built:
@@ -1055,7 +1063,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The noise texture used for generating cumulus cloud patterns.
-@export var cumulus_texture: Texture2D = CUMULUS_TEXTURE :
+@export var cumulus_texture: Texture2D = CUMULUS_TEXTURE:
 	set(value):
 		cumulus_texture = value
 		if is_scene_built:
@@ -1064,7 +1072,7 @@ func _check_cloud_processing() -> void:
 
 ## This parameter adjusts the scale of the noise texture, which indirectly affects the apparent height and 
 ## speed of the clouds.
-@export var cumulus_size: float = 0.5 :
+@export var cumulus_size: float = 0.5:
 	set(value):
 		cumulus_size = value
 		if is_scene_built:
@@ -1079,7 +1087,7 @@ func _check_cloud_processing() -> void:
 
 
 ## For aligning the star map texture map to known reference points. See [annotation SkyDome.show_alignment_lasers].
-@export var starmap_alignment := Vector3(2.68288, -0.25891, 0.40101) :
+@export var starmap_alignment := Vector3(2.68288, -0.25891, 0.40101):
 	set(value):
 		starmap_alignment = value
 		if sky_material:
@@ -1088,7 +1096,7 @@ func _check_cloud_processing() -> void:
 
 ## Offset value for realigning the sky's rotation if using a datetime too many years off from the "epoch" of 20 March 2025.[br][br]
 ## [b]Temporary; will eventually be removed in a future update.[/b]
-@export var star_rotation_offset: float = 9.38899 :
+@export var star_rotation_offset: float = 9.38899:
 	set(value):
 		star_rotation_offset = value
 		if sky_material:
@@ -1096,21 +1104,21 @@ func _check_cloud_processing() -> void:
 
 
 ## Flips the star map texture's U. Useful if the imported texture is backwards or upside down.
-@export var starmap_flip_u: bool = false :
+@export var starmap_flip_u: bool = false:
 	set(value):
 		starmap_flip_u = value
 		sky_material.set_shader_parameter("starmap_flip_u", value)
 
 
 ## Flips the star map texture's V. Useful if the imported texture is backwards or upside down.
-@export var starmap_flip_v: bool = false :
+@export var starmap_flip_v: bool = false:
 	set(value):
 		starmap_flip_v = value
 		sky_material.set_shader_parameter("starmap_flip_v", value)
 
 
 ## Color tint applied to the background starmap
-@export var starmap_color := Color(0.709804, 0.709804, 0.709804, 0.854902) :
+@export var starmap_color := Color(0.709804, 0.709804, 0.709804, 0.854902):
 	set(value):
 		starmap_color = value
 		if is_scene_built:
@@ -1118,7 +1126,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The panoramic texture for the stars and constellation background.
-@export var starmap_texture: Texture2D = STARMAP_TEXTURE :
+@export var starmap_texture: Texture2D = STARMAP_TEXTURE:
 	set(value):
 		starmap_texture = value
 		if is_scene_built:
@@ -1126,7 +1134,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The color tint for scattered individual stars.
-@export var star_field_color := Color.WHITE :
+@export var star_field_color := Color.WHITE:
 	set(value):
 		star_field_color = value
 		if is_scene_built:
@@ -1134,7 +1142,7 @@ func _check_cloud_processing() -> void:
 
 
 ## The texture for rendering stars that will scintillate.
-@export var star_field_texture: Texture2D = STARFIELD_TEXTURE :
+@export var star_field_texture: Texture2D = STARFIELD_TEXTURE:
 	set(value):
 		star_field_texture = value
 		if is_scene_built:
@@ -1142,7 +1150,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Controls the intensity of the simulated star "twinkling".
-@export_range(0.0, 1.0, 0.001) var star_scintillation: float = 0.75 :
+@export_range(0.0, 1.0, 0.001) var star_scintillation: float = 0.75:
 	set(value):
 		star_scintillation = value
 		if is_scene_built:
@@ -1150,7 +1158,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Adjusts the speed at which the texture used for star "twinkling" moves across the star map textures.
-@export var star_scintillation_speed: float = 0.01 :
+@export var star_scintillation_speed: float = 0.01:
 	set(value):
 		star_scintillation_speed = value
 		if is_scene_built:
@@ -1165,7 +1173,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Overlays a grid aligned to the horizon and the sky zenith.
-@export var show_azimuthal_grid: bool = false :
+@export var show_azimuthal_grid: bool = false:
 	set(value):
 		if is_scene_built:
 			show_azimuthal_grid = value
@@ -1181,7 +1189,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Rotation offset for azimuthal grid.
-@export_range(0.0, 1.0, 0.001) var azimuthal_grid_rotation_offset: float = 0.03 :
+@export_range(0.0, 1.0, 0.001) var azimuthal_grid_rotation_offset: float = 0.03:
 	set(value):
 		azimuthal_grid_rotation_offset = value
 		if sky_material:
@@ -1189,7 +1197,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Overlays a grid aligned to the celestial equator and the north celestial pole (near Polaris).
-@export var show_equatorial_grid: bool = false :
+@export var show_equatorial_grid: bool = false:
 	set(value):
 		if is_scene_built:
 			show_equatorial_grid = value
@@ -1197,7 +1205,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Color for equatorial coordinate grid lines.
-@export var equatorial_grid_color := Color(.0, .75, 1.) :
+@export var equatorial_grid_color := Color(.0, .75, 1.):
 	set(value):
 		if is_scene_built:
 			equatorial_grid_color = value
@@ -1205,7 +1213,7 @@ func _check_cloud_processing() -> void:
 
 
 ## Rotation offset for equatorial grid.
-@export_range(0.0, 1.0, 0.001) var equatorial_grid_rotation_offset: float = 0.03 :
+@export_range(0.0, 1.0, 0.001) var equatorial_grid_rotation_offset: float = 0.03:
 	set(value):
 		equatorial_grid_rotation_offset = value
 		if sky_material:
@@ -1216,8 +1224,8 @@ func _check_cloud_processing() -> void:
 # This is counter to traditional math where "azimuth" would increase going counter-clockwise.
 # When inputting a star's known azimuth, it should be subtracted from 360 to map it to Godot's coordinates
 # and avoid negative angles. 
-const POLARIS_LASER_ALIGNMENT := Vector3(89.3707, 48.2213, 0.0)  # Real-world azimuth is 311.7787.
-const VEGA_LASER_ALIGNMENT := Vector3(38.8, 281.666, 0.0)  # Real-world azimuth is 78.334.
+const POLARIS_LASER_ALIGNMENT := Vector3(89.3707, 48.2213, 0.0) # Real-world azimuth is 311.7787.
+const VEGA_LASER_ALIGNMENT := Vector3(38.8, 281.666, 0.0) # Real-world azimuth is 78.334.
 const LASER_COLOR := Color(1.0, 0.0, 0.0, 1.0)
 var _polaris_laser: MeshInstance3D
 var _vega_laser: MeshInstance3D
@@ -1235,7 +1243,7 @@ var _laser_material: StandardMaterial3D
 ## · Use View / 2 Viewports to see both lasers simultaneously.[br]
 ## · Position the editor cameras near the origin point as perspective may throw off adjustments.[br]
 ## · Not all texture maps are created equal. Distortions may result in alignments being slightly off no matter what.
-@export var show_alignment_lasers: bool = false :
+@export var show_alignment_lasers: bool = false:
 	set(value):
 		show_alignment_lasers = value
 		
