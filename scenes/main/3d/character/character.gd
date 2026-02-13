@@ -117,6 +117,11 @@ func _is_in_idle() -> bool:
 	return _get_current_action_node() == &"idle"
 
 
+func _can_trigger_one_shot_action() -> bool:
+	# 约束：除 typing 外，其它动作仅允许在 idle 状态触发
+	return action_playback != null and _is_in_idle()
+
+
 func _cancel_idle_variation() -> void:
 	_idle_variation_token += 1
 	_idle_variation_scheduled = false
@@ -245,37 +250,55 @@ func set_typing_pose():
 		action_playback.travel("typing")
 ## 以下动作都是一次性动作，播放完会自动回到idle
 func set_clap_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("clap")
 	set_happy()
 func set_think_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("think")
 	set_angry()
 func set_cheer_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("cheer")
 	set_happy()
 func set_watch_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("watch")
 	set_neutral()
 func set_greet_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("greet")
 	set_happy()
 func set_surprised_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("surprised")
 	set_surprised()
 func set_disbelief_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("disbelief")
 	set_sad()
 func set_stretch_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("stretch")
 func set_stretch2_pose():
+	if not _can_trigger_one_shot_action():
+		return
 	if action_playback:
 		action_playback.travel("stretch2")
 

@@ -6,12 +6,15 @@ extends Node
 
 # --- UI 通知信号 ---
 signal pomodoro_started(data: Dictionary)
-signal pomodoro_stopped
-signal pomodoro_paused
-signal pomodoro_continued
+signal work_phase_stopped
+signal work_phase_paused
+signal work_phase_continued
 signal work_phase_started
-signal rest_phase_started
 signal work_phase_completed
+signal rest_phase_stopped
+signal rest_phase_paused
+signal rest_phase_continued
+signal rest_phase_started
 signal rest_phase_completed
 signal tick(remaining_seconds: int, total_seconds: int, progress: float, is_work_mode: bool)
 signal loop_completed(current_loop: int, total_loops: int)
@@ -68,18 +71,27 @@ func toggle_pause() -> void:
 	if is_running:
 		_timer.stop()
 		is_running = false
-		pomodoro_paused.emit()
+		if is_work_mode:
+			work_phase_paused.emit()
+		else:
+			rest_phase_paused.emit()
 	elif remaining_seconds > 0:
 		_timer.start()
 		is_running = true
-		pomodoro_continued.emit()
+		if is_work_mode:
+			work_phase_continued.emit()
+		else:
+			rest_phase_continued.emit()
 
 
 func stop() -> void:
 	_timer.stop()
 	_reset_state()
 	print("[PomodoroState] 已停止")
-	pomodoro_stopped.emit()
+	if is_work_mode:
+		work_phase_stopped.emit()
+	else:
+		rest_phase_stopped.emit()
 
 
 func set_work_duration(minutes: int) -> void:

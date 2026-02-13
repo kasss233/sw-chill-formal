@@ -35,25 +35,25 @@ func _connect_signals() -> void:
 		if not SettingState.env_weather_changed.is_connected(_on_env_weather_changed):
 			SettingState.env_weather_changed.connect(_on_env_weather_changed)
 	
-	if PomodoroState and PomodoroState.has_signal("work_started"):
-		if not PomodoroState.work_started.is_connected(_on_work_started):
-			PomodoroState.work_started.connect(_on_work_started)
+	if PomodoroState and PomodoroState.has_signal("work_phase_started"):
+		if not PomodoroState.work_phase_started.is_connected(_on_work_phase_started):
+			PomodoroState.work_phase_started.connect(_on_work_phase_started)
 	
-	if PomodoroState and PomodoroState.has_signal("work_completed"):
-		if not PomodoroState.work_completed.is_connected(_on_work_completed):
-			PomodoroState.work_completed.connect(_on_work_completed)
+	if PomodoroState and PomodoroState.has_signal("work_phase_completed"):
+		if not PomodoroState.work_phase_completed.is_connected(_on_work_phase_completed):
+			PomodoroState.work_phase_completed.connect(_on_work_phase_completed)
 	
-	if PomodoroState and PomodoroState.has_signal("work_paused"):
-		if not PomodoroState.work_paused.is_connected(_on_work_paused):
-			PomodoroState.work_paused.connect(_on_work_paused)
+	if PomodoroState and PomodoroState.has_signal("work_phase_paused"):
+		if not PomodoroState.work_phase_paused.is_connected(_on_work_phase_paused):
+			PomodoroState.work_phase_paused.connect(_on_work_phase_paused)
 	
-	if PomodoroState and PomodoroState.has_signal("work_stopped"):
-		if not PomodoroState.work_stopped.is_connected(_on_work_stopped):
-			PomodoroState.work_stopped.connect(_on_work_stopped)
+	if PomodoroState and PomodoroState.has_signal("work_phase_stopped"):
+		if not PomodoroState.work_phase_stopped.is_connected(_on_work_phase_stopped):
+			PomodoroState.work_phase_stopped.connect(_on_work_phase_stopped)
 	
-	if PomodoroState and PomodoroState.has_signal("work_continued"):
-		if not PomodoroState.work_continued.is_connected(_on_work_continued):
-			PomodoroState.work_continued.connect(_on_work_continued)
+	if PomodoroState and PomodoroState.has_signal("work_phase_continued"):
+		if not PomodoroState.work_phase_continued.is_connected(_on_work_phase_continued):
+			PomodoroState.work_phase_continued.connect(_on_work_phase_continued)
 	if TaskState and TaskState.has_signal("task_completed"):
 		if not TaskState.task_completed.is_connected(_on_task_completed):
 			TaskState.task_completed.connect(_on_task_completed)
@@ -136,23 +136,23 @@ func _on_env_weather_changed(mode: int) -> void:
 
 func _on_character_interacted() -> void:
 	character.set_surprised_pose()
-func _on_work_completed() -> void:
+func _on_work_phase_completed() -> void:
 	character.set_idle_pose()
 
 
-func _on_work_started() -> void:
+func _on_work_phase_started() -> void:
 	character.set_typing_pose()
 
 
-func _on_work_paused() -> void:
+func _on_work_phase_paused() -> void:
 	character.set_idle_pose()
 
 
-func _on_work_stopped() -> void:
+func _on_work_phase_stopped() -> void:
 	character.set_idle_pose()
 
 
-func _on_work_continued() -> void:
+func _on_work_phase_continued() -> void:
 	character.set_typing_pose()
 func _on_task_completed() -> void:
 	character.set_cheer_pose()

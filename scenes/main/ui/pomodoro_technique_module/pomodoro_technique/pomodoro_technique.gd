@@ -23,9 +23,12 @@ func _ready() -> void:
 	_idle_view()
 	# 连接 PomodoroState 信号
 	PomodoroState.pomodoro_started.connect(_on_pomodoro_started)
-	PomodoroState.pomodoro_stopped.connect(_on_pomodoro_stopped)
-	PomodoroState.pomodoro_paused.connect(_on_pomodoro_paused)
-	PomodoroState.pomodoro_continued.connect(_on_pomodoro_continued)
+	PomodoroState.work_phase_stopped.connect(_on_pomodoro_stopped)
+	PomodoroState.rest_phase_stopped.connect(_on_pomodoro_stopped)
+	PomodoroState.work_phase_paused.connect(_on_pomodoro_paused)
+	PomodoroState.rest_phase_paused.connect(_on_pomodoro_paused)
+	PomodoroState.work_phase_continued.connect(_on_pomodoro_continued)
+	PomodoroState.rest_phase_continued.connect(_on_pomodoro_continued)
 	PomodoroState.tick.connect(_on_tick)
 	PomodoroState.work_phase_started.connect(_on_work_phase_started)
 	PomodoroState.rest_phase_started.connect(_on_rest_phase_started)
@@ -74,6 +77,9 @@ func _update_status_display(is_work: bool) -> void:
 
 func _on_pomodoro_started(_data: Dictionary) -> void:
 	_running_view()
+	# 启动时同步一次循环显示，避免等待 loop_completed 才刷新
+	var status = PomodoroState.get_status()
+	_update_loop_display(status.current_loop, status.total_loops)
 
 
 func _on_pomodoro_stopped() -> void:
