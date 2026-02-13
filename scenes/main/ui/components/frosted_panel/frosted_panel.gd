@@ -24,12 +24,12 @@ extends PanelContainer
 		_update_shader_params()
 
 @export_group("Frosted Effect")
-@export_range(0.0, 5.0) var blur_amount: float = 4:
+@export_range(0.0, 10.0) var blur_amount: float = 7.2:
 	set(value):
 		blur_amount = value
 		_update_shader_params()
 
-@export var tint_color: Color = Color(0.23, 0.23, 0.23, 0.4):
+@export var tint_color: Color = Color("6969694b"):
 	set(value):
 		tint_color = value
 		_update_shader_params()

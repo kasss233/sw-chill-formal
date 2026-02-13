@@ -6,7 +6,6 @@ extends Node
 @export var ui_node: UI = null  # UI 主节点引用（包含所有模块）
 @export var music_module: MusicModule = null  # 音乐管理模块节点引用
 @export var note_module: NoteModule = null  # 笔记模块节点引用
-@export var note_book: NoteBook = null  # 笔记本模块节点引用
 @export var pomodoro_module: PomodoroTechniqueModule = null  # 番茄钟模块节点引用（使用class_name）
 
 # 任务ID生成器（用于将字符串ID转换为整数ID）
@@ -49,18 +48,8 @@ func _initialize_node_references() -> void:
 		print("[Parser] 警告: 未找到 UI 节点，某些功能可能无法使用")
 		return
 	
-	# 从 UI 节点获取各个模块引用
-	music_module = ui_node.music_module
-	note_module = ui_node.note_module
-	note_book = ui_node.note_book
-	pomodoro_module = ui_node.pomodoro_module
+	
 
-	# 打印初始化结果
-	print("[Parser] 模块初始化完成:")
-	print("  - 音乐模块: ", "✓" if music_module else "✗")
-	print("  - 笔记模块: ", "✓" if note_module else "✗")
-	print("  - 笔记本模块: ", "✓" if note_book else "✗")
-	print("  - 番茄钟模块: ", "✓" if pomodoro_module else "✗")
 
 ## 递归查找 UI 节点
 func _find_ui_node_recursive(node: Node) -> UI:

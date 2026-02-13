@@ -5,7 +5,7 @@ uniform bool show_border = true;
 uniform float border_width : hint_range(0.0, 10.0) = 1.0;
 uniform vec4 border_color : source_color = vec4(1.0, 1.0, 1.0, 0.2);
 
-uniform float blur_amount : hint_range(0.0, 5.0) = 3.0;
+uniform float blur_amount : hint_range(0.0, 10.0) = 6.0;
 uniform vec4 tint_color : source_color = vec4(0.0, 0.0, 0.0, 0.4);
 uniform float noise_amount : hint_range(0.0, 1.0) = 0.03;
 uniform sampler2D noise_texture : repeat_enable, filter_linear;
