@@ -54,7 +54,9 @@ func _connect_signals() -> void:
 	if PomodoroState and PomodoroState.has_signal("work_continued"):
 		if not PomodoroState.work_continued.is_connected(_on_work_continued):
 			PomodoroState.work_continued.connect(_on_work_continued)
-
+	if TaskState and TaskState.has_signal("task_completed"):
+		if not TaskState.task_completed.is_connected(_on_task_completed):
+			TaskState.task_completed.connect(_on_task_completed)
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
@@ -131,26 +133,9 @@ func _on_env_weather_changed(mode: int) -> void:
 			set_env_weather_snowy()
 		3:
 			set_env_weather_sync()
-var cur_pose = 4;
+
 func _on_character_interacted() -> void:
-	# rand2
-	#var rand = randi() % 7
-	match cur_pose:
-		0:
-			character.set_watch_pose()
-		1:
-			character.set_dodge_pose()
-		2:
-			character.set_laughing_pose()
-		3:
-			character.set_clap_pose()
-		4:
-			character.set_cheer_pose()
-		5:
-			character.set_angry_pose()
-		6:
-			character.set_disbelief_pose()
-	#cur_pose = (cur_pose + 1) % 7
+	character.set_surprised_pose()
 func _on_work_completed() -> void:
 	character.set_idle_pose()
 
@@ -169,3 +154,5 @@ func _on_work_stopped() -> void:
 
 func _on_work_continued() -> void:
 	character.set_typing_pose()
+func _on_task_completed() -> void:
+	character.set_cheer_pose()

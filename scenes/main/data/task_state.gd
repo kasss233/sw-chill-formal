@@ -3,8 +3,9 @@ extends Node
 # --- 信号 ---
 signal task_added(task: TaskData)
 signal task_removed(task_id: int)
-signal task_updated(task: TaskData)           # title/due_time 等字段变化
-signal task_state_changed(task: TaskData)     # 完成状态变化（触发 UI 排序）
+signal task_updated(task: TaskData) # title/due_time 等字段变化
+signal task_state_changed(task: TaskData) # 完成状态变化（触发 UI 排序）
+signal task_completed
 signal tasks_reordered
 signal data_loaded
 signal task_deadline_reached(task: TaskData)
@@ -16,7 +17,7 @@ var _next_id: int = 1
 var _deadline_timer: Timer = null
 
 # 截止时间警告记录
-var _warned_15min: Dictionary = {}    # {task_id: bool}
+var _warned_15min: Dictionary = {} # {task_id: bool}
 var _warned_deadline: Dictionary = {} # {task_id: bool}
 
 const SAVE_PATH = "user://task_data.json"
@@ -170,6 +171,8 @@ func set_task_completed(id: int, completed: bool) -> bool:
 	_update_orders()
 	_save_data()
 	task_state_changed.emit(task)
+	if completed:
+		task_completed.emit()
 	print("[TaskState] Task(id: %d) completed=%s" % [id, completed])
 	return true
 
@@ -249,6 +252,8 @@ func reorder_by_drag(task_id: int, new_data_index: int, new_completed: bool) -> 
 
 	if was_completed != new_completed:
 		task_state_changed.emit(task)
+		if new_completed:
+			task_completed.emit()
 	else:
 		tasks_reordered.emit()
 
