@@ -9,6 +9,12 @@ extends Node3D
 @export_range(1.0, 60.0, 0.5) var idle_variation_min_delay_sec: float = 6.0
 @export_range(1.0, 60.0, 0.5) var idle_variation_max_delay_sec: float = 18.0
 
+## 运行时：随机眨眼（避免打断持续表情，默认只在 neutral 时眨眼）
+@export var blinking_enabled: bool = true
+@export_range(0.5, 60.0, 0.5) var blinking_min_delay_sec: float = 3.0
+@export_range(0.5, 60.0, 0.5) var blinking_max_delay_sec: float = 8.0
+@export var blinking_only_when_neutral: bool = true
+
 ## 编辑器测试工具
 enum ActionTest {
 	IDLE,
@@ -54,6 +60,9 @@ var _idle_variation_token: int = 0
 var _idle_variation_scheduled: bool = false
 var _last_idle_variation: StringName = &""
 
+var _blinking_token: int = 0
+var _blinking_scheduled: bool = false
+
 func _ready() -> void:
 	if action_tree:
 		action_tree.active = true
@@ -72,6 +81,7 @@ func _ready() -> void:
 	_last_action_node = _get_current_action_node()
 	if _last_action_node == &"idle":
 		_schedule_idle_variation()
+	_schedule_blinking()
 
 
 func _process(_delta: float) -> void:
@@ -97,6 +107,12 @@ func _get_current_action_node() -> StringName:
 	return action_playback.get_current_node()
 
 
+func _get_current_emotion_node() -> StringName:
+	if not emotion_playback:
+		return &""
+	return emotion_playback.get_current_node()
+
+
 func _is_in_idle() -> bool:
 	return _get_current_action_node() == &"idle"
 
@@ -104,6 +120,42 @@ func _is_in_idle() -> bool:
 func _cancel_idle_variation() -> void:
 	_idle_variation_token += 1
 	_idle_variation_scheduled = false
+
+
+func _cancel_blinking() -> void:
+	_blinking_token += 1
+	_blinking_scheduled = false
+
+
+func _schedule_blinking() -> void:
+	if Engine.is_editor_hint() or not blinking_enabled:
+		return
+	if not emotion_playback:
+		return
+	if blinking_max_delay_sec < blinking_min_delay_sec:
+		blinking_max_delay_sec = blinking_min_delay_sec
+	if _blinking_scheduled:
+		return
+
+	_blinking_scheduled = true
+	var token := _blinking_token + 1
+	_blinking_token = token
+
+	var delay_sec := randf_range(blinking_min_delay_sec, blinking_max_delay_sec)
+	await get_tree().create_timer(delay_sec).timeout
+
+	if not is_inside_tree():
+		return
+	if token != _blinking_token:
+		return
+	_blinking_scheduled = false
+
+	if blinking_enabled and emotion_playback:
+		if (not blinking_only_when_neutral) or (_get_current_emotion_node() == &"neutral"):
+			set_blinking()
+
+	# 循环调度下一次
+	_schedule_blinking()
 
 
 func _schedule_idle_variation() -> void:
