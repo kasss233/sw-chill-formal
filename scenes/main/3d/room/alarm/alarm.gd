@@ -1,6 +1,6 @@
 extends Node3D
 
-@onready var label=$Sketchfab_Scene/Label3D
+@onready var label=$Label3D
 
 func _process(_delta):
 	var t = Time.get_datetime_dict_from_system()

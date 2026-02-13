@@ -152,20 +152,20 @@ func _on_character_interacted() -> void:
 			character.set_disbelief_pose()
 	#cur_pose = (cur_pose + 1) % 7
 func _on_work_completed() -> void:
-	character.set_typing_pose(false)
+	character.set_idle_pose()
 
 
 func _on_work_started() -> void:
-	character.set_typing_pose(true)
+	character.set_typing_pose()
 
 
 func _on_work_paused() -> void:
-	character.set_typing_pose(false)
+	character.set_idle_pose()
 
 
 func _on_work_stopped() -> void:
-	character.set_typing_pose(false)
+	character.set_idle_pose()
 
 
 func _on_work_continued() -> void:
-	character.set_typing_pose(true)
+	character.set_typing_pose()

@@ -55,6 +55,7 @@ func _ready() -> void:
 func set_idle_pose():
 	if action_playback:
 		action_playback.travel("idle")
+	set_neutral()
 ## typing一直循环，需要手动跳转到idle
 func set_typing_pose():
 	if action_playback:
@@ -63,24 +64,31 @@ func set_typing_pose():
 func set_clap_pose():
 	if action_playback:
 		action_playback.travel("clap")
+	set_happy()
 func set_think_pose():
 	if action_playback:
 		action_playback.travel("think")
+	set_angry()
 func set_cheer_pose():
 	if action_playback:
 		action_playback.travel("cheer")
+	set_happy()
 func set_watch_pose():
 	if action_playback:
 		action_playback.travel("watch")
+	set_neutral()
 func set_greet_pose():
 	if action_playback:
 		action_playback.travel("greet")
+	set_happy()
 func set_surprised_pose():
 	if action_playback:
 		action_playback.travel("surprised")
+	set_surprised()
 func set_disbelief_pose():
 	if action_playback:
 		action_playback.travel("disbelief")
+	set_sad()
 func set_stretch_pose():
 	if action_playback:
 		action_playback.travel("stretch")
@@ -165,3 +173,8 @@ func _test_emotion(emotion: EmotionTest):
 			set_saying()
 		EmotionTest.BLINKING:
 			set_blinking()
+
+
+func _on_action_animation_tree_animation_finished(anim_name: StringName) -> void:
+	print("Action animation finished: ", anim_name)
+	set_neutral()
