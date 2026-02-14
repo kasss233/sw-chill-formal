@@ -7,7 +7,10 @@ extends MarginContainer
 @onready var mm = %running/VBoxContainer/hh_mm_dd/mm
 @onready var ss = %running/VBoxContainer/hh_mm_dd/ss
 
-@onready var progress_bar = $FrostedPanel/MaterialProgressIndicator
+@onready var work_progress_bar = $FrostedPanel/MaterialProgressIndicator
+@onready var rest_progress_bar = $FrostedPanel/MaterialProgressIndicator2
+var _active_bar: Control  # 当前活跃的进度条引用
+
 @onready var loop_info = %idle/VBoxContainer/loop
 @onready var work_info = %idle/VBoxContainer/HBoxContainer/work
 @onready var rest_info = %idle/VBoxContainer/HBoxContainer/rest
@@ -52,6 +55,35 @@ func _idle_view() -> void:
 	running_view.visible = false
 
 
+# ======================== 进度条轮换 ========================
+
+func _swap_to_work() -> void:
+	_active_bar = work_progress_bar
+	var parent = work_progress_bar.get_parent()
+	parent.move_child(work_progress_bar, 1)  # 工作环绘制在上层
+	var status = PomodoroState.get_status()
+	if status.current_loop >= status.total_loops:
+		# 最后一次工作，不显示休息进度条
+		rest_progress_bar.visible = false
+	else:
+		rest_progress_bar.visible = true
+		rest_progress_bar.set_progress_immediate(1.0)  # 休息环满置
+
+
+func _swap_to_rest() -> void:
+	_active_bar = rest_progress_bar
+	rest_progress_bar.visible = true
+	var parent = rest_progress_bar.get_parent()
+	parent.move_child(rest_progress_bar, 1)  # 休息环绘制在上层
+	work_progress_bar.set_progress_immediate(1.0)  # 工作环满置
+
+
+func _reset_progress_bars() -> void:
+	work_progress_bar.set_progress_value(0.0)
+	rest_progress_bar.set_progress_value(0.0)
+	rest_progress_bar.visible = true
+
+
 # ======================== 显示更新 ========================
 
 func _update_display(remaining: int) -> void:
@@ -84,23 +116,24 @@ func _on_pomodoro_started(_data: Dictionary) -> void:
 
 func _on_pomodoro_stopped() -> void:
 	_idle_view()
-	if progress_bar:
-		progress_bar.set_progress_value(0.0)
+	_reset_progress_bars()
 
 
 func _on_tick(remaining: int, total: int, progress: float, is_work: bool) -> void:
 	_update_display(remaining)
 	_update_status_display(is_work)
-	if progress_bar:
-		progress_bar.set_progress_value(progress)
+	if _active_bar:
+		_active_bar.set_progress_value(progress)
 
 
 func _on_work_phase_started() -> void:
 	_update_status_display(true)
+	_swap_to_work()
 
 
 func _on_rest_phase_started() -> void:
 	_update_status_display(false)
+	_swap_to_rest()
 
 
 func _on_loop_completed(current: int, total: int) -> void:
@@ -109,8 +142,7 @@ func _on_loop_completed(current: int, total: int) -> void:
 
 func _on_all_completed() -> void:
 	_idle_view()
-	if progress_bar:
-		progress_bar.set_progress_value(0.0)
+	_reset_progress_bars()
 
 
 func _on_pomodoro_paused() -> void:
@@ -142,10 +174,14 @@ func _sync_from_state() -> void:
 		_update_display(status.remaining_seconds)
 		_update_loop_display(status.current_loop, status.total_loops)
 		_update_status_display(status.is_work_mode)
-		if progress_bar:
-			progress_bar.set_progress_value(status.progress)
+		if status.is_work_mode:
+			_swap_to_work()
+		else:
+			_swap_to_rest()
+		_active_bar.set_progress_value(status.progress)
 	else:
 		_idle_view()
+		_reset_progress_bars()
 		work_info.times = PomodoroState.work_duration
 		work_info.flush_times_text()
 		rest_info.times = PomodoroState.rest_duration

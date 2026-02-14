@@ -26,14 +26,6 @@
 [ext_resource type="Texture2D" uid="uid://blcgohu24iebs" path="res://assets/ui/icons/repeat_one_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="25_62hhh"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="30_00qru"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_vq68n"]
-frequency = 0.1
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_62hhh"]
-width = 64
-height = 64
-noise = SubResource("FastNoiseLite_vq68n")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bihbd"]
 shader = ExtResource("20_bihbd")
 shader_parameter/corner_radius = 20.0
@@ -41,21 +33,22 @@ shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
 shader_parameter/blur_amount = 4.0
-shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 shader_parameter/noise_amount = 0.0
-shader_parameter/noise_texture = SubResource("NoiseTexture2D_62hhh")
-shader_parameter/show_shadow = true
+shader_parameter/show_shadow = false
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(334, 65)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(0, 0)
+shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_50xrc"]
-content_margin_left = 12.0
-content_margin_top = 12.0
-content_margin_right = 12.0
-content_margin_bottom = 12.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bihbd"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
@@ -379,13 +372,13 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_t6w3t"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_10ivm"]
 frequency = 0.1
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_t0g7c"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_00qru"]
 width = 64
 height = 64
-noise = SubResource("FastNoiseLite_t6w3t")
+noise = SubResource("FastNoiseLite_10ivm")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tooop"]
 shader = ExtResource("20_bihbd")
@@ -393,16 +386,18 @@ shader_parameter/corner_radius = 20.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 4.0
-shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
+shader_parameter/blur_amount = 7.2
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 shader_parameter/noise_amount = 0.0
-shader_parameter/noise_texture = SubResource("NoiseTexture2D_t0g7c")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_00qru")
 shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(288, 365)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7nmkm"]
 content_margin_left = 12.0
@@ -416,20 +411,23 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_10ivm"]
-frequency = 0.1
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_00qru"]
-width = 64
-height = 64
-noise = SubResource("FastNoiseLite_10ivm")
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_10ivm"]
+content_margin_left = 42.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ig0f4"]
 content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -440,7 +438,7 @@ content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -451,7 +449,7 @@ content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -462,24 +460,13 @@ content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t1xwq"]
-content_margin_left = 42.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
 bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_732up"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t1xwq"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -490,7 +477,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k1tl0"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_732up"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -501,7 +488,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rqxsy"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k1tl0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -512,12 +499,23 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusr8"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rqxsy"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
 bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jusr8"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -539,7 +537,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -550,7 +548,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -561,7 +559,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -572,24 +570,13 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3dqc"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o5s7w"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i3dqc"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -621,11 +608,14 @@ icon = ExtResource("13_00qru")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
 [node name="MusicModule" type="MarginContainer" unique_id=1367296249]
-anchors_preset = 2
+anchors_preset = 3
+anchor_left = 1.0
 anchor_top = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -65.0
-offset_right = 334.0
+offset_left = -310.0
+offset_top = -36.0
+grow_horizontal = 0
 grow_vertical = 0
 script = ExtResource("1_t37u8")
 music_list_scene = ExtResource("4_x6s46")
@@ -636,10 +626,11 @@ metadata/_edit_horizontal_guides_ = [279.0, 277.0]
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=862494518]
 material = SubResource("ShaderMaterial_bihbd")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_50xrc")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bihbd")
 script = ExtResource("12_2p7cx")
 corner_radius = 20.0
-noise_texture = SubResource("NoiseTexture2D_62hhh")
+blur_amount = 4.0
+show_shadow = false
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=87646170]
@@ -770,6 +761,7 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_7nmkm")
 script = ExtResource("12_2p7cx")
 corner_radius = 20.0
+blur_amount = 7.2
 noise_texture = SubResource("NoiseTexture2D_00qru")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
@@ -790,11 +782,11 @@ custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_ig0f4")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_nuo1n")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ytp1m")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_edba7")
-theme_override_styles/focus = SubResource("StyleBoxFlat_t1xwq")
+theme_override_styles/normal = SubResource("StyleBoxFlat_10ivm")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ig0f4")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nuo1n")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ytp1m")
+theme_override_styles/focus = SubResource("StyleBoxFlat_edba7")
 text = "全部音乐"
 text_overrun_behavior = 7
 clip_text = true
@@ -817,11 +809,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_732up")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_k1tl0")
-theme_override_styles/hover = SubResource("StyleBoxFlat_rqxsy")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_jusr8")
-theme_override_styles/focus = SubResource("StyleBoxFlat_lrjur")
+theme_override_styles/normal = SubResource("StyleBoxFlat_t1xwq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_732up")
+theme_override_styles/hover = SubResource("StyleBoxFlat_k1tl0")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_rqxsy")
+theme_override_styles/focus = SubResource("StyleBoxFlat_jusr8")
 text_overrun_behavior = 7
 clip_text = true
 script = ExtResource("12_btupq")
@@ -845,11 +837,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_4mqkb")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ro2q1")
-theme_override_styles/hover = SubResource("StyleBoxFlat_60cfw")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_g0jrd")
-theme_override_styles/focus = SubResource("StyleBoxFlat_i3dqc")
+theme_override_styles/normal = SubResource("StyleBoxFlat_lrjur")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_4mqkb")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ro2q1")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_60cfw")
+theme_override_styles/focus = SubResource("StyleBoxFlat_g0jrd")
 flat = true
 text_overrun_behavior = 7
 clip_text = true
@@ -880,9 +872,18 @@ offset_left = 277.0
 offset_top = 394.0
 offset_right = 477.0
 offset_bottom = 490.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_o5s7w")
+theme_override_styles/panel = SubResource("StyleBoxFlat_i3dqc")
 script = ExtResource("10_bj3ck")
 editor_items = Array[ExtResource("11_btupq")]([SubResource("Resource_t1xwq"), SubResource("Resource_732up")])
+background_color = Color(0.15, 0.15, 0.15, 0.95)
+border_color = Color(0.3, 0.3, 0.3, 0.5)
+corner_radius = 8
+frosted_effect = null
+blur_amount = null
+saturation = null
+brightness = null
+tint_color = null
+noise_amount = null
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="GuiTransition" type="Node" parent="CanvasLayer" unique_id=1892176726]

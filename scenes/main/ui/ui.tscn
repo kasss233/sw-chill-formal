@@ -226,12 +226,6 @@ size_flags_horizontal = 4
 
 [node name="MusicModule" parent="." unique_id=1778345012 instance=ExtResource("1_2q31f")]
 layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -334.0
-offset_right = 0.0
-grow_horizontal = 0
 
 [node name="CharacterInteractor" parent="." unique_id=1482575657 instance=ExtResource("5_fhd3w")]
 layout_mode = 0

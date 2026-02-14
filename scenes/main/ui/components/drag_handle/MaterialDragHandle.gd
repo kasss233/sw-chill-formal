@@ -19,6 +19,13 @@ enum BoundaryMode {
 		drag_target = value
 		_update_target()
 
+## 视觉效果目标（null = 使用 drag_target）
+## 分离拖拽目标和视觉效果目标，避免缩放动画导致拖拽位置偏移
+@export var visual_target: Control = null:
+	set(value):
+		visual_target = value
+		_update_target()
+
 ## 目标节点别名（与 drag_target 相同）
 @export var target_node: Control = null:
 	set(value):
@@ -70,8 +77,11 @@ var _drag_start_global_pos: Vector2
 var _target_start_pos: Vector2
 var _handle_start_pos: Vector2  # 拖拽开始时手柄自身的全局位置
 var _target: Control = null
+var _visual_node: Control = null
 var _tween: Tween
-var _target_start_modulate: Color = Color.WHITE
+var _visual_start_modulate: Color = Color.WHITE
+var _visual_start_scale: Vector2 = Vector2.ONE
+var _canvas_layer: CanvasLayer = null
 
 
 func _ready() -> void:
@@ -102,6 +112,17 @@ func _update_target() -> void:
 		_target = drag_target
 	else:
 		_target = get_parent() as Control
+	_visual_node = visual_target if visual_target else _target
+	_canvas_layer = _find_canvas_layer()
+
+
+func _find_canvas_layer() -> CanvasLayer:
+	var current = get_parent()
+	while current:
+		if current is CanvasLayer:
+			return current
+		current = current.get_parent()
+	return null
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -129,11 +150,25 @@ func _start_dragging() -> void:
 	_drag_start_global_pos = get_global_mouse_position()
 	_target_start_pos = _target.global_position
 	_handle_start_pos = global_position  # 记录手柄自身的初始全局位置
-	_target_start_modulate = _target.modulate
+
+	# 如果有正在进行的视觉动画（如上次退出动画未结束），先恢复到干净状态
+	# 避免在 scale != 1 时改变 pivot_offset 导致视觉跳变
+	if _tween and _tween.is_valid():
+		_tween.kill()
+		_reset_visual_effect()
+
+	_visual_start_modulate = _visual_node.modulate
+	_visual_start_scale = _visual_node.scale
 
 	# 视觉反馈
 	if visual_feedback:
 		_apply_drag_enter_effect()
+
+	# 拖拽开始时将所在 CanvasLayer 置顶
+	if _canvas_layer and not Engine.is_editor_hint():
+		var lm = get_node_or_null("/root/LayerManager")
+		if lm:
+			lm.bring_to_front(_canvas_layer)
 
 	drag_started.emit()
 
@@ -146,7 +181,7 @@ func _stop_dragging() -> void:
 
 	# 弹跳动画
 	if visual_feedback and bounce_animation:
-		_apply_bounce_animation()
+		_apply_drag_exit_effect()
 	else:
 		_reset_visual_effect()
 
@@ -223,51 +258,50 @@ func _on_mouse_exited() -> void:
 
 ## 应用拖拽进入效果
 func _apply_drag_enter_effect() -> void:
-	if not is_inside_tree():
+	if not is_inside_tree() or not _visual_node:
 		return
 
 	if _tween and _tween.is_valid():
 		_tween.kill()
+
+	# 先确保 scale 为起始值，再设置 pivot_offset
+	# 避免 scale != 1 时改变 pivot 导致位置跳变
+	_visual_node.scale = _visual_start_scale
+	_visual_node.pivot_offset = _visual_node.size / 2.0
 
 	_tween = create_tween()
 	_tween.set_parallel(true)
 
 	# 缩放效果
-	_tween.tween_property(self, "scale", Vector2(drag_scale, drag_scale), 0.1)
-	_tween.set_ease(Tween.EASE_OUT)
-	_tween.set_trans(Tween.TRANS_BACK)
+	_tween.tween_property(_visual_node, "scale", Vector2(drag_scale, drag_scale), 0.15)
 
-	# 透明度效果（应用到目标节点）
+	# 透明度效果
 	if drag_opacity < 1.0:
-		_target.modulate = _target_start_modulate
-		_tween.tween_property(_target, "modulate:a", drag_opacity, 0.15)
+		_visual_node.modulate = _visual_start_modulate
+		_tween.tween_property(_visual_node, "modulate:a", drag_opacity, 0.15)
 
 
-## 应用弹跳动画
-func _apply_bounce_animation() -> void:
-	if not is_inside_tree():
+## 应用拖拽退出效果（弹跳动画）
+func _apply_drag_exit_effect() -> void:
+	if not is_inside_tree() or not _visual_node:
 		return
 
 	if _tween and _tween.is_valid():
 		_tween.kill()
 
+	_visual_node.pivot_offset = _visual_node.size / 2.0
 	_tween = create_tween()
 	_tween.set_parallel(false)
 
-	# 先放大
-	_tween.tween_property(self, "scale", Vector2(drag_scale + 0.05, drag_scale + 0.05), 0.1)
+	# 缩放回原始大小（bounce easing）
+	_tween.tween_property(_visual_node, "scale", _visual_start_scale, 0.25)
 	_tween.set_ease(Tween.EASE_OUT)
 	_tween.set_trans(Tween.TRANS_BACK)
-
-	# 然后恢复
-	_tween.tween_property(self, "scale", Vector2.ONE, 0.15)
-	_tween.set_ease(Tween.EASE_OUT)
-	_tween.set_trans(Tween.TRANS_BOUNCE)
 
 	# 恢复透明度
 	if drag_opacity < 1.0:
 		_tween.parallel()
-		_tween.tween_property(_target, "modulate:a", _target_start_modulate.a, 0.15)
+		_tween.tween_property(_visual_node, "modulate:a", _visual_start_modulate.a, 0.15)
 
 	_tween.tween_callback(_reset_visual_effect)
 
@@ -277,10 +311,10 @@ func _reset_visual_effect() -> void:
 	if not is_inside_tree():
 		return
 
-	scale = Vector2.ONE
-
-	if _target:
-		_target.modulate = _target_start_modulate
+	if _visual_node:
+		_visual_node.scale = _visual_start_scale
+		_visual_node.pivot_offset = Vector2.ZERO
+		_visual_node.modulate = _visual_start_modulate
 
 
 ## 设置拖拽目标
@@ -332,5 +366,8 @@ func _is_descendant_of_target() -> bool:
 	while current:
 		if current == _target:
 			return true
+		# CanvasLayer 会打断变换继承链，视为非子孙关系
+		if current is CanvasLayer:
+			return false
 		current = current.get_parent()
 	return false

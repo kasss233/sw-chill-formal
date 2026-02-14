@@ -230,17 +230,18 @@ func _on_phase_complete() -> void:
 	is_running = false
 	if is_work_mode:
 		work_phase_completed.emit()
-		_start_rest()
-	else:
-		rest_phase_completed.emit()
 		if current_loop < total_loops:
-			current_loop += 1
-			loop_completed.emit(current_loop, total_loops)
-			_start_work()
+			_start_rest()
 		else:
+			# 最后一个循环的工作完成，番茄钟结束（不再进入休息）
 			all_completed.emit()
 			print("[PomodoroState] 番茄钟全部完成！")
 			_reset_state()
+	else:
+		rest_phase_completed.emit()
+		current_loop += 1
+		loop_completed.emit(current_loop, total_loops)
+		_start_work()
 
 
 func _start_work() -> void:

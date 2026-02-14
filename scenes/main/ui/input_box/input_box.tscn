@@ -47,10 +47,10 @@ shader_parameter/show_shadow = false
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.36862746)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 0)
-shader_parameter/size = Vector2(0, 0)
+shader_parameter/size = Vector2(316, 76)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bqtvt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3jhc"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -370,24 +370,43 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3jhc"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_j5ktv"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_arvrt"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_j5ktv")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hyecp"]
+shader = ExtResource("1_q8yjo")
+shader_parameter/corner_radius = 16.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_arvrt")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0, 0, 0, 0.4509804)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(171, 96)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qtajv"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.2)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
 
 [sub_resource type="Resource" id="Resource_c48v0"]
 script = ExtResource("14_q6tgl")
@@ -409,7 +428,7 @@ script = ExtResource("1_o8rmt")
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=375968268]
 material = SubResource("ShaderMaterial_bqtvt")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bqtvt")
+theme_override_styles/panel = SubResource("StyleBoxFlat_h3jhc")
 script = ExtResource("2_t5fk1")
 corner_radius = 27.0
 border_color = Color(1, 1, 1, 0.09803922)
@@ -448,7 +467,6 @@ layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(109, 32)
 layout_mode = 2
-mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("5_d007x")
 chip_type = 2
@@ -461,7 +479,6 @@ metadata/_custom_type_script = "uid://3xl08c2pg3qt"
 visible = false
 custom_minimum_size = Vector2(109, 32)
 layout_mode = 2
-mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("5_d007x")
 chip_type = 2
@@ -615,19 +632,16 @@ use_viewport_size = true
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1221344660]
 
 [node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=1625279168]
+material = SubResource("ShaderMaterial_hyecp")
 custom_minimum_size = Vector2(100, 0)
 offset_left = 71.0
 offset_top = 76.0
 offset_right = 242.0
 offset_bottom = 172.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_h3jhc")
+theme_override_styles/panel = SubResource("StyleBoxFlat_qtajv")
 script = ExtResource("13_d007x")
 editor_items = Array[ExtResource("14_q6tgl")]([SubResource("Resource_c48v0"), SubResource("Resource_q6tgl")])
 min_width = 100
-frosted_effect = null
-blur_amount = null
-saturation = null
-brightness = null
-tint_color = null
-noise_amount = null
+shadow_color = Color(0, 0, 0, 0.4509804)
+noise_texture = SubResource("NoiseTexture2D_arvrt")
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
