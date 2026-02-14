@@ -18,15 +18,25 @@ extends PanelContainer
 		border_width = value
 		_update_shader_params()
 
-@export var border_color: Color = Color(1, 1, 1, 0.2):
+@export var border_color: Color = Color("ffffff33"):
 	set(value):
 		border_color = value
 		_update_shader_params()
 
 @export_group("Frosted Effect")
-@export_range(0.0, 10.0) var blur_amount: float = 7.2:
+@export_range(0.0, 5.0) var blur_amount: float = 3.5:
 	set(value):
 		blur_amount = value
+		_update_shader_params()
+
+@export_range(0.0, 3.0) var saturation: float = 1.6:
+	set(value):
+		saturation = value
+		_update_shader_params()
+
+@export_range(0.0, 2.0) var brightness: float = 1.1:
+	set(value):
+		brightness = value
 		_update_shader_params()
 
 @export var tint_color: Color = Color("6969694b"):
@@ -133,6 +143,8 @@ func _update_shader_params() -> void:
 		material.set_shader_parameter("border_width", border_width)
 		material.set_shader_parameter("border_color", border_color)
 		material.set_shader_parameter("blur_amount", blur_amount)
+		material.set_shader_parameter("saturation", saturation)
+		material.set_shader_parameter("brightness", brightness)
 		material.set_shader_parameter("tint_color", tint_color)
 		material.set_shader_parameter("noise_amount", noise_amount)
 		material.set_shader_parameter("noise_texture", noise_texture)

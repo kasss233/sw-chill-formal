@@ -23,23 +23,34 @@
 [ext_resource type="Texture2D" uid="uid://c2p0fd4s5qo8l" path="res://assets/ui/icons/close_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="16_o8rmt"]
 [ext_resource type="Script" uid="uid://4tb3djjq503s" path="res://scenes/main/ui/components/snackbar/MaterialSnackbar.gd" id="17_snackbar"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_bqtvt"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_h3jhc"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_bqtvt")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bqtvt"]
 shader = ExtResource("1_q8yjo")
 shader_parameter/corner_radius = 27.0
-shader_parameter/show_border = false
+shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 7.2
+shader_parameter/border_color = Color(1, 1, 1, 0.09803922)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_h3jhc")
 shader_parameter/show_shadow = false
-shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0)
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.36862746)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 0)
 shader_parameter/size = Vector2(0, 0)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3jhc"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bqtvt"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -63,60 +74,60 @@ script = ExtResource("4_ctfil")
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kuivi"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bqtvt"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.69, 0.69, 0.69, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2r1w8"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.621, 0.621, 0.621, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.69, 0.69, 0.69, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qxf7m"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.721, 0.721, 0.721, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.621, 0.621, 0.621, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mhg7t"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.48299998, 0.48299998, 0.48299998, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.721, 0.721, 0.721, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gjq8r"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.48299998, 0.48299998, 0.48299998, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0p7d6"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.69, 0.69, 0.69, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vyd8f"]
 
@@ -124,60 +135,60 @@ corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q6tgl"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0p7d6"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.6901961, 0.6901961, 0.6901961, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kb35h"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.6211765, 0.6211765, 0.6211765, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.6901961, 0.6901961, 0.6901961, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c48v0"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.7211765, 0.7211765, 0.7211765, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.6211765, 0.6211765, 0.6211765, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7efhl"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.48313725, 0.48313725, 0.48313725, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.7211765, 0.7211765, 0.7211765, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0vqak"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.48313725, 0.48313725, 0.48313725, 0.47058824)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i65by"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.6901961, 0.6901961, 0.6901961, 0.47058824)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7ha6s"]
 content_margin_left = 0.0
@@ -359,17 +370,17 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j5ktv"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h3jhc"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.15, 0.15, 0.15, 0.95)
+bg_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.3, 0.5)
+border_color = Color(1, 1, 1, 0.2)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
@@ -398,12 +409,13 @@ script = ExtResource("1_o8rmt")
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=375968268]
 material = SubResource("ShaderMaterial_bqtvt")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_h3jhc")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bqtvt")
 script = ExtResource("2_t5fk1")
 corner_radius = 27.0
-show_border = false
+border_color = Color(1, 1, 1, 0.09803922)
+noise_texture = SubResource("NoiseTexture2D_h3jhc")
 show_shadow = false
-shadow_color = Color(0.1, 0.1, 0.1, 0)
+shadow_color = Color(0.1, 0.1, 0.1, 0.36862746)
 shadow_offset = Vector2(0, 0)
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
@@ -485,13 +497,14 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_bqtvt")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_2r1w8")
-theme_override_styles/hover = SubResource("StyleBoxFlat_qxf7m")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_mhg7t")
-theme_override_styles/focus = SubResource("StyleBoxFlat_gjq8r")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2r1w8")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qxf7m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mhg7t")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_gjq8r")
+theme_override_styles/focus = SubResource("StyleBoxFlat_0p7d6")
 script = ExtResource("5_vyd8f")
 menu = NodePath("../../../../../CanvasLayer/MaterialMenu")
+popup_position = 3
 button_icon = ExtResource("4_7lvpk")
 ripple_color = Color(0.45, 0.45, 0.45, 0.09803922)
 background_color = Color(0.69, 0.69, 0.69, 0.47058824)
@@ -513,11 +526,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_0p7d6")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_kb35h")
-theme_override_styles/hover = SubResource("StyleBoxFlat_c48v0")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_7efhl")
-theme_override_styles/focus = SubResource("StyleBoxFlat_0vqak")
+theme_override_styles/normal = SubResource("StyleBoxFlat_kb35h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_c48v0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_7efhl")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_0vqak")
+theme_override_styles/focus = SubResource("StyleBoxFlat_i65by")
 script = ExtResource("3_opna7")
 button_icon = ExtResource("5_2ldic")
 background_color = Color(0.6901961, 0.6901961, 0.6901961, 0.47058824)
@@ -607,9 +620,14 @@ offset_left = 71.0
 offset_top = 76.0
 offset_right = 242.0
 offset_bottom = 172.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_j5ktv")
+theme_override_styles/panel = SubResource("StyleBoxFlat_h3jhc")
 script = ExtResource("13_d007x")
 editor_items = Array[ExtResource("14_q6tgl")]([SubResource("Resource_c48v0"), SubResource("Resource_q6tgl")])
 min_width = 100
-corner_radius = 16
+frosted_effect = null
+blur_amount = null
+saturation = null
+brightness = null
+tint_color = null
+noise_amount = null
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"

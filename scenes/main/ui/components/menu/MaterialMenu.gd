@@ -40,13 +40,13 @@ enum MenuSize {
 		max_width = value
 
 ## 背景颜色
-@export var background_color: Color = Color(0.15, 0.15, 0.15, 0.95):
+@export var background_color: Color = Color("6969694b"):
 	set(value):
 		background_color = value
 		_update_style()
 
 ## 边框颜色
-@export var border_color: Color = Color(0.3, 0.3, 0.3, 0.5):
+@export var border_color: Color = Color("ffffff33"):
 	set(value):
 		border_color = value
 		_update_style()
@@ -58,7 +58,7 @@ enum MenuSize {
 		_update_style()
 
 ## 圆角半径
-@export_range(0, 24, 1) var corner_radius: int = 8:
+@export_range(0, 24, 1) var corner_radius: int = 16:
 	set(value):
 		corner_radius = value
 		_update_style()
@@ -123,6 +123,52 @@ enum MenuSize {
 ## 例如: [".:_on_menu_item_pressed", "../SomeNode:handle_menu"]
 @export var editor_signal_connections: Array[String] = []
 
+## 磨砂玻璃效果
+@export_group("Frosted Effect")
+
+## 启用磨砂玻璃效果
+@export var frosted_effect: bool = true:
+	set(value):
+		frosted_effect = value
+		_update_frosted()
+		_update_style()
+
+## 模糊程度
+@export_range(0.0, 5.0) var blur_amount: float = 3.5:
+	set(value):
+		blur_amount = value
+		_update_frosted_params()
+
+## 背景饱和度
+@export_range(0.0, 3.0) var saturation: float = 1.6:
+	set(value):
+		saturation = value
+		_update_frosted_params()
+
+## 背景亮度
+@export_range(0.0, 2.0) var brightness: float = 1.1:
+	set(value):
+		brightness = value
+		_update_frosted_params()
+
+## 色调颜色
+@export var tint_color: Color = Color("6969694b"):
+	set(value):
+		tint_color = value
+		_update_frosted_params()
+
+## 噪点强度
+@export_range(0.0, 1.0) var noise_amount: float = 0.0:
+	set(value):
+		noise_amount = value
+		_update_frosted_params()
+
+## 噪点纹理
+@export var noise_texture: Texture2D:
+	set(value):
+		noise_texture = value
+		_update_frosted_params()
+
 # 内部节点
 var _items_container: VBoxContainer
 var _show_tween: Tween
@@ -145,19 +191,22 @@ const SIZE_MAP = {
 
 func _ready() -> void:
 	_setup_menu()
+	_update_frosted()
 	_update_style()
-	
+
 	# 编辑器模式下保持可见，运行时才隐藏
 	if not Engine.is_editor_hint():
 		visible = false
 		modulate.a = 0
-	
+
 	# 从编辑器配置创建菜单项
 	if editor_items.size() > 0:
 		_rebuild_from_editor_items()
-	
+
 	# 收集已有的子节点作为菜单项
 	_collect_existing_items()
+
+	resized.connect(_on_menu_resized)
 
 func _setup_menu() -> void:
 	# 设置基础属性
@@ -196,38 +245,51 @@ func _ensure_container() -> void:
 func _update_style() -> void:
 	if not is_inside_tree():
 		return
-	
+
 	var size_config = SIZE_MAP.get(menu_size, SIZE_MAP[MenuSize.STANDARD])
 	var radius = corner_radius if corner_radius > 0 else size_config["corner"]
 	var pad = padding if padding > 0 else size_config["padding"]
-	
+
 	# 创建面板样式
 	var style = StyleBoxFlat.new()
-	style.bg_color = background_color
+
+	if frosted_effect:
+		# 磨砂模式：背景透明，shader 负责渲染
+		style.bg_color = Color.TRANSPARENT
+		# 不使用 StyleBoxFlat 的边框和阴影（由 shader 渲染）
+		style.border_width_left = 0
+		style.border_width_right = 0
+		style.border_width_top = 0
+		style.border_width_bottom = 0
+		style.shadow_size = 0
+	else:
+		style.bg_color = background_color
+		# 边框
+		style.border_color = border_color
+		style.border_width_left = border_width
+		style.border_width_right = border_width
+		style.border_width_top = border_width
+		style.border_width_bottom = border_width
+		# 阴影
+		style.shadow_color = shadow_color
+		style.shadow_size = shadow_size
+		style.shadow_offset = shadow_offset
+
 	style.corner_radius_top_left = radius
 	style.corner_radius_top_right = radius
 	style.corner_radius_bottom_left = radius
 	style.corner_radius_bottom_right = radius
-	
-	# 边框
-	style.border_color = border_color
-	style.border_width_left = border_width
-	style.border_width_right = border_width
-	style.border_width_top = border_width
-	style.border_width_bottom = border_width
-	
-	# 阴影
-	style.shadow_color = shadow_color
-	style.shadow_size = shadow_size
-	style.shadow_offset = shadow_offset
-	
+
 	# 内边距
 	style.content_margin_left = pad
 	style.content_margin_right = pad
 	style.content_margin_top = pad
 	style.content_margin_bottom = pad
-	
+
 	add_theme_stylebox_override("panel", style)
+
+	# 同步磨砂 shader 参数（边框、阴影、圆角等共用属性）
+	_update_frosted_params()
 
 func _input(event: InputEvent) -> void:
 	if not visible:
@@ -495,6 +557,16 @@ func popup_beside(control: Control, offset: Vector2 = Vector2.ZERO) -> void:
 	var pos = control.global_position + Vector2(control.size.x, 0) + offset
 	show_menu(pos)
 
+## 在指定控件上方弹出菜单
+func popup_above(control: Control, offset: Vector2 = Vector2.ZERO) -> void:
+	var pos = control.global_position + Vector2(0, -size.y) + offset
+	show_menu(pos)
+
+## 在指定控件左侧弹出菜单
+func popup_beside_left(control: Control, offset: Vector2 = Vector2.ZERO) -> void:
+	var pos = control.global_position + Vector2(-size.x, 0) + offset
+	show_menu(pos)
+
 ## 在鼠标位置弹出菜单
 func popup_at_mouse() -> void:
 	var mouse_pos = get_viewport().get_mouse_position()
@@ -505,6 +577,56 @@ func popup_at_mouse() -> void:
 func _get_item_height() -> int:
 	var size_config = SIZE_MAP.get(menu_size, SIZE_MAP[MenuSize.STANDARD])
 	return item_height if item_height > 0 else size_config["item_height"]
+
+## 初始化/切换磨砂效果
+func _update_frosted() -> void:
+	if frosted_effect:
+		if not material or not material is ShaderMaterial:
+			var mat = ShaderMaterial.new()
+			mat.shader = preload("res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader")
+			material = mat
+		else:
+			material = material.duplicate()
+		# 默认噪点纹理
+		if noise_texture == null:
+			var noise = FastNoiseLite.new()
+			noise.frequency = 0.1
+			var noise_tex = NoiseTexture2D.new()
+			noise_tex.noise = noise
+			noise_tex.width = 64
+			noise_tex.height = 64
+			noise_texture = noise_tex
+		_update_frosted_params()
+	else:
+		material = null
+
+## 更新磨砂 shader 参数
+func _update_frosted_params() -> void:
+	if not frosted_effect or not material:
+		return
+	var size_config = SIZE_MAP.get(menu_size, SIZE_MAP[MenuSize.STANDARD])
+	var radius = corner_radius if corner_radius > 0 else size_config["corner"]
+	material.set_shader_parameter("corner_radius", float(radius))
+	material.set_shader_parameter("show_border", border_width > 0)
+	material.set_shader_parameter("border_width", float(border_width))
+	material.set_shader_parameter("border_color", border_color)
+	material.set_shader_parameter("blur_amount", blur_amount)
+	material.set_shader_parameter("saturation", saturation)
+	material.set_shader_parameter("brightness", brightness)
+	material.set_shader_parameter("tint_color", tint_color)
+	material.set_shader_parameter("noise_amount", noise_amount)
+	material.set_shader_parameter("noise_texture", noise_texture)
+	material.set_shader_parameter("show_shadow", shadow_size > 0)
+	material.set_shader_parameter("shadow_color", shadow_color)
+	material.set_shader_parameter("shadow_size", float(shadow_size))
+	material.set_shader_parameter("shadow_offset", shadow_offset)
+	material.set_shader_parameter("shadow_padding", 0.0)
+	material.set_shader_parameter("size", size)
+
+## 菜单尺寸变化时更新 shader 的 size 参数
+func _on_menu_resized() -> void:
+	if frosted_effect and material:
+		material.set_shader_parameter("size", size)
 
 func _clamp_to_screen() -> void:
 	# 等待一帧确保 size 已更新
