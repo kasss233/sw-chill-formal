@@ -4,7 +4,8 @@ extends Node
 signal env_time_changed(mode: int)
 ## 环境天气切换信号
 signal env_weather_changed(mode: int)
-
+signal snow_changed(_value: int)
+signal rain_changed(_value: int)
 ## 时间模式: 0=白天, 1=黄昏, 2=晚上, 3=同步系统
 var _time_mode: int = 0
 ## 天气模式: 0=晴天, 1=雨天, 2=雪天, 3=同步
@@ -28,7 +29,10 @@ func set_time(mode: int) -> void:
 func set_weather(mode: int) -> void:
 	_weather_mode = mode
 	env_weather_changed.emit(mode)
-
+func set_rain_amount(amount: int) -> void:
+	emit_signal("rain_changed", amount)
+func set_snow_amount(amount: int) -> void:
+	emit_signal("snow_changed", amount)
 func get_time_mode() -> int:
 	return _time_mode
 

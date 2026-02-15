@@ -50,3 +50,11 @@ func _init_dropdowns_from_state() -> void:
 	var ssaa_val = SettingState.get_ssaa()
 	_msaa_dropdown.set_selected_by_value(str(msaa_val))
 	_ssaa_dropdown.set_selected_by_value(str(ssaa_val))
+
+
+func _on_rain_material_slider_value_changed(value: float) -> void:
+	SettingState.set_rain_amount(int(value))
+
+
+func _on_snow_material_slider_value_changed(value: float) -> void:
+	SettingState.set_snow_amount(int(value))

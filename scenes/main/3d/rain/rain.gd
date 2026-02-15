@@ -4,6 +4,7 @@ extends Node3D
 @export var max_amount: int = 1200
 ## 雨滴数量,300-1000
 func set_amount(_amount: int):
+	print("Setting rain amount to: ", _amount)
 	## 判断数量是否在合理范围内
 	if _amount < min_amount:
 		_amount = min_amount

@@ -36,7 +36,12 @@ func _connect_signals() -> void:
 	if SettingState and SettingState.has_signal("env_weather_changed"):
 		if not SettingState.env_weather_changed.is_connected(_on_env_weather_changed):
 			SettingState.env_weather_changed.connect(_on_env_weather_changed)
-	
+	if SettingState and SettingState.has_signal("rain_changed"):
+		if not SettingState.rain_changed.is_connected(_on_rain_amount_changed):
+			SettingState.rain_changed.connect(_on_rain_amount_changed)
+	if SettingState and SettingState.has_signal("snow_changed"):
+		if not SettingState.snow_changed.is_connected(_on_snow_amount_changed):
+			SettingState.snow_changed.connect(_on_snow_amount_changed)
 	if PomodoroState and PomodoroState.has_signal("work_phase_started"):
 		if not PomodoroState.work_phase_started.is_connected(_on_work_phase_started):
 			PomodoroState.work_phase_started.connect(_on_work_phase_started)
@@ -165,3 +170,7 @@ func _on_work_phase_continued() -> void:
 	character.set_typing_pose()
 func _on_task_completed() -> void:
 	character.set_cheer_pose()
+func _on_rain_amount_changed(amount: int) -> void:
+	set_rain_amount(amount)
+func _on_snow_amount_changed(amount: int) -> void:
+	set_snow_amount(amount)
