@@ -21,7 +21,7 @@ func _init_ui():
 		get_tree().root.content_scale_factor = 1.8
 		ui.queue_free()
 		ui_mobile.visible = true
-		main3d.set_camera_fov(85)
+		main3d.set_camera_fov(60)
 		return
 	if OS.has_feature("pc"):
 		ui_mobile.queue_free()

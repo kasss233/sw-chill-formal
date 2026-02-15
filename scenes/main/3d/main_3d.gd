@@ -5,13 +5,15 @@ extends Node3D
 @export var rain_particle: Node3D
 @export var snow_particle: Node3D
 @export var character: Character
-@export var camera: Camera3D
+@export var side_camera: Camera3D
+@export var central_camera: Camera3D
 @export var TIME_OF_DAYTIME: float = 8
 @export var TIME_OF_DUSK: float = 17
 @export var TIME_OF_EVENING: float = 21
 @export var RAINY_LIGHT_ENERGY := 0.2
 @export var SUNNY_LIGHT_ENERGY := 0.7
-
+@export var rain: Node3D
+@export var snow: Node3D
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -65,7 +67,7 @@ func _init_time():
 	time_of_day.current_time = TIME_OF_DAYTIME
 
 func set_camera_fov(_fov: int):
-	camera.fov = _fov
+	side_camera.fov = _fov
 	pass
 ## 切换天气,0:晴天,1:雨天,2:雪天,3:同步
 func set_env_weather_rain():
@@ -112,6 +114,13 @@ func set_env_time_sync():
 	await time_tween.finished
 	time_of_day.game_time_enabled = true
 	time_of_day.system_sync = true
+## 设置粒子
+func set_rain_amount(amount: int):
+	if rain and rain.has_method("set_amount"):
+		rain.call("set_amount", amount)
+func set_snow_amount(amount: int):
+	if snow and snow.has_method("set_amount"):
+		snow.call("set_amount", amount)
 ## --- UI 信号回调 ---
 func _on_env_time_changed(mode: int) -> void:
 	match mode:

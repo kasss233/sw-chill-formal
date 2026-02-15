@@ -19,7 +19,6 @@ extends Node3D
 enum ActionTest {
 	IDLE,
 	TYPING,
-	NOT_TYPING,
 	CLAP,
 	THINK,
 	CHEER,
@@ -28,7 +27,9 @@ enum ActionTest {
 	SURPRISED,
 	DISBELIEF,
 	STRETCH,
-	STRETCH2
+	STRETCH2,
+	TALK,
+
 }
 
 enum EmotionTest {
@@ -248,6 +249,12 @@ func set_idle_pose():
 func set_typing_pose():
 	if action_playback:
 		action_playback.travel("typing")
+## talking一直循环，需要手动跳转到idle
+func set_talk_pose():
+	if not _can_trigger_one_shot_action():
+		return
+	if action_playback:
+		action_playback.travel("talk")
 ## 以下动作都是一次性动作，播放完会自动回到idle
 func set_clap_pose():
 	if not _can_trigger_one_shot_action():
@@ -357,6 +364,9 @@ func _test_action(action: ActionTest):
 			set_stretch_pose()
 		ActionTest.STRETCH2:
 			set_stretch2_pose()
+		ActionTest.TALK:
+			set_talk_pose()
+		
 
 func _test_emotion(emotion: EmotionTest):
 	if not emotion_playback:
