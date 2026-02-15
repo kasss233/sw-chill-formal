@@ -10,6 +10,8 @@ extends MarginContainer
 @onready var work_progress_bar = $FrostedPanel/MaterialProgressIndicator
 @onready var rest_progress_bar = $FrostedPanel/MaterialProgressIndicator2
 var _active_bar: Control  # 当前活跃的进度条引用
+var _pending_swap: StringName = &""   # 待执行的切换: &"work" / &"rest" / &""
+var _is_transitioning: bool = false   # 是否正在等待归零动画完成
 
 @onready var loop_info = %idle/VBoxContainer/loop
 @onready var work_info = %idle/VBoxContainer/HBoxContainer/work
@@ -67,7 +69,7 @@ func _swap_to_work() -> void:
 		rest_progress_bar.visible = false
 	else:
 		rest_progress_bar.visible = true
-		rest_progress_bar.set_progress_immediate(1.0)  # 休息环满置
+		rest_progress_bar.set_progress_value(1.0)  # 休息环满置
 
 
 func _swap_to_rest() -> void:
@@ -82,6 +84,49 @@ func _reset_progress_bars() -> void:
 	work_progress_bar.set_progress_value(0.0)
 	rest_progress_bar.set_progress_value(0.0)
 	rest_progress_bar.visible = true
+
+
+# ======================== 进度条切换过渡 ========================
+
+func _begin_swap_transition(target: StringName) -> void:
+	if not _active_bar:
+		_execute_swap(target)
+		return
+	var has_running_tween = (_active_bar._progress_tween
+			and _active_bar._progress_tween.is_valid()
+			and _active_bar._progress_tween.is_running())
+	if not has_running_tween:
+		_execute_swap(target)
+		return
+	_pending_swap = target
+	_is_transitioning = true
+	if not _active_bar.animation_finished.is_connected(_on_active_bar_animation_finished):
+		_active_bar.animation_finished.connect(_on_active_bar_animation_finished, CONNECT_ONE_SHOT)
+
+
+func _on_active_bar_animation_finished() -> void:
+	if not _is_transitioning or _pending_swap == &"":
+		return
+	var target = _pending_swap
+	_pending_swap = &""
+	_is_transitioning = false
+	_execute_swap(target)
+
+
+func _execute_swap(target: StringName) -> void:
+	match target:
+		&"work": _swap_to_work()
+		&"rest": _swap_to_rest()
+	if _active_bar and PomodoroState.is_active():
+		_active_bar.set_progress_value(PomodoroState.get_status().progress)
+
+
+func _cancel_swap_transition() -> void:
+	if _is_transitioning and _active_bar:
+		if _active_bar.animation_finished.is_connected(_on_active_bar_animation_finished):
+			_active_bar.animation_finished.disconnect(_on_active_bar_animation_finished)
+	_pending_swap = &""
+	_is_transitioning = false
 
 
 # ======================== 显示更新 ========================
@@ -115,6 +160,7 @@ func _on_pomodoro_started(_data: Dictionary) -> void:
 
 
 func _on_pomodoro_stopped() -> void:
+	_cancel_swap_transition()
 	_idle_view()
 	_reset_progress_bars()
 
@@ -122,18 +168,20 @@ func _on_pomodoro_stopped() -> void:
 func _on_tick(remaining: int, total: int, progress: float, is_work: bool) -> void:
 	_update_display(remaining)
 	_update_status_display(is_work)
+	if _is_transitioning:
+		return
 	if _active_bar:
 		_active_bar.set_progress_value(progress)
 
 
 func _on_work_phase_started() -> void:
 	_update_status_display(true)
-	_swap_to_work()
+	_begin_swap_transition(&"work")
 
 
 func _on_rest_phase_started() -> void:
 	_update_status_display(false)
-	_swap_to_rest()
+	_begin_swap_transition(&"rest")
 
 
 func _on_loop_completed(current: int, total: int) -> void:
@@ -141,6 +189,7 @@ func _on_loop_completed(current: int, total: int) -> void:
 
 
 func _on_all_completed() -> void:
+	_cancel_swap_transition()
 	_idle_view()
 	_reset_progress_bars()
 
