@@ -25,8 +25,10 @@ shader_parameter/corner_radius = 12.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 4.0
-shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 shader_parameter/noise_amount = 0.0
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_0vjod")
 shader_parameter/show_shadow = true
@@ -122,24 +124,43 @@ TextEdit/styles/focus = SubResource("StyleBoxEmpty_8mtc7")
 TextEdit/styles/normal = SubResource("StyleBoxEmpty_8mtc7")
 TextEdit/styles/read_only = SubResource("StyleBoxEmpty_8mtc7")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2afly"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2afly"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ycma3"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_2afly")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5m2a5"]
+shader = ExtResource("1_wuqb7")
+shader_parameter/corner_radius = 16.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_ycma3")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(150, 96)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_otvcy"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.15, 0.15, 0.15, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.3, 0.5)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [sub_resource type="Resource" id="Resource_wohh0"]
 script = ExtResource("8_3qy2h")
@@ -220,27 +241,30 @@ theme = SubResource("Theme_0vjod")
 placeholder_text = "请输入文本"
 wrap_mode = 1
 
-[node name="DragHandle" type="Control" parent="." unique_id=1741704685 node_paths=PackedStringArray("drag_target", "target_node")]
+[node name="DragHandle" type="Control" parent="." unique_id=1741704685 node_paths=PackedStringArray("drag_target", "visual_target", "target_node")]
 anchors_preset = 0
 offset_left = 104.0
 offset_top = 12.0
 offset_right = 166.0
 offset_bottom = 65.0
 script = ExtResource("6_v5ehv")
-drag_target = NodePath("../FrostedPanel")
-target_node = NodePath("../FrostedPanel")
+drag_target = NodePath("..")
+visual_target = NodePath("../FrostedPanel")
+target_node = NodePath("..")
 
 [node name="MaterialMenu" type="PanelContainer" parent="." unique_id=1894019910]
+material = SubResource("ShaderMaterial_5m2a5")
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 0
 offset_left = 278.0
 offset_top = 131.0
 offset_right = 428.0
 offset_bottom = 227.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_2afly")
+theme_override_styles/panel = SubResource("StyleBoxFlat_otvcy")
 script = ExtResource("7_u558q")
 editor_items = Array[ExtResource("8_3qy2h")]([SubResource("Resource_wohh0"), SubResource("Resource_ngvjn")])
 min_width = 150
+noise_texture = SubResource("NoiseTexture2D_ycma3")
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [connection signal="menu_item_pressed" from="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/MenuButton" to="." method="_on_menu_button_menu_item_pressed"]

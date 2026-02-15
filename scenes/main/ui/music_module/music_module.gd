@@ -181,6 +181,9 @@ func _setup_initial_music() -> void:
 	if MusicState:
 		mode_button.set_state_no_signal(MusicState.play_mode)
 
+	# 8. 注册"全部音乐"运行时歌单
+	MusicState.register_runtime_playlist("全部音乐", _build_all_music_track_names())
+
 	# 7. 恢复当前歌单选择
 	if MusicState and MusicState.current_playlist != "":
 		var names = _playlist_manager.get_all_playlist_names()
@@ -188,9 +191,8 @@ func _setup_initial_music() -> void:
 			if names[i] == MusicState.current_playlist:
 				_switch_to_list(i)
 				break
-
-	# 8. 注册"全部音乐"运行时歌单
-	MusicState.register_runtime_playlist("全部音乐", _build_all_music_track_names())
+	else:
+		_switch_to_list(0)
 
 	print("[Music Module] Setup initial music completed (with persistence restore)")
 

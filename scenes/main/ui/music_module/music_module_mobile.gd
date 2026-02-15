@@ -302,13 +302,15 @@ func _setup_initial_music() -> void:
 			_playlist_manager.sync_music_category_state(tname, pname, true)
 	if MusicState:
 		mode_button.set_state_no_signal(MusicState.play_mode)
+	MusicState.register_runtime_playlist("全部音乐", _build_all_music_track_names())
 	if MusicState and MusicState.current_playlist != "":
 		var names = _playlist_manager.get_all_playlist_names()
 		for i in range(names.size()):
 			if names[i] == MusicState.current_playlist:
 				_switch_to_list(i)
 				break
-	MusicState.register_runtime_playlist("全部音乐", _build_all_music_track_names())
+	else:
+		_switch_to_list(0)
 
 func _setup_list_menu() -> void:
 	if list_menu_button:

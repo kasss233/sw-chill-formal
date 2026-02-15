@@ -26,7 +26,7 @@ signal menu_item_pressed(index: int, item: MaterialMenuItem)
 				menu.menu_closed.connect(_on_menu_closed)
 
 ## 菜单弹出位置
-@export_enum("下方", "右侧", "鼠标位置") var popup_position: int = 0
+@export_enum("下方", "右侧", "鼠标位置", "上方", "左侧") var popup_position: int = 0
 
 ## 菜单偏移量
 @export var menu_offset: Vector2 = Vector2(0, 4)
@@ -190,6 +190,10 @@ func _show_menu() -> void:
 			menu.popup_beside(self, menu_offset)
 		2:  # 鼠标位置
 			menu.popup_at_mouse()
+		3:  # 上方
+			menu.popup_above(self, menu_offset)
+		4:  # 左侧
+			menu.popup_beside_left(self, menu_offset)
 
 func _on_menu_closed() -> void:
 	_is_menu_open = false

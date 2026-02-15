@@ -195,6 +195,18 @@ enum BackgroundStyle {
 		blur_amount = value
 		_update_frosted_params()
 
+## 磨砂背景饱和度
+@export_range(0.0, 3.0) var saturation: float = 1.6:
+	set(value):
+		saturation = value
+		_update_frosted_params()
+
+## 磨砂背景亮度
+@export_range(0.0, 2.0) var brightness: float = 1.1:
+	set(value):
+		brightness = value
+		_update_frosted_params()
+
 ## 磨砂色调颜色
 @export var tint_color: Color = Color(0, 0, 0, 0.3):
 	set(value):
@@ -307,6 +319,8 @@ func _update_frosted_params() -> void:
 
 	var mat = _background_panel.material
 	mat.set_shader_parameter("blur_amount", blur_amount)
+	mat.set_shader_parameter("saturation", saturation)
+	mat.set_shader_parameter("brightness", brightness)
 	mat.set_shader_parameter("tint_color", tint_color)
 	mat.set_shader_parameter("border_width", border_width)
 	mat.set_shader_parameter("border_color", _current_border_color)
