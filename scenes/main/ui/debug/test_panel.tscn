@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://daa0dvlkhliq6"]
+[gd_scene load_steps=8 format=3 uid="uid://daa0dvlkhliq6"]
 
 [ext_resource type="Script" uid="uid://c3harjmj1bpcc" path="res://scenes/main/ui/debug/test_panel.gd" id="1_test_panel"]
 [ext_resource type="PackedScene" uid="uid://dh3k8yjvb2qwm" path="res://scenes/main/ui/debug/task_module_test_panel.tscn" id="2_task_test"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://c8yjvb2qwm3la" path="res://scenes/main/ui/debug/music_module_test_panel.tscn" id="3_uae58"]
 [ext_resource type="PackedScene" uid="uid://dxvj8y3k4m5nb" path="res://scenes/main/ui/debug/input_box_test_panel.tscn" id="4_input_test"]
 [ext_resource type="PackedScene" uid="uid://bnm7x2k4p9qwe" path="res://scenes/main/ui/debug/notebook_mobile_test_panel.tscn" id="5_note_test"]
+[ext_resource type="PackedScene" uid="uid://ca7thp4n2x8qr" path="res://scenes/main/ui/debug/auth_test_panel.tscn" id="6_auth_test"]
 
 [node name="TestPanel" type="MarginContainer"]
 offset_right = 314.0
@@ -62,6 +63,11 @@ metadata/_tab_index = 2
 visible = false
 layout_mode = 2
 metadata/_tab_index = 3
+
+[node name="Auth" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("6_auth_test")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

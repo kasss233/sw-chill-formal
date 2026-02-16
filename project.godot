@@ -40,6 +40,7 @@ CharacterInteractorState="*res://scenes/main/data/character_interactor_state.gd"
 StickyNoteState="*res://scenes/main/data/sticky_note_state.gd"
 ChatState="*res://scenes/main/data/chat_state.gd"
 LayerManager="*res://scenes/main/data/layer_manager.gd"
+EventTracker="*res://scenes/main/data/event_tracker.gd"
 
 [display]
 

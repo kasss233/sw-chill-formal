@@ -7,4 +7,5 @@ script = ExtResource("1_ai_svc")
 api_key = "AIzaSyAN1gt5Wbn4rSxA5HkCf7gBbVN6v1li0bc"
 api_base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
 model = "gemini-3-flash-preview"
+system_prompt = ""
 debug_enabled = true
