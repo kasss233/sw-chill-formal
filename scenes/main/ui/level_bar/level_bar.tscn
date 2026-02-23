@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ml7tvlqo12m7" path="res://scenes/main/ui/level_bar/level_bar.gd" id="1_rkt6b"]
 [ext_resource type="Script" uid="uid://qac15j88w15i" path="res://scenes/main/ui/components/progress_indicator/MaterialProgressIndicator.gd" id="1_s4bu5"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="3_ldljy"]
+[ext_resource type="FontFile" uid="uid://l4dcpp5cofuj" path="res://assets/ui/fonts/方正兰亭圆简体.TTF" id="4_ldljy"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="4_pb80h"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ql75p"]
@@ -13,9 +14,9 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_ql75p")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_bblk2"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ldljy"]
 shader = ExtResource("3_ldljy")
-shader_parameter/corner_radius = 50.0
+shader_parameter/corner_radius = 60.0
 shader_parameter/show_border = false
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
@@ -29,10 +30,10 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(123, 124)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(97, 93)
+shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j5hew"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pb80h"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -44,46 +45,117 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="LevelBar" type="Control" unique_id=752990611 node_paths=PackedStringArray("bar", "label")]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("1_rkt6b")
-bar = NodePath("MaterialProgressIndicator2")
-label = NodePath("FrostedPanel/Label")
+[sub_resource type="LabelSettings" id="LabelSettings_rkt6b"]
+font = ExtResource("4_ldljy")
+font_size = 17
 
-[node name="MaterialProgressIndicator2" type="Control" parent="." unique_id=1381881898]
-custom_minimum_size = Vector2(120, 120)
+[sub_resource type="LabelSettings" id="LabelSettings_ldljy"]
+font = ExtResource("4_ldljy")
+font_size = 13
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_n7q0g"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bblk2"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_n7q0g")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j5hew"]
+shader = ExtResource("3_ldljy")
+shader_parameter/corner_radius = 12.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_bblk2")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(104, 68)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ev85l"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="LevelBar" type="Control" unique_id=752990611 node_paths=PackedStringArray("bar", "level_label", "xp_level", "msg_label", "msg_panel")]
+layout_mode = 3
 anchors_preset = 0
-offset_right = 120.0
-offset_bottom = 120.0
-script = ExtResource("1_s4bu5")
-indicator_type = 1
-progress = 0.56
-track_thickness = 12
-circular_size = 120
-progress_color = Color(0.95, 0.95, 0.95, 1)
-track_color = Color(0.20501125, 0.27533963, 0.55704886, 0.5019608)
-metadata/_custom_type_script = "uid://qac15j88w15i"
+script = ExtResource("1_rkt6b")
+bar = NodePath("FrostedPanel/MaterialProgressIndicator2")
+level_label = NodePath("FrostedPanel/VBoxContainer/LevelLabel")
+xp_level = NodePath("FrostedPanel/VBoxContainer/XPLabel")
+msg_label = NodePath("FrostedPanel2/Label")
+msg_panel = NodePath("FrostedPanel2")
 
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=1980697312]
-material = SubResource("ShaderMaterial_bblk2")
+material = SubResource("ShaderMaterial_ldljy")
 layout_mode = 0
-offset_left = -2.0
-offset_top = -2.0
-offset_right = 121.0
-offset_bottom = 122.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_j5hew")
+offset_left = 11.0
+offset_top = 14.0
+offset_right = 108.0
+offset_bottom = 107.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_pb80h")
 script = ExtResource("4_pb80h")
-corner_radius = 50.0
+corner_radius = 60.0
 show_border = false
 noise_texture = SubResource("NoiseTexture2D_n7q0g")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="Label" type="Label" parent="FrostedPanel" unique_id=39483440]
+[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel" unique_id=2050064574]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="LevelLabel" type="Label" parent="FrostedPanel/VBoxContainer" unique_id=39483440]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "等级"
+label_settings = SubResource("LabelSettings_rkt6b")
+autowrap_mode = 3
+
+[node name="XPLabel" type="Label" parent="FrostedPanel/VBoxContainer" unique_id=590084398]
+layout_mode = 2
+text = "XP"
+label_settings = SubResource("LabelSettings_ldljy")
+
+[node name="MaterialProgressIndicator2" type="Control" parent="FrostedPanel" unique_id=1381881898]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+script = ExtResource("1_s4bu5")
+indicator_type = 1
+track_thickness = 12
+circular_size = 120
+progress_color = Color(0.39100066, 0.67479986, 0.9588484, 1)
+metadata/_custom_type_script = "uid://qac15j88w15i"
+
+[node name="FrostedPanel2" type="PanelContainer" parent="." unique_id=1014675826]
+material = SubResource("ShaderMaterial_j5hew")
+layout_mode = 0
+offset_left = 31.0
+offset_right = 135.0
+offset_bottom = 68.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ev85l")
+script = ExtResource("4_pb80h")
+noise_texture = SubResource("NoiseTexture2D_bblk2")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="Label" type="Label" parent="FrostedPanel2" unique_id=975200627]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "经验加5"
