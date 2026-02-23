@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dqpk5a7xnv3wy"]
 
-[ext_resource type="Script" uid="uid://duob05pwom6mw" path="res://scenes/main/ai_service/ai_service.gd" id="1_ai_svc"]
+[ext_resource type="Script" uid="uid://duob05pwom6mw" path="res://scenes/main/autoload/ai_service/ai_service.gd" id="1_ai_svc"]
 
 [node name="AIService" type="Node" unique_id=1406060595]
 script = ExtResource("1_ai_svc")
