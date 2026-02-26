@@ -23,6 +23,7 @@ const SAVE_PATH := "user://level_data.json"
 # ===== 生命周期 =====
 func _ready() -> void:
 	load_data()
+	_connect_signals()
 
 
 # ===== 对外接口（UI/模块可调用） =====
@@ -126,3 +127,12 @@ func _clear_pending_gain_context() -> void:
 	_pending_gain_amount = 0
 	_pending_gain_source = ""
 	_pending_show_gain_source = false
+
+
+func _connect_signals() -> void:
+	if AchievementState and AchievementState.has_signal("daily_task_reward_claimed"):
+		if not AchievementState.daily_task_reward_claimed.is_connected(_on_daily_task_reward_claimed):
+			AchievementState.daily_task_reward_claimed.connect(_on_daily_task_reward_claimed)
+
+func _on_daily_task_reward_claimed(_data: Dictionary) -> void:
+	add_xp(50, "完成每日任务奖励", true)

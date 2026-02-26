@@ -40,10 +40,14 @@ func _ready() -> void:
 
 	AchievementState.daily_task_added.connect(_on_state_daily_task_added)
 	AchievementState.daily_task_removed.connect(_on_state_daily_task_removed)
-	AchievementState.daily_task_updated.connect(_on_state_daily_task_updated)
+	AchievementState.daily_task_state_updated.connect(_on_state_daily_task_state_updated)
+	AchievementState.daily_task_completed.connect(_on_state_daily_task_completed)
+	AchievementState.daily_task_reward_claimed.connect(_on_state_daily_task_reward_claimed)
 	AchievementState.achievement_added.connect(_on_state_achievement_added)
 	AchievementState.achievement_removed.connect(_on_state_achievement_removed)
-	AchievementState.achievement_updated.connect(_on_state_achievement_updated)
+	AchievementState.achievement_state_updated.connect(_on_state_achievement_state_updated)
+	AchievementState.achievement_completed.connect(_on_state_achievement_completed)
+	AchievementState.achievement_reward_claimed.connect(_on_state_achievement_reward_claimed)
 
 	_log_info("Achievement 调试面板已就绪")
 	_log_info("当前数据: 每日任务=%d, 成就=%d" % [AchievementState.get_daily_task_count(), AchievementState.get_achievement_count()])
@@ -147,8 +151,14 @@ func _on_state_daily_task_added(data: Dictionary) -> void:
 func _on_state_daily_task_removed(item_id: int) -> void:
 	_log_info("[signal] daily_task_removed -> id=%d" % item_id)
 
-func _on_state_daily_task_updated(data: Dictionary) -> void:
-	_log_info("[signal] daily_task_updated -> id=%d" % int(data.get("id", -1)))
+func _on_state_daily_task_state_updated(data: Dictionary) -> void:
+	_log_info("[signal] daily_task_state_updated -> id=%d" % int(data.get("id", -1)))
+
+func _on_state_daily_task_completed(data: Dictionary) -> void:
+	_log_info("[signal] daily_task_completed -> id=%d" % int(data.get("id", -1)))
+
+func _on_state_daily_task_reward_claimed(data: Dictionary) -> void:
+	_log_info("[signal] daily_task_reward_claimed -> id=%d" % int(data.get("id", -1)))
 
 func _on_state_achievement_added(data: Dictionary) -> void:
 	_log_info("[signal] achievement_added -> id=%d" % int(data.get("id", -1)))
@@ -156,8 +166,14 @@ func _on_state_achievement_added(data: Dictionary) -> void:
 func _on_state_achievement_removed(item_id: int) -> void:
 	_log_info("[signal] achievement_removed -> id=%d" % item_id)
 
-func _on_state_achievement_updated(data: Dictionary) -> void:
-	_log_info("[signal] achievement_updated -> id=%d" % int(data.get("id", -1)))
+func _on_state_achievement_state_updated(data: Dictionary) -> void:
+	_log_info("[signal] achievement_state_updated -> id=%d" % int(data.get("id", -1)))
+
+func _on_state_achievement_completed(data: Dictionary) -> void:
+	_log_info("[signal] achievement_completed -> id=%d" % int(data.get("id", -1)))
+
+func _on_state_achievement_reward_claimed(data: Dictionary) -> void:
+	_log_info("[signal] achievement_reward_claimed -> id=%d" % int(data.get("id", -1)))
 
 func _read_title(prefix: String) -> String:
 	var title := title_input.text.strip_edges()

@@ -227,61 +227,6 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f6u4w"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e3fsq"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8b17p"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_aq74g"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jho0c"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [node name="AchievementModule" type="MarginContainer" unique_id=2007027537]
 offset_right = 48.0
 offset_bottom = 48.0
@@ -344,6 +289,8 @@ vertical_alignment = 1
 
 [node name="TabButtons" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1664879877]
 layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
 theme_override_constants/separation = 6
 
 [node name="DailyTaskButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons" unique_id=49060023]
@@ -378,22 +325,6 @@ script = ExtResource("4_q6hjx")
 padding_horizontal = 14
 padding_vertical = 7
 
-[node name="AddButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1736811024]
-clip_contents = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme = ExtResource("3_5f0gk")
-theme_override_styles/normal = SubResource("StyleBoxFlat_f6u4w")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_e3fsq")
-theme_override_styles/hover = SubResource("StyleBoxFlat_8b17p")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_aq74g")
-theme_override_styles/focus = SubResource("StyleBoxFlat_jho0c")
-text = "添加"
-script = ExtResource("4_q6hjx")
-padding_horizontal = 14
-padding_vertical = 7
-
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=1274443928]
 layout_mode = 2
 size_flags_vertical = 3
@@ -408,13 +339,13 @@ theme_override_constants/separation = 8
 [node name="DailyTaskList" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=2121413013]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 30
 
 [node name="AchievementList" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=13641101]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 30
 
 [node name="EmptyLabel" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=1224922960]
 layout_mode = 2
@@ -437,4 +368,3 @@ metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 [connection signal="state_changed" from="Button" to="." method="_on_button_state_changed"]
 [connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons/DailyTaskButton" to="." method="_on_daily_task_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons/AchievementButton" to="." method="_on_achievement_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/AddButton" to="." method="_on_add_button_pressed"]

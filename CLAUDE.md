@@ -39,7 +39,9 @@ Data Autoload (单例) → UI Module (模块) → UI Component (组件)
 | GuiTransitions | `addons/simple-gui-transitions/singleton.gd` | UI 布局切换动画，`go_to()` / `show()` / `hide()` |
 | AudioPlayer | `scenes/main/audio_player/audio_player.tscn` | BGM/SFX 引擎，音量淡入淡出，crossfade。`is_paused` 独立于当前曲目 |
 | MusicState | `scenes/main/audio_player/music_state.gd` | 音乐状态数据源：曲目、播放状态、模式(SEQUENTIAL/RANDOM/SINGLE_LOOP)、播放列表 |
-| TaskState | `scenes/main/data/task_state.gd` | 任务数据管理，持久化 `user://task_data.json`，60s 检查截止时间 |
+| TaskState | `scenes/main/autoload/data/task_state.gd` | 任务数据管理，持久化 `user://task_data.json`，60s 检查截止时间 |
+| AchievementState | `scenes/main/autoload/data/achievement_state.gd` | 每日任务/成就数据源，自动任务补齐、按天刷新、奖励领取状态持久化 |
+| LevelState | `scenes/main/autoload/data/level_state.gd` | 等级与经验数据源，统一经验结算与升级广播，监听成就/每日任务奖励领取加经验 |
 | AIService | `scenes/main/ai_service/ai_service.tscn` | OpenAI 兼容 SSE 流式 API，多模态，线程化 HTTP |
 
 ### 音频数据流
@@ -61,6 +63,8 @@ AudioRes (resource/audio_res/) → AudioPlayer → MusicModule → MusicList →
 | DialogueBox | `dialogue_box/dialogue_box.gd` | AI 对话展示，逐字流式动画，BBCode，3 个操作按钮 |
 | Setting | `setting/setting.gd` | 环境时间/天气/抗锯齿设置，持久化到 `user://settings.cfg` |
 | PomodoroModule | `pomodoro_technique_module/pomodoro_technique_module.gd` | 番茄钟，CanvasLayer UI |
+| AchievementModule | `achievement_module/achievement_module.gd` | 每日任务/成就双 Tab 展示，完成、删除、领取交互转发到 `AchievementState` |
+| LevelBar | `level_bar/level_bar.gd` | 等级条 UI，监听 `LevelState` 的等级与经验进度更新 |
 | CharacterInteractor | `character_interactor/character_interactor.gd` | 角色交互触发（3 次点击） |
 
 ### 3D Components
