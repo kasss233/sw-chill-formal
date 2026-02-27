@@ -8,7 +8,7 @@ class_name CustomAPIAdapter extends AIAdapter
 ##
 ## 请求端点:
 ##   POST /chat/messages — 发送消息（SSE 流）
-##   POST /chat/function-results — 回传函数执行结果（SSE 流）
+##   POST /chat/function-results — 回传函数执行结果（JSON）
 
 ## API 配置
 var api_url: String = ""
@@ -25,6 +25,7 @@ var _is_requesting: bool = false
 var _should_stop: bool = false
 var _buffer: String = ""
 var _stream_thread: Thread = null
+var _fr_thread: Thread = null   # function-result 独立线程
 var _mutex: Mutex = null
 var _full_response: String = ""
 var _event_type: String = ""
@@ -94,6 +95,9 @@ func cancel_request() -> void:
 	if _http_client:
 		_http_client.close()
 
+	if _fr_thread and _fr_thread.is_started():
+		_fr_thread.wait_to_finish()
+
 	_is_requesting = false
 
 
@@ -113,8 +117,10 @@ func send_function_result(call_id: String, name: String, result: Variant) -> voi
 	# 更新 auth token
 	auth_token = AuthState.get_access_token()
 
-	_stream_thread = Thread.new()
-	_stream_thread.start(_execute_function_result_request.bind(body))
+	if _fr_thread and _fr_thread.is_started():
+		_fr_thread.wait_to_finish()
+	_fr_thread = Thread.new()
+	_fr_thread.start(_execute_function_result_request.bind(body))
 
 
 ## 构建请求体
@@ -175,14 +181,15 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 		_is_requesting = false
 		return
 
-	var url_parts = _parse_url(api_url + "/chat/messages")
+	var url_parts = _parse_url(api_url + "/api/v1/chat/messages")
 	if url_parts.is_empty():
 		call_deferred("_emit_request_failed", "API URL 格式无效")
 		_is_requesting = false
 		return
 
 	_http_client = HTTPClient.new()
-	var err = _http_client.connect_to_host(url_parts["host"], url_parts["port"], url_parts["tls"])
+	var tls_options: TLSOptions = TLSOptions.client_unsafe() if url_parts["tls"] else null
+	var err = _http_client.connect_to_host(url_parts["host"], url_parts["port"], tls_options)
 	if err != OK:
 		call_deferred("_emit_request_failed", "连接失败: %d" % err)
 		_is_requesting = false
@@ -221,13 +228,14 @@ func _execute_function_result_request(body: Dictionary) -> void:
 		call_deferred("_emit_request_failed", "未登录，无法回传函数结果")
 		return
 
-	var url_parts = _parse_url(api_url + "/chat/function-results")
+	var url_parts = _parse_url(api_url + "/api/v1/chat/function-results")
 	if url_parts.is_empty():
 		call_deferred("_emit_request_failed", "API URL 格式无效")
 		return
 
 	var client = HTTPClient.new()
-	var err = client.connect_to_host(url_parts["host"], url_parts["port"], url_parts["tls"])
+	var tls_options: TLSOptions = TLSOptions.client_unsafe() if url_parts["tls"] else null
+	var err = client.connect_to_host(url_parts["host"], url_parts["port"], tls_options)
 	if err != OK:
 		call_deferred("_emit_request_failed", "连接失败: %d" % err)
 		return
@@ -253,7 +261,7 @@ func _execute_function_result_request(body: Dictionary) -> void:
 	var headers = PackedStringArray([
 		"Content-Type: application/json",
 		"Authorization: Bearer " + auth_token,
-		"Accept: text/event-stream"
+		"Accept: application/json"
 	])
 
 	var body_json = JSON.stringify(body)
@@ -263,10 +271,7 @@ func _execute_function_result_request(body: Dictionary) -> void:
 		client.close()
 		return
 
-	# 读取后续 SSE 流（后端可能基于函数结果继续生成回复）
-	_buffer = ""
-	_event_type = ""
-
+	# 等待请求完成
 	while client.get_status() == HTTPClient.STATUS_REQUESTING:
 		client.poll()
 		OS.delay_msec(10)
@@ -281,20 +286,28 @@ func _execute_function_result_request(body: Dictionary) -> void:
 		client.close()
 		return
 
+	# 读取完整 JSON 响应体
+	var response_body = ""
 	while client.get_status() == HTTPClient.STATUS_BODY:
-		_mutex.lock()
-		var stopped = _should_stop
-		_mutex.unlock()
-		if stopped:
-			break
-
 		client.poll()
 		var chunk = client.read_response_body_chunk()
 		if chunk.size() > 0:
-			_process_sse_chunk(chunk.get_string_from_utf8())
+			response_body += chunk.get_string_from_utf8()
 		OS.delay_msec(10)
 
 	client.close()
+
+	# 解析 JSON
+	if not response_body.is_empty():
+		var json = JSON.new()
+		if json.parse(response_body) == OK:
+			var result = json.get_data()
+			if result is Dictionary and result.get("code", -1) != 0:
+				call_deferred("_emit_request_failed",
+					"函数结果回传失败: %s" % result.get("message", ""))
+		else:
+			call_deferred("_emit_request_failed",
+				"函数结果响应解析失败")
 
 
 ## 等待连接建立
@@ -409,6 +422,9 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 		return
 
 	match event_type:
+		"session_start":
+			_session_id = data.get("session_id", _session_id)
+
 		"text_delta":
 			var content = data.get("content", "")
 			_full_response += content
@@ -445,6 +461,9 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 			_session_id = data.get("session_id", _session_id)
 			_message_id = data.get("message_id", "")
 			call_deferred("_emit_stream_done")
+
+		_:
+			print("[CustomAPIAdapter] 未知 SSE 事件: %s" % event_type)
 
 
 ## 线程安全的信号发射辅助方法

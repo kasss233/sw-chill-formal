@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://ca7thp4n2x8qr"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/auth_test_panel.gd" id="1_auth_test"]
+
+[node name="AuthTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_auth_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="BaseUrlInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "服务器地址"
+
+[node name="UsernameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "用户名"
+
+[node name="PasswordInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "密码"
+secret = true
+
+[node name="DisplayNameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "显示名称 (注册用，可选)"
+
+[node name="ButtonSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "AuthState API 测试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="SetBaseUrlBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "设置服务器地址 (set_base_url)"
+
+[node name="RegisterBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "注册 (register)"
+
+[node name="LoginBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "登录 (login)"
+
+[node name="LogoutBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "登出 (logout)"
+
+[node name="RefreshTokenBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "刷新Token (refresh_access_token)"
+
+[node name="CheckStatusBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "查看认证状态 (check_status)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]测试日志将显示在这里...[/color]"
+scroll_following = true

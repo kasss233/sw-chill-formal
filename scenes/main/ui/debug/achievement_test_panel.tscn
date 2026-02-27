@@ -1,0 +1,142 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/achievement_test_panel.gd" id="1_achieve_test"]
+
+[node name="AchievementTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_achieve_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="TitleInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "标题 (添加时使用)"
+
+[node name="DescriptionInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "描述 (添加时使用)"
+
+[node name="ItemIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "条目ID (更新/删除/领取时使用)"
+
+[node name="TargetInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "目标值 target (默认>=1)"
+text = "1"
+
+[node name="CurrentInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "当前值 current"
+text = "0"
+
+[node name="ButtonSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "AchievementState 调试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddDailyBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "添加每日任务 (add_daily_task)"
+
+[node name="AddAchievementBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "添加成就 (add_achievement)"
+
+[node name="SetDailyProgressBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "更新每日任务进度 (set_daily_task_progress)"
+
+[node name="SetAchievementProgressBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "更新成就进度 (set_achievement_progress)"
+
+[node name="MarkDailyCompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "每日任务标记完成 (set_daily_task_completed=true)"
+
+[node name="MarkDailyUncompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "每日任务标记未完成 (set_daily_task_completed=false)"
+
+[node name="MarkAchievementCompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "成就标记完成 (set_achievement_completed=true)"
+
+[node name="MarkAchievementUncompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "成就标记未完成 (set_achievement_completed=false)"
+
+[node name="ClaimAchievementBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "领取成就奖励 (claim_achievement)"
+
+[node name="RemoveDailyBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "删除每日任务 (remove_daily_task)"
+
+[node name="RemoveAchievementBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "删除成就 (remove_achievement)"
+
+[node name="GetAllBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "获取全部数据 (get_daily_tasks/get_achievements)"
+
+[node name="ClearDailyBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "清空每日任务 (clear_daily_tasks)"
+
+[node name="ClearAchievementBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "清空成就 (clear_achievements)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]Achievement 调试日志将显示在这里...[/color]"
+scroll_following = true

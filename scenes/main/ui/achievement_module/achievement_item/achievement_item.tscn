@@ -1,0 +1,160 @@
+[gd_scene format=3 uid="uid://dr5d1jy583lfx"]
+
+[ext_resource type="Script" uid="uid://37bp0bseljgx" path="res://scenes/main/ui/achievement_module/achievement_item/achievement_item.gd" id="1_rhld0"]
+[ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="2_wr7jv"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="4_p8vbx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1wrr0"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 1, 1, 0.08)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qin3d"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iefdx"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qtcyg"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5bhh7"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cm4ar"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="AchievementItem" type="Control" unique_id=1629096960]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 3
+mouse_default_cursor_shape = 2
+theme = ExtResource("2_wr7jv")
+script = ExtResource("1_rhld0")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=4434433]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1634113719]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1wrr0")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer" unique_id=1803815610]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TopRow" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer" unique_id=1582159961]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/TopRow" unique_id=1530865940]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "标题"
+vertical_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/TopRow" unique_id=61879027]
+layout_mode = 2
+text = "进行中"
+vertical_alignment = 1
+
+[node name="OperationContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer/TopRow" unique_id=427844510]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ClaimButton" type="Button" parent="MarginContainer/PanelContainer/VBoxContainer/TopRow/OperationContainer" unique_id=51009758]
+visible = false
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme = ExtResource("2_wr7jv")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qin3d")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_iefdx")
+theme_override_styles/hover = SubResource("StyleBoxFlat_qtcyg")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_5bhh7")
+theme_override_styles/focus = SubResource("StyleBoxFlat_cm4ar")
+text = "领取"
+script = ExtResource("4_p8vbx")
+padding_horizontal = 14
+padding_vertical = 7
+
+[node name="DescriptionLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer" unique_id=1398942065]
+visible = false
+layout_mode = 2
+text = "描述"
+autowrap_mode = 2
+
+[node name="ProgressRow" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer" unique_id=1548663180]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/PanelContainer/VBoxContainer/ProgressRow" unique_id=386478861]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+show_percentage = false
+
+[node name="ProgressLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/ProgressRow" unique_id=1143579570]
+layout_mode = 2
+text = "0/1"
+vertical_alignment = 1
+
+[connection signal="pressed" from="MarginContainer/PanelContainer/VBoxContainer/TopRow/OperationContainer/ClaimButton" to="." method="_on_claim_button_pressed"]
