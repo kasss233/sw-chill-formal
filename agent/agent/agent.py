@@ -135,10 +135,12 @@ class Agent:
         messages = self._get_context_messages(user_message)
         
         # 调用LLM生成响应
+        # 设置合理的max_tokens限制，避免生成过长导致超时
+        max_tokens = self.config.max_tokens or 1000  # 默认1000 tokens
         llm_response = self.llm.chat(
             messages=messages,
             temperature=self.config.temperature,
-            max_tokens=self.config.max_tokens
+            max_tokens=max_tokens
         )
         
         response_text = llm_response.content

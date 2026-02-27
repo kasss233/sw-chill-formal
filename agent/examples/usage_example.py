@@ -149,7 +149,8 @@ def main():
     config = AgentConfig(
         character_name="女孩",
         character_personality="温柔、体贴，以鼓励和支持为主",
-        temperature=0.7
+        temperature=0.7,
+        max_tokens=800  # 限制最大token数，避免超时
     )
     print("  ✓ Agent配置已创建")
     print(f"  提示: tinyllama对中文支持可能不够好，如果中文效果不理想，")
@@ -170,7 +171,7 @@ def main():
     print("-" * 60)
     # user_message = "你好，今天有什么任务要完成吗？"
     # user_message = "你好，今天有什么任务要完成吗？"
-    user_message = "你好，我想学习python，帮我列一个学习列表吧！顺便帮我把音乐声音调大一点儿。"
+    user_message = "你好，我想学习python，帮我列一个学习列表吧！"
     print(f"用户: {user_message}")
     print("-" * 60)
     
@@ -184,8 +185,9 @@ def main():
                 print(f"  {i+1}. [{msg.role}]: {msg.content[:200]}..." if len(msg.content) > 200 else f"  {i+1}. [{msg.role}]: {msg.content}")
             print("-" * 60)
         
+        print("  正在生成响应（可能需要一些时间，请耐心等待）...")
         response = agent.chat(user_message)
-        
+        print(f"\nAgent response: {response.json()}")
         print(f"\nAgent响应: {response.text}")
         print(f"\n响应详情:")
         print(f"  - 文本长度: {len(response.text)} 字符")
