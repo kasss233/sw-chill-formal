@@ -378,7 +378,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_j5ktv")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_hyecp"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j5ktv"]
 shader = ExtResource("1_q8yjo")
 shader_parameter/corner_radius = 16.0
 shader_parameter/show_border = true
@@ -397,7 +397,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(171, 96)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qtajv"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_arvrt"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -467,6 +467,7 @@ layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(109, 32)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("5_d007x")
 chip_type = 2
@@ -479,6 +480,7 @@ metadata/_custom_type_script = "uid://3xl08c2pg3qt"
 visible = false
 custom_minimum_size = Vector2(109, 32)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("5_d007x")
 chip_type = 2
@@ -632,13 +634,13 @@ use_viewport_size = true
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1221344660]
 
 [node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=1625279168]
-material = SubResource("ShaderMaterial_hyecp")
+material = SubResource("ShaderMaterial_j5ktv")
 custom_minimum_size = Vector2(100, 0)
 offset_left = 71.0
 offset_top = 76.0
 offset_right = 242.0
 offset_bottom = 172.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_qtajv")
+theme_override_styles/panel = SubResource("StyleBoxFlat_arvrt")
 script = ExtResource("13_d007x")
 editor_items = Array[ExtResource("14_q6tgl")]([SubResource("Resource_c48v0"), SubResource("Resource_q6tgl")])
 min_width = 100

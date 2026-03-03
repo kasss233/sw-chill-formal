@@ -470,10 +470,12 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 			pass
 
 		"function_call":
+			var raw_args = data.get("arguments", {})
+			print("[CustomAPIAdapter][DEBUG] function_call name=%s args_type=%s args=%s" % [data.get("name", ""), typeof(raw_args), raw_args])
 			var response = AIResponse.function_call(
 				data.get("id", ""),
 				data.get("name", ""),
-				data.get("arguments", {})
+				raw_args if raw_args is Dictionary else {}
 			)
 			call_deferred("_emit_stream_chunk", response)
 
