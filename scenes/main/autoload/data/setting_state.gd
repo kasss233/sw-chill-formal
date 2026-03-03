@@ -8,6 +8,8 @@ signal snow_changed(_value: int)
 signal rain_changed(_value: int)
 signal outdoor_1_changed(_state: int)
 signal outdoor_2_changed(_state: int)
+signal outdoor_2_unlock_changed(unlocked: bool)
+signal fog_changed(_state: int)
 ## 时间模式: 0=白天, 1=黄昏, 2=晚上, 3=同步系统
 var _time_mode: int = 0
 ## 天气模式: 0=晴天, 1=雨天, 2=雪天, 3=同步
@@ -24,16 +26,22 @@ var _snow_amount: int = 500
 var _outdoor_1_state: int = 0
 ## 户外特效 2 开关状态
 var _outdoor_2_state: int = 0
+## 雾效开关状态
+var _fog_state: int = 0
 
 const SAVE_PATH = "user://settings.cfg"
 const SAVE_DEBOUNCE_SEC := 0.25
 const RAIN_MIN_AMOUNT := 300
 const SNOW_MIN_AMOUNT := 500
+const OUTDOOR_2_UNLOCK_LEVEL := 5
 
 var _save_timer: SceneTreeTimer
+var _outdoor_2_unlocked := false
 
 func _ready() -> void:
 	_load_settings()
+	_connect_level_state_signals()
+	_update_outdoor_2_unlock_state(false)
 	call_deferred("_emit_loaded_settings")
 
 ## 设置时间模式并发出信号
@@ -77,7 +85,15 @@ func get_outdoor_1_state() -> int:
 	return _outdoor_1_state
 
 func get_outdoor_2_state() -> int:
+	if not _outdoor_2_unlocked:
+		return 1
 	return _outdoor_2_state
+
+func get_fog_state() -> int:
+	return _fog_state
+
+func is_outdoor_2_unlocked() -> bool:
+	return _outdoor_2_unlocked
 
 ## 设置 MSAA 并应用到视口、持久化
 func set_msaa(mode: int) -> void:
@@ -102,9 +118,18 @@ func set_outdoor_1(state: int) -> void:
 	emit_signal("outdoor_1_changed", state)
 	_save_settings()
 func set_outdoor_2(state: int) -> void:
+	if not _outdoor_2_unlocked:
+		emit_signal("outdoor_2_changed", 1)
+		return
 	_outdoor_2_state = state
 	emit_signal("outdoor_2_changed", state)
 	_save_settings()
+
+func set_fog(state: int) -> void:
+	_fog_state = state
+	emit_signal("fog_changed", state)
+	_save_settings()
+
 func _save_settings() -> void:
 	var config = ConfigFile.new()
 	config.set_value("env", "time_mode", _time_mode)
@@ -113,6 +138,7 @@ func _save_settings() -> void:
 	config.set_value("env", "snow_amount", _snow_amount)
 	config.set_value("env", "outdoor_1_state", _outdoor_1_state)
 	config.set_value("env", "outdoor_2_state", _outdoor_2_state)
+	config.set_value("env", "fog_state", _fog_state)
 	config.set_value("rendering", "msaa_3d", _msaa)
 	config.set_value("rendering", "screen_space_aa", _ssaa)
 	config.save(SAVE_PATH)
@@ -138,6 +164,7 @@ func _load_settings() -> void:
 	_snow_amount = maxi(int(config.get_value("env", "snow_amount", SNOW_MIN_AMOUNT)), SNOW_MIN_AMOUNT)
 	_outdoor_1_state = int(config.get_value("env", "outdoor_1_state", 0))
 	_outdoor_2_state = int(config.get_value("env", "outdoor_2_state", 0))
+	_fog_state = int(config.get_value("env", "fog_state", 0))
 	_msaa = int(config.get_value("rendering", "msaa_3d", 0))
 	_ssaa = int(config.get_value("rendering", "screen_space_aa", 0))
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
@@ -149,4 +176,33 @@ func _emit_loaded_settings() -> void:
 	rain_changed.emit(_rain_amount)
 	snow_changed.emit(_snow_amount)
 	outdoor_1_changed.emit(_outdoor_1_state)
-	outdoor_2_changed.emit(_outdoor_2_state)
+	outdoor_2_unlock_changed.emit(_outdoor_2_unlocked)
+	outdoor_2_changed.emit(get_outdoor_2_state())
+	fog_changed.emit(_fog_state)
+
+func _connect_level_state_signals() -> void:
+	if not LevelState:
+		return
+	if LevelState.has_signal("level_state_changed") and not LevelState.level_state_changed.is_connected(_on_level_state_changed):
+		LevelState.level_state_changed.connect(_on_level_state_changed)
+	if LevelState.has_signal("data_loaded") and not LevelState.data_loaded.is_connected(_on_level_data_loaded):
+		LevelState.data_loaded.connect(_on_level_data_loaded)
+
+func _is_outdoor_2_unlocked_by_level() -> bool:
+	if not LevelState:
+		return false
+	return LevelState.level > OUTDOOR_2_UNLOCK_LEVEL
+
+func _update_outdoor_2_unlock_state(emit_signal_when_unchanged: bool = true) -> void:
+	var unlocked := _is_outdoor_2_unlocked_by_level()
+	var changed := unlocked != _outdoor_2_unlocked
+	_outdoor_2_unlocked = unlocked
+	if changed or emit_signal_when_unchanged:
+		outdoor_2_unlock_changed.emit(_outdoor_2_unlocked)
+		outdoor_2_changed.emit(get_outdoor_2_state())
+
+func _on_level_state_changed(_data: Dictionary) -> void:
+	_update_outdoor_2_unlock_state()
+
+func _on_level_data_loaded() -> void:
+	_update_outdoor_2_unlock_state()

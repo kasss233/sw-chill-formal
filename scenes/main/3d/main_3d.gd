@@ -15,7 +15,7 @@ extends Node3D
 @export var rain: Node3D
 @export var snow: Node3D
 @export var cherry_blossom: Node3D
-@export var black_hole: Node3D
+@export var planet: Node3D
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -50,6 +50,10 @@ func _connect_signals() -> void:
 	if SettingState and SettingState.has_signal("outdoor_2_changed"):
 		if not SettingState.outdoor_2_changed.is_connected(_on_out_door_2_button_state_changed):
 			SettingState.outdoor_2_changed.connect(_on_out_door_2_button_state_changed)
+	## fog
+	if SettingState and SettingState.has_signal("fog_changed"):
+		if not SettingState.fog_changed.is_connected(_on_fog_button_state_changed):
+			SettingState.fog_changed.connect(_on_fog_button_state_changed)
 	if PomodoroState and PomodoroState.has_signal("work_phase_started"):
 		if not PomodoroState.work_phase_started.is_connected(_on_work_phase_started):
 			PomodoroState.work_phase_started.connect(_on_work_phase_started)
@@ -189,6 +193,11 @@ func _on_out_door_1_button_state_changed(state: int) -> void:
 		cherry_blossom.visible = false
 func _on_out_door_2_button_state_changed(state: int) -> void:
 	if state == 0:
-		black_hole.visible = true
+		planet.visible = true
 	elif state == 1:
-		black_hole.visible = false
+		planet.visible = false
+func _on_fog_button_state_changed(state: int) -> void:
+	if state == 0:
+		sky3d.fog_enabled = true
+	elif state == 1:
+		sky3d.fog_enabled = false
