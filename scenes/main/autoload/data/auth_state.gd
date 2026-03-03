@@ -22,7 +22,7 @@ var _is_refreshing: bool = false
 var _http_request: HTTPRequest = null
 var _pending_action: String = ""  # "login" / "register" / "refresh" / "logout"
 
-var _base_url: String = "http://localhost:8000/api/v1"
+var _base_url: String = ""
 
 const AUTH_SAVE_PATH = "user://auth.json"
 const SERVER_CONFIG_PATH = "user://server_config.cfg"

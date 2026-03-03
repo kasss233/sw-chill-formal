@@ -67,6 +67,10 @@ func send_request(
 		call_deferred("_emit_request_failed", "已有请求正在进行中")
 		return
 
+	# 每次请求实时获取最新配置
+	api_url = AuthState.get_base_url()
+	auth_token = AuthState.get_access_token()
+
 	if api_url.is_empty():
 		call_deferred("_emit_request_failed", "API URL 未设置")
 		return
@@ -78,9 +82,6 @@ func send_request(
 	_event_type = ""
 
 	var body = _build_request_body(messages, context, stream)
-
-	# 更新 auth token
-	auth_token = AuthState.get_access_token()
 
 	_stream_thread = Thread.new()
 	_stream_thread.start(_execute_request.bind(body, stream))
@@ -103,6 +104,10 @@ func cancel_request() -> void:
 
 ## 回传函数执行结果
 func send_function_result(call_id: String, name: String, result: Variant) -> void:
+	# 实时获取最新配置
+	api_url = AuthState.get_base_url()
+	auth_token = AuthState.get_access_token()
+
 	if api_url.is_empty():
 		push_warning("[CustomAPIAdapter] API URL 未设置，无法回传函数结果")
 		return
@@ -113,9 +118,6 @@ func send_function_result(call_id: String, name: String, result: Variant) -> voi
 		"function_name": name,
 		"result": result
 	}
-
-	# 更新 auth token
-	auth_token = AuthState.get_access_token()
 
 	if _fr_thread and _fr_thread.is_started():
 		_fr_thread.wait_to_finish()
@@ -181,15 +183,21 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 		_is_requesting = false
 		return
 
-	var url_parts = _parse_url(api_url + "/api/v1/chat/messages")
+	var full_url = api_url + "/chat/messages"
+	print("[CustomAPIAdapter][DEBUG] api_url = %s" % api_url)
+	print("[CustomAPIAdapter][DEBUG] full_url = %s" % full_url)
+	var url_parts = _parse_url(full_url)
 	if url_parts.is_empty():
 		call_deferred("_emit_request_failed", "API URL 格式无效")
 		_is_requesting = false
 		return
 
+	print("[CustomAPIAdapter][DEBUG] host=%s port=%d tls=%s path=%s" % [url_parts["host"], url_parts["port"], url_parts["tls"], url_parts["path"]])
+
 	_http_client = HTTPClient.new()
 	var tls_options: TLSOptions = TLSOptions.client_unsafe() if url_parts["tls"] else null
 	var err = _http_client.connect_to_host(url_parts["host"], url_parts["port"], tls_options)
+	print("[CustomAPIAdapter][DEBUG] connect_to_host 返回: %d" % err)
 	if err != OK:
 		call_deferred("_emit_request_failed", "连接失败: %d" % err)
 		_is_requesting = false
@@ -209,6 +217,7 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 
 	var body_json = JSON.stringify(body)
 	err = _http_client.request(HTTPClient.METHOD_POST, url_parts["path"], headers, body_json)
+	print("[CustomAPIAdapter][DEBUG] request() 返回: %d" % err)
 	if err != OK:
 		call_deferred("_emit_request_failed", "请求发送失败: %d" % err)
 		_http_client.close()
@@ -216,7 +225,9 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 		return
 
 	# 读取 SSE 响应流
+	print("[CustomAPIAdapter][DEBUG] 开始读取 SSE 流...")
 	_read_sse_stream()
+	print("[CustomAPIAdapter][DEBUG] SSE 流读取结束")
 
 	_http_client.close()
 	_is_requesting = false
@@ -228,7 +239,7 @@ func _execute_function_result_request(body: Dictionary) -> void:
 		call_deferred("_emit_request_failed", "未登录，无法回传函数结果")
 		return
 
-	var url_parts = _parse_url(api_url + "/api/v1/chat/function-results")
+	var url_parts = _parse_url(api_url + "/chat/function-results")
 	if url_parts.is_empty():
 		call_deferred("_emit_request_failed", "API URL 格式无效")
 		return
@@ -314,11 +325,15 @@ func _execute_function_result_request(body: Dictionary) -> void:
 func _wait_for_connection() -> bool:
 	var timeout_ms = int(request_timeout * 1000)
 	var elapsed = 0
+	print("[CustomAPIAdapter][DEBUG] 等待连接... 初始状态: %d" % _http_client.get_status())
 	while _http_client.get_status() == HTTPClient.STATUS_CONNECTING or \
 		  _http_client.get_status() == HTTPClient.STATUS_RESOLVING:
 		_http_client.poll()
 		OS.delay_msec(50)
 		elapsed += 50
+
+		if elapsed % 1000 == 0:
+			print("[CustomAPIAdapter][DEBUG] 等待中... %dms 状态: %d" % [elapsed, _http_client.get_status()])
 
 		_mutex.lock()
 		var stopped = _should_stop
@@ -333,8 +348,10 @@ func _wait_for_connection() -> bool:
 			_http_client.close()
 			return false
 
-	if _http_client.get_status() != HTTPClient.STATUS_CONNECTED:
-		call_deferred("_emit_request_failed", "连接失败，状态: %d" % _http_client.get_status())
+	var final_status = _http_client.get_status()
+	print("[CustomAPIAdapter][DEBUG] 连接循环结束，最终状态: %d (5=CONNECTED, 4=CANT_CONNECT, 2=CANT_RESOLVE, 9=TLS_ERROR)" % final_status)
+	if final_status != HTTPClient.STATUS_CONNECTED:
+		call_deferred("_emit_request_failed", "连接失败，状态: %d" % final_status)
 		_http_client.close()
 		return false
 
@@ -344,15 +361,23 @@ func _wait_for_connection() -> bool:
 ## 读取 SSE 事件流
 func _read_sse_stream() -> void:
 	# 等待请求发送完成
+	var req_elapsed = 0
 	while _http_client.get_status() == HTTPClient.STATUS_REQUESTING:
 		_http_client.poll()
 		OS.delay_msec(10)
+		req_elapsed += 10
+		if req_elapsed > int(request_timeout * 1000):
+			call_deferred("_emit_request_failed", "等待服务器响应超时")
+			return
+
+	print("[CustomAPIAdapter][DEBUG] 请求发送完成，状态: %d has_response: %s" % [_http_client.get_status(), _http_client.has_response()])
 
 	if not _http_client.has_response():
 		call_deferred("_emit_request_failed", "服务端无响应")
 		return
 
 	var response_code = _http_client.get_response_code()
+	print("[CustomAPIAdapter][DEBUG] HTTP 响应码: %d" % response_code)
 	if response_code != 200:
 		# 尝试读取错误体
 		var error_body = ""
@@ -367,6 +392,8 @@ func _read_sse_stream() -> void:
 		return
 
 	# 读取 SSE 数据流
+	var idle_elapsed = 0
+	var idle_timeout_ms = int(request_timeout * 1000)
 	while _http_client.get_status() == HTTPClient.STATUS_BODY:
 		_mutex.lock()
 		var stopped = _should_stop
@@ -377,7 +404,14 @@ func _read_sse_stream() -> void:
 		_http_client.poll()
 		var chunk = _http_client.read_response_body_chunk()
 		if chunk.size() > 0:
+			idle_elapsed = 0
 			_process_sse_chunk(chunk.get_string_from_utf8())
+		else:
+			idle_elapsed += 10
+			if idle_elapsed > idle_timeout_ms:
+				print("[CustomAPIAdapter][DEBUG] SSE 空闲超时 %ds，中断" % int(idle_timeout_ms / 1000))
+				call_deferred("_emit_request_failed", "SSE 流读取超时（服务器长时间无数据）")
+				return
 		OS.delay_msec(10)
 
 

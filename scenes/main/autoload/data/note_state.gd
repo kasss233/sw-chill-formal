@@ -335,3 +335,98 @@ func import_data(data: Dictionary) -> void:
 	_save_data()
 	print("[NoteState] Imported %d notes" % _notes.size())
 	data_loaded.emit()
+
+# ======================== 同步辅助 API ========================
+
+## 按 server_id 查找笔记
+func get_note_by_server_id(sid: int) -> NoteData:
+	for note in _notes:
+		if note.server_id == sid:
+			return note
+	return null
+
+## 从远程数据创建笔记（同步用）
+func sync_create_note(note: NoteData) -> void:
+	if note.id >= _next_id:
+		_next_id = note.id + 1
+	_notes.insert(0, note)
+	_save_data()
+	note_added.emit(note)
+	print("[NoteState] Sync created note(id: %d, server_id: %d)" % [note.id, note.server_id])
+
+## 按字段精确更新（同步用）
+func sync_update_note(local_id: int, fields: Dictionary) -> bool:
+	var note = get_note_by_id(local_id)
+	if note == null:
+		return false
+	if fields.has("title"):
+		note.title = fields["title"]
+	if fields.has("content"):
+		note.content = fields["content"]
+	if fields.has("categories"):
+		note.categories = []
+		for c in fields["categories"]:
+			note.categories.append(str(c))
+	if fields.has("updated_at"):
+		note.updated_at = fields["updated_at"]
+	if fields.has("server_id"):
+		note.server_id = fields["server_id"]
+	_save_data()
+	note_updated.emit(note)
+	print("[NoteState] Sync updated note(id: %d)" % local_id)
+	return true
+
+## 删除笔记（同步用）
+func sync_remove_note(local_id: int) -> bool:
+	for i in range(_notes.size()):
+		if _notes[i].id == local_id:
+			_notes.remove_at(i)
+			_save_data()
+			note_removed.emit(local_id)
+			print("[NoteState] Sync removed note(id: %d)" % local_id)
+			return true
+	return false
+
+## 全量替换（full sync 用）
+func sync_replace_all(notes: Array[NoteData], categories: Array[String]) -> void:
+	_notes.clear()
+	_categories.clear()
+	for cat in categories:
+		_categories.append(cat)
+	for note in notes:
+		_notes.append(note)
+		if note.id >= _next_id:
+			_next_id = note.id + 1
+	_save_data()
+	print("[NoteState] Sync replaced all: %d notes, %d categories" % [_notes.size(), _categories.size()])
+	data_loaded.emit()
+
+## 获取分类的位置索引
+func get_category_position(cat_name: String) -> int:
+	return _categories.find(cat_name)
+
+## 在指定位置插入分类（同步用）
+func sync_insert_category_at(cat_name: String, position: int) -> void:
+	if cat_name in _categories:
+		return
+	position = clamp(position, 0, _categories.size())
+	_categories.insert(position, cat_name)
+	_save_data()
+	category_added.emit(cat_name)
+	print("[NoteState] Sync inserted category '%s' at position %d" % [cat_name, position])
+
+## 静默删除分类（同步用，不从笔记中移除）
+func sync_remove_category(cat_name: String) -> void:
+	var idx = _categories.find(cat_name)
+	if idx < 0:
+		return
+	_categories.remove_at(idx)
+	_save_data()
+	category_removed.emit(cat_name)
+	print("[NoteState] Sync removed category '%s'" % cat_name)
+
+## 分配新的本地 ID
+func allocate_id() -> int:
+	var id = _next_id
+	_next_id += 1
+	return id

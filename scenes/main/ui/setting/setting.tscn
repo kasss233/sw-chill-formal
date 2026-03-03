@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bsk40q141nhng"]
 
 [ext_resource type="Script" uid="uid://g3h1hclaruxb" path="res://scenes/main/ui/setting/setting.gd" id="1_iahff"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/setting/auth_panel.tscn" id="22_auth"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="2_b4mu8"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="2_xly7c"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_s3f03"]
@@ -717,9 +718,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -174.5
-offset_top = -166.5
+offset_top = -216.5
 offset_right = 174.5
-offset_bottom = 166.5
+offset_bottom = 216.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_nyv81")
@@ -1012,6 +1013,9 @@ script = ExtResource("12_jec7i")
 unchecked_icon = ExtResource("13_7oay3")
 checked_icon = ExtResource("14_m4j3q")
 metadata/_custom_type_script = "uid://bkxpnxtj5fc1f"
+
+[node name="AuthPanel" parent="CanvasLayer/FrostedPanel/VBoxContainer" instance=ExtResource("22_auth")]
+layout_mode = 2
 
 [node name="SettingButton" type="Button" parent="." unique_id=199275167]
 clip_contents = true

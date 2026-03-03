@@ -31,7 +31,7 @@ shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 7.2
+shader_parameter/blur_amount = 3.5
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -41,7 +41,7 @@ shader_parameter/show_shadow = false
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(272, 64)
+shader_parameter/size = Vector2(220, 64)
 shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rt1al"]
@@ -212,6 +212,7 @@ button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="NoteModule" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=106579566 instance=ExtResource("8_yvysw")]
+visible = false
 layout_mode = 2
 
 [node name="NoteBookTab" parent="MarginContainer/VBoxContainer/TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=2043863668 instance=ExtResource("13_fb1sj")]
