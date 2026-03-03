@@ -14,6 +14,8 @@ extends Node3D
 @export var SUNNY_LIGHT_ENERGY := 0.7
 @export var rain: Node3D
 @export var snow: Node3D
+@export var cherry_blossom: Node3D
+@export var black_hole: Node3D
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -42,6 +44,12 @@ func _connect_signals() -> void:
 	if SettingState and SettingState.has_signal("snow_changed"):
 		if not SettingState.snow_changed.is_connected(_on_snow_amount_changed):
 			SettingState.snow_changed.connect(_on_snow_amount_changed)
+	if SettingState and SettingState.has_signal("outdoor_1_changed"):
+		if not SettingState.outdoor_1_changed.is_connected(_on_out_door_1_button_state_changed):
+			SettingState.outdoor_1_changed.connect(_on_out_door_1_button_state_changed)
+	if SettingState and SettingState.has_signal("outdoor_2_changed"):
+		if not SettingState.outdoor_2_changed.is_connected(_on_out_door_2_button_state_changed):
+			SettingState.outdoor_2_changed.connect(_on_out_door_2_button_state_changed)
 	if PomodoroState and PomodoroState.has_signal("work_phase_started"):
 		if not PomodoroState.work_phase_started.is_connected(_on_work_phase_started):
 			PomodoroState.work_phase_started.connect(_on_work_phase_started)
@@ -174,3 +182,13 @@ func _on_rain_amount_changed(amount: int) -> void:
 	set_rain_amount(amount)
 func _on_snow_amount_changed(amount: int) -> void:
 	set_snow_amount(amount)
+func _on_out_door_1_button_state_changed(state: int) -> void:
+	if state == 0:
+		cherry_blossom.visible = true
+	elif state == 1:
+		cherry_blossom.visible = false
+func _on_out_door_2_button_state_changed(state: int) -> void:
+	if state == 0:
+		black_hole.visible = true
+	elif state == 1:
+		black_hole.visible = false
