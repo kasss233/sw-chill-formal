@@ -1,14 +1,23 @@
 extends Node
 
+## SettingState
+## - 设置模块的唯一数据源（Autoload）
+## - 负责环境参数与抗锯齿参数的读写、持久化与信号广播
+## - UI 层只通过公开 API 改值，并监听本脚本信号更新显示
+
 ## 环境时间切换信号
 signal env_time_changed(mode: int)
 ## 环境天气切换信号
 signal env_weather_changed(mode: int)
+## 雪量强度变化
 signal snow_changed(_value: int)
+## 雨量强度变化
 signal rain_changed(_value: int)
+## 户外特效 1 状态变化
 signal outdoor_1_changed(_state: int)
+## 户外特效 2 状态变化
 signal outdoor_2_changed(_state: int)
-signal outdoor_2_unlock_changed(unlocked: bool)
+## 雾效状态变化
 signal fog_changed(_state: int)
 ## 时间模式: 0=白天, 1=黄昏, 2=晚上, 3=同步系统
 var _time_mode: int = 0
@@ -33,42 +42,47 @@ const SAVE_PATH = "user://settings.cfg"
 const SAVE_DEBOUNCE_SEC := 0.25
 const RAIN_MIN_AMOUNT := 300
 const SNOW_MIN_AMOUNT := 500
-const OUTDOOR_2_UNLOCK_LEVEL := 5
 
 var _save_timer: SceneTreeTimer
-var _outdoor_2_unlocked := false
 
 func _ready() -> void:
 	_load_settings()
-	_connect_level_state_signals()
-	_update_outdoor_2_unlock_state(false)
 	call_deferred("_emit_loaded_settings")
 
 ## 设置时间模式并发出信号
 func set_time(mode: int) -> void:
+	if _time_mode == mode:
+		return
 	_time_mode = mode
 	env_time_changed.emit(mode)
 	_save_settings()
 
 ## 设置天气模式并发出信号
 func set_weather(mode: int) -> void:
+	if _weather_mode == mode:
+		return
 	_weather_mode = mode
 	env_weather_changed.emit(mode)
 	_save_settings()
+
+## 设置雨量（下限 300），高频调整走防抖保存
 func set_rain_amount(amount: int) -> void:
 	amount = maxi(amount, RAIN_MIN_AMOUNT)
 	if _rain_amount == amount:
 		return
 	_rain_amount = amount
-	emit_signal("rain_changed", amount)
+	rain_changed.emit(amount)
 	_queue_save_settings()
+
+## 设置雪量（下限 500），高频调整走防抖保存
 func set_snow_amount(amount: int) -> void:
 	amount = maxi(amount, SNOW_MIN_AMOUNT)
 	if _snow_amount == amount:
 		return
 	_snow_amount = amount
-	emit_signal("snow_changed", amount)
+	snow_changed.emit(amount)
 	_queue_save_settings()
+
 func get_time_mode() -> int:
 	return _time_mode
 
@@ -85,24 +99,23 @@ func get_outdoor_1_state() -> int:
 	return _outdoor_1_state
 
 func get_outdoor_2_state() -> int:
-	if not _outdoor_2_unlocked:
-		return 1
 	return _outdoor_2_state
 
 func get_fog_state() -> int:
 	return _fog_state
 
-func is_outdoor_2_unlocked() -> bool:
-	return _outdoor_2_unlocked
-
 ## 设置 MSAA 并应用到视口、持久化
 func set_msaa(mode: int) -> void:
+	if _msaa == mode:
+		return
 	_msaa = mode
 	get_viewport().msaa_3d = mode as Viewport.MSAA
 	_save_settings()
 
 ## 设置 Screen Space AA 并应用到视口、持久化
 func set_ssaa(mode: int) -> void:
+	if _ssaa == mode:
+		return
 	_ssaa = mode
 	get_viewport().screen_space_aa = mode as Viewport.ScreenSpaceAA
 	_save_settings()
@@ -113,23 +126,31 @@ func get_msaa() -> int:
 func get_ssaa() -> int:
 	return _ssaa
 
+## 设置户外特效 1 开关状态
 func set_outdoor_1(state: int) -> void:
+	if _outdoor_1_state == state:
+		return
 	_outdoor_1_state = state
-	emit_signal("outdoor_1_changed", state)
+	outdoor_1_changed.emit(state)
 	_save_settings()
+
+## 设置户外特效 2 开关状态
 func set_outdoor_2(state: int) -> void:
-	if not _outdoor_2_unlocked:
-		emit_signal("outdoor_2_changed", 1)
+	if _outdoor_2_state == state:
 		return
 	_outdoor_2_state = state
-	emit_signal("outdoor_2_changed", state)
+	outdoor_2_changed.emit(state)
 	_save_settings()
 
+## 设置雾效开关状态
 func set_fog(state: int) -> void:
+	if _fog_state == state:
+		return
 	_fog_state = state
-	emit_signal("fog_changed", state)
+	fog_changed.emit(state)
 	_save_settings()
 
+## 立即写盘（离散操作）
 func _save_settings() -> void:
 	var config = ConfigFile.new()
 	config.set_value("env", "time_mode", _time_mode)
@@ -143,12 +164,14 @@ func _save_settings() -> void:
 	config.set_value("rendering", "screen_space_aa", _ssaa)
 	config.save(SAVE_PATH)
 
+## 防抖写盘（滑条等高频操作）
 func _queue_save_settings() -> void:
 	if _save_timer and _save_timer.time_left > 0.0:
 		return
 	_save_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
 	_save_timer.timeout.connect(_save_settings, CONNECT_ONE_SHOT)
 
+## 读取本地配置；无配置时回退当前视口默认值并生成配置文件
 func _load_settings() -> void:
 	var config = ConfigFile.new()
 	if config.load(SAVE_PATH) != OK:
@@ -170,39 +193,12 @@ func _load_settings() -> void:
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
 	get_viewport().screen_space_aa = _ssaa as Viewport.ScreenSpaceAA
 
+## 启动后统一广播当前状态，驱动 UI 首帧同步
 func _emit_loaded_settings() -> void:
 	env_time_changed.emit(_time_mode)
 	env_weather_changed.emit(_weather_mode)
 	rain_changed.emit(_rain_amount)
 	snow_changed.emit(_snow_amount)
 	outdoor_1_changed.emit(_outdoor_1_state)
-	outdoor_2_unlock_changed.emit(_outdoor_2_unlocked)
 	outdoor_2_changed.emit(get_outdoor_2_state())
 	fog_changed.emit(_fog_state)
-
-func _connect_level_state_signals() -> void:
-	if not LevelState:
-		return
-	if LevelState.has_signal("level_state_changed") and not LevelState.level_state_changed.is_connected(_on_level_state_changed):
-		LevelState.level_state_changed.connect(_on_level_state_changed)
-	if LevelState.has_signal("data_loaded") and not LevelState.data_loaded.is_connected(_on_level_data_loaded):
-		LevelState.data_loaded.connect(_on_level_data_loaded)
-
-func _is_outdoor_2_unlocked_by_level() -> bool:
-	if not LevelState:
-		return false
-	return LevelState.level > OUTDOOR_2_UNLOCK_LEVEL
-
-func _update_outdoor_2_unlock_state(emit_signal_when_unchanged: bool = true) -> void:
-	var unlocked := _is_outdoor_2_unlocked_by_level()
-	var changed := unlocked != _outdoor_2_unlocked
-	_outdoor_2_unlocked = unlocked
-	if changed or emit_signal_when_unchanged:
-		outdoor_2_unlock_changed.emit(_outdoor_2_unlocked)
-		outdoor_2_changed.emit(get_outdoor_2_state())
-
-func _on_level_state_changed(_data: Dictionary) -> void:
-	_update_outdoor_2_unlock_state()
-
-func _on_level_data_loaded() -> void:
-	_update_outdoor_2_unlock_state()

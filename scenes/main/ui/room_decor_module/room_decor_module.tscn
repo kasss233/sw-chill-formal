@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://bgbv8yre2k242"]
+
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_q6yil"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_v1ed3"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_j063l"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tbtju"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_j063l")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nxikl"]
+shader = ExtResource("1_q6yil")
+shader_parameter/corner_radius = 12.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_tbtju")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(705, 563)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_30aeb"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="RoomDecorModule" type="Control" unique_id=1205374477]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FrostedPanel" type="PanelContainer" parent="." unique_id=1111612907]
+material = SubResource("ShaderMaterial_nxikl")
+layout_mode = 0
+offset_right = 705.0
+offset_bottom = 563.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_30aeb")
+script = ExtResource("2_v1ed3")
+noise_texture = SubResource("NoiseTexture2D_tbtju")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="BoxContainer" type="BoxContainer" parent="FrostedPanel" unique_id=1369902248]
+layout_mode = 2

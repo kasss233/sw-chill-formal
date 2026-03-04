@@ -1,0 +1,148 @@
+[gd_scene format=3 uid="uid://bu654g2pcq3yk"]
+
+[ext_resource type="Script" uid="uid://bmi6gs6bai3dw" path="res://scenes/main/ui/room_decor_module/room_decor_item/room_decor_item.gd" id="1_a7ikj"]
+[ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="2_6e6mx"]
+[ext_resource type="Texture2D" uid="uid://bpa56ysux4bmi" path="res://icon.png" id="2_jxm58"]
+[ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="3_scobk"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="5_vxq1h"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="6_2ua7v"]
+[ext_resource type="Texture2D" uid="uid://bmu6xfxqdku2p" path="res://assets/ui/icons/check_circle_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="7_ksj28"]
+[ext_resource type="Texture2D" uid="uid://x7vncxw8bj6s" path="res://assets/ui/icons/radio_button_unchecked_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="8_162af"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ydxle"]
+shader = ExtResource("2_6e6mx")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(216, 304)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_77mno"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3saoq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u0cm"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2kwvi"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yos4y"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qirpg"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="Resource" id="Resource_x0udo"]
+script = ExtResource("6_2ua7v")
+state_name = "chose"
+icon = ExtResource("7_ksj28")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_ckldb"]
+script = ExtResource("6_2ua7v")
+state_name = "unchose"
+icon = ExtResource("8_162af")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="RoomDecorItem" type="Control" unique_id=1695013410]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_a7ikj")
+
+[node name="InnerPanel" type="PanelContainer" parent="." unique_id=496000576]
+material = SubResource("ShaderMaterial_ydxle")
+layout_mode = 0
+offset_right = 16.0
+offset_bottom = 16.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_77mno")
+script = ExtResource("3_scobk")
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InnerPanel" unique_id=1414934946]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="InnerPanel/VBoxContainer" unique_id=776946583]
+layout_mode = 2
+texture = ExtResource("2_jxm58")
+
+[node name="ItemInfoLabel" type="Label" parent="InnerPanel/VBoxContainer" unique_id=1452454424]
+layout_mode = 2
+text = "ItemName"
+horizontal_alignment = 1
+
+[node name="LockStateLabel" type="Label" parent="InnerPanel/VBoxContainer" unique_id=620361386]
+layout_mode = 2
+text = "等级7时解锁"
+horizontal_alignment = 1
+
+[node name="MaterialToggleButton" type="Button" parent="InnerPanel/VBoxContainer" unique_id=2053432150]
+clip_contents = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_3saoq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1u0cm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2kwvi")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yos4y")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qirpg")
+script = ExtResource("5_vxq1h")
+states = Array[ExtResource("6_2ua7v")]([SubResource("Resource_x0udo"), SubResource("Resource_ckldb")])
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
