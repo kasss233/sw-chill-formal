@@ -43,6 +43,7 @@ ChatState="*res://scenes/main/autoload/data/chat_state.gd"
 LayerManager="*res://scenes/main/autoload/data/layer_manager.gd"
 EventTracker="*res://scenes/main/autoload/data/event_tracker.gd"
 LevelState="*uid://cosfe6ux5f6ci"
+SyncState="*uid://cngm81h6ehphb"
 
 [display]
 

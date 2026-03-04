@@ -21,7 +21,7 @@ signal function_started(call_id: String, name: String)
 @export var auto_register_defaults: bool = true
 
 ## 函数定义 JSON 文件路径
-const FUNCTION_DEFINITIONS_PATH = "res://scenes/main/ai_service/function_definitions.json"
+const FUNCTION_DEFINITIONS_PATH = "res://scenes/main/autoload/ai_service/function_definitions.json"
 
 ## 已注册的函数 { name: { callable: Callable, definition: Dictionary } }
 var _functions: Dictionary = {}
@@ -57,6 +57,7 @@ func has_function(name: String) -> bool:
 
 ## 执行函数调用
 func execute(call_id: String, name: String, args: Dictionary) -> Dictionary:
+	print("[AgentExecutor][DEBUG] execute() called: name=%s enabled=%s registered=%s args=%s" % [name, enabled, _functions.has(name), args])
 	if not enabled:
 		var error = "函数执行已禁用"
 		function_failed.emit(call_id, name, error)
@@ -64,11 +65,12 @@ func execute(call_id: String, name: String, args: Dictionary) -> Dictionary:
 
 	if not _functions.has(name):
 		var error = "未知函数: " + name
+		print("[AgentExecutor][DEBUG] 已注册函数列表: %s" % str(_functions.keys()))
 		function_failed.emit(call_id, name, error)
 		return {"success": false, "error": error}
 
 	function_started.emit(call_id, name)
-	print("[AgentExecutor] 执行函数: %s (call_id: %s)" % [name, call_id])
+	print("[AgentExecutor] 执行函数: %s (call_id: %s) args=%s" % [name, call_id, args])
 
 	var callable: Callable = _functions[name]["callable"]
 	var result: Dictionary = callable.call(args)
