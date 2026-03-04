@@ -127,7 +127,7 @@ func _register_default_functions() -> void:
 		if not has_method(method_name):
 			push_warning("[AgentExecutor] 未找到实现方法: %s" % method_name)
 			continue
-		register(fn_name, Callable(self, method_name), def)
+		register(fn_name, Callable(self , method_name), def)
 
 
 # ============================================================
@@ -514,3 +514,31 @@ func _fn_set_input_text(args: Dictionary) -> Dictionary:
 func _fn_clear_input(_args: Dictionary) -> Dictionary:
 	var ok = ChatState.agent_clear_input()
 	return {"success": ok}
+
+
+# ============================================================
+# 函数实现 — 房间装饰（2 个）
+# ============================================================
+
+func _fn_add_room_decor_item(args: Dictionary) -> Dictionary:
+	var name := str(args.get("name", "")).strip_edges()
+	if name.is_empty():
+		return {"success": false, "error": "物品名称不能为空"}
+	var category := str(args.get("category", "")).strip_edges()
+	if category.is_empty():
+		return {"success": false, "error": "位置分类不能为空"}
+
+	var required_level := int(args.get("required_level", 1))
+	var icon_path := str(args.get("icon_path", ""))
+	var data := RoomDecorState.agent_add_room_decor_item(name, category, required_level, icon_path)
+	if data.is_empty():
+		return {"success": false, "error": "添加失败"}
+	return {"success": true, "data": data}
+
+
+func _fn_select_room_decor_item(args: Dictionary) -> Dictionary:
+	var item_id := int(args.get("item_id", 0))
+	var ok := RoomDecorState.agent_select_room_decor_item(item_id)
+	if not ok:
+		return {"success": false, "error": "选择失败（物品不存在或未解锁）"}
+	return {"success": true, "data": {"item_id": item_id}}

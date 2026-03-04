@@ -1,0 +1,323 @@
+extends Node
+
+signal room_decor_added(data: Dictionary)
+signal room_decor_removed(item_id: int)
+signal room_decor_updated(data: Dictionary)
+signal room_decor_state_changed(data: Dictionary)
+signal data_loaded
+signal agent_room_decor_added(data: Dictionary)
+signal agent_room_decor_selected(item_id: int)
+
+var _items: Array[RoomDecorData] = []
+var _next_id: int = 1
+var _selected_item_ids_by_category: Dictionary = {}
+
+const SAVE_PATH := "user://room_decor_data.json"
+
+
+func _ready() -> void:
+	load_data()
+	_connect_level_signals()
+
+
+func get_all_items() -> Array[Dictionary]:
+	var list: Array[Dictionary] = []
+	for item in _items:
+		list.append(_to_view_data(item))
+	return list
+
+
+func get_selected_item_ids_by_category() -> Dictionary:
+	return _selected_item_ids_by_category.duplicate()
+
+
+func add_item(name: String, category: String = "default", required_level: int = 1, icon_path: String = "") -> RoomDecorData:
+	var final_name := name.strip_edges()
+	if final_name.is_empty():
+		return null
+	var final_category := _normalize_category(category)
+
+	var item := RoomDecorData.new(_next_id, final_name, final_category, required_level, icon_path)
+	_next_id += 1
+	_items.append(item)
+
+	if _get_selected_id(final_category) <= 0 and _is_unlocked(item):
+		_selected_item_ids_by_category[final_category] = item.id
+
+	_save_data()
+	room_decor_added.emit(_to_view_data(item))
+	_emit_state_changed()
+	return item
+
+
+func remove_item(item_id: int) -> bool:
+	for i in range(_items.size()):
+		if _items[i].id != item_id:
+			continue
+
+		var removed_category := _normalize_category(_items[i].category)
+		_items.remove_at(i)
+		if _get_selected_id(removed_category) == item_id:
+			_selected_item_ids_by_category.erase(removed_category)
+			_assign_first_unlocked_for_category(removed_category)
+
+		_save_data()
+		room_decor_removed.emit(item_id)
+		_emit_state_changed()
+		return true
+
+	return false
+
+
+func clear_all_items() -> int:
+	if _items.is_empty():
+		return 0
+
+	var removed_ids: Array[int] = []
+	for item in _items:
+		removed_ids.append(item.id)
+
+	_items.clear()
+	_selected_item_ids_by_category.clear()
+	_save_data()
+
+	for item_id in removed_ids:
+		room_decor_removed.emit(item_id)
+
+	_emit_state_changed()
+	return removed_ids.size()
+
+
+func clear_all_categories() -> Dictionary:
+	if _items.is_empty():
+		return {
+			"removed_category_count": 0,
+			"removed_item_count": 0
+		}
+
+	var category_map: Dictionary = {}
+	for item in _items:
+		category_map[_normalize_category(item.category)] = true
+
+	var removed_category_count := category_map.size()
+	var removed_item_count := clear_all_items()
+
+	return {
+		"removed_category_count": removed_category_count,
+		"removed_item_count": removed_item_count
+	}
+
+
+func select_item(item_id: int) -> bool:
+	var item := _get_item_by_id(item_id)
+	if item == null:
+		return false
+	if not _is_unlocked(item):
+		return false
+
+	var category := _normalize_category(item.category)
+	var old_id := _get_selected_id(category)
+	if old_id == item_id:
+		return true
+
+	_selected_item_ids_by_category[category] = item_id
+	_save_data()
+
+	if old_id > 0:
+		var old_item := _get_item_by_id(old_id)
+		if old_item:
+			room_decor_updated.emit(_to_view_data(old_item))
+	room_decor_updated.emit(_to_view_data(item))
+	_emit_state_changed()
+	return true
+
+
+func agent_add_room_decor_item(name: String, category: String, required_level: int = 1, icon_path: String = "") -> Dictionary:
+	var item := add_item(name, category, required_level, icon_path)
+	if item == null:
+		return {}
+	var data := _to_view_data(item)
+	agent_room_decor_added.emit(data)
+	return data
+
+
+func agent_select_room_decor_item(item_id: int) -> bool:
+	var ok := select_item(item_id)
+	if ok:
+		agent_room_decor_selected.emit(item_id)
+	return ok
+
+
+func _get_item_by_id(item_id: int) -> RoomDecorData:
+	for item in _items:
+		if item.id == item_id:
+			return item
+	return null
+
+
+func _is_unlocked(item: RoomDecorData) -> bool:
+	var current_level := 1
+	if typeof(LevelState) != TYPE_NIL:
+		current_level = int(LevelState.level)
+	return current_level >= item.required_level
+
+
+func _to_view_data(item: RoomDecorData) -> Dictionary:
+	var unlocked := _is_unlocked(item)
+	var category := _normalize_category(item.category)
+	return {
+		"id": item.id,
+		"name": item.name,
+		"category": category,
+		"icon_path": item.icon_path,
+		"required_level": item.required_level,
+		"unlocked": unlocked,
+		"selected": _get_selected_id(category) == item.id,
+		"created_at": item.created_at,
+		"updated_at": item.updated_at
+	}
+
+
+func _emit_state_changed() -> void:
+	var unlocked_count := 0
+	var category_count := 0
+	var category_map: Dictionary = {}
+	for item in _items:
+		category_map[_normalize_category(item.category)] = true
+		if _is_unlocked(item):
+			unlocked_count += 1
+	category_count = category_map.size()
+
+	room_decor_state_changed.emit({
+		"count": _items.size(),
+		"category_count": category_count,
+		"selected_item_ids_by_category": _selected_item_ids_by_category.duplicate(),
+		"unlocked_count": unlocked_count,
+		"current_level": int(LevelState.level) if typeof(LevelState) != TYPE_NIL else 1
+	})
+
+
+func _save_data() -> void:
+	var data := {
+		"version": 1,
+		"next_id": _next_id,
+		"selected_item_ids_by_category": _selected_item_ids_by_category.duplicate(),
+		"items": []
+	}
+	for item in _items:
+		data["items"].append(item.to_dict())
+
+	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(data, "\t"))
+		file.close()
+
+
+func load_data() -> void:
+	if not FileAccess.file_exists(SAVE_PATH):
+		data_loaded.emit()
+		_emit_state_changed()
+		return
+
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if not file:
+		data_loaded.emit()
+		_emit_state_changed()
+		return
+
+	var text := file.get_as_text()
+	file.close()
+
+	var json := JSON.new()
+	if json.parse(text) != OK or typeof(json.data) != TYPE_DICTIONARY:
+		data_loaded.emit()
+		_emit_state_changed()
+		return
+
+	var data: Dictionary = json.data
+	_next_id = int(data.get("next_id", 1))
+	_selected_item_ids_by_category.clear()
+	var saved_selected: Dictionary = data.get("selected_item_ids_by_category", {})
+	for category in saved_selected.keys():
+		var normalized := _normalize_category(str(category))
+		_selected_item_ids_by_category[normalized] = int(saved_selected.get(category, 0))
+
+	var old_selected_id := int(data.get("selected_item_id", 0))
+	_items.clear()
+
+	var items: Array = data.get("items", [])
+	for d in items:
+		if d is Dictionary:
+			_items.append(RoomDecorData.from_dict(d))
+
+	if old_selected_id > 0:
+		var old_selected_item := _get_item_by_id(old_selected_id)
+		if old_selected_item:
+			var old_category := _normalize_category(old_selected_item.category)
+			if _get_selected_id(old_category) <= 0:
+				_selected_item_ids_by_category[old_category] = old_selected_id
+
+	for category in _selected_item_ids_by_category.keys():
+		var selected_id := int(_selected_item_ids_by_category[category])
+		var selected_item := _get_item_by_id(selected_id)
+		if selected_item == null:
+			_selected_item_ids_by_category.erase(category)
+			continue
+		if _normalize_category(selected_item.category) != _normalize_category(str(category)):
+			_selected_item_ids_by_category.erase(category)
+			continue
+		if not _is_unlocked(selected_item):
+			_selected_item_ids_by_category.erase(category)
+
+	for item in _items:
+		_assign_first_unlocked_for_category(_normalize_category(item.category))
+
+	data_loaded.emit()
+	_emit_state_changed()
+
+
+func _assign_first_unlocked_for_category(category: String) -> void:
+	var normalized := _normalize_category(category)
+	if _get_selected_id(normalized) > 0:
+		return
+	for item in _items:
+		if _normalize_category(item.category) != normalized:
+			continue
+		if _is_unlocked(item):
+			_selected_item_ids_by_category[normalized] = item.id
+			return
+
+
+func _get_selected_id(category: String) -> int:
+	var normalized := _normalize_category(category)
+	return int(_selected_item_ids_by_category.get(normalized, 0))
+
+
+func _normalize_category(category: String) -> String:
+	var normalized := category.strip_edges()
+	if normalized.is_empty():
+		return "default"
+	return normalized
+
+
+func _connect_level_signals() -> void:
+	if typeof(LevelState) == TYPE_NIL:
+		return
+	if LevelState.has_signal("level_state_changed") and not LevelState.level_state_changed.is_connected(_on_level_state_changed):
+		LevelState.level_state_changed.connect(_on_level_state_changed)
+
+
+func _on_level_state_changed(_data: Dictionary) -> void:
+	for category in _selected_item_ids_by_category.keys():
+		var selected_id := int(_selected_item_ids_by_category[category])
+		var selected := _get_item_by_id(selected_id)
+		if selected and not _is_unlocked(selected):
+			_selected_item_ids_by_category.erase(category)
+
+	for item in _items:
+		_assign_first_unlocked_for_category(_normalize_category(item.category))
+
+	for item in _items:
+		room_decor_updated.emit(_to_view_data(item))
+	_save_data()
+	_emit_state_changed()

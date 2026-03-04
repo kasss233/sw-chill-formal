@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bmu6xfxqdku2p" path="res://assets/ui/icons/check_circle_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="7_ksj28"]
 [ext_resource type="Texture2D" uid="uid://x7vncxw8bj6s" path="res://assets/ui/icons/radio_button_unchecked_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="8_162af"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ydxle"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6e6mx"]
 shader = ExtResource("2_6e6mx")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
@@ -17,7 +17,7 @@ shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
 shader_parameter/size = Vector2(216, 304)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_77mno"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scobk"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -29,7 +29,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3saoq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxq1h"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -40,7 +40,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u0cm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2ua7v"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -51,7 +51,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2kwvi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ksj28"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -62,7 +62,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yos4y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_162af"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -73,7 +73,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qirpg"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ydxle"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -96,26 +96,29 @@ state_name = "unchose"
 icon = ExtResource("8_162af")
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="RoomDecorItem" type="Control" unique_id=1695013410]
-layout_mode = 3
-anchors_preset = 0
+[node name="RoomDecorItem" type="MarginContainer" unique_id=606536940]
+custom_minimum_size = Vector2(180, 240)
+offset_right = 216.0
+offset_bottom = 304.0
 script = ExtResource("1_a7ikj")
 
 [node name="InnerPanel" type="PanelContainer" parent="." unique_id=496000576]
-material = SubResource("ShaderMaterial_ydxle")
-layout_mode = 0
-offset_right = 16.0
-offset_bottom = 16.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_77mno")
+material = SubResource("ShaderMaterial_6e6mx")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_scobk")
 script = ExtResource("3_scobk")
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="InnerPanel" unique_id=1414934946]
 layout_mode = 2
+size_flags_vertical = 3
 
 [node name="TextureRect" type="TextureRect" parent="InnerPanel/VBoxContainer" unique_id=776946583]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
+size_flags_vertical = 3
 texture = ExtResource("2_jxm58")
+stretch_mode = 5
 
 [node name="ItemInfoLabel" type="Label" parent="InnerPanel/VBoxContainer" unique_id=1452454424]
 layout_mode = 2
@@ -138,11 +141,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_3saoq")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_1u0cm")
-theme_override_styles/hover = SubResource("StyleBoxFlat_2kwvi")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_yos4y")
-theme_override_styles/focus = SubResource("StyleBoxFlat_qirpg")
+theme_override_styles/normal = SubResource("StyleBoxFlat_vxq1h")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2ua7v")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ksj28")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_162af")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ydxle")
 script = ExtResource("5_vxq1h")
 states = Array[ExtResource("6_2ua7v")]([SubResource("Resource_x0udo"), SubResource("Resource_ckldb")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://daa0dvlkhliq6"]
+[gd_scene load_steps=11 format=3 uid="uid://daa0dvlkhliq6"]
 
 [ext_resource type="Script" uid="uid://c3harjmj1bpcc" path="res://scenes/main/ui/debug/test_panel.gd" id="1_test_panel"]
 [ext_resource type="PackedScene" uid="uid://dh3k8yjvb2qwm" path="res://scenes/main/ui/debug/task_module_test_panel.tscn" id="2_task_test"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://ca7thp4n2x8qr" path="res://scenes/main/ui/debug/auth_test_panel.tscn" id="6_auth_test"]
 [ext_resource type="PackedScene" path="res://scenes/main/ui/debug/level_test_panel.tscn" id="7_level_test"]
 [ext_resource type="PackedScene" path="res://scenes/main/ui/debug/achievement_test_panel.tscn" id="8_achievement_test"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/debug/room_decor_test_panel.tscn" id="9_room_decor_test"]
 
 [node name="TestPanel" type="MarginContainer"]
 offset_right = 314.0
@@ -80,6 +81,11 @@ metadata/_tab_index = 5
 visible = false
 layout_mode = 2
 metadata/_tab_index = 6
+
+[node name="RoomDecor" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer" instance=ExtResource("9_room_decor_test")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 7
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
