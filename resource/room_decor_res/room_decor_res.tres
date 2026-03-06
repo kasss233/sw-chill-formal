@@ -5,8 +5,34 @@
 
 [sub_resource type="Resource" id="Resource_rkhps"]
 script = ExtResource("1_2gecy")
+name = "black hole"
+category = "planet"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_2gecy"]
+script = ExtResource("1_2gecy")
+name = "purple planet"
+category = "planet"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_shu76"]
+script = ExtResource("1_2gecy")
+name = "fire planet"
+category = "planet"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_lwreo"]
+script = ExtResource("1_2gecy")
+name = "cherry"
+category = "windowside"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_l2by2"]
+script = ExtResource("1_2gecy")
+name = "whale"
+category = "windowside"
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [resource]
 script = ExtResource("1_8761q")
-decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps")])
+decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2")])

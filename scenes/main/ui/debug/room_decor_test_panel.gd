@@ -31,19 +31,18 @@ func _ready() -> void:
 	RoomDecorState.room_decor_removed.connect(_on_state_item_removed)
 	RoomDecorState.room_decor_updated.connect(_on_state_item_updated)
 	RoomDecorState.room_decor_state_changed.connect(_on_state_changed)
-	RoomDecorState.agent_room_decor_added.connect(_on_agent_item_added)
-	RoomDecorState.agent_room_decor_selected.connect(_on_agent_item_selected)
+	RoomDecorState.room_decor_selected.connect(_on_room_decor_selected)
 
 	_log_info("RoomDecor 调试面板已就绪")
 	_on_get_selected_pressed()
 
 
 func _on_add_item_pressed() -> void:
-	var name := _read_name()
+	var item_name := _read_name()
 	var category := _read_category()
 	var required_level := _read_required_level()
 	var icon_path := icon_path_input.text.strip_edges()
-	var item := RoomDecorState.add_item(name, category, required_level, icon_path)
+	var item := RoomDecorState.add_item(item_name, category, required_level, icon_path)
 	if item == null:
 		_log_error("添加失败，名称不能为空")
 		return
@@ -133,12 +132,8 @@ func _on_state_changed(data: Dictionary) -> void:
 	_log_info("[signal] room_decor_state_changed -> selected=%s" % JSON.stringify(data.get("selected_item_ids_by_category", {})))
 
 
-func _on_agent_item_added(data: Dictionary) -> void:
-	_log_info("[signal] agent_room_decor_added -> id=%d" % int(data.get("id", -1)))
-
-
-func _on_agent_item_selected(item_id: int) -> void:
-	_log_info("[signal] agent_room_decor_selected -> id=%d" % item_id)
+func _on_room_decor_selected(item_name: String, category: String) -> void:
+	_log_info("[signal] room_decor_selected -> name=%s category=%s" % [item_name, category])
 
 
 func _read_name() -> String:

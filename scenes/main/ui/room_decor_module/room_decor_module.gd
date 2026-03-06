@@ -37,8 +37,8 @@ func _ready() -> void:
 	_render_all()
 
 
-func add_decor_item(name: String, category: String, required_level: int = 1, icon_path: String = "") -> Dictionary:
-	var item := RoomDecorState.add_item(name, category, required_level, icon_path)
+func add_decor_item(item_name: String, category: String, required_level: int = 1, icon_path: String = "") -> Dictionary:
+	var item := RoomDecorState.add_item(item_name, category, required_level, icon_path)
 	if item == null:
 		return {}
 	for data in RoomDecorState.get_all_items():
@@ -88,6 +88,8 @@ func _create_item_node(data: Dictionary) -> void:
 		item.set_data(data)
 	if item.has_signal("select_requested"):
 		item.select_requested.connect(_on_item_select_requested)
+	if item.has_signal("deselect_requested"):
+		item.deselect_requested.connect(_on_item_deselect_requested)
 	var item_id := int(data.get("id", -1))
 	_item_nodes[item_id] = item
 	_item_categories[item_id] = category
@@ -101,6 +103,10 @@ func _on_item_select_requested(item_id: int) -> void:
 		if int(data.get("id", -1)) == item_id:
 			item_selected.emit(item_id, data)
 			break
+
+
+func _on_item_deselect_requested(item_id: int) -> void:
+	RoomDecorState.deselect_item(item_id)
 
 
 func _on_state_item_added(data: Dictionary) -> void:

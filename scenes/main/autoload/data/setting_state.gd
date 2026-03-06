@@ -14,9 +14,9 @@ signal snow_changed(_value: int)
 ## 雨量强度变化
 signal rain_changed(_value: int)
 ## 户外特效 1 状态变化
-signal outdoor_1_changed(_state: int)
+# signal outdoor_1_changed(_state: int)
 ## 户外特效 2 状态变化
-signal outdoor_2_changed(_state: int)
+# signal outdoor_2_changed(_state: int)
 ## 雾效状态变化
 signal fog_changed(_state: int)
 ## 时间模式: 0=白天, 1=黄昏, 2=晚上, 3=同步系统
@@ -32,9 +32,9 @@ var _rain_amount: int = 300
 ## 雪量强度
 var _snow_amount: int = 500
 ## 户外特效 1 开关状态
-var _outdoor_1_state: int = 0
+# var _outdoor_1_state: int = 0
 ## 户外特效 2 开关状态
-var _outdoor_2_state: int = 0
+# var _outdoor_2_state: int = 0
 ## 雾效开关状态
 var _fog_state: int = 0
 
@@ -95,11 +95,11 @@ func get_rain_amount() -> int:
 func get_snow_amount() -> int:
 	return _snow_amount
 
-func get_outdoor_1_state() -> int:
-	return _outdoor_1_state
+#func get_outdoor_1_state() -> int:
+	#return 0
 
-func get_outdoor_2_state() -> int:
-	return _outdoor_2_state
+#func get_outdoor_2_state() -> int:
+	#return 0
 
 func get_fog_state() -> int:
 	return _fog_state
@@ -127,20 +127,24 @@ func get_ssaa() -> int:
 	return _ssaa
 
 ## 设置户外特效 1 开关状态
-func set_outdoor_1(state: int) -> void:
-	if _outdoor_1_state == state:
-		return
-	_outdoor_1_state = state
-	outdoor_1_changed.emit(state)
-	_save_settings()
+func set_outdoor_1(_state: int) -> void:
+	# outdoor_1 功能暂时停用
+	# if _outdoor_1_state == state:
+	# 	return
+	# _outdoor_1_state = state
+	# outdoor_1_changed.emit(state)
+	# _save_settings()
+	pass
 
 ## 设置户外特效 2 开关状态
-func set_outdoor_2(state: int) -> void:
-	if _outdoor_2_state == state:
-		return
-	_outdoor_2_state = state
-	outdoor_2_changed.emit(state)
-	_save_settings()
+func set_outdoor_2(_state: int) -> void:
+	# outdoor_2 功能暂时停用
+	# if _outdoor_2_state == state:
+	# 	return
+	# _outdoor_2_state = state
+	# outdoor_2_changed.emit(state)
+	# _save_settings()
+	pass
 
 ## 设置雾效开关状态
 func set_fog(state: int) -> void:
@@ -157,8 +161,9 @@ func _save_settings() -> void:
 	config.set_value("env", "weather_mode", _weather_mode)
 	config.set_value("env", "rain_amount", _rain_amount)
 	config.set_value("env", "snow_amount", _snow_amount)
-	config.set_value("env", "outdoor_1_state", _outdoor_1_state)
-	config.set_value("env", "outdoor_2_state", _outdoor_2_state)
+	# outdoor_1/outdoor_2 功能暂时停用，不写入存档
+	# config.set_value("env", "outdoor_1_state", _outdoor_1_state)
+	# config.set_value("env", "outdoor_2_state", _outdoor_2_state)
 	config.set_value("env", "fog_state", _fog_state)
 	config.set_value("rendering", "msaa_3d", _msaa)
 	config.set_value("rendering", "screen_space_aa", _ssaa)
@@ -185,8 +190,9 @@ func _load_settings() -> void:
 	_weather_mode = int(config.get_value("env", "weather_mode", 0))
 	_rain_amount = maxi(int(config.get_value("env", "rain_amount", RAIN_MIN_AMOUNT)), RAIN_MIN_AMOUNT)
 	_snow_amount = maxi(int(config.get_value("env", "snow_amount", SNOW_MIN_AMOUNT)), SNOW_MIN_AMOUNT)
-	_outdoor_1_state = int(config.get_value("env", "outdoor_1_state", 0))
-	_outdoor_2_state = int(config.get_value("env", "outdoor_2_state", 0))
+	# outdoor_1/outdoor_2 功能已停用
+	# _outdoor_1_state = int(config.get_value("env", "outdoor_1_state", 0))
+	# _outdoor_2_state = int(config.get_value("env", "outdoor_2_state", 0))
 	_fog_state = int(config.get_value("env", "fog_state", 0))
 	_msaa = int(config.get_value("rendering", "msaa_3d", 0))
 	_ssaa = int(config.get_value("rendering", "screen_space_aa", 0))
@@ -199,6 +205,5 @@ func _emit_loaded_settings() -> void:
 	env_weather_changed.emit(_weather_mode)
 	rain_changed.emit(_rain_amount)
 	snow_changed.emit(_snow_amount)
-	outdoor_1_changed.emit(_outdoor_1_state)
-	outdoor_2_changed.emit(get_outdoor_2_state())
+	# outdoor_1/outdoor_2 功能已停用（信号已注释）
 	fog_changed.emit(_fog_state)

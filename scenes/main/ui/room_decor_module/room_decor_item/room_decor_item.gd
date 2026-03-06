@@ -1,6 +1,7 @@
 extends Control
 
 signal select_requested(item_id: int)
+signal deselect_requested(item_id: int)
 
 @onready var texture_rect: TextureRect = $InnerPanel/VBoxContainer/TextureRect
 @onready var item_info_label: Label = $InnerPanel/VBoxContainer/ItemInfoLabel
@@ -12,8 +13,9 @@ var _unlocked: bool = false
 
 
 func _ready() -> void:
-	if toggle_button and not toggle_button.pressed.is_connected(_on_toggle_button_pressed):
-		toggle_button.pressed.connect(_on_toggle_button_pressed)
+	pass
+	#if toggle_button and not toggle_button.pressed.is_connected(_on_toggle_button_pressed):
+		#toggle_button.pressed.connect(_on_toggle_button_pressed)
 
 
 func set_data(data: Dictionary) -> void:
@@ -46,7 +48,15 @@ func is_unlocked() -> bool:
 	return _unlocked
 
 
-func _on_toggle_button_pressed() -> void:
-	if not _unlocked or _item_id <= 0:
-		return
-	select_requested.emit(_item_id)
+#func _on_toggle_button_pressed() -> void:
+	#if not _unlocked or _item_id <= 0:
+		#return
+	#select_requested.emit(_item_id)
+
+
+func _on_material_toggle_button_state_changed(_old_state: int, new_state: int) -> void:
+	match new_state:
+		0:
+			select_requested.emit(_item_id)
+		1:
+			deselect_requested.emit(_item_id)

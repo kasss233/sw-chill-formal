@@ -10,9 +10,9 @@ extends Control
 @onready var _weather_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/WeatherButton
 @onready var _rain_slider: MaterialSlider = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer4/RainMaterialSlider
 @onready var _snow_slider: MaterialSlider = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer5/SnowMaterialSlider
-@onready var _outdoor_1_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6/OutDoor1Button
-@onready var _outdoor_2_row: HBoxContainer = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7
-@onready var _outdoor_2_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7/OutDoor2Button
+# @onready var _outdoor_1_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6/OutDoor1Button
+# @onready var _outdoor_2_row: HBoxContainer = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7
+# @onready var _outdoor_2_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7/OutDoor2Button
 
 # ============ 生命周期 ============
 
@@ -34,8 +34,8 @@ func _connect_state_signals() -> void:
 	_connect_if_needed(SettingState, "env_weather_changed", _on_state_env_weather_changed)
 	_connect_if_needed(SettingState, "rain_changed", _on_state_rain_changed)
 	_connect_if_needed(SettingState, "snow_changed", _on_state_snow_changed)
-	_connect_if_needed(SettingState, "outdoor_1_changed", _on_state_outdoor_1_changed)
-	_connect_if_needed(SettingState, "outdoor_2_changed", _on_state_outdoor_2_changed)
+	# _connect_if_needed(SettingState, "outdoor_1_changed", _on_state_outdoor_1_changed)
+	# _connect_if_needed(SettingState, "outdoor_2_changed", _on_state_outdoor_2_changed)
 
 # 工具方法：若信号存在且未连接，则连接
 func _connect_if_needed(emitter: Object, signal_name: StringName, callback: Callable) -> void:
@@ -48,9 +48,9 @@ func _sync_all_controls_from_state() -> void:
 	_weather_button.set_state_no_signal(SettingState.get_weather_mode())
 	_rain_slider.set_value_no_signal(float(SettingState.get_rain_amount()))
 	_snow_slider.set_value_no_signal(float(SettingState.get_snow_amount()))
-	_outdoor_1_button.set_state_no_signal(SettingState.get_outdoor_1_state())
-	_outdoor_2_button.set_state_no_signal(SettingState.get_outdoor_2_state())
-	_outdoor_2_row.visible = true
+	# _outdoor_1_button.set_state_no_signal(SettingState.get_outdoor_1_state())
+	# _outdoor_2_button.set_state_no_signal(SettingState.get_outdoor_2_state())
+	# _outdoor_2_row.visible = true
 
 
 # ============ UI 事件 -> State ============
@@ -97,12 +97,12 @@ func _on_snow_material_slider_value_changed(value: float) -> void:
 	SettingState.set_snow_amount(int(value))
 
 
-func _on_out_door_1_button_state_changed(_old_state: int, new_state: int) -> void:
-	SettingState.set_outdoor_1(new_state)
+#func _on_out_door_1_button_state_changed(_old_state: int, new_state: int) -> void:
+	#SettingState.set_outdoor_1(new_state)
 
 
-func _on_out_door_2_button_state_changed(_old_state: int, new_state: int) -> void:
-	SettingState.set_outdoor_2(new_state)
+#func _on_out_door_2_button_state_changed(_old_state: int, new_state: int) -> void:
+	#SettingState.set_outdoor_2(new_state)
 
 # ============ State -> UI 回调 ============
 
@@ -118,11 +118,11 @@ func _on_state_rain_changed(amount: int) -> void:
 func _on_state_snow_changed(amount: int) -> void:
 	_snow_slider.set_value_no_signal(float(amount))
 
-func _on_state_outdoor_1_changed(state: int) -> void:
-	_outdoor_1_button.set_state_no_signal(state)
+# func _on_state_outdoor_1_changed(state: int) -> void:
+# 	_outdoor_1_button.set_state_no_signal(state)
 
-func _on_state_outdoor_2_changed(state: int) -> void:
-	_outdoor_2_button.set_state_no_signal(state)
+# func _on_state_outdoor_2_changed(state: int) -> void:
+# 	_outdoor_2_button.set_state_no_signal(state)
 
 
 func _on_fog_button_state_changed(_old_state: int, new_state: int) -> void:

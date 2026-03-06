@@ -46,7 +46,7 @@ shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(349, 433)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oe8y2"]
 content_margin_left = 12.0
@@ -864,6 +864,7 @@ states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_6gip8"), SubResour
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1349643387]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -891,6 +892,7 @@ states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_v5sup"), SubResour
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="HBoxContainer7" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=175157831]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

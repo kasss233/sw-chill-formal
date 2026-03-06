@@ -148,3 +148,5 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_ydxle")
 script = ExtResource("5_vxq1h")
 states = Array[ExtResource("6_2ua7v")]([SubResource("Resource_x0udo"), SubResource("Resource_ckldb")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[connection signal="state_changed" from="InnerPanel/VBoxContainer/MaterialToggleButton" to="." method="_on_material_toggle_button_state_changed"]

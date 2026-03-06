@@ -1,13 +1,19 @@
 extends Node
 
+# RoomDecorState
+# 职责：房间装饰物品数据源（增删改查、分类选中、解锁校验、持久化、资源导入）。
+# 规则：UI/Agent 仅调用本 State API，不直接改写内部数据。
+
+# ===== 信号 =====
 signal room_decor_added(data: Dictionary)
 signal room_decor_removed(item_id: int)
 signal room_decor_updated(data: Dictionary)
 signal room_decor_state_changed(data: Dictionary)
+signal room_decor_selected(item_name: String, category: String)
+signal room_decor_category_unselected(category: String)
 signal data_loaded
-signal agent_room_decor_added(data: Dictionary)
-signal agent_room_decor_selected(item_id: int)
 
+# ===== 内部状态 =====
 var _items: Array[RoomDecorData] = []
 var _next_id: int = 1
 var _selected_item_ids_by_category: Dictionary = {}
@@ -16,12 +22,16 @@ const SAVE_PATH := "user://room_decor_data.json"
 const RESOURCE_PATH := "res://resource/room_decor_res/room_decor_res.tres"
 
 
+# ===== 生命周期 =====
 func _ready() -> void:
 	load_data()
-	load_from_resource()
+	if _items.is_empty():
+		load_from_resource()
 	_connect_level_signals()
+	call_deferred("_emit_startup_sync_signals")
 
 
+# ===== 查询 API =====
 func get_all_items() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
 	for item in _items:
@@ -33,8 +43,10 @@ func get_selected_item_ids_by_category() -> Dictionary:
 	return _selected_item_ids_by_category.duplicate()
 
 
-func add_item(name: String, category: String = "default", required_level: int = 1, icon_path: String = "") -> RoomDecorData:
-	var final_name := name.strip_edges()
+# ===== 写入 API =====
+# 添加装饰物品；若该分类尚无选中项且物品已解锁，则自动设为选中。
+func add_item(item_name: String, category: String = "default", required_level: int = 1, icon_path: String = "") -> RoomDecorData:
+	var final_name := item_name.strip_edges()
 	if final_name.is_empty():
 		return null
 	var final_category := _normalize_category(category)
@@ -53,6 +65,7 @@ func add_item(name: String, category: String = "default", required_level: int = 
 
 
 func remove_item(item_id: int) -> bool:
+	var prev_selected_map := _selected_item_ids_by_category.duplicate()
 	for i in range(_items.size()):
 		if _items[i].id != item_id:
 			continue
@@ -65,6 +78,7 @@ func remove_item(item_id: int) -> bool:
 
 		_save_data()
 		room_decor_removed.emit(item_id)
+		_emit_unselected_categories(prev_selected_map)
 		_emit_state_changed()
 		return true
 
@@ -74,6 +88,7 @@ func remove_item(item_id: int) -> bool:
 func clear_all_items() -> int:
 	if _items.is_empty():
 		return 0
+	var prev_selected_map := _selected_item_ids_by_category.duplicate()
 
 	var removed_ids: Array[int] = []
 	for item in _items:
@@ -86,6 +101,7 @@ func clear_all_items() -> int:
 	for item_id in removed_ids:
 		room_decor_removed.emit(item_id)
 
+	_emit_unselected_categories(prev_selected_map)
 	_emit_state_changed()
 	return removed_ids.size()
 
@@ -111,6 +127,7 @@ func clear_all_categories() -> Dictionary:
 
 
 func select_item(item_id: int) -> bool:
+	# 选中成功后统一发出 room_decor_selected(name, category) 信号。
 	var item := _get_item_by_id(item_id)
 	if item == null:
 		return false
@@ -130,24 +147,38 @@ func select_item(item_id: int) -> bool:
 		if old_item:
 			room_decor_updated.emit(_to_view_data(old_item))
 	room_decor_updated.emit(_to_view_data(item))
+	room_decor_selected.emit(item.name, category)
 	_emit_state_changed()
 	return true
 
 
-func agent_add_room_decor_item(name: String, category: String, required_level: int = 1, icon_path: String = "") -> Dictionary:
-	var item := add_item(name, category, required_level, icon_path)
+func deselect_item(item_id: int) -> bool:
+	var item := _get_item_by_id(item_id)
+	if item == null:
+		return false
+
+	var category := _normalize_category(item.category)
+	if _get_selected_id(category) != item_id:
+		return false
+
+	_selected_item_ids_by_category.erase(category)
+	_save_data()
+	room_decor_updated.emit(_to_view_data(item))
+	room_decor_category_unselected.emit(category)
+	_emit_state_changed()
+	return true
+
+
+# ===== Agent API（仅方法名保留 agent_ 前缀） =====
+func agent_add_room_decor_item(item_name: String, category: String, required_level: int = 1, icon_path: String = "") -> Dictionary:
+	var item := add_item(item_name, category, required_level, icon_path)
 	if item == null:
 		return {}
-	var data := _to_view_data(item)
-	agent_room_decor_added.emit(data)
-	return data
+	return _to_view_data(item)
 
 
 func agent_select_room_decor_item(item_id: int) -> bool:
-	var ok := select_item(item_id)
-	if ok:
-		agent_room_decor_selected.emit(item_id)
-	return ok
+	return select_item(item_id)
 
 
 func agent_load_room_decor_from_resource() -> Dictionary:
@@ -164,6 +195,7 @@ func agent_load_room_decor_from_resource() -> Dictionary:
 	}
 
 
+# ===== 内部实现 =====
 func _get_item_by_id(item_id: int) -> RoomDecorData:
 	for item in _items:
 		if item.id == item_id:
@@ -230,14 +262,17 @@ func _save_data() -> void:
 
 
 func load_data() -> void:
+	var prev_selected_map := _selected_item_ids_by_category.duplicate()
 	if not FileAccess.file_exists(SAVE_PATH):
 		data_loaded.emit()
+		_emit_unselected_categories(prev_selected_map)
 		_emit_state_changed()
 		return
 
 	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if not file:
 		data_loaded.emit()
+		_emit_unselected_categories(prev_selected_map)
 		_emit_state_changed()
 		return
 
@@ -247,11 +282,13 @@ func load_data() -> void:
 	var json := JSON.new()
 	if json.parse(text) != OK or typeof(json.data) != TYPE_DICTIONARY:
 		data_loaded.emit()
+		_emit_unselected_categories(prev_selected_map)
 		_emit_state_changed()
 		return
 
 	var data: Dictionary = json.data
 	_next_id = int(data.get("next_id", 1))
+	var has_selected_map := data.has("selected_item_ids_by_category")
 	_selected_item_ids_by_category.clear()
 	var saved_selected: Dictionary = data.get("selected_item_ids_by_category", {})
 	for category in saved_selected.keys():
@@ -285,10 +322,37 @@ func load_data() -> void:
 		if not _is_unlocked(selected_item):
 			_selected_item_ids_by_category.erase(category)
 
-	for item in _items:
-		_assign_first_unlocked_for_category(_normalize_category(item.category))
+	if not has_selected_map:
+		for item in _items:
+			_assign_first_unlocked_for_category(_normalize_category(item.category))
 
 	data_loaded.emit()
+	_emit_unselected_categories(prev_selected_map)
+	_emit_state_changed()
+
+
+func _emit_startup_sync_signals() -> void:
+	data_loaded.emit()
+	for item in _items:
+		room_decor_updated.emit(_to_view_data(item))
+
+	var category_map: Dictionary = {}
+	for item in _items:
+		var category := _normalize_category(item.category)
+		category_map[category] = true
+
+	for category in category_map.keys():
+		var normalized := _normalize_category(str(category))
+		var selected_id := _get_selected_id(normalized)
+		if selected_id > 0:
+			var selected_item := _get_item_by_id(selected_id)
+			if selected_item:
+				room_decor_selected.emit(selected_item.name, normalized)
+			else:
+				room_decor_category_unselected.emit(normalized)
+		else:
+			room_decor_category_unselected.emit(normalized)
+
 	_emit_state_changed()
 
 
@@ -364,16 +428,32 @@ func _connect_level_signals() -> void:
 
 
 func _on_level_state_changed(_data: Dictionary) -> void:
+	var prev_selected_map := _selected_item_ids_by_category.duplicate()
+	var categories_need_reassign: Dictionary = {}
 	for category in _selected_item_ids_by_category.keys():
+		var normalized_category := _normalize_category(str(category))
 		var selected_id := int(_selected_item_ids_by_category[category])
 		var selected := _get_item_by_id(selected_id)
 		if selected and not _is_unlocked(selected):
 			_selected_item_ids_by_category.erase(category)
+			categories_need_reassign[normalized_category] = true
 
-	for item in _items:
-		_assign_first_unlocked_for_category(_normalize_category(item.category))
+	for category in categories_need_reassign.keys():
+		_assign_first_unlocked_for_category(str(category))
 
 	for item in _items:
 		room_decor_updated.emit(_to_view_data(item))
 	_save_data()
+	_emit_unselected_categories(prev_selected_map)
 	_emit_state_changed()
+
+
+func _emit_unselected_categories(prev_selected_map: Dictionary) -> void:
+	for category in prev_selected_map.keys():
+		var normalized := _normalize_category(str(category))
+		var prev_selected_id := int(prev_selected_map.get(category, 0))
+		if prev_selected_id <= 0:
+			continue
+		if _get_selected_id(normalized) > 0:
+			continue
+		room_decor_category_unselected.emit(normalized)
