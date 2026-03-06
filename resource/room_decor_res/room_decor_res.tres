@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3 uid="uid://bs61n06lcg6tu"]
+
+[ext_resource type="Script" uid="uid://rnfs55jsskvs" path="res://resource/room_decor_res/roon_decor_item/room_decor_item.gd" id="1_2gecy"]
+[ext_resource type="Script" uid="uid://dgpcvfir2tjid" path="res://resource/room_decor_res/room_decor_res.gd" id="1_8761q"]
+
+[sub_resource type="Resource" id="Resource_rkhps"]
+script = ExtResource("1_2gecy")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[resource]
+script = ExtResource("1_8761q")
+decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps")])

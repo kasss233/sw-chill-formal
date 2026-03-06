@@ -13,10 +13,12 @@ var _next_id: int = 1
 var _selected_item_ids_by_category: Dictionary = {}
 
 const SAVE_PATH := "user://room_decor_data.json"
+const RESOURCE_PATH := "res://resource/room_decor_res/room_decor_res.tres"
 
 
 func _ready() -> void:
 	load_data()
+	load_from_resource()
 	_connect_level_signals()
 
 
@@ -148,6 +150,20 @@ func agent_select_room_decor_item(item_id: int) -> bool:
 	return ok
 
 
+func agent_load_room_decor_from_resource() -> Dictionary:
+	"""AI API: 从 room_decor_res 资源文件加载初始房间装饰物品"""
+	var initial_count := _items.size()
+	load_from_resource()
+	var final_count := _items.size()
+	var loaded_count := final_count - initial_count
+	
+	return {
+		"success": loaded_count > 0,
+		"loaded_count": loaded_count,
+		"total_count": final_count
+	}
+
+
 func _get_item_by_id(item_id: int) -> RoomDecorData:
 	for item in _items:
 		if item.id == item_id:
@@ -274,6 +290,46 @@ func load_data() -> void:
 
 	data_loaded.emit()
 	_emit_state_changed()
+
+
+func load_from_resource() -> void:
+	"""从 room_decor_res 资源加载初始物品数据"""
+	if not ResourceLoader.exists(RESOURCE_PATH):
+		push_warning("RoomDecorState: 资源文件不存在: ", RESOURCE_PATH)
+		return
+	
+	var res = ResourceLoader.load(RESOURCE_PATH)
+	if res == null:
+		push_error("RoomDecorState: 无法加载资源: ", RESOURCE_PATH)
+		return
+	
+	# 获取 decor_items 数组
+	var decor_items: Array = []
+	if "decor_items" in res:
+		var items_attr = res.get_meta("decor_items") if res.has_meta("decor_items") else res.decor_items
+		if items_attr is Array:
+			decor_items = items_attr
+	
+	if decor_items.is_empty():
+		return
+	
+	# 遍历物品并添加
+	for room_decor_item in decor_items:
+		if not room_decor_item is RoomDecorItem:
+			continue
+		
+		# 提取 Texture2D 的资源路径
+		var icon_path := ""
+		if room_decor_item.icon is Texture2D:
+			icon_path = room_decor_item.icon.resource_path
+		
+		# 使用 add_item 添加（自动处理选中状态和持久化）
+		add_item(
+			room_decor_item.name,
+			room_decor_item.category,
+			room_decor_item.required_level,
+			icon_path
+		)
 
 
 func _assign_first_unlocked_for_category(category: String) -> void:

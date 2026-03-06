@@ -9,7 +9,9 @@ signal item_selected(item_id: int, item_data: Dictionary)
 @onready var empty_label: Label = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/EmptyLabel
 @onready var category_list: VBoxContainer = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList
 @onready var category_section_template: VBoxContainer = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate
-
+@onready var panel = $CanvasLayer/FrostedPanel
+@onready var button = $Button
+@onready var canvas_layer = $CanvasLayer
 var _item_nodes: Dictionary = {}
 var _item_categories: Dictionary = {}
 var _category_sections: Dictionary = {}
@@ -31,7 +33,7 @@ func _ready() -> void:
 		RoomDecorState.room_decor_state_changed.connect(_on_state_changed)
 	if RoomDecorState.has_signal("data_loaded"):
 		RoomDecorState.data_loaded.connect(_on_state_data_loaded)
-
+	panel.visible = false
 	_render_all()
 
 
@@ -256,3 +258,15 @@ func _try_remove_empty_category_section(category: String) -> void:
 	if grid and grid.get_child_count() == 0:
 		section.queue_free()
 		_category_sections.erase(normalized)
+
+func show_module() -> void:
+	button.state.set_state(1)
+func hide_module() -> void:
+	button.state.set_state(0)
+func _on_button_state_changed(_old_state: int, new_state: int) -> void:
+	match new_state:
+		0:
+			GuiTransitions.hide("room_decor")
+		1:
+			LayerManager.bring_to_front(canvas_layer)
+			GuiTransitions.show("room_decor")

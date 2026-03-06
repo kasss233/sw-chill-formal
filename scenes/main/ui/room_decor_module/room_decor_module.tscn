@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="5_30aeb"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="6_ql3sb"]
 [ext_resource type="Texture2D" uid="uid://0bhcvchib8d0" path="res://assets/ui/icons/local_florist_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_j412a"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="8_ql3sb"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_j063l"]
 frequency = 0.1
@@ -16,7 +17,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_j063l")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_30aeb"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ql3sb"]
 shader = ExtResource("1_q6yil")
 shader_parameter/corner_radius = 12.0
 shader_parameter/show_border = true
@@ -35,7 +36,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(548, 563)
 shader_parameter/shadow_padding = 12.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ql3sb"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j412a"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -47,7 +48,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j412a"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ljhog"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -58,7 +59,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ljhog"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nxbn"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -69,7 +70,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nxbn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq8fo"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -80,7 +81,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq8fo"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w20c3"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -91,7 +92,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w20c3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s4qcs"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -116,24 +117,20 @@ background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
 [node name="RoomDecorModule" type="MarginContainer" unique_id=1442530485]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 48.0
+offset_bottom = 48.0
 script = ExtResource("3_ha2cr")
 item_scene = ExtResource("4_j0rqg")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2008160506]
-visible = false
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=1111612907]
-material = SubResource("ShaderMaterial_30aeb")
+material = SubResource("ShaderMaterial_ql3sb")
 offset_left = 312.0
 offset_top = 34.0
 offset_right = 860.0
 offset_bottom = 597.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_ql3sb")
+theme_override_styles/panel = SubResource("StyleBoxFlat_j412a")
 script = ExtResource("2_v1ed3")
 noise_texture = SubResource("NoiseTexture2D_tbtju")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -172,6 +169,7 @@ horizontal_alignment = 1
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content" unique_id=338460065]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
 [node name="CategoryList" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer" unique_id=1631578345]
 layout_mode = 2
@@ -204,7 +202,7 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 3
 
-[node name="TodoButton" type="Button" parent="." unique_id=536673203]
+[node name="Button" type="Button" parent="." unique_id=536673203]
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -213,12 +211,26 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_j412a")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ljhog")
-theme_override_styles/hover = SubResource("StyleBoxFlat_6nxbn")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_iq8fo")
-theme_override_styles/focus = SubResource("StyleBoxFlat_w20c3")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ljhog")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6nxbn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_iq8fo")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_w20c3")
+theme_override_styles/focus = SubResource("StyleBoxFlat_s4qcs")
 script = ExtResource("5_30aeb")
 states = Array[ExtResource("6_ql3sb")]([SubResource("Resource_ume71"), SubResource("Resource_8tdj8")])
 button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="GuiTransition" type="Node" parent="." unique_id=135567749]
+script = ExtResource("8_ql3sb")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.4
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/FrostedPanel")
+layout_id = "room_decor"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[connection signal="state_changed" from="Button" to="." method="_on_button_state_changed"]

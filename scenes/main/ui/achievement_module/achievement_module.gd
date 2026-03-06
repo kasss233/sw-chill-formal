@@ -13,6 +13,7 @@ signal tab_changed(tab_name: String)
 @onready var empty_label: Label = $CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/EmptyLabel
 @onready var canvas_layer = $CanvasLayer
 @onready var panel = $CanvasLayer/PanelContainer
+@onready var button = $Button
 enum Tab {
 	DAILY_TASK,
 	ACHIEVEMENT
@@ -183,7 +184,10 @@ func _on_state_achievement_reward_claimed(data: Dictionary) -> void:
 func _on_state_data_loaded() -> void:
 	_render_all()
 
-
+func show_module() -> void:
+	button.state.set_state(1)
+func hide_module() -> void:
+	button.state.set_state(0)
 func _on_button_state_changed(old_state: int, new_state: int) -> void:
 	if new_state == 0:
 		GuiTransitions.hide("achievement")

@@ -114,7 +114,6 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="TextureRect" type="TextureRect" parent="InnerPanel/VBoxContainer" unique_id=776946583]
-custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("2_jxm58")
