@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="11_uypi5"]
 [ext_resource type="PackedScene" uid="uid://bgbv8yre2k242" path="res://scenes/main/ui/room_decor_module/room_decor_module.tscn" id="12_3ru4j"]
 [ext_resource type="PackedScene" uid="uid://c8l76gjafw6xh" path="res://scenes/main/ui/notebook_mobile_module/NoteBookTab.tscn" id="12_w2hwp"]
+[ext_resource type="PackedScene" uid="uid://b8blywtcq1xws" path="res://scenes/main/ui/calendar_module/calendar_tab.tscn" id="13_uumow"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="15_khr3h"]
 [ext_resource type="PackedScene" uid="uid://w7pybkxter3h" path="res://scenes/main/ui/level_bar/level_bar.tscn" id="17_tnos5"]
 [ext_resource type="PackedScene" uid="uid://cecvhnjpe47ei" path="res://scenes/main/ui/achievement_module/achievement_module.tscn" id="18_w2hwp"]
@@ -44,7 +45,7 @@ shader_parameter/show_shadow = false
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(64, 376)
+shader_parameter/size = Vector2(64, 428)
 shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
@@ -206,6 +207,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="RoomDecorModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1442530485 instance=ExtResource("12_3ru4j")]
+layout_mode = 2
+
+[node name="CalendarTab" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1801343001 instance=ExtResource("13_uumow")]
 layout_mode = 2
 
 [node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1982143006 instance=ExtResource("4_ex8bf")]

@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://8rtsyrvshb4i"]
+
+[ext_resource type="Script" uid="uid://cmykggw5nw5kb" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_library_panel.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_btn"]
+[ext_resource type="Texture2D" uid="uid://c7ck2hhjgnsuf" path="res://assets/ui/icons/add_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_add"]
+[ext_resource type="PackedScene" uid="uid://bll6akhkj6n3h" path="res://scenes/main/ui/calendar_module/habit_edit_dialog/habit_edit_dialog.tscn" id="4_dialog"]
+
+[node name="HabitLibraryPanel" type="VBoxContainer" unique_id=1092369672]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+script = ExtResource("1_script")
+
+[node name="Header" type="HBoxContainer" parent="." unique_id=1941936279]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Header" unique_id=326058138]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 16
+text = "习惯库"
+
+[node name="AddBtn" type="Button" parent="Header"]
+layout_mode = 2
+text = "添加习惯"
+script = ExtResource("2_btn")
+button_icon = ExtResource("3_add")
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="EmptyLabel" type="Label" parent="." unique_id=28641150]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 13
+text = "还没有习惯，点击按钮添加"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1199723151]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ListContainer" type="VBoxContainer" parent="ScrollContainer" unique_id=572944123]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="HabitEditDialog" parent="." unique_id=286722988 instance=ExtResource("4_dialog")]
+layout_mode = 2

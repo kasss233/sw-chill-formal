@@ -23,6 +23,9 @@ signal function_started(call_id: String, name: String)
 ## 函数定义 JSON 文件路径
 const FUNCTION_DEFINITIONS_PATH = "res://scenes/main/autoload/ai_service/function_definitions.json"
 
+## 时区偏移量（UTC+8）
+const TIMEZONE_OFFSET = 8 * 3600
+
 ## 已注册的函数 { name: { callable: Callable, definition: Dictionary } }
 var _functions: Dictionary = {}
 
@@ -138,7 +141,7 @@ func _fn_add_task(args: Dictionary) -> Dictionary:
 	var title = args.get("title", "")
 	if title.is_empty():
 		return {"success": false, "error": "任务标题不能为空"}
-	var due = int(args.get("due_timestamp", 0))
+	var due = _resolve_due_timestamp(args)
 	var task = TaskState.add_task(title, due)
 	return {"success": true, "data": {"task_id": task.id, "title": task.title, "due_timestamp": task.due_timestamp}}
 
@@ -165,7 +168,8 @@ func _fn_set_task_completed(args: Dictionary) -> Dictionary:
 
 
 func _fn_set_task_due_time(args: Dictionary) -> Dictionary:
-	var ok = TaskState.set_task_due_time(int(args.get("task_id", 0)), int(args.get("due_timestamp", 0)))
+	var due = _resolve_due_timestamp(args)
+	var ok = TaskState.set_task_due_time(int(args.get("task_id", 0)), due)
 	if ok:
 		return {"success": true}
 	return {"success": false, "error": "任务不存在"}
@@ -542,3 +546,146 @@ func _fn_select_room_decor_item(args: Dictionary) -> Dictionary:
 	if not ok:
 		return {"success": false, "error": "选择失败（物品不存在或未解锁）"}
 	return {"success": true, "data": {"item_id": item_id}}
+
+
+# ============================================================
+# 函数实现 — 习惯管理（9 个）
+# ============================================================
+
+func _fn_add_habit(args: Dictionary) -> Dictionary:
+	var habit_name = args.get("name", "")
+	if habit_name.is_empty():
+		return {"success": false, "error": "习惯名称不能为空"}
+	var data = HabitState.agent_add_habit(
+		habit_name,
+		int(args.get("estimated_minutes", 30)),
+		int(args.get("preferred_period", 0)),
+		int(args.get("frequency", 0)),
+	)
+	return {"success": true, "data": data}
+
+
+func _fn_remove_habit(args: Dictionary) -> Dictionary:
+	var ok = HabitState.remove_habit(int(args.get("habit_id", 0)))
+	if ok:
+		return {"success": true}
+	return {"success": false, "error": "习惯不存在"}
+
+
+func _fn_update_habit(args: Dictionary) -> Dictionary:
+	var habit_id = int(args.get("habit_id", 0))
+	var fields: Dictionary = {}
+	if args.has("name"):
+		fields["name"] = args["name"]
+	if args.has("estimated_minutes"):
+		fields["estimated_minutes"] = int(args["estimated_minutes"])
+	if args.has("preferred_period"):
+		fields["preferred_period"] = int(args["preferred_period"])
+	if args.has("frequency"):
+		fields["frequency"] = int(args["frequency"])
+	if args.has("is_active"):
+		fields["is_active"] = args["is_active"]
+	var ok = HabitState.update_habit(habit_id, fields)
+	if ok:
+		return {"success": true}
+	return {"success": false, "error": "习惯不存在"}
+
+
+func _fn_get_habits(_args: Dictionary) -> Dictionary:
+	var data = HabitState.agent_get_habits()
+	return {"success": true, "data": data}
+
+
+func _fn_get_time_slots(_args: Dictionary) -> Dictionary:
+	var data = HabitState.agent_get_time_slots()
+	return {"success": true, "data": data}
+
+
+func _fn_generate_week_schedule(args: Dictionary) -> Dictionary:
+	var week_key = args.get("week_key", "")
+	if week_key.is_empty():
+		return {"success": false, "error": "week_key 不能为空"}
+	var entries = args.get("entries", [])
+	var ok = HabitState.agent_generate_schedule(week_key, entries)
+	if ok:
+		return {"success": true, "data": {"week_key": week_key, "entry_count": entries.size()}}
+	return {"success": false, "error": "排期生成失败"}
+
+
+func _fn_get_week_schedule(args: Dictionary) -> Dictionary:
+	var week_key = args.get("week_key", "")
+	if week_key.is_empty():
+		return {"success": false, "error": "week_key 不能为空"}
+	var data = HabitState.agent_get_week_schedule(week_key)
+	return {"success": true, "data": data}
+
+
+func _fn_set_habit_execution(args: Dictionary) -> Dictionary:
+	var ok = HabitState.agent_set_execution(
+		int(args.get("entry_id", 0)),
+		args.get("date_key", ""),
+		int(args.get("status", 0)),
+	)
+	if ok:
+		return {"success": true}
+	return {"success": false, "error": "设置执行状态失败"}
+
+
+func _fn_get_habit_stats(args: Dictionary) -> Dictionary:
+	var week_key = args.get("week_key", "")
+	if week_key.is_empty():
+		return {"success": false, "error": "week_key 不能为空"}
+	var data = HabitState.agent_get_habit_stats(week_key)
+	return {"success": true, "data": data}
+
+
+# ============================================================
+# 辅助函数
+# ============================================================
+
+## 将本地时间 datetime 字符串解析为 UTC Unix 时间戳
+## 格式: "YYYY-MM-DDTHH:MM:SS" 或 "YYYY-MM-DD HH:MM:SS"
+## 返回 0 表示无截止时间或解析失败
+func _parse_deadline_to_timestamp(deadline_str: String) -> int:
+	if deadline_str.is_empty():
+		return 0
+
+	# 兼容 "T" 和空格分隔
+	var date_time_part = deadline_str.split(".")[0].strip_edges()
+	var separator = "T" if date_time_part.contains("T") else " "
+	var parts = date_time_part.split(separator)
+	if parts.size() != 2:
+		push_warning("[AgentExecutor] deadline 格式错误: %s" % deadline_str)
+		return 0
+
+	var date_parts = parts[0].split("-")
+	var time_parts = parts[1].split(":")
+	if date_parts.size() != 3 or time_parts.size() < 2:
+		push_warning("[AgentExecutor] deadline 格式错误: %s" % deadline_str)
+		return 0
+
+	var datetime_dict = {
+		"year": date_parts[0].to_int(),
+		"month": date_parts[1].to_int(),
+		"day": date_parts[2].to_int(),
+		"hour": time_parts[0].to_int(),
+		"minute": time_parts[1].to_int(),
+		"second": time_parts[2].to_int() if time_parts.size() >= 3 else 0
+	}
+
+	# get_unix_time_from_datetime_dict 将输入视为 UTC
+	# 由于输入是本地时间（UTC+8），需减去时区偏移得到真正的 UTC 时间戳
+	var local_as_utc = Time.get_unix_time_from_datetime_dict(datetime_dict)
+	return int(local_as_utc) - TIMEZONE_OFFSET
+
+
+## 从参数中解析截止时间，兼容新旧两种格式
+## 优先使用 deadline（字符串），fallback 到 due_timestamp（整数）
+func _resolve_due_timestamp(args: Dictionary) -> int:
+	# 优先：新格式 deadline 字符串
+	var deadline_str = str(args.get("deadline", ""))
+	if not deadline_str.is_empty():
+		return _parse_deadline_to_timestamp(deadline_str)
+	# 兼容：旧格式 due_timestamp 整数
+	var due_raw = args.get("due_timestamp", 0)
+	return int(due_raw)

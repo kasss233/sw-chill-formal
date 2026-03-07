@@ -185,9 +185,16 @@ func _on_state_data_loaded() -> void:
 	_render_all()
 
 func show_module() -> void:
-	button.state.set_state(1)
+	if button.current_state == 0:
+		LayerManager.bring_to_front(canvas_layer)
+		GuiTransitions.show("achievement")
+		button.set_state_no_signal(1)
+
 func hide_module() -> void:
-	button.state.set_state(0)
+	if button.current_state == 1:
+		GuiTransitions.hide("achievement")
+		button.set_state_no_signal(0)
+
 func _on_button_state_changed(old_state: int, new_state: int) -> void:
 	if new_state == 0:
 		GuiTransitions.hide("achievement")

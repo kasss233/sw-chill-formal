@@ -1,0 +1,128 @@
+[gd_scene format=3 uid="uid://b8blywtcq1xws"]
+
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="1_3ljc0"]
+[ext_resource type="Script" uid="uid://dktu8746707t1" path="res://scenes/main/ui/calendar_module/calendar_tab.gd" id="1_mjfma"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="2_mjfma"]
+[ext_resource type="Texture2D" uid="uid://dwa63qqbbakjr" path="res://assets/ui/round_icons/calendar-bold.svg" id="3_ilrsm"]
+[ext_resource type="PackedScene" uid="uid://xv83kmr2vgxv" path="res://scenes/main/ui/calendar_module/calendar_module.tscn" id="4_x87v1"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="5_7wwvt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mjfma"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ilrsm"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x87v1"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7wwvt"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sj1fv"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Resource" id="Resource_ts7tm"]
+script = ExtResource("2_mjfma")
+icon = ExtResource("3_ilrsm")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_a8g37"]
+script = ExtResource("2_mjfma")
+icon = ExtResource("3_ilrsm")
+icon_color = Color(0, 0, 0, 1)
+background_color = Color(1, 1, 1, 1)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="CalendarTab" type="MarginContainer" unique_id=1801343001]
+offset_right = 32.0
+offset_bottom = 36.0
+script = ExtResource("1_mjfma")
+
+[node name="MaterialToggleButton" type="Button" parent="." unique_id=755705448]
+clip_contents = true
+custom_minimum_size = Vector2(36, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_mjfma")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ilrsm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_x87v1")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_7wwvt")
+theme_override_styles/focus = SubResource("StyleBoxFlat_sj1fv")
+script = ExtResource("1_3ljc0")
+states = Array[ExtResource("2_mjfma")]([SubResource("Resource_ts7tm"), SubResource("Resource_a8g37")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=274763694]
+
+[node name="CalendarModule" parent="CanvasLayer" unique_id=814536265 instance=ExtResource("4_x87v1")]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -178.0
+offset_top = -186.0
+offset_right = 178.0
+offset_bottom = 186.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GuiTransition" type="Node" parent="." unique_id=2097538940]
+script = ExtResource("5_7wwvt")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.39999999999999997
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/CalendarModule")
+layout_id = "calendar"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[connection signal="state_changed" from="MaterialToggleButton" to="." method="_on_material_toggle_button_state_changed"]

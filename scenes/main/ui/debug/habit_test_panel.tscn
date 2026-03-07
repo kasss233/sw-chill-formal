@@ -1,0 +1,221 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/habit_test_panel.gd" id="1_habit_test"]
+
+[node name="HabitTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_habit_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="HabitNameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "习惯名称"
+
+[node name="HabitIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "习惯ID (整数)"
+
+[node name="WeekKeyInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "周标识 如 2026-W10"
+
+[node name="EntryIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "排期条目ID (整数)"
+
+[node name="DateKeyInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "日期 如 2026-03-07"
+
+[node name="HabitSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HabitSection"]
+layout_mode = 2
+text = "习惯库 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddHabitBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HabitSection"]
+layout_mode = 2
+text = "添加习惯"
+
+[node name="GetAllHabitsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HabitSection"]
+layout_mode = 2
+text = "获取所有习惯"
+
+[node name="UpdateHabitBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HabitSection"]
+layout_mode = 2
+text = "更新习惯名称"
+
+[node name="RemoveHabitBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HabitSection"]
+layout_mode = 2
+text = "删除习惯"
+
+[node name="ToggleActiveBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/HabitSection"]
+layout_mode = 2
+text = "切换激活状态"
+
+[node name="SlotSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/SlotSection"]
+layout_mode = 2
+text = "时间段 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="GetTimeSlotsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/SlotSection"]
+layout_mode = 2
+text = "获取时间段模板"
+
+[node name="ScheduleSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ScheduleSection"]
+layout_mode = 2
+text = "排期 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="GetWeekScheduleBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ScheduleSection"]
+layout_mode = 2
+text = "获取周排期"
+
+[node name="ClearWeekBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ScheduleSection"]
+layout_mode = 2
+text = "清空周排期"
+
+[node name="CopyWeekBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ScheduleSection"]
+layout_mode = 2
+text = "复制到下周"
+
+[node name="ExecutionSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ExecutionSection"]
+layout_mode = 2
+text = "执行记录 API:"
+theme_override_font_sizes/font_size = 16
+
+[node name="MarkCompletedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ExecutionSection"]
+layout_mode = 2
+text = "标记完成"
+
+[node name="MarkSkippedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ExecutionSection"]
+layout_mode = 2
+text = "标记跳过"
+
+[node name="GetDayRecordsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ExecutionSection"]
+layout_mode = 2
+text = "获取日记录"
+
+[node name="GetWeekStatsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ExecutionSection"]
+layout_mode = 2
+text = "获取周统计"
+
+[node name="AgentSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent API 测试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AgentAddHabitBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent: 添加习惯"
+
+[node name="AgentGetHabitsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent: 获取习惯列表"
+
+[node name="AgentGetTimeSlotsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent: 获取时间段"
+
+[node name="AgentGetScheduleBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent: 获取周排期"
+
+[node name="AgentGetStatsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent: 获取统计"
+
+[node name="AgentSetExecutionBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "Agent: 设置执行状态"
+
+[node name="FnCallSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/FnCallSection"]
+layout_mode = 2
+text = "Function Call 链路测试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="FnAddHabitBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/FnCallSection"]
+layout_mode = 2
+text = "FnCall: add_habit"
+
+[node name="FnGetHabitsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/FnCallSection"]
+layout_mode = 2
+text = "FnCall: get_habits"
+
+[node name="FnGenScheduleBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/FnCallSection"]
+layout_mode = 2
+text = "FnCall: generate_week_schedule"
+
+[node name="FnGetStatsBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/FnCallSection"]
+layout_mode = 2
+text = "FnCall: get_habit_stats"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]测试日志将显示在这里...[/color]"
+scroll_following = true

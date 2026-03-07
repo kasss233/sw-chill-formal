@@ -22,10 +22,12 @@ var _categories: Array[String] = []
 var _next_id: int = 1
 
 const SAVE_PATH = "user://note_data.json"
+const PROTECTED_CATEGORIES: Array[String] = ["反思总结"]
 
 
 func _ready() -> void:
 	load_data()
+	_ensure_protected_categories()
 	print("[NoteState] Initialized as autoload singleton")
 
 
@@ -212,6 +214,9 @@ func add_category(cat_name: String) -> bool:
 
 ## 删除分类（同时从笔记的分类列表中移除该分类）
 func remove_category(cat_name: String) -> bool:
+	if cat_name in PROTECTED_CATEGORIES:
+		push_warning("[NoteState] Cannot remove protected category: %s" % cat_name)
+		return false
 	var idx = _categories.find(cat_name)
 	if idx < 0:
 		return false
@@ -430,3 +435,15 @@ func allocate_id() -> int:
 	var id = _next_id
 	_next_id += 1
 	return id
+
+
+## 确保受保护分类存在
+func _ensure_protected_categories() -> void:
+	var changed = false
+	for cat in PROTECTED_CATEGORIES:
+		if cat not in _categories:
+			_categories.append(cat)
+			changed = true
+			print("[NoteState] Created protected category: %s" % cat)
+	if changed:
+		_save_data()

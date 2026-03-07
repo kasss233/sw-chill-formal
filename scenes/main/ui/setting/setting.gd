@@ -70,7 +70,18 @@ func _on_setting_button_pressed() -> void:
 		GuiTransitions.show("setter")
 
 
-func _on_full_screen_checkbox_toggled(_toggled_on: bool) -> void:
+func show_module() -> void:
+	if not panel.visible:
+		LayerManager.bring_to_front(canvas_layer)
+		GuiTransitions.show("setter")
+
+
+func hide_module() -> void:
+	if panel.visible:
+		GuiTransitions.hide("setter")
+
+
+func _on_full_screen_checkbox_toggled(toggled_on: bool) -> void:
 	pass # Replace with function body.
 
 # ============ 抗锯齿设置 ============
