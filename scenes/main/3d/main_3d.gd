@@ -55,6 +55,9 @@ func _connect_signals() -> void:
 	if SettingState and SettingState.has_signal("fog_changed"):
 		if not SettingState.fog_changed.is_connected(_on_fog_button_state_changed):
 			SettingState.fog_changed.connect(_on_fog_button_state_changed)
+	if SettingState and SettingState.has_signal("camera_changed"):
+		if not SettingState.camera_changed.is_connected(_on_camera_changed):
+			SettingState.camera_changed.connect(_on_camera_changed)
 	if PomodoroState and PomodoroState.has_signal("work_phase_started"):
 		if not PomodoroState.work_phase_started.is_connected(_on_work_phase_started):
 			PomodoroState.work_phase_started.connect(_on_work_phase_started)
@@ -240,3 +243,11 @@ func _on_room_decor_category_unselected(category: String) -> void:
 			window_side.call("hide_all")
 		"sidedesk":
 			window_side.call("hide_all")
+func _on_camera_changed(value: int) -> void:
+	## 输出调试信息
+	print("Camera mode changed to: %d" % value)
+	match value:
+		0:
+			side_camera.current = true
+		1:
+			central_camera.current = true

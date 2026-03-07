@@ -13,6 +13,8 @@ signal env_weather_changed(mode: int)
 signal snow_changed(_value: int)
 ## 雨量强度变化
 signal rain_changed(_value: int)
+## 摄像头切换
+signal camera_changed(_value: int)
 ## 户外特效 1 状态变化
 # signal outdoor_1_changed(_state: int)
 ## 户外特效 2 状态变化
@@ -37,6 +39,9 @@ var _snow_amount: int = 500
 # var _outdoor_2_state: int = 0
 ## 雾效开关状态
 var _fog_state: int = 0
+## 摄像头模式
+var _camera_mode: int = 0
+
 
 const SAVE_PATH = "user://settings.cfg"
 const SAVE_DEBOUNCE_SEC := 0.25
@@ -120,6 +125,16 @@ func set_ssaa(mode: int) -> void:
 	get_viewport().screen_space_aa = mode as Viewport.ScreenSpaceAA
 	_save_settings()
 
+func set_camera(mode: int) -> void:
+	if _camera_mode == mode:
+		return
+	_camera_mode = mode
+	camera_changed.emit(mode)
+	_save_settings()
+
+func get_camera_mode() -> int:
+	return _camera_mode
+
 func get_msaa() -> int:
 	return _msaa
 
@@ -165,6 +180,7 @@ func _save_settings() -> void:
 	# config.set_value("env", "outdoor_1_state", _outdoor_1_state)
 	# config.set_value("env", "outdoor_2_state", _outdoor_2_state)
 	config.set_value("env", "fog_state", _fog_state)
+	config.set_value("env", "camera_mode", _camera_mode)
 	config.set_value("rendering", "msaa_3d", _msaa)
 	config.set_value("rendering", "screen_space_aa", _ssaa)
 	config.save(SAVE_PATH)
@@ -194,6 +210,7 @@ func _load_settings() -> void:
 	# _outdoor_1_state = int(config.get_value("env", "outdoor_1_state", 0))
 	# _outdoor_2_state = int(config.get_value("env", "outdoor_2_state", 0))
 	_fog_state = int(config.get_value("env", "fog_state", 0))
+	_camera_mode = int(config.get_value("env", "camera_mode", 0))
 	_msaa = int(config.get_value("rendering", "msaa_3d", 0))
 	_ssaa = int(config.get_value("rendering", "screen_space_aa", 0))
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
@@ -207,3 +224,4 @@ func _emit_loaded_settings() -> void:
 	snow_changed.emit(_snow_amount)
 	# outdoor_1/outdoor_2 功能已停用（信号已注释）
 	fog_changed.emit(_fog_state)
+	camera_changed.emit(_camera_mode)

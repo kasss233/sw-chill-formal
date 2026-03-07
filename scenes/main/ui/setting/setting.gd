@@ -6,6 +6,7 @@ extends Control
 @onready var panel = $CanvasLayer/FrostedPanel
 @onready var _msaa_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow/MsaaDropdown
 @onready var _ssaa_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/SsaaRow/SsaaDropdown
+@onready var _camera_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10/CameraDropDown
 @onready var _time_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/TimeButton
 @onready var _weather_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/WeatherButton
 @onready var _rain_slider: MaterialSlider = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer4/RainMaterialSlider
@@ -69,7 +70,7 @@ func _on_setting_button_pressed() -> void:
 		GuiTransitions.show("setter")
 
 
-func _on_full_screen_checkbox_toggled(toggled_on: bool) -> void:
+func _on_full_screen_checkbox_toggled(_toggled_on: bool) -> void:
 	pass # Replace with function body.
 
 # ============ 抗锯齿设置 ============
@@ -85,8 +86,10 @@ func _on_ssaa_changed(_index: int, value: Variant) -> void:
 func _init_dropdowns_from_state() -> void:
 	var msaa_val = SettingState.get_msaa()
 	var ssaa_val = SettingState.get_ssaa()
+	var camera_val = SettingState.get_camera_mode()
 	_msaa_dropdown.set_selected_by_value(str(msaa_val))
 	_ssaa_dropdown.set_selected_by_value(str(ssaa_val))
+	_camera_dropdown.set_selected_by_value(str(camera_val))
 
 
 func _on_rain_material_slider_value_changed(value: float) -> void:
@@ -127,3 +130,7 @@ func _on_state_snow_changed(amount: int) -> void:
 
 func _on_fog_button_state_changed(_old_state: int, new_state: int) -> void:
 	SettingState.set_fog(new_state)
+
+
+func _on_camera_drop_down_selection_changed(_index: int, value: Variant) -> void:
+	SettingState.set_camera(int(value))

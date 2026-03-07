@@ -46,7 +46,7 @@ shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(349, 433)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oe8y2"]
 content_margin_left = 12.0
@@ -469,6 +469,73 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="Resource" id="Resource_doxmi"]
+script = ExtResource("16_do")
+label = "侧边摄像头"
+value = "0"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
+[sub_resource type="Resource" id="Resource_yse4d"]
+script = ExtResource("16_do")
+label = "正面摄像头"
+value = "1"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ftjdn"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sryhx"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1se7"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bfg6y"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ikx1w"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [sub_resource type="Resource" id="Resource_ms0"]
 script = ExtResource("16_do")
 label = "关闭"
@@ -493,7 +560,7 @@ label = "8x"
 value = "3"
 metadata/_custom_type_script = "uid://cbss0rumljfsx"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_doxmi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h2a2"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -504,7 +571,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yse4d"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahkkk"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -515,7 +582,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ftjdn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_41d5u"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -526,7 +593,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sryhx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prmue"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -537,7 +604,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1se7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1v1ii"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -560,7 +627,7 @@ label = "FXAA"
 value = "1"
 metadata/_custom_type_script = "uid://cbss0rumljfsx"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bfg6y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ioa2x"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -571,7 +638,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ikx1w"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q6vrp"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -582,7 +649,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h2a2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ksap7"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -593,7 +660,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahkkk"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bibii"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -604,7 +671,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_41d5u"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lp55d"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -615,7 +682,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prmue"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6gip8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -626,9 +693,9 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="ImageTexture" id="ImageTexture_1v1ii"]
+[sub_resource type="ImageTexture" id="ImageTexture_iy1ji"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ioa2x"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bimj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -639,7 +706,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q6vrp"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nij40"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -650,7 +717,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ksap7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3pjvp"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -661,7 +728,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bibii"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n27lb"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -672,7 +739,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lp55d"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bqhkt"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -919,6 +986,35 @@ script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_g4tmb"), SubResource("Resource_80fn4")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
+[node name="HBoxContainer10" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=996145830]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10" unique_id=883773752]
+layout_mode = 2
+text = "摄像头切换"
+
+[node name="CameraDropDown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10" unique_id=1019112706 node_paths=PackedStringArray("menu")]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_6k6um")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_hxeb1")
+theme_override_styles/hover = SubResource("StyleBoxFlat_dyrbh")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_pdtyu")
+theme_override_styles/focus = SubResource("StyleBoxFlat_6d4nw")
+text = "选择摄像头"
+script = ExtResource("15_md")
+placeholder = "选择摄像头"
+editor_options = Array[ExtResource("16_do")]([SubResource("Resource_doxmi"), SubResource("Resource_yse4d")])
+menu = NodePath("DropdownMenu")
+sync_selected_item = true
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://47c8avtwpt0y"
+
 [node name="HBoxContainer8" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=81432407]
 layout_mode = 2
 
@@ -936,11 +1032,11 @@ clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_6k6um")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_hxeb1")
-theme_override_styles/hover = SubResource("StyleBoxFlat_dyrbh")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_pdtyu")
-theme_override_styles/focus = SubResource("StyleBoxFlat_6d4nw")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ftjdn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sryhx")
+theme_override_styles/hover = SubResource("StyleBoxFlat_g1se7")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_bfg6y")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ikx1w")
 text = "选择 MSAA"
 script = ExtResource("15_md")
 placeholder = "选择 MSAA"
@@ -965,11 +1061,11 @@ clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_doxmi")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_yse4d")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ftjdn")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_sryhx")
-theme_override_styles/focus = SubResource("StyleBoxFlat_g1se7")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3h2a2")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ahkkk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_41d5u")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_prmue")
+theme_override_styles/focus = SubResource("StyleBoxFlat_1v1ii")
 text = "选择 SSAA"
 script = ExtResource("15_md")
 placeholder = "选择 SSAA"
@@ -996,17 +1092,17 @@ layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_bfg6y")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ikx1w")
-theme_override_styles/hover = SubResource("StyleBoxFlat_3h2a2")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_ahkkk")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_41d5u")
-theme_override_styles/focus = SubResource("StyleBoxFlat_prmue")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ioa2x")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_q6vrp")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ksap7")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_bibii")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_lp55d")
+theme_override_styles/focus = SubResource("StyleBoxFlat_6gip8")
 theme_override_constants/check_v_offset = 0
-theme_override_icons/checked = SubResource("ImageTexture_1v1ii")
-theme_override_icons/unchecked = SubResource("ImageTexture_1v1ii")
-theme_override_icons/checked_disabled = SubResource("ImageTexture_1v1ii")
-theme_override_icons/unchecked_disabled = SubResource("ImageTexture_1v1ii")
+theme_override_icons/checked = SubResource("ImageTexture_iy1ji")
+theme_override_icons/unchecked = SubResource("ImageTexture_iy1ji")
+theme_override_icons/checked_disabled = SubResource("ImageTexture_iy1ji")
+theme_override_icons/unchecked_disabled = SubResource("ImageTexture_iy1ji")
 alignment = 1
 script = ExtResource("12_jec7i")
 unchecked_icon = ExtResource("13_7oay3")
@@ -1025,11 +1121,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_ioa2x")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_q6vrp")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ksap7")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bibii")
-theme_override_styles/focus = SubResource("StyleBoxFlat_lp55d")
+theme_override_styles/normal = SubResource("StyleBoxFlat_6bimj")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nij40")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3pjvp")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_n27lb")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bqhkt")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_yna35"), SubResource("Resource_u7uji")])
 button_size = 3
@@ -1054,6 +1150,7 @@ metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 [connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer9/FogButton" to="." method="_on_fog_button_state_changed"]
 [connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6/OutDoor1Button" to="." method="_on_out_door_1_button_state_changed"]
 [connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7/OutDoor2Button" to="." method="_on_out_door_2_button_state_changed"]
+[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10/CameraDropDown" to="." method="_on_camera_drop_down_selection_changed"]
 [connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow/MsaaDropdown" to="." method="_on_msaa_changed"]
 [connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/SsaaRow/SsaaDropdown" to="." method="_on_ssaa_changed"]
 [connection signal="toggled" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3/FullScreenCheckbox" to="." method="_on_full_screen_checkbox_toggled"]
