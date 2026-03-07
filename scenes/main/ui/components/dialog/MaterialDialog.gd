@@ -526,13 +526,15 @@ func set_custom_content(content_node: Control) -> bool:
 	custom_content_node = content_node
 	_custom_content = content_node
 
-	# 如果节点还没有父节点，将其添加到内容容器中
-	if not _custom_content.get_parent():
-		if _content_container:
+	# 确保节点在 _content_container 内
+	if _content_container:
+		if _custom_content.get_parent() != _content_container:
+			if _custom_content.get_parent():
+				_custom_content.get_parent().remove_child(_custom_content)
 			_content_container.add_child(_custom_content)
-		else:
-			# 如果内容容器还不存在，添加为临时子节点，稍后会在 _setup_dialog 中重新排列
-			add_child(_custom_content)
+	elif not _custom_content.get_parent():
+		# 如果内容容器还不存在，添加为临时子节点，稍后会在 _setup_dialog 中重新排列
+		add_child(_custom_content)
 
 	_update_text()
 	_update_layout()
@@ -833,9 +835,9 @@ func _refresh_dialog_height() -> void:
 			# 判断相邻元素类型，确定间距
 			if element == _icon_rect and next_element == _title_label:
 				gap = title_content_gap
-			elif element == _title_label and next_element == _text_label:
+			elif element == _title_label and (next_element == _text_label or next_element == _custom_content):
 				gap = title_content_gap
-			elif element == _text_label and next_element == _button_container:
+			elif (element == _text_label or element == _custom_content) and next_element == _button_container:
 				gap = content_button_gap
 			else:
 				gap = 8  # 默认间距

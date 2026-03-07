@@ -2,7 +2,7 @@ extends MarginContainer
 
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
 @onready var note_book_mobile: NoteBookMobile = $CanvasLayer/NoteBookMobile
-@onready var todo_button: MaterialToggleButton = $TodoButton
+@onready var todo_button: MaterialToggleButton = $ToggleButton
 
 func _ready() -> void:
 	note_book_mobile.visible = false

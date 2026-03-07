@@ -266,9 +266,16 @@ func _try_remove_empty_category_section(category: String) -> void:
 		_category_sections.erase(normalized)
 
 func show_module() -> void:
-	button.state.set_state(1)
+	if button.current_state == 0:
+		LayerManager.bring_to_front(canvas_layer)
+		GuiTransitions.show("room_decor")
+		button.set_state_no_signal(1)
+
 func hide_module() -> void:
-	button.state.set_state(0)
+	if button.current_state == 1:
+		GuiTransitions.hide("room_decor")
+		button.set_state_no_signal(0)
+
 func _on_button_state_changed(_old_state: int, new_state: int) -> void:
 	match new_state:
 		0:

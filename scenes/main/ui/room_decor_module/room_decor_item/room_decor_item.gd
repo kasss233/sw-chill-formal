@@ -3,7 +3,7 @@ extends Control
 signal select_requested(item_id: int)
 signal deselect_requested(item_id: int)
 
-@onready var texture_rect: TextureRect = $InnerPanel/VBoxContainer/TextureRect
+@onready var texture_rect: TextureRect = %TextureRect
 @onready var item_info_label: Label = $InnerPanel/VBoxContainer/ItemInfoLabel
 @onready var lock_state_label: Label = $InnerPanel/VBoxContainer/LockStateLabel
 @onready var toggle_button: MaterialToggleButton = $InnerPanel/VBoxContainer/MaterialToggleButton
@@ -54,9 +54,11 @@ func is_unlocked() -> bool:
 	#select_requested.emit(_item_id)
 
 
-func _on_material_toggle_button_state_changed(_old_state: int, new_state: int) -> void:
+func _on_material_toggle_button_2_state_changed(old_state: int, new_state: int) -> void:
 	match new_state:
 		0:
+			toggle_button.set_state(0)
 			select_requested.emit(_item_id)
 		1:
+			toggle_button.set_state(1)
 			deselect_requested.emit(_item_id)

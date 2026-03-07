@@ -1,4 +1,4 @@
-extends Control
+extends MarginContainer
 
 # 日历控件 - 使用 calendar_library 插件
 
@@ -29,6 +29,13 @@ var selected_date: Dictionary = {}  # {year: int, month: int, day: int}
 # 日期按钮数组
 var day_buttons: Array[MaterialButton] = []
 
+# 滑动手势
+var _slide_tween: Tween = null
+var _swipe_start_pos: Vector2 = Vector2.ZERO
+var _is_swiping: bool = false
+var _is_animating: bool = false
+const SWIPE_THRESHOLD: float = 50.0
+
 # 中文月份映射
 const CHINESE_MONTHS = {
 	1: "一月", 2: "二月", 3: "三月", 4: "四月",
@@ -37,6 +44,9 @@ const CHINESE_MONTHS = {
 }
 
 func _ready():
+	# 启用裁剪，让滑动动画中的网格超出部分不可见
+	clip_contents = true
+
 	# 初始化日历库
 	calendar = Calendar.new()
 	calendar.set_first_weekday(Time.WEEKDAY_MONDAY)  # 从周一开始
@@ -128,19 +138,11 @@ func _update_calendar():
 
 func _on_prev_month_pressed():
 	"""上一个月"""
-	current_month -= 1
-	if current_month < 1:
-		current_month = 12
-		current_year -= 1
-	_update_calendar()
+	_switch_month(-1)
 
 func _on_next_month_pressed():
 	"""下一个月"""
-	current_month += 1
-	if current_month > 12:
-		current_month = 1
-		current_year += 1
-	_update_calendar()
+	_switch_month(1)
 
 func _on_prev_year_pressed():
 	"""上一年"""
@@ -156,11 +158,11 @@ func _on_day_button_pressed(button_index: int):
 	"""点击日期按钮"""
 	# 获取当前月份的日历数据
 	var month_data = calendar.get_calendar_month(current_year, current_month, true, true)
-	
+
 	# 计算按钮对应的日期
 	var week_index = button_index / 7
 	var day_index = button_index % 7
-	
+
 	if week_index < month_data.size():
 		var week = month_data[week_index]
 		if day_index < week.size():
@@ -172,13 +174,18 @@ func _on_day_button_pressed(button_index: int):
 					"month": day_data.month,
 					"day": day_data.day
 				}
-				
-				# 如果点击的是相邻月份的日期，切换到那个月
+
+				# 如果点击的是相邻月份的日期，带动画切换到那个月
 				if day_data.month != current_month:
-					current_year = day_data.year
-					current_month = day_data.month
-				
-				_update_calendar()
+					# 判断方向：目标月份在当前月份之后则向前（+1），之前则向后（-1）
+					var direction: int
+					if day_data.year > current_year or (day_data.year == current_year and day_data.month > current_month):
+						direction = 1
+					else:
+						direction = -1
+					_switch_month(direction)
+				else:
+					_update_calendar()
 
 
 func get_selected_date() -> Dictionary:
@@ -209,3 +216,108 @@ func _on_confirm_pressed():
 func _on_cancel_pressed():
 	"""取消按钮被点击"""
 	cancelled.emit()
+
+# ===== 滑动手势识别 =====
+
+func _input(event: InputEvent):
+	# 触摸事件
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			# 检查触摸点是否在日历区域内
+			if _is_point_in_calendar(event.position):
+				_swipe_start_pos = event.position
+				_is_swiping = true
+		else:
+			if _is_swiping:
+				_is_swiping = false
+				_handle_swipe_end(event.position)
+	# 鼠标事件
+	elif event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				if _is_point_in_calendar(event.global_position):
+					_swipe_start_pos = event.global_position
+					_is_swiping = true
+			else:
+				if _is_swiping:
+					_is_swiping = false
+					_handle_swipe_end(event.global_position)
+
+func _is_point_in_calendar(point: Vector2) -> bool:
+	"""检查点是否在日历网格区域内"""
+	var rect = grid_container.get_global_rect()
+	return rect.has_point(point)
+
+func _handle_swipe_end(end_pos: Vector2):
+	"""判断滑动方向并触发月份切换"""
+	var delta = end_pos - _swipe_start_pos
+	# 水平分量必须大于垂直分量，且超过阈值
+	if abs(delta.x) > abs(delta.y) and abs(delta.x) > SWIPE_THRESHOLD:
+		if delta.x < 0:
+			_switch_month(1)  # 向左滑 → 下月
+		else:
+			_switch_month(-1)  # 向右滑 → 上月
+
+# ===== 统一月份切换入口 =====
+
+func _switch_month(direction: int):
+	"""统一月份切换入口，direction: -1 上月，+1 下月"""
+	if _is_animating:
+		# 中断当前动画，立即完成
+		if _slide_tween:
+			_slide_tween.kill()
+		grid_container.position.x = 0
+		grid_container.modulate.a = 1.0
+		_is_animating = false
+
+	# 更新月份数据
+	current_month += direction
+	if current_month > 12:
+		current_month = 1
+		current_year += 1
+	elif current_month < 1:
+		current_month = 12
+		current_year -= 1
+
+	_animate_month_change(direction)
+
+func _animate_month_change(direction: int):
+	"""执行月份切换的滑动动画"""
+	_is_animating = true
+	var grid_width = grid_container.size.x
+
+	if _slide_tween:
+		_slide_tween.kill()
+
+	_slide_tween = create_tween()
+
+	# 阶段 1 - 滑出 (0.12s)
+	_slide_tween.set_parallel(true)
+	_slide_tween.tween_property(grid_container, "position:x", -direction * grid_width, 0.12) \
+		.from(0.0) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	_slide_tween.tween_property(grid_container, "modulate:a", 0.0, 0.12) \
+		.from(1.0) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	_slide_tween.set_parallel(false)
+
+	# 中间回调 - 刷新数据并瞬移到另一侧
+	_slide_tween.tween_callback(func():
+		_update_calendar()
+		grid_container.position.x = direction * grid_width
+	)
+
+	# 阶段 2 - 滑入 (0.15s)
+	_slide_tween.set_parallel(true)
+	_slide_tween.tween_property(grid_container, "position:x", 0.0, 0.15) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_slide_tween.tween_property(grid_container, "modulate:a", 1.0, 0.15) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	_slide_tween.set_parallel(false)
+
+	# 最终回调 - 重置状态
+	_slide_tween.tween_callback(func():
+		grid_container.position.x = 0
+		grid_container.modulate.a = 1.0
+		_is_animating = false
+	)

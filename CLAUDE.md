@@ -42,6 +42,7 @@ Data Autoload (单例) → UI Module (模块) → UI Component (组件)
 | TaskState | `scenes/main/autoload/data/task_state.gd` | 任务数据管理，持久化 `user://task_data.json`，60s 检查截止时间 |
 | AchievementState | `scenes/main/autoload/data/achievement_state.gd` | 每日任务/成就数据源，自动任务补齐、按天刷新、奖励领取状态持久化 |
 | LevelState | `scenes/main/autoload/data/level_state.gd` | 等级与经验数据源，统一经验结算与升级广播，监听成就/每日任务奖励领取加经验 |
+| HabitState | `scenes/main/autoload/data/habit_state.gd` | 习惯管理数据源：习惯库、时间段模板、课表排期、执行记录，持久化 `user://habit_data.json` |
 | AIService | `scenes/main/ai_service/ai_service.tscn` | OpenAI 兼容 SSE 流式 API，多模态，线程化 HTTP |
 
 ### 音频数据流
@@ -66,6 +67,7 @@ AudioRes (resource/audio_res/) → AudioPlayer → MusicModule → MusicList →
 | AchievementModule | `achievement_module/achievement_module.gd` | 每日任务/成就双 Tab 展示，完成、删除、领取交互转发到 `AchievementState` |
 | LevelBar | `level_bar/level_bar.gd` | 等级条 UI，监听 `LevelState` 的等级与经验进度更新 |
 | CharacterInteractor | `character_interactor/character_interactor.gd` | 角色交互触发（3 次点击） |
+| CalendarModule | `calendar_module/calendar_module.gd` | 日历+习惯课表+习惯库 Tab 切换，监听 HabitState 信号 |
 
 ### 3D Components
 

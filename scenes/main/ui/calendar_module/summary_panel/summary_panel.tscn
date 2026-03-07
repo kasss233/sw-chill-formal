@@ -1,0 +1,129 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/summary_panel/summary_panel.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_btn"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/keyboard_arrow_left_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_left"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/keyboard_arrow_right_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_right"]
+[ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="5_panel"]
+[ext_resource type="Script" uid="uid://qac15j88w15i" path="res://scenes/main/ui/components/progress_indicator/MaterialProgressIndicator.gd" id="6_progress"]
+
+[node name="SummaryPanel" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+
+[node name="NavBar" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 4
+
+[node name="PrevWeekBtn" type="Button" parent="NavBar"]
+layout_mode = 2
+script = ExtResource("2_btn")
+button_icon = ExtResource("3_left")
+button_size = 0
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="WeekLabel" type="Label" parent="NavBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="NextWeekBtn" type="Button" parent="NavBar"]
+layout_mode = 2
+script = ExtResource("2_btn")
+button_icon = ExtResource("4_right")
+button_size = 0
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="OverallPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+script = ExtResource("5_panel")
+content_padding = 12.0
+background_color = Color(1, 1, 1, 0.05)
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="OverallVBox" type="VBoxContainer" parent="OverallPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OverallRateLabel" type="Label" parent="OverallPanel/OverallVBox"]
+layout_mode = 2
+text = "本周完成率: 0%"
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="OverallProgress" type="Control" parent="OverallPanel/OverallVBox"]
+layout_mode = 2
+script = ExtResource("6_progress")
+indicator_type = 0
+linear_width = 300
+track_thickness = 6
+progress_color = Color(0.35, 0.65, 0.95, 1)
+metadata/_custom_type_script = "uid://qac15j88w15i"
+
+[node name="HeatmapPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+script = ExtResource("5_panel")
+content_padding = 12.0
+background_color = Color(1, 1, 1, 0.05)
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="HeatmapVBox" type="VBoxContainer" parent="HeatmapPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeatmapTitle" type="Label" parent="HeatmapPanel/HeatmapVBox"]
+layout_mode = 2
+text = "每日打卡"
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="HeatmapContainer" type="HBoxContainer" parent="HeatmapPanel/HeatmapVBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 6
+
+[node name="HabitsScroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="HabitsContainer" type="VBoxContainer" parent="HabitsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ReflectionPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+script = ExtResource("5_panel")
+content_padding = 12.0
+background_color = Color(1, 1, 1, 0.05)
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="ReflectionVBox" type="VBoxContainer" parent="ReflectionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ReflectionTitle" type="Label" parent="ReflectionPanel/ReflectionVBox"]
+layout_mode = 2
+text = "反思总结"
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="ReflectionLabel" type="Label" parent="ReflectionPanel/ReflectionVBox"]
+layout_mode = 2
+text = "暂无反思总结"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="GenerateBtn" type="Button" parent="ReflectionPanel/ReflectionVBox"]
+layout_mode = 2
+text = "生成反思总结"
+script = ExtResource("2_btn")
+button_size = 1
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
