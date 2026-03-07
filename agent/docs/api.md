@@ -2,6 +2,11 @@
 
 本文档描述本仓库内 Agent HTTP 服务暴露的 API（与后端业务 API 区分）。
 
+## 运行与测试
+
+- 启动服务：`python run_server.py` 或 `python run.py`（从项目根目录，host/port 见 `config/settings.yaml`）
+- 测试：`python test_chat_agent.py`、`python test_reflection_agent.py`、`python test.py`（统一跑全部）
+
 ## 基础信息
 
 | 项目 | 说明 |
