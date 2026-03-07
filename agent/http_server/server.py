@@ -37,6 +37,7 @@ from agent.core.logger import get_logger, setup_logging
 from interfaces.llm_implementations.ollama_llm import OllamaLLM
 from interfaces.memory import MemoryInterface
 from interfaces.simple_server_api import SimpleServerAPI
+from interfaces.real_server_api import RealServerAPI
 
 logger = get_logger(__name__)
 
@@ -83,7 +84,15 @@ def _load_config(config_dir: Optional[Path] = None) -> None:
     model = llm_opts.get("model", "qwen2:1.5b")
     LLM_INSTANCE = OllamaLLM(base_url=base_url, model=model)
     MEMORY_INSTANCE = DummyMemory()
-    SERVER_API_INSTANCE = SimpleServerAPI()
+    backend = settings.get("backend") or {}
+    if backend.get("use_real_api"):
+        SERVER_API_INSTANCE = RealServerAPI(
+            base_url=backend.get("base_url", "http://106.54.18.206:8000/api/v1"),
+            access_token=backend.get("access_token") or None,
+        )
+        logger.info("使用 RealServerAPI: %s", backend.get("base_url"))
+    else:
+        SERVER_API_INSTANCE = SimpleServerAPI()
 
     # 只保留 Pydantic 模型支持的键，避免 extra 报错
     def _agent_config_keys():

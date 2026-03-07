@@ -8,5 +8,11 @@ llm:
   base_url: "http://localhost:11434"
   model: "qwen2:1.5b"
 
+# 后端 API（ReflectionAgent / 统计 等可选用真实后端）
+backend:
+  base_url: "http://106.54.18.206:8000/api/v1"
+  access_token: ""   # 可选，认证后填入
+  use_real_api: false  # true 时使用 RealServerAPI，否则使用 SimpleServerAPI
+
 logging:
   level: "info"  # trace | debug | info | warning | error
