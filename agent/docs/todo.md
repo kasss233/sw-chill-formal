@@ -1,6 +1,6 @@
 # 待办 (TODO)
 
-- [ ] 外部配置：所有可配置项（prompt、选项等）放入外部配置文件，运行时加载
+- [x] 外部配置：所有可配置项（prompt、选项等）放入 config/*.yaml，运行时通过 core/config_loader 加载
 - [ ] 公用/独立拆分：公用部分放入 common，chat_agent / reflection_agent 各自独立目录
 - [ ] Agent 模块化：每层/模块单独文件，核心 agent 只做拼接
 - [ ] 后端 API 实现：为需调用后端的接口实现 RealServerAPI（Base URL: http://106.54.18.206:8000/api/v1）

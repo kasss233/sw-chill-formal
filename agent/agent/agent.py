@@ -16,7 +16,7 @@ from response import AgentResponse
 
 
 class AgentConfig(BaseModel):
-    """Agent配置"""
+    """Agent配置（可从 config/chat_agent.yaml 加载）"""
     character_name: str = "女孩"
     character_personality: str = "温柔、体贴，以鼓励和支持为主"
     system_prompt_template: str = """你是一位名为{character_name}的AI陪伴角色。
@@ -33,14 +33,18 @@ class AgentConfig(BaseModel):
 2. 回复要符合你的角色设定，语气要{character_personality}
 3. 回复要简洁、温暖、自然，就像朋友间的对话
 4. 当用户请求创建任务或学习计划时，除了文字回复，系统会自动为你创建相应的任务"""
-    
-    # LLM参数
+
+    # LLM 参数
     temperature: float = 0.7
     max_tokens: Optional[int] = None
-    
+
     # 记忆相关
     memory_top_k: int = 5
     memory_max_tokens: int = 2000
+
+    # 任务生成（可选，从配置覆盖）
+    task_generation_prompt_template: Optional[str] = None
+    task_generation_system_prompt: Optional[str] = None
 
 
 class Agent:
@@ -186,9 +190,8 @@ class Agent:
             生成的任务列表
         """
         from models.task import Task, TaskInfo, TaskOwner
-        
-        # 构建任务生成的提示词
-        task_generation_prompt = f"""用户请求：{conversation_text}
+
+        default_task_prompt = """用户请求：{conversation_text}
 
 请根据用户的请求，生成一个结构化的任务列表。任务应该是具体的、可执行的步骤。
 
@@ -203,11 +206,13 @@ class Agent:
 2. 任务描述2
 3. 任务描述3
 ..."""
-        
-        # 调用LLM生成任务描述
+        task_prompt_template = self.config.task_generation_prompt_template or default_task_prompt
+        task_generation_prompt = task_prompt_template.format(conversation_text=conversation_text)
+        system_prompt = self.config.task_generation_system_prompt or "你是一个任务规划助手，擅长将用户的目标转化为具体的任务列表。"
+
         messages = [
-            LLMMessage(role="system", content="你是一个任务规划助手，擅长将用户的目标转化为具体的任务列表。"),
-            LLMMessage(role="user", content=task_generation_prompt)
+            LLMMessage(role="system", content=system_prompt),
+            LLMMessage(role="user", content=task_generation_prompt),
         ]
         
         llm_response = self.llm.chat(

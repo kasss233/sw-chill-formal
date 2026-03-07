@@ -1,0 +1,12 @@
+# 全局与服务端配置
+
+server:
+  host: "127.0.0.1"
+  port: 8000
+
+llm:
+  base_url: "http://localhost:11434"
+  model: "qwen2:1.5b"
+
+logging:
+  level: "info"  # trace | debug | info | warning | error
