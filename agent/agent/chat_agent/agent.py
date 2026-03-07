@@ -59,8 +59,8 @@ class Agent:
             except NotImplementedError:
                 pass
             except Exception as e:
-                import logging
-                logging.getLogger(__name__).warning("任务生成失败: %s", e)
+                from core.logger import get_logger
+                get_logger(__name__).warning("任务生成失败: %s", e)
         self.conversation_history.append(LLMMessage(role="user", content=user_message))
         self.conversation_history.append(LLMMessage(role="assistant", content=response_text))
         return AgentResponse(
