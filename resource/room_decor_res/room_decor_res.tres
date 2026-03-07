@@ -33,6 +33,18 @@ name = "whale"
 category = "windowside"
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
+[sub_resource type="Resource" id="Resource_qreuf"]
+script = ExtResource("1_2gecy")
+name = "cat"
+category = "sidedesk"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_p2tlr"]
+script = ExtResource("1_2gecy")
+name = "flowers"
+category = "sidedesk"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
 [resource]
 script = ExtResource("1_8761q")
-decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2")])
+decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2"), SubResource("Resource_qreuf"), SubResource("Resource_p2tlr")])

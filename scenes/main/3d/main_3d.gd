@@ -16,6 +16,7 @@ extends Node3D
 @export var snow: Node3D
 @export var planet: Node3D
 @export var window_side: Node3D
+@export var side_desk: Node3D
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -224,9 +225,18 @@ func _on_room_decor_selected(item_name: String, item_category: String) -> void:
 				window_side.call("show_cherry")
 			"whale":
 				window_side.call("show_whale")
+	if item_category == "sidedesk":
+		match item_name:
+			"cat":
+				side_desk.call("show_cat")
+			"flowers":
+				side_desk.call("show_flowers")
 func _on_room_decor_category_unselected(category: String) -> void:
 	print("Unselected decor category: %s" % category)
-	if category == "planet":
-		planet.call("hide_all")
-	if category == "windowside":
-		window_side.call("hide_all")
+	match category:
+		"planet":
+			planet.call("hide_all")
+		"windowside":
+			window_side.call("hide_all")
+		"sidedesk":
+			window_side.call("hide_all")
