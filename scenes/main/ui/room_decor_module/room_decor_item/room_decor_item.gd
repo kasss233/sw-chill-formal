@@ -36,6 +36,7 @@ func set_data(data: Dictionary) -> void:
 	if icon_path.is_empty() or not ResourceLoader.exists(icon_path):
 		return
 	var tex := load(icon_path) as Texture2D
+	print("加载纹理：%s，结果：%s" % [icon_path, tex])
 	if tex:
 		texture_rect.texture = tex
 

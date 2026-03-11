@@ -209,8 +209,10 @@ metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
 
 [node name="TextureRect" type="TextureRect" parent="InnerPanel/VBoxContainer/InnerPanel" unique_id=776946583]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 size_flags_vertical = 3
+expand_mode = 1
 texture = ExtResource("2_jxm58")
 stretch_mode = 5
 
