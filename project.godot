@@ -18,9 +18,9 @@ config/name="sw_chill_formal"
 run/main_scene="uid://6h1mp3m4h25v"
 config/features=PackedStringArray("4.6", "Mobile")
 run/max_fps=120
-boot_splash/bg_color=Color(0.99607843, 0.99607843, 0.99607843, 1)
+boot_splash/bg_color=Color(0, 0, 0, 1)
+boot_splash/show_image=false
 boot_splash/stretch_mode=0
-boot_splash/image="uid://bpa56ysux4bmi"
 config/icon="uid://bpa56ysux4bmi"
 
 [autoload]
@@ -46,6 +46,7 @@ EventTracker="*res://scenes/main/autoload/data/event_tracker.gd"
 LevelState="*uid://cosfe6ux5f6ci"
 SyncState="*uid://cngm81h6ehphb"
 HabitState="*res://scenes/main/autoload/data/habit_state.gd"
+TransitionAnimation="*res://scenes/main/autoload/transition_animation/transition_animation.tscn"
 
 [display]
 
