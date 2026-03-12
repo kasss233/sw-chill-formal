@@ -17,6 +17,8 @@ extends Node3D
 @export var planet: Node3D
 @export var window_side: Node3D
 @export var side_desk: Node3D
+@export var wall: Node3D
+@export var on_desk: Node3D
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -234,6 +236,15 @@ func _on_room_decor_selected(item_name: String, item_category: String) -> void:
 				side_desk.call("show_cat")
 			"flowers":
 				side_desk.call("show_flowers")
+	if item_category == "wall":
+		match item_name:
+			pass
+	if item_category == "ondesk":
+		match item_name:
+			"alarm clock":
+				on_desk.call("show_alarm_clock")
+			"night light":
+				on_desk.call("show_night_light")
 func _on_room_decor_category_unselected(category: String) -> void:
 	print("Unselected decor category: %s" % category)
 	match category:
@@ -242,7 +253,10 @@ func _on_room_decor_category_unselected(category: String) -> void:
 		"windowside":
 			window_side.call("hide_all")
 		"sidedesk":
-			window_side.call("hide_all")
+			side_desk.call("hide_all")
+		"ondesk":
+			on_desk.call("hide_all")
+
 func _on_camera_changed(value: int) -> void:
 	## 输出调试信息
 	print("Camera mode changed to: %d" % value)

@@ -59,6 +59,18 @@ category = "sidedesk"
 icon = ExtResource("8_6deep")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
+[sub_resource type="Resource" id="Resource_l68k4"]
+script = ExtResource("1_2gecy")
+name = "alarm clock"
+category = "ondesk"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_xqban"]
+script = ExtResource("1_2gecy")
+name = "night light"
+category = "ondesk"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
 [resource]
 script = ExtResource("1_8761q")
-decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2"), SubResource("Resource_qreuf"), SubResource("Resource_p2tlr")])
+decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2"), SubResource("Resource_qreuf"), SubResource("Resource_p2tlr"), SubResource("Resource_l68k4"), SubResource("Resource_xqban")])

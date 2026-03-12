@@ -13,7 +13,8 @@ uniform bool use_vertex_color = false;
 uniform int cuts : hint_range(1, 8) = 3;
 uniform float wrap : hint_range(-2.0, 2.0) = 0.1; // 调整受光范围
 uniform float steepness : hint_range(1.0, 8.0) = 1.0;
-uniform float shadow_brightness : hint_range(0.0, 1.0) = 0.5; // 阴影处的基础亮度
+uniform float shadow_brightness : hint_range(0.0, 1.0) = 0.15; // 阴影基础亮度（不再整面强抬亮）
+uniform float light_threshold : hint_range(0.0, 1.0) = 0.15; // 小于该值的弱光不进入色阶高亮
 
 // --- 辅助功能 ---
 uniform bool use_attenuation = true;
@@ -63,21 +64,25 @@ void fragment() {
 void light() {
 	float attenuation = 1.0;
 	if (use_attenuation) {
-		attenuation = ATTENUATION; 
+		attenuation = ATTENUATION;
 	}
-	
-	// 漫反射计算
-	float NdotL = dot(NORMAL, LIGHT);
-	
-	// 使用类似 Half-Lambert 的处理方式，让光照更均匀，避免视角转动导致的死黑
-	float diffuse_amount = (NdotL + 1.0) * 0.5; 
-	diffuse_amount = clamp(diffuse_amount + (attenuation - 1.0) + wrap, 0.0, 1.0);
-	
-	float cuts_inv = 1.0 / float(cuts);
-	float diffuse_stepped = clamp(ceil(diffuse_amount * float(cuts)) / float(cuts), 0.0, 1.0);
 
-	// 确保暗部亮度不低于 shadow_brightness
-	float light_intensity = max(diffuse_stepped, shadow_brightness);
+	// 仅让真正朝向光源的区域进入受光，避免弱点光整面提亮
+	float NdotL = max(dot(NORMAL, LIGHT), 0.0);
+	float diffuse_amount = NdotL + wrap;
+	if (use_attenuation) {
+		diffuse_amount *= attenuation;
+	}
+
+	// 给弱光一个启动阈值，低于阈值只保留极弱暗部，不触发整块高亮
+	diffuse_amount = clamp((diffuse_amount - light_threshold) / max(1.0 - light_threshold, 0.0001), 0.0, 1.0);
+
+	float cuts_f = float(cuts);
+	float diffuse_stepped = floor(diffuse_amount * cuts_f) / cuts_f;
+
+	// 阴影亮度与受光量绑定，避免每盏灯都把整个物体抬亮
+	float shadow_floor = shadow_brightness * diffuse_amount;
+	float light_intensity = max(diffuse_stepped, shadow_floor);
 	
 	vec3 diffuse_base = ALBEDO.rgb * LIGHT_COLOR / PI;
 	vec3 diffuse_final;

@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://dehlw8il1xn2w"
-path="res://.godot/imported/as_bookshelf (1).glb-d65d947f621cd022d67d16023e9963dd.scn"
+uid="uid://bn2bodxfgvb73"
+path="res://.godot/imported/uwu_cat_night_light.glb-2cfe8f6e3e538cb3e4c77542c81d31aa.scn"
 
 [deps]
 
-source_file="res://assets/3d/book_shelf/as_bookshelf (1).glb"
-dest_files=["res://.godot/imported/as_bookshelf (1).glb-d65d947f621cd022d67d16023e9963dd.scn"]
+source_file="res://assets/3d/night_light/uwu_cat_night_light.glb"
+dest_files=["res://.godot/imported/uwu_cat_night_light.glb-2cfe8f6e3e538cb3e4c77542c81d31aa.scn"]
 
 [params]
 
