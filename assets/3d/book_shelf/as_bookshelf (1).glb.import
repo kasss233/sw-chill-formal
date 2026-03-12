@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://1076dmqrhe0k"
-path="res://.godot/imported/sakura1.glb-1f6f0c3df0bc807bd2a2f670afde4745.scn"
+uid="uid://dehlw8il1xn2w"
+path="res://.godot/imported/as_bookshelf (1).glb-d65d947f621cd022d67d16023e9963dd.scn"
 
 [deps]
 
-source_file="res://assets/3d/cherry_blossom/sakura1.glb"
-dest_files=["res://.godot/imported/sakura1.glb-1f6f0c3df0bc807bd2a2f670afde4745.scn"]
+source_file="res://assets/3d/book_shelf/as_bookshelf (1).glb"
+dest_files=["res://.godot/imported/as_bookshelf (1).glb-d65d947f621cd022d67d16023e9963dd.scn"]
 
 [params]
 
