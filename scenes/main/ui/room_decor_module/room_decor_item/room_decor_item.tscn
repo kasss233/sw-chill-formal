@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="6_2ua7v"]
 [ext_resource type="Texture2D" uid="uid://d4n1shmqqg5f1" path="res://assets/ui/icons/check_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="7_oo4gt"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_6e6mx"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oo4gt"]
 shader = ExtResource("2_6e6mx")
 shader_parameter/corner_radius = 28.0
 shader_parameter/border_width = 1.0
@@ -16,7 +16,7 @@ shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
 shader_parameter/size = Vector2(216, 304)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scobk"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6e6mx"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -28,15 +28,15 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_77mno"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_scobk"]
 shader = ExtResource("2_6e6mx")
 shader_parameter/corner_radius = 16.0
 shader_parameter/border_width = 0.0
 shader_parameter/border_color = Color(1, 1, 1, 0.1)
 shader_parameter/background_color = Color(1, 1, 1, 0.05)
-shader_parameter/size = Vector2(200, 200)
+shader_parameter/size = Vector2(200, 160)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3saoq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxq1h"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -48,7 +48,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u0cm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2ua7v"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -59,7 +59,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2kwvi"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ksj28"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -70,7 +70,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yos4y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_162af"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -81,7 +81,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qirpg"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ydxle"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -92,7 +92,7 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x0udo"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_77mno"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -114,7 +114,7 @@ script = ExtResource("6_2ua7v")
 state_name = "unchose"
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6e6mx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3saoq"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -125,7 +125,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vxq1h"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u0cm"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -136,7 +136,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2ua7v"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2kwvi"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -147,7 +147,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ksj28"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yos4y"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -158,7 +158,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_162af"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qirpg"]
 content_margin_left = 16.0
 content_margin_top = 8.0
 content_margin_right = 16.0
@@ -186,9 +186,9 @@ offset_bottom = 304.0
 script = ExtResource("1_a7ikj")
 
 [node name="InnerPanel" type="PanelContainer" parent="." unique_id=496000576]
-material = SubResource("ShaderMaterial_6e6mx")
+material = SubResource("ShaderMaterial_oo4gt")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_scobk")
+theme_override_styles/panel = SubResource("StyleBoxFlat_6e6mx")
 script = ExtResource("3_scobk")
 corner_radius = 28.0
 metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
@@ -198,9 +198,9 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="InnerPanel" type="PanelContainer" parent="InnerPanel/VBoxContainer" unique_id=1855208185]
-material = SubResource("ShaderMaterial_77mno")
+material = SubResource("ShaderMaterial_scobk")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_3saoq")
+theme_override_styles/panel = SubResource("StyleBoxFlat_vxq1h")
 script = ExtResource("3_scobk")
 corner_radius = 16.0
 border_width = 0.0
@@ -212,8 +212,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 size_flags_vertical = 3
-expand_mode = 1
 texture = ExtResource("2_jxm58")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="ItemInfoLabel" type="Label" parent="InnerPanel/VBoxContainer" unique_id=1452454424]
@@ -236,11 +236,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_1u0cm")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_2kwvi")
-theme_override_styles/hover = SubResource("StyleBoxFlat_yos4y")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_qirpg")
-theme_override_styles/focus = SubResource("StyleBoxFlat_x0udo")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2ua7v")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ksj28")
+theme_override_styles/hover = SubResource("StyleBoxFlat_162af")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ydxle")
+theme_override_styles/focus = SubResource("StyleBoxFlat_77mno")
 script = ExtResource("5_vxq1h")
 states = Array[ExtResource("6_2ua7v")]([SubResource("Resource_x0udo"), SubResource("Resource_ckldb")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
@@ -254,15 +254,13 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_6e6mx")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_vxq1h")
-theme_override_styles/hover = SubResource("StyleBoxFlat_2ua7v")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_ksj28")
-theme_override_styles/focus = SubResource("StyleBoxFlat_162af")
+theme_override_styles/normal = SubResource("StyleBoxFlat_3saoq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1u0cm")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2kwvi")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_yos4y")
+theme_override_styles/focus = SubResource("StyleBoxFlat_qirpg")
 script = ExtResource("5_vxq1h")
 states = Array[ExtResource("6_2ua7v")]([SubResource("Resource_ydxle"), SubResource("Resource_77mno")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[connection signal="state_changed" from="InnerPanel/VBoxContainer/MaterialToggleButton" to="." method="_on_material_toggle_button_state_changed"]
-[connection signal="state_changed" from="InnerPanel/MaterialToggleButton2" to="." method="_on_material_toggle_button_state_changed"]
 [connection signal="state_changed" from="InnerPanel/MaterialToggleButton2" to="." method="_on_material_toggle_button_2_state_changed"]

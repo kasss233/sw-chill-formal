@@ -4,16 +4,14 @@ signal tab_changed(tab_name: String)
 
 @export var item_scene: PackedScene
 
-@onready var module_title_label: Label = $CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/ModuleTitleLabel
-@onready var daily_task_button: Button = $CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons/DailyTaskButton
-@onready var achievement_button: Button = $CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons/AchievementButton
-@onready var add_button: Button = $CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/AddButton
-@onready var daily_task_list: VBoxContainer = $CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/DailyTaskList
-@onready var achievement_list: VBoxContainer = $CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/AchievementList
-@onready var empty_label: Label = $CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/EmptyLabel
-@onready var canvas_layer = $CanvasLayer
-@onready var panel = $CanvasLayer/PanelContainer
-@onready var button = $Button
+@onready var module_title_label: Label = %ModuleTitleLabel
+@onready var tab_segmented_button: MaterialSegmentedButton = %TabSegmentedButton
+@onready var daily_task_list: VBoxContainer = %DailyTaskList
+@onready var achievement_list: VBoxContainer = %AchievementList
+@onready var empty_label: Label = %EmptyLabel
+@onready var canvas_layer: CanvasLayer = %CanvasLayer
+@onready var panel: PanelContainer = %PanelContainer
+@onready var button: Button = %Button
 enum Tab {
 	DAILY_TASK,
 	ACHIEVEMENT
@@ -37,6 +35,7 @@ func _ready() -> void:
 	AchievementState.achievement_completed.connect(_on_state_achievement_completed)
 	AchievementState.achievement_reward_claimed.connect(_on_state_achievement_reward_claimed)
 	AchievementState.data_loaded.connect(_on_state_data_loaded)
+	tab_segmented_button.segment_selected.connect(_on_tab_segment_selected)
 	panel.visible = false
 	_render_all()
 	_switch_tab(Tab.DAILY_TASK)
@@ -49,11 +48,8 @@ func show_daily_task_tab() -> void:
 func show_achievement_tab() -> void:
 	_switch_tab(Tab.ACHIEVEMENT)
 
-func _on_daily_task_button_pressed() -> void:
-	_switch_tab(Tab.DAILY_TASK)
-
-func _on_achievement_button_pressed() -> void:
-	_switch_tab(Tab.ACHIEVEMENT)
+func _on_tab_segment_selected(index: int, _text: String) -> void:
+	_switch_tab(index)
 
 
 func _on_item_completed_changed(item_id: int, completed: bool, category: String) -> void:
@@ -77,8 +73,7 @@ func _switch_tab(tab: int) -> void:
 	_current_tab = tab
 	daily_task_list.visible = tab == Tab.DAILY_TASK
 	achievement_list.visible = tab == Tab.ACHIEVEMENT
-	daily_task_button.disabled = tab == Tab.DAILY_TASK
-	achievement_button.disabled = tab == Tab.ACHIEVEMENT
+	tab_segmented_button.set_selected_no_signal(tab)
 	_refresh_empty_state()
 	tab_changed.emit("daily_task" if tab == Tab.DAILY_TASK else "achievement")
 

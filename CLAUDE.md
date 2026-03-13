@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Godot 4.6 项目（Mobile 渲染），3D 角色互动 + Material Design UI 系统（音乐、任务、AI 对话、番茄钟、笔记）。
+Godot 4.6 项目（Mobile 渲染），3D 角色互动 + Material Design UI 系统（音乐、任务、AI 对话、番茄钟、笔记、习惯、房间装饰）。
 
 ## Development Commands
 
@@ -37,13 +37,27 @@ Data Autoload (单例) → UI Module (模块) → UI Component (组件)
 | 单例 | 路径 | 职责 |
 |---|---|---|
 | GuiTransitions | `addons/simple-gui-transitions/singleton.gd` | UI 布局切换动画，`go_to()` / `show()` / `hide()` |
-| AudioPlayer | `scenes/main/audio_player/audio_player.tscn` | BGM/SFX 引擎，音量淡入淡出，crossfade。`is_paused` 独立于当前曲目 |
-| MusicState | `scenes/main/audio_player/music_state.gd` | 音乐状态数据源：曲目、播放状态、模式(SEQUENTIAL/RANDOM/SINGLE_LOOP)、播放列表 |
+| AudioPlayer | `scenes/main/autoload/audio_player/audio_player.tscn` | BGM/SFX 引擎，音量淡入淡出，crossfade。`is_paused` 独立于当前曲目 |
+| MusicState | `scenes/main/autoload/audio_player/music_state.gd` | 音乐状态数据源：曲目、播放状态、模式(SEQUENTIAL/RANDOM/SINGLE_LOOP)、播放列表 |
+| AIService | `scenes/main/autoload/ai_service/ai_service.tscn` | OpenAI 兼容 SSE 流式 API，多模态，线程化 HTTP |
+| ChatController | `scenes/main/autoload/ai_service/chat_controller.tscn` | 聊天控制器，管理对话流程与上下文 |
+| AuthState | `scenes/main/autoload/data/auth_state.gd` | 用户认证状态管理 |
+| ApiClient | `scenes/main/autoload/data/api_client.gd` | API 请求客户端 |
 | TaskState | `scenes/main/autoload/data/task_state.gd` | 任务数据管理，持久化 `user://task_data.json`，60s 检查截止时间 |
 | AchievementState | `scenes/main/autoload/data/achievement_state.gd` | 每日任务/成就数据源，自动任务补齐、按天刷新、奖励领取状态持久化 |
 | LevelState | `scenes/main/autoload/data/level_state.gd` | 等级与经验数据源，统一经验结算与升级广播，监听成就/每日任务奖励领取加经验 |
 | HabitState | `scenes/main/autoload/data/habit_state.gd` | 习惯管理数据源：习惯库、时间段模板、课表排期、执行记录，持久化 `user://habit_data.json` |
-| AIService | `scenes/main/ai_service/ai_service.tscn` | OpenAI 兼容 SSE 流式 API，多模态，线程化 HTTP |
+| NoteState | `scenes/main/autoload/data/note_state.gd` | 便签数据管理 |
+| StickyNoteState | `scenes/main/autoload/data/sticky_note_state.gd` | 便签条状态管理 |
+| ChatState | `scenes/main/autoload/data/chat_state.gd` | 聊天状态管理 |
+| SettingState | `scenes/main/autoload/data/setting_state.gd` | 应用设置管理 |
+| PomodoroState | `scenes/main/autoload/data/pomodoro_state.gd` | 番茄钟状态管理 |
+| CharacterInteractorState | `scenes/main/autoload/data/character_interactor_state.gd` | 角色交互状态 |
+| RoomDecorState | `scenes/main/autoload/data/room_decor_state.gd` | 房间装饰物品数据源 |
+| LayerManager | `scenes/main/autoload/data/layer_manager.gd` | UI 图层管理器 |
+| EventTracker | `scenes/main/autoload/data/event_tracker.gd` | 事件追踪 |
+| SyncState | `scenes/main/autoload/data/sync_state.gd` | 数据同步管理 |
+| TransitionAnimation | `scenes/main/autoload/transition_animation/transition_animation.tscn` | 过渡动画管理 |
 
 ### 音频数据流
 
@@ -55,29 +69,30 @@ AudioRes (resource/audio_res/) → AudioPlayer → MusicModule → MusicList →
 
 | 模块 | 脚本 | 职责 |
 |---|---|---|
-| Main UI Controller | `ui.gd` | UI 协调器，信号转发，不含 Agent API |
+| Main UI Controller | `ui.gd` / `ui_portrait.gd` | UI 协调器，信号转发，不含 Agent API |
 | MusicModule | `music_module/music_module.gd` | 音乐播放 UI，多播放列表 |
 | TaskModule | `task_module_new/task_module_new.gd` | 任务管理，ReorderableVBox 拖拽排序 |
 | NoteModule | `note_module/note_module.gd` | 便签系统（上限 20），`take_note(text)` |
-| NotebookModule | `notebook_module/note_book.gd` | 多页笔记本 |
+| NotebookMobileModule | `notebook_mobile_module/note_book_mobile.gd` | 移动端多页笔记本 |
 | InputBox | `input_box/input_box.gd` | AI 对话输入框，单行/多行切换，图片附件(max 2) |
 | DialogueBox | `dialogue_box/dialogue_box.gd` | AI 对话展示，逐字流式动画，BBCode，3 个操作按钮 |
-| Setting | `setting/setting.gd` | 环境时间/天气/抗锯齿设置，持久化到 `user://settings.cfg` |
+| Setting | `setting/setting.gd` | 环境时间/天气/抗锯齿设置，含 `auth_panel.gd` 认证面板 |
 | PomodoroModule | `pomodoro_technique_module/pomodoro_technique_module.gd` | 番茄钟，CanvasLayer UI |
 | AchievementModule | `achievement_module/achievement_module.gd` | 每日任务/成就双 Tab 展示，完成、删除、领取交互转发到 `AchievementState` |
 | LevelBar | `level_bar/level_bar.gd` | 等级条 UI，监听 `LevelState` 的等级与经验进度更新 |
 | CharacterInteractor | `character_interactor/character_interactor.gd` | 角色交互触发（3 次点击） |
 | CalendarModule | `calendar_module/calendar_module.gd` | 日历+习惯课表+习惯库 Tab 切换，监听 HabitState 信号 |
+| RoomDecorModule | `room_decor_module/room_decor_module.gd` | 房间装饰管理与展示 |
 
 ### 3D Components
 
 - **Character** (`scenes/main/3d/character/character.gd`)：VRM 角色，双 AnimationTree（action_tree 姿势 + emotion_tree 表情），支持对话动画
-- **Room** (`scenes/main/3d/room/`)：环境道具
-- **Environment**：`outdoor/` / `rain/` / `snow/`
+- **Room** (`scenes/main/3d/room/`)：环境道具（alarm, on_desk, side_desk）
+- **Environment**：`outdoor/`（planet, window_side, cherry_blossom）/ `rain/` / `snow/`
 
 ## UI Components 与 Skill 工具
 
-Material Design 组件位于 `scenes/main/ui/components/`，继承 Godot 原语，`@tool` 标记，mixin 共享行为。另有 Calendar（日历）和 DatePicker（日期选择器）两个非 Material 组件。
+Material Design 组件位于 `scenes/main/ui/components/`，继承 Godot 原语，`@tool` 标记，mixin 共享行为。另有 Calendar（日历）、DatePicker（日期选择器）和 MusicVisualizer（音乐可视化器）三个非 Material 组件。
 
 **规则：使用或配置以下组件时，必须优先调用对应 Skill 工具获取规范，而非搜索源码。仅当 Skill 不足时才读源码补充。**
 
@@ -108,29 +123,35 @@ Material Design 组件位于 `scenes/main/ui/components/`，继承 Godot 原语�
 ```
 scenes/main/
 ├── 3d/                      # Character, Room, Environment
-├── ai_service/              # AIService autoload (adapters/, context, agent, tts)
-├── audio_player/            # AudioPlayer + MusicState autoload
-├── data/                    # Data Autoload singletons (TaskState, NoteState, etc.)
+├── autoload/
+│   ├── ai_service/          # AIService + ChatController (adapters/, context, agent, tts)
+│   ├── audio_player/        # AudioPlayer + MusicState
+│   ├── data/                # Data Autoload 单例 (TaskState, NoteState, RoomDecorState, etc.)
+│   └── transition_animation/ # TransitionAnimation 过渡动画
 └── ui/
 	├── components/          # Material Design 组件 (→ 用 Skill 工具查询)
 	├── music_module/
 	├── task_module_new/
 	├── note_module/
-	├── notebook_module/
 	├── notebook_mobile_module/
 	├── input_box/
 	├── dialogue_box/
 	├── setting/
 	├── pomodoro_technique_module/
+	├── achievement_module/
+	├── level_bar/
 	├── character_interactor/
+	├── calendar_module/
+	├── room_decor_module/
 	└── debug/
 
 addons/                      # vrm, Godot-MToon-Shader, sky_3d,
 							 # simple-gui-transitions, SmoothScroll,
 							 # ReorderableContainer, calendar_library, markdownlabel
-resource/audio_res/          # AudioRes 音频资源
+resource/
+├── audio_res/               # AudioRes 音频资源
+└── room_decor_res/          # RoomDecorRes 房间装饰资源
 agent/godot_paser/paser.gd   # Agent JSON → modules/State
-docs/REFACTOR_GUIDE.md       # 三层架构重构指南（权威规则）
 ```
 
 ## Important Notes
@@ -138,4 +159,4 @@ docs/REFACTOR_GUIDE.md       # 三层架构重构指南（权威规则）
 - **Godot 4.6**，Mobile 渲染
 - **语言约定**：所有对话、文档、注释、commit message 使用中文
 - **重构指南**：`docs/REFACTOR_GUIDE.md` 为三层架构权威规则文档
-- **启用插件**：vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d
+- **启用插件**：vrm, Godot-MToon-Shader, ReorderableContainer, SmoothScroll, markdownlabel, simple-gui-transitions, sky_3d, calendar_library

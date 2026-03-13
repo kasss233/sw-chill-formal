@@ -7,9 +7,11 @@ signal deselect_requested(item_id: int)
 @onready var item_info_label: Label = $InnerPanel/VBoxContainer/ItemInfoLabel
 @onready var lock_state_label: Label = $InnerPanel/VBoxContainer/LockStateLabel
 @onready var toggle_button: MaterialToggleButton = $InnerPanel/VBoxContainer/MaterialToggleButton
+@onready var toggle_button_2: MaterialToggleButton = $InnerPanel/MaterialToggleButton2
 
 var _item_id: int = -1
 var _unlocked: bool = false
+var _syncing: bool = false
 
 
 func _ready() -> void:
@@ -29,8 +31,13 @@ func set_data(data: Dictionary) -> void:
 	else:
 		lock_state_label.text = "等级%d时解锁" % required_level
 
+	var target_state := 0 if bool(data.get("selected", false)) else 1
+	_syncing = true
 	toggle_button.disabled = not _unlocked
-	toggle_button.current_state = 0 if bool(data.get("selected", false)) else 1
+	toggle_button.current_state = target_state
+	toggle_button_2.disabled = not _unlocked
+	toggle_button_2.current_state = target_state
+	_syncing = false
 
 	var icon_path := str(data.get("icon_path", "")).strip_edges()
 	if icon_path.is_empty() or not ResourceLoader.exists(icon_path):
@@ -56,6 +63,8 @@ func is_unlocked() -> bool:
 
 
 func _on_material_toggle_button_2_state_changed(old_state: int, new_state: int) -> void:
+	if _syncing:
+		return
 	match new_state:
 		0:
 			toggle_button.set_state(0)

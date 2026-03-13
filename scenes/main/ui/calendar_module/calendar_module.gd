@@ -3,10 +3,10 @@ extends MarginContainer
 ## 日历模块 - 管理月历、课表、习惯库和统计的 Tab 切换
 
 @onready var _tab_bar: MaterialSegmentedButton = $FrostedPanel/MarginContainer/VBoxContainer/TabBar
-@onready var _calendar: Node = $FrostedPanel/MarginContainer/VBoxContainer/Calendar
-@onready var _week_view: Node = $FrostedPanel/MarginContainer/VBoxContainer/WeekScheduleView
-@onready var _habit_panel: Node = $FrostedPanel/MarginContainer/VBoxContainer/HabitLibraryPanel
-@onready var _summary_panel: Node = $FrostedPanel/MarginContainer/VBoxContainer/SummaryPanel
+@onready var _calendar: Node = %Calendar
+@onready var _week_view: Node = %WeekScheduleView
+@onready var _habit_panel: Node = %HabitLibraryPanel
+@onready var _summary_panel: Node = %SummaryPanel
 
 var _views: Array = []
 

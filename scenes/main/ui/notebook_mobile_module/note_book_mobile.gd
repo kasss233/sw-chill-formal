@@ -7,18 +7,18 @@ extends Control
 ## 监听 NoteState 信号响应式更新 UI
 
 # --- 节点引用 ---
-@onready var _frosted_panel: PanelContainer = $FrostedPanel
-@onready var _header_button: Button = $FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/MaterialButton
-@onready var _scroll_container: ScrollContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer
-@onready var _search_field: Control = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/MaterialTextField
-@onready var _chips_container: HBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer/HBoxContainer2
-@onready var _all_chip: Control = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer/HBoxContainer2/AllChip
-@onready var _items_container: VBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/VBoxContainer
-@onready var _list_container: VBoxContainer = $FrostedPanel/MarginContainer/VBoxContainer
-@onready var _note_container: VBoxContainer = $FrostedPanel/MarginContainer/NoteVBoxContainer
-@onready var _back_button: Button = $FrostedPanel/MarginContainer/NoteVBoxContainer/HBoxContainer/BackButton
-@onready var _note_menu: MaterialMenu = $CanvasLayer/MaterialMenu
-@onready var _list_menu: MaterialMenu = $CanvasLayer/MaterialMenu2
+@onready var _frosted_panel: PanelContainer = %FrostedPanel
+@onready var _header_button: Button = %MaterialButton
+@onready var _scroll_container: ScrollContainer = %SmoothScrollContainer
+@onready var _search_field: Control = %MaterialTextField
+@onready var _chips_container: HBoxContainer = %HBoxContainer2
+@onready var _all_chip: Control = %AllChip
+@onready var _items_container: VBoxContainer = %NoteItemsContainer
+@onready var _list_container: VBoxContainer = %VBoxContainer
+@onready var _note_container: VBoxContainer = %NoteVBoxContainer
+@onready var _back_button: Button = %BackButton
+@onready var _note_menu: MaterialMenu = %MaterialMenu
+@onready var _list_menu: MaterialMenu = %MaterialMenu2
 
 # --- 场景资源 ---
 var _note_item_scene: PackedScene = preload("res://scenes/main/ui/notebook_mobile_module/note_item/note_item.tscn")

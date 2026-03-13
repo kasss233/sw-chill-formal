@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_s3f03"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="3_t7p8r"]
 [ext_resource type="Texture2D" uid="uid://ucqcesyiou3u" path="res://assets/ui/icons/wb_sunny_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="4_dlm0l"]
+[ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="4_yodwa"]
+[ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="5_nyv81"]
 [ext_resource type="Texture2D" uid="uid://br6k5el85uq1v" path="res://assets/ui/icons/wb_twilight_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="5_xly7c"]
 [ext_resource type="Texture2D" uid="uid://cv33u7vkx65r4" path="res://assets/ui/icons/bedtime_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="6_s3f03"]
 [ext_resource type="Texture2D" uid="uid://cgyvm6ep5vpyw" path="res://assets/ui/icons/sync_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_wn8k3"]
@@ -21,31 +23,31 @@
 [ext_resource type="Script" uid="uid://cbss0rumljfsx" path="res://scenes/main/ui/components/menu/DropdownOption.gd" id="16_do"]
 [ext_resource type="PackedScene" path="res://scenes/main/ui/setting/auth_panel.tscn" id="22_auth"]
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_puvah"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_i53a1"]
 frequency = 0.1
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_fmbcd"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_oe8y2"]
 width = 64
 height = 64
-noise = SubResource("FastNoiseLite_puvah")
+noise = SubResource("FastNoiseLite_i53a1")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_i53a1"]
 shader = ExtResource("2_xly7c")
-shader_parameter/corner_radius = 12.0
-shader_parameter/show_border = false
+shader_parameter/corner_radius = 21.0
+shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0)
-shader_parameter/blur_amount = 0.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
-shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0)
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 shader_parameter/noise_amount = 0.0
-shader_parameter/noise_texture = SubResource("NoiseTexture2D_fmbcd")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_oe8y2")
 shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(349, 433)
+shader_parameter/size = Vector2(308, 433)
 shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oe8y2"]
@@ -59,6 +61,12 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
+
+[sub_resource type="Resource" id="Resource_2cw8a"]
+script = ExtResource("5_nyv81")
+
+[sub_resource type="Resource" id="Resource_k244m"]
+script = ExtResource("5_nyv81")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yodwa"]
 content_margin_left = 0.0
@@ -481,7 +489,7 @@ label = "正面摄像头"
 value = "1"
 metadata/_custom_type_script = "uid://cbss0rumljfsx"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ftjdn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_doxmi"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -492,7 +500,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sryhx"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yse4d"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -503,7 +511,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1se7"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ftjdn"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -514,7 +522,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bfg6y"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sryhx"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -525,7 +533,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ikx1w"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g1se7"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -560,7 +568,7 @@ label = "8x"
 value = "3"
 metadata/_custom_type_script = "uid://cbss0rumljfsx"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h2a2"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bfg6y"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -571,7 +579,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahkkk"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ikx1w"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -582,7 +590,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_41d5u"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3h2a2"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -593,7 +601,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prmue"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahkkk"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -604,7 +612,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1v1ii"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_41d5u"]
 content_margin_left = 14.0
 content_margin_top = 7.0
 content_margin_right = 14.0
@@ -627,12 +635,34 @@ label = "FXAA"
 value = "1"
 metadata/_custom_type_script = "uid://cbss0rumljfsx"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ioa2x"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prmue"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1v1ii"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ioa2x"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.12)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -643,7 +673,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.4, 0.4, 0.4, 0.12)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -654,7 +684,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.12)
+bg_color = Color(0.2, 0.2, 0.2, 0.06)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -665,37 +695,15 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.12)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lp55d"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.06)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6gip8"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
 bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="ImageTexture" id="ImageTexture_iy1ji"]
+[sub_resource type="ImageTexture" id="ImageTexture_lp55d"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bimj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6gip8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -706,7 +714,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nij40"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iy1ji"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -717,7 +725,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3pjvp"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6bimj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -728,7 +736,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n27lb"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nij40"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -739,7 +747,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bqhkt"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3pjvp"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -773,8 +781,10 @@ offset_bottom = 48.0
 script = ExtResource("1_iahff")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2054325971]
+unique_name_in_owner = true
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=711930611]
+unique_name_in_owner = true
 material = SubResource("ShaderMaterial_i53a1")
 anchors_preset = 8
 anchor_left = 0.5
@@ -783,42 +793,72 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -174.5
 offset_top = -216.5
-offset_right = 174.5
+offset_right = 133.5
 offset_bottom = 216.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_oe8y2")
 script = ExtResource("3_s3f03")
-show_border = false
-border_color = Color(1, 1, 1, 0)
-blur_amount = 0.0
-tint_color = Color(0.23, 0.23, 0.23, 0)
-noise_texture = SubResource("NoiseTexture2D_fmbcd")
+noise_texture = SubResource("NoiseTexture2D_oe8y2")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel" unique_id=1746556238]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel" unique_id=2101704719]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1147939088]
+[node name="MarginContainer2" type="MarginContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=615263440]
 layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer2" unique_id=1147939088]
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/font_size = 30
 text = "设置"
-horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1955574934]
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1575746906]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=916364810]
+[node name="SmoothScrollContainer" type="ScrollContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer" unique_id=762774368]
 layout_mode = 2
+horizontal_scroll_mode = 0
+script = ExtResource("4_yodwa")
+wheel_scroll_damper = SubResource("Resource_2cw8a")
+dragging_scroll_damper = SubResource("Resource_k244m")
+metadata/_custom_type_script = "uid://bgqglerkcylxx"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer" unique_id=1746556238]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1955574934]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer" unique_id=916364810]
+layout_mode = 2
+mouse_filter = 1
 text = "时间设置"
 horizontal_alignment = 1
 
-[node name="TimeButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer" unique_id=1403130573]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer" unique_id=2012152989]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="TimeButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer" unique_id=1403130573]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
@@ -833,22 +873,29 @@ script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_84458"), SubResource("Resource_5cvtp"), SubResource("Resource_2s0wq"), SubResource("Resource_2tfue")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=146928363]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=146928363]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 0
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2" unique_id=776993055]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer2" unique_id=776993055]
 layout_mode = 2
+mouse_filter = 1
 text = "天气设置"
 horizontal_alignment = 1
 
-[node name="WeatherButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2" unique_id=794756869]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer2" unique_id=1239968158]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="WeatherButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer2" unique_id=794756869]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
@@ -863,19 +910,26 @@ script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_3bpux"), SubResource("Resource_j36pu"), SubResource("Resource_fe1vx"), SubResource("Resource_iwq8r")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1396281718]
+[node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1396281718]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer4" unique_id=536554631]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer4" unique_id=536554631]
 layout_mode = 2
+mouse_filter = 1
 text = "下雨效果"
 
-[node name="RainMaterialSlider" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer4" unique_id=835215475]
-clip_contents = true
-custom_minimum_size = Vector2(100, 32)
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer4" unique_id=1895335981]
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="RainMaterialSlider" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer4" unique_id=835215475]
+unique_name_in_owner = true
+clip_contents = true
+custom_minimum_size = Vector2(150, 32)
+layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("12_fmbcd")
 value = 100.0
@@ -883,19 +937,26 @@ min_value = 300.0
 max_value = 1200.0
 metadata/_custom_type_script = "uid://dlsbsc0torxs0"
 
-[node name="HBoxContainer5" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1501338849]
+[node name="HBoxContainer5" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1501338849]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer5" unique_id=1975449804]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer5" unique_id=1975449804]
 layout_mode = 2
+mouse_filter = 1
 text = "下雪效果"
 
-[node name="SnowMaterialSlider" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer5" unique_id=937362444]
-clip_contents = true
-custom_minimum_size = Vector2(100, 32)
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer5" unique_id=2118798140]
 layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="SnowMaterialSlider" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer5" unique_id=937362444]
+unique_name_in_owner = true
+clip_contents = true
+custom_minimum_size = Vector2(150, 32)
+layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 script = ExtResource("12_fmbcd")
 value = 100.0
@@ -903,19 +964,25 @@ min_value = 500.0
 max_value = 2000.0
 metadata/_custom_type_script = "uid://dlsbsc0torxs0"
 
-[node name="HBoxContainer9" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=927175069]
+[node name="HBoxContainer9" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=927175069]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer9" unique_id=1853304775]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer9" unique_id=1853304775]
 layout_mode = 2
+mouse_filter = 1
 text = "雾气启用"
 
-[node name="FogButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer9" unique_id=701437136]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer9" unique_id=1011558858]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="FogButton" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer9" unique_id=701437136]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
@@ -930,20 +997,26 @@ script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_6gip8"), SubResource("Resource_iy1ji")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="HBoxContainer6" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1349643387]
+[node name="HBoxContainer6" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1349643387]
 visible = false
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6" unique_id=1386707112]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer6" unique_id=1386707112]
 layout_mode = 2
+mouse_filter = 1
 text = "樱花树启用"
 
-[node name="OutDoor1Button" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6" unique_id=615849175]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer6" unique_id=116388985]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="OutDoor1Button" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer6" unique_id=615849175]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
@@ -958,20 +1031,26 @@ script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_v5sup"), SubResource("Resource_lcsko")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="HBoxContainer7" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=175157831]
+[node name="HBoxContainer7" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=175157831]
 visible = false
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7" unique_id=1646922497]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer7" unique_id=1646922497]
 layout_mode = 2
+mouse_filter = 1
 text = "星球启用"
 
-[node name="OutDoor2Button" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7" unique_id=44755620]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer7" unique_id=810226097]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="OutDoor2Button" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer7" unique_id=44755620]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
@@ -986,19 +1065,26 @@ script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_g4tmb"), SubResource("Resource_80fn4")])
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
-[node name="HBoxContainer10" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=996145830]
+[node name="HBoxContainer10" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=996145830]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10" unique_id=883773752]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer10" unique_id=883773752]
 layout_mode = 2
+mouse_filter = 1
 text = "摄像头切换"
 
-[node name="CameraDropDown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10" unique_id=1019112706 node_paths=PackedStringArray("menu")]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer10" unique_id=2075954208]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="CameraDropDown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer10" unique_id=1019112706 node_paths=PackedStringArray("menu")]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_6k6um")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_hxeb1")
@@ -1015,28 +1101,35 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://47c8avtwpt0y"
 
-[node name="HBoxContainer8" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=81432407]
+[node name="HBoxContainer8" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=81432407]
 layout_mode = 2
 
-[node name="MsaaRow" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=496789706]
+[node name="MsaaRow" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=496789706]
 layout_mode = 2
-size_flags_horizontal = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow" unique_id=1747361752]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/MsaaRow" unique_id=1747361752]
 layout_mode = 2
+mouse_filter = 1
 text = "MSAA 3D"
 horizontal_alignment = 1
 
-[node name="MsaaDropdown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow" unique_id=893238363 node_paths=PackedStringArray("menu")]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/MsaaRow" unique_id=1709715074]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="MsaaDropdown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/MsaaRow" unique_id=893238363 node_paths=PackedStringArray("menu")]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_ftjdn")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_sryhx")
-theme_override_styles/hover = SubResource("StyleBoxFlat_g1se7")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_bfg6y")
-theme_override_styles/focus = SubResource("StyleBoxFlat_ikx1w")
+theme_override_styles/normal = SubResource("StyleBoxFlat_doxmi")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_yse4d")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ftjdn")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_sryhx")
+theme_override_styles/focus = SubResource("StyleBoxFlat_g1se7")
 text = "选择 MSAA"
 script = ExtResource("15_md")
 placeholder = "选择 MSAA"
@@ -1047,25 +1140,32 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://47c8avtwpt0y"
 
-[node name="SsaaRow" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1277495038]
+[node name="SsaaRow" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1277495038]
 layout_mode = 2
-size_flags_horizontal = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/SsaaRow" unique_id=86682496]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/SsaaRow" unique_id=86682496]
 layout_mode = 2
+mouse_filter = 1
 text = "屏幕空间AA"
 horizontal_alignment = 1
 
-[node name="SsaaDropdown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/SsaaRow" unique_id=193249457 node_paths=PackedStringArray("menu")]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/SsaaRow" unique_id=1566757134]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="SsaaDropdown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/SsaaRow" unique_id=193249457 node_paths=PackedStringArray("menu")]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_3h2a2")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ahkkk")
-theme_override_styles/hover = SubResource("StyleBoxFlat_41d5u")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_prmue")
-theme_override_styles/focus = SubResource("StyleBoxFlat_1v1ii")
+theme_override_styles/normal = SubResource("StyleBoxFlat_bfg6y")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ikx1w")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3h2a2")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ahkkk")
+theme_override_styles/focus = SubResource("StyleBoxFlat_41d5u")
 text = "选择 SSAA"
 script = ExtResource("15_md")
 placeholder = "选择 SSAA"
@@ -1076,40 +1176,47 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://47c8avtwpt0y"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1701583484]
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1701583484]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3" unique_id=456597509]
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer3" unique_id=456597509]
 layout_mode = 2
+mouse_filter = 1
 text = "全屏"
 
-[node name="FullScreenCheckbox" type="CheckBox" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3" unique_id=2134212292]
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer3" unique_id=1652535910]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="FullScreenCheckbox" type="CheckBox" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer3" unique_id=2134212292]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
+mouse_filter = 1
 mouse_default_cursor_shape = 2
 theme_override_constants/h_separation = 0
 theme_override_constants/icon_max_width = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_ioa2x")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_q6vrp")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ksap7")
-theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_bibii")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_lp55d")
-theme_override_styles/focus = SubResource("StyleBoxFlat_6gip8")
+theme_override_styles/normal = SubResource("StyleBoxFlat_prmue")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1v1ii")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ioa2x")
+theme_override_styles/hover_pressed = SubResource("StyleBoxFlat_q6vrp")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ksap7")
+theme_override_styles/focus = SubResource("StyleBoxFlat_bibii")
 theme_override_constants/check_v_offset = 0
-theme_override_icons/checked = SubResource("ImageTexture_iy1ji")
-theme_override_icons/unchecked = SubResource("ImageTexture_iy1ji")
-theme_override_icons/checked_disabled = SubResource("ImageTexture_iy1ji")
-theme_override_icons/unchecked_disabled = SubResource("ImageTexture_iy1ji")
+theme_override_icons/checked = SubResource("ImageTexture_lp55d")
+theme_override_icons/unchecked = SubResource("ImageTexture_lp55d")
+theme_override_icons/checked_disabled = SubResource("ImageTexture_lp55d")
+theme_override_icons/unchecked_disabled = SubResource("ImageTexture_lp55d")
 alignment = 1
 script = ExtResource("12_jec7i")
 unchecked_icon = ExtResource("13_7oay3")
 checked_icon = ExtResource("14_m4j3q")
 metadata/_custom_type_script = "uid://bkxpnxtj5fc1f"
 
-[node name="AuthPanel" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=659454606 instance=ExtResource("22_auth")]
+[node name="AuthPanel" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=659454606 instance=ExtResource("22_auth")]
 layout_mode = 2
 
 [node name="SettingButton" type="Button" parent="." unique_id=199275167]
@@ -1121,11 +1228,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_6bimj")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_nij40")
-theme_override_styles/hover = SubResource("StyleBoxFlat_3pjvp")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_n27lb")
-theme_override_styles/focus = SubResource("StyleBoxFlat_bqhkt")
+theme_override_styles/normal = SubResource("StyleBoxFlat_6gip8")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_iy1ji")
+theme_override_styles/hover = SubResource("StyleBoxFlat_6bimj")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_nij40")
+theme_override_styles/focus = SubResource("StyleBoxFlat_3pjvp")
 script = ExtResource("2_b4mu8")
 states = Array[ExtResource("3_t7p8r")]([SubResource("Resource_yna35"), SubResource("Resource_u7uji")])
 button_size = 3
@@ -1143,15 +1250,15 @@ layout = NodePath("../CanvasLayer/FrostedPanel")
 layout_id = "setter"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
-[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/TimeButton" to="." method="_on_time_button_state_changed"]
-[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/WeatherButton" to="." method="_on_weather_button_state_changed"]
-[connection signal="value_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer4/RainMaterialSlider" to="." method="_on_rain_material_slider_value_changed"]
-[connection signal="value_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer5/SnowMaterialSlider" to="." method="_on_snow_material_slider_value_changed"]
-[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer9/FogButton" to="." method="_on_fog_button_state_changed"]
-[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6/OutDoor1Button" to="." method="_on_out_door_1_button_state_changed"]
-[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7/OutDoor2Button" to="." method="_on_out_door_2_button_state_changed"]
-[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10/CameraDropDown" to="." method="_on_camera_drop_down_selection_changed"]
-[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow/MsaaDropdown" to="." method="_on_msaa_changed"]
-[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/SsaaRow/SsaaDropdown" to="." method="_on_ssaa_changed"]
-[connection signal="toggled" from="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer3/FullScreenCheckbox" to="." method="_on_full_screen_checkbox_toggled"]
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer/TimeButton" to="." method="_on_time_button_state_changed"]
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer2/WeatherButton" to="." method="_on_weather_button_state_changed"]
+[connection signal="value_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer4/RainMaterialSlider" to="." method="_on_rain_material_slider_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer5/SnowMaterialSlider" to="." method="_on_snow_material_slider_value_changed"]
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer9/FogButton" to="." method="_on_fog_button_state_changed"]
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer6/OutDoor1Button" to="." method="_on_out_door_1_button_state_changed"]
+[connection signal="state_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer7/OutDoor2Button" to="." method="_on_out_door_2_button_state_changed"]
+[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer10/CameraDropDown" to="." method="_on_camera_drop_down_selection_changed"]
+[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/MsaaRow/MsaaDropdown" to="." method="_on_msaa_changed"]
+[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/SsaaRow/SsaaDropdown" to="." method="_on_ssaa_changed"]
+[connection signal="toggled" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer3/FullScreenCheckbox" to="." method="_on_full_screen_checkbox_toggled"]
 [connection signal="pressed" from="SettingButton" to="." method="_on_setting_button_pressed"]

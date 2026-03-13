@@ -2,18 +2,15 @@ class_name EnvSetter
 extends Control
 
 # ============ 节点引用 ============
-@onready var canvas_layer: CanvasLayer = $CanvasLayer
-@onready var panel = $CanvasLayer/FrostedPanel
-@onready var _msaa_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/MsaaRow/MsaaDropdown
-@onready var _ssaa_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/SsaaRow/SsaaDropdown
-@onready var _camera_dropdown: MaterialDropdown = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer10/CameraDropDown
-@onready var _time_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer/TimeButton
-@onready var _weather_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/WeatherButton
-@onready var _rain_slider: MaterialSlider = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer4/RainMaterialSlider
-@onready var _snow_slider: MaterialSlider = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer5/SnowMaterialSlider
-# @onready var _outdoor_1_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer6/OutDoor1Button
-# @onready var _outdoor_2_row: HBoxContainer = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7
-# @onready var _outdoor_2_button: MaterialToggleButton = $CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer7/OutDoor2Button
+@onready var canvas_layer: CanvasLayer = %CanvasLayer
+@onready var panel = %FrostedPanel
+@onready var _msaa_dropdown: MaterialDropdown = %MsaaDropdown
+@onready var _ssaa_dropdown: MaterialDropdown = %SsaaDropdown
+@onready var _camera_dropdown: MaterialDropdown = %CameraDropDown
+@onready var _time_button: MaterialToggleButton = %TimeButton
+@onready var _weather_button: MaterialToggleButton = %WeatherButton
+@onready var _rain_slider: MaterialSlider = %RainMaterialSlider
+@onready var _snow_slider: MaterialSlider = %SnowMaterialSlider
 
 # ============ 生命周期 ============
 

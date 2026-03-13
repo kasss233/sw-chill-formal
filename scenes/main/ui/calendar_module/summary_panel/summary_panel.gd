@@ -1,6 +1,6 @@
 extends VBoxContainer
 
-## 统计面板 - 显示习惯完成率和热力图
+## 统计面板 - 显示习惯完成率、热力图和专注统计
 
 signal generate_reflection_requested(week_key: String)
 
@@ -16,6 +16,22 @@ var _current_week_key: String = ""
 @onready var _prev_btn: MaterialButton = $NavBar/PrevWeekBtn
 @onready var _next_btn: MaterialButton = $NavBar/NextWeekBtn
 
+# 专注统计节点
+@onready var _focus_nav_bar: HBoxContainer = $FocusStatsPanel/FocusVBox/FocusNavBar
+@onready var _focus_prev_btn: MaterialButton = $FocusStatsPanel/FocusVBox/FocusNavBar/FocusPrevBtn
+@onready var _focus_next_btn: MaterialButton = $FocusStatsPanel/FocusVBox/FocusNavBar/FocusNextBtn
+@onready var _focus_date_label: Label = $FocusStatsPanel/FocusVBox/FocusNavBar/FocusDateLabel
+@onready var _focus_view_mode: MaterialSegmentedButton = $FocusStatsPanel/FocusVBox/FocusViewMode
+@onready var _today_title: Label = $FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard/TodayVBox/TodayTitle
+@onready var _today_value: Label = $FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard/TodayVBox/TodayValue
+@onready var _period_title: Label = $FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard/PeriodVBox/PeriodTitle
+@onready var _period_value: Label = $FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard/PeriodVBox/PeriodValue
+@onready var _focus_chart: Control = $FocusStatsPanel/FocusVBox/FocusChart
+
+# 专注统计状态：0=周, 1=月, 2=年
+var _focus_view: int = 0
+var _focus_offset: int = 0
+
 
 func _ready() -> void:
 	_prev_btn.pressed.connect(_on_prev_week)
@@ -29,6 +45,8 @@ func _ready() -> void:
 	HabitState.execution_updated.connect(func(_r): _refresh_stats())
 	HabitState.schedule_updated.connect(func(_wk): _refresh_stats())
 	HabitState.data_loaded.connect(_refresh_stats)
+
+	_init_focus_panel()
 
 
 func show_for_week(week_key: String) -> void:
@@ -190,11 +208,15 @@ func _refresh_reflection() -> void:
 func _on_prev_week() -> void:
 	_current_week_key = _offset_week(_current_week_key, -1)
 	_refresh_stats()
+	if _focus_view == 0:
+		_refresh_focus_stats()
 
 
 func _on_next_week() -> void:
 	_current_week_key = _offset_week(_current_week_key, 1)
 	_refresh_stats()
+	if _focus_view == 0:
+		_refresh_focus_stats()
 
 
 func _update_week_label() -> void:
@@ -239,3 +261,207 @@ func _get_date_key_for_day(day_of_week: int) -> String:
 	var target_unix = week1_monday_unix + ((week - 1) * 7 + day_of_week) * 86400
 	var target_dict = Time.get_datetime_dict_from_unix_time(target_unix)
 	return "%04d-%02d-%02d" % [target_dict["year"], target_dict["month"], target_dict["day"]]
+
+
+# ======================== 专注统计面板 ========================
+
+func _init_focus_panel() -> void:
+	_focus_prev_btn.pressed.connect(_on_focus_prev)
+	_focus_next_btn.pressed.connect(_on_focus_next)
+	_focus_view_mode.segment_selected.connect(_on_focus_view_changed)
+
+	if StatsState:
+		StatsState.record_added.connect(func(_r): _refresh_focus_stats())
+		StatsState.record_removed.connect(func(_id): _refresh_focus_stats())
+		StatsState.data_loaded.connect(_refresh_focus_stats)
+
+	_refresh_focus_stats()
+	_update_focus_nav_visibility()
+
+
+func _on_focus_prev() -> void:
+	_focus_offset -= 1
+	_refresh_focus_stats()
+
+
+func _on_focus_next() -> void:
+	_focus_offset += 1
+	_refresh_focus_stats()
+
+
+func _on_focus_view_changed(index: int, _text: String) -> void:
+	_focus_view = index
+	_focus_offset = 0
+	_update_focus_nav_visibility()
+	_refresh_focus_stats()
+
+
+func _refresh_focus_stats() -> void:
+	_update_focus_nav_label()
+	_update_focus_cards()
+	_update_focus_chart()
+
+
+func _update_focus_nav_visibility() -> void:
+	_focus_nav_bar.visible = _focus_view != 0  # 周视图隐藏，月/年视图显示
+
+
+func _update_focus_nav_label() -> void:
+	match _focus_view:
+		0:  # 周 - FocusNavBar 已隐藏，仅更新周期标题
+			_period_title.text = "本周合计"
+		1:  # 月
+			var ref = _get_month_year_for_offset(_focus_offset)
+			_focus_date_label.text = "%d年%d月" % [ref["year"], ref["month"]]
+			_period_title.text = "本月合计"
+		2:  # 年
+			var now = Time.get_datetime_dict_from_system()
+			var year = int(now["year"]) + _focus_offset
+			_focus_date_label.text = "%d年" % year
+			_period_title.text = "全年合计"
+
+
+func _update_focus_cards() -> void:
+	if not StatsState:
+		return
+
+	# 今日卡片
+	var today_seconds = StatsState.get_today_focus_seconds()
+	_today_value.text = _format_duration(today_seconds)
+
+	# 周期卡片
+	var period_seconds: int = 0
+	match _focus_view:
+		0:  # 周 - 复用顶部 NavBar 的周
+			var monday = _get_date_key_for_day(0)
+			var totals = StatsState.get_week_daily_totals("focus", monday, "duration_seconds")
+			for item in totals:
+				period_seconds += int(item["value"])
+		1:  # 月
+			var ref = _get_month_year_for_offset(_focus_offset)
+			var totals = StatsState.get_month_daily_totals("focus", ref["year"], ref["month"], "duration_seconds")
+			for item in totals:
+				period_seconds += int(item["value"])
+		2:  # 年
+			var now = Time.get_datetime_dict_from_system()
+			var year = int(now["year"]) + _focus_offset
+			var totals = StatsState.get_year_monthly_totals("focus", year, "duration_seconds")
+			for item in totals:
+				period_seconds += int(item["value"])
+
+	_period_value.text = _format_duration(period_seconds)
+
+
+func _update_focus_chart() -> void:
+	if not StatsState:
+		return
+
+	var chart_data: Array[Dictionary] = []
+	var day_labels = ["一", "二", "三", "四", "五", "六", "日"]
+
+	match _focus_view:
+		0:  # 周 - 复用顶部 NavBar 的周
+			var monday = _get_date_key_for_day(0)
+			var totals = StatsState.get_week_focus_totals(monday)
+			for i in range(totals.size()):
+				var label = day_labels[i] if i < day_labels.size() else str(i)
+				chart_data.append({"label": label, "value": totals[i]["value"]})
+
+			# 计算日均
+			var total_hours: float = 0.0
+			var active_days: int = 0
+			for item in chart_data:
+				if float(item["value"]) > 0.0:
+					total_hours += float(item["value"])
+					active_days += 1
+			var avg = total_hours / 7.0
+			_focus_chart.set_average_line(avg)
+
+		1:  # 月
+			var ref = _get_month_year_for_offset(_focus_offset)
+			var totals = StatsState.get_month_daily_totals("focus", ref["year"], ref["month"], "duration_seconds")
+			for i in range(totals.size()):
+				var hours = float(totals[i]["value"]) / 3600.0
+				chart_data.append({"label": str(i + 1), "value": hours})
+
+			var total_hours: float = 0.0
+			for item in chart_data:
+				total_hours += float(item["value"])
+			var avg = total_hours / float(chart_data.size()) if not chart_data.is_empty() else 0.0
+			_focus_chart.set_average_line(avg)
+
+		2:  # 年
+			var now = Time.get_datetime_dict_from_system()
+			var year = int(now["year"]) + _focus_offset
+			var totals = StatsState.get_year_monthly_totals("focus", year, "duration_seconds")
+			var month_labels = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"]
+			for i in range(totals.size()):
+				var hours = float(totals[i]["value"]) / 3600.0
+				chart_data.append({"label": month_labels[i], "value": hours})
+
+			var total_hours: float = 0.0
+			for item in chart_data:
+				total_hours += float(item["value"])
+			var avg = total_hours / 12.0
+			_focus_chart.set_average_line(avg)
+
+	_focus_chart.set_chart_data(chart_data)
+
+
+# ======================== 专注统计日期工具 ========================
+
+func _get_monday_for_offset(offset: int) -> String:
+	var now = Time.get_datetime_dict_from_system()
+	var dt = {
+		"year": int(now["year"]),
+		"month": int(now["month"]),
+		"day": int(now["day"]),
+		"hour": 12,
+		"minute": 0,
+		"second": 0,
+	}
+	var unix = int(Time.get_unix_time_from_datetime_dict(dt))
+	var weekday = int(Time.get_datetime_dict_from_unix_time(unix)["weekday"])
+	# weekday: 0=Sunday, 1=Monday...6=Saturday
+	var days_since_monday = (weekday + 6) % 7
+	var monday_unix = unix - days_since_monday * 86400 + offset * 7 * 86400
+	var monday_dict = Time.get_datetime_dict_from_unix_time(monday_unix)
+	return "%04d-%02d-%02d" % [monday_dict["year"], monday_dict["month"], monday_dict["day"]]
+
+
+func _offset_date_str(date_str: String, days: int) -> String:
+	var parts = date_str.split("-")
+	if parts.size() < 3:
+		return date_str
+	var dt = {
+		"year": int(parts[0]),
+		"month": int(parts[1]),
+		"day": int(parts[2]),
+		"hour": 12,
+		"minute": 0,
+		"second": 0,
+	}
+	var unix = int(Time.get_unix_time_from_datetime_dict(dt)) + days * 86400
+	var result = Time.get_datetime_dict_from_unix_time(unix)
+	return "%04d-%02d-%02d" % [result["year"], result["month"], result["day"]]
+
+
+func _get_month_year_for_offset(offset: int) -> Dictionary:
+	var now = Time.get_datetime_dict_from_system()
+	var year = int(now["year"])
+	var month = int(now["month"]) + offset
+	while month < 1:
+		year -= 1
+		month += 12
+	while month > 12:
+		year += 1
+		month -= 12
+	return {"year": year, "month": month}
+
+
+func _format_duration(seconds: int) -> String:
+	var hours = seconds / 3600
+	var minutes = (seconds % 3600) / 60
+	if hours > 0:
+		return "%dh %dm" % [hours, minutes]
+	return "%dm" % minutes
