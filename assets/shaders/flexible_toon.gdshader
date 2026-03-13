@@ -15,6 +15,12 @@ uniform float wrap : hint_range(-2.0, 2.0) = 0.1; // 调整受光范围
 uniform float steepness : hint_range(1.0, 8.0) = 1.0;
 uniform float shadow_brightness : hint_range(0.0, 1.0) = 0.15; // 阴影基础亮度（不再整面强抬亮）
 uniform float light_threshold : hint_range(0.0, 1.0) = 0.15; // 小于该值的弱光不进入色阶高亮
+uniform float band_softness : hint_range(0.001, 0.25) = 0.06; // 色阶过渡软化，越大越接近塞尔达柔和层次
+uniform float mid_threshold : hint_range(0.0, 1.0) = 0.4; // 暗部到中间调阈值
+uniform float high_threshold : hint_range(0.0, 1.0) = 0.78; // 中间调到高光阈值
+uniform vec3 shadow_tint : source_color = vec3(0.82, 0.88, 1.0); // 阴影轻微偏冷，避免脏灰
+uniform float mid_boost : hint_range(0.5, 1.5) = 1.0;
+uniform float high_boost : hint_range(0.8, 2.0) = 1.22;
 
 // --- 辅助功能 ---
 uniform bool use_attenuation = true;
@@ -38,6 +44,10 @@ uniform sampler2D ramp : source_color;
 varying vec3 vertex_pos;
 varying vec3 normal;
 varying vec4 v_color;
+
+float smooth_band(float value, float threshold, float softness) {
+	return smoothstep(threshold - softness, threshold + softness, value);
+}
 
 float split_specular(float specular) {
 	return step(0.5, specular);
@@ -67,30 +77,34 @@ void light() {
 		attenuation = ATTENUATION;
 	}
 
-	// 仅让真正朝向光源的区域进入受光，避免弱点光整面提亮
 	float NdotL = max(dot(NORMAL, LIGHT), 0.0);
 	float diffuse_amount = NdotL + wrap;
 	if (use_attenuation) {
 		diffuse_amount *= attenuation;
 	}
 
-	// 给弱光一个启动阈值，低于阈值只保留极弱暗部，不触发整块高亮
+	// 塞尔达风格：三段明度 + 平滑过渡，而非硬 floor 切阶
+	// 先做启动阈值，避免极弱补光抬亮整面
 	diffuse_amount = clamp((diffuse_amount - light_threshold) / max(1.0 - light_threshold, 0.0001), 0.0, 1.0);
 
-	float cuts_f = float(cuts);
-	float diffuse_stepped = floor(diffuse_amount * cuts_f) / cuts_f;
+	float soft = max(band_softness, 0.001);
+	float t_mid = smooth_band(diffuse_amount, mid_threshold, soft);
+	float t_high = smooth_band(diffuse_amount, high_threshold, soft);
 
-	// 阴影亮度与受光量绑定，避免每盏灯都把整个物体抬亮
-	float shadow_floor = shadow_brightness * diffuse_amount;
-	float light_intensity = max(diffuse_stepped, shadow_floor);
+	vec3 shadow_level = vec3(shadow_brightness) * shadow_tint;
+	vec3 mid_level = vec3(mid_boost);
+	vec3 high_level = vec3(high_boost);
+
+	vec3 light_band = mix(shadow_level, mid_level, t_mid);
+	light_band = mix(light_band, high_level, t_high);
 	
 	vec3 diffuse_base = ALBEDO.rgb * LIGHT_COLOR / PI;
 	vec3 diffuse_final;
 	
 	if (use_ramp) {
-		diffuse_final = diffuse_base * texture(ramp, vec2(light_intensity, 0.0)).rgb;
+		diffuse_final = diffuse_base * texture(ramp, vec2(diffuse_amount, 0.0)).rgb;
 	} else {
-		diffuse_final = diffuse_base * light_intensity;
+		diffuse_final = diffuse_base * light_band;
 	}
 	
 	if (clamp_diffuse_to_max) {
