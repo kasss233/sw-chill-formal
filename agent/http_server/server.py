@@ -142,6 +142,15 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.end_headers()
 
+    def _set_sse_headers(self) -> None:
+        """设置 SSE 流式响应头"""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+
     def _read_json_body(self) -> Optional[Dict[str, Any]]:
         try:
             length = int(self.headers.get("Content-Length", "0"))
@@ -182,6 +191,10 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
 
     # ---- 具体处理逻辑 ----
 
+    def _get_user_id(self, body: Dict[str, Any]) -> Optional[str]:
+        """从请求体读取用户 UUID，支持 user_id 或 uuid 字段。"""
+        return (body or {}).get("user_id") or (body or {}).get("uuid") or None
+
     def _handle_chat(self) -> None:
         body = self._read_json_body()
         if body is None:
@@ -195,14 +208,52 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "缺少 message 字段或为空"}).encode("utf-8"))
             return
 
+        user_id = self._get_user_id(body)
+
+        # 流式：Accept: text/event-stream 或 query ?stream=true
+        want_stream = (
+            "text/event-stream" in (self.headers.get("Accept") or "")
+            or (urlparse(self.path).query or "").lower().find("stream=true") >= 0
+        )
+        if want_stream:
+            self._handle_chat_stream(message, body.get("session_id"), user_id=user_id)
+            return
+
         try:
             response = CHAT_AGENT.chat(message)
-            # 直接返回 AgentResponse 的 JSON
+            out = json.loads(response.json(ensure_ascii=False))
+            if user_id is not None:
+                out["user_id"] = user_id
             self._set_headers(200)
-            self.wfile.write(response.json(ensure_ascii=False).encode("utf-8"))
+            self.wfile.write(json.dumps(out, ensure_ascii=False).encode("utf-8"))
         except Exception as e:
             self._set_headers(500)
             self.wfile.write(json.dumps({"error": f"Agent 处理失败: {e}"}).encode("utf-8"))
+
+    def _handle_chat_stream(
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+    ) -> None:
+        """以 SSE 流式返回 /chat 结果。done 事件中带回 user_id。"""
+        try:
+            self._set_sse_headers()
+            for event_type, data in CHAT_AGENT.chat_stream(message, session_id=session_id):
+                if event_type == "done" and user_id is not None:
+                    data = {**data, "user_id": user_id}
+                line = f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+                self.wfile.write(line.encode("utf-8"))
+                self.wfile.flush()
+        except Exception as e:
+            logger.exception("流式 chat 失败: %s", e)
+            # 已发送 SSE 头时无法再改状态码，只能发 error 事件
+            err_line = f"event: error\ndata: {json.dumps({'code': 500, 'message': str(e)}, ensure_ascii=False)}\n\n"
+            try:
+                self.wfile.write(err_line.encode("utf-8"))
+                self.wfile.flush()
+            except Exception:
+                pass
 
     def _handle_reflection_summary(self) -> None:
         body = self._read_json_body()
@@ -253,8 +304,12 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 precomputed_stats=precomputed_stats,
                 extra_context=extra_context,
             )
+            out = json.loads(response.json(ensure_ascii=False))
+            user_id = self._get_user_id(body)
+            if user_id is not None:
+                out["user_id"] = user_id
             self._set_headers(200)
-            self.wfile.write(response.json(ensure_ascii=False).encode("utf-8"))
+            self.wfile.write(json.dumps(out, ensure_ascii=False).encode("utf-8"))
         except Exception as e:
             self._set_headers(500)
             self.wfile.write(json.dumps({"error": f"ReflectionAgent 处理失败: {e}"}).encode("utf-8"))

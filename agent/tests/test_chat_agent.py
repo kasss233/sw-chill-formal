@@ -60,6 +60,43 @@ def test_chat_agent_import_and_config():
     assert config.temperature == 0.5
 
 
+def test_chat_stream_events():
+    """测试 chat_stream 产出的事件类型与顺序（mock LLM，不依赖 Ollama）"""
+    from agent.chat_agent.agent import Agent
+    from agent.chat_agent.config import AgentConfig
+    from interfaces.llm import LLMInterface, LLMMessage, LLMResponse
+    from interfaces.memory import MemoryInterface
+    from interfaces.simple_server_api import SimpleServerAPI
+
+    class MockLLMStream(LLMInterface):
+        def chat(self, messages, temperature=0.7, max_tokens=None, **kwargs):
+            return LLMResponse(content="流式回复内容")
+        def stream_chat(self, messages, temperature=0.7, max_tokens=None, **kwargs):
+            for c in "流式":
+                yield c
+            yield "回复"
+            yield "内容"
+        def count_tokens(self, text):
+            return len(text) // 2
+
+    class EmptyMemory(MemoryInterface):
+        def get_memory_context(self, *a, **k): return ""
+        def add_memory(self, *a, **k): return ""
+        def search_memories(self, *a, **k): return []
+        def update_memory(self, *a, **k): return True
+        def delete_memory(self, *a, **k): return True
+
+    agent = Agent(llm=MockLLMStream(), memory=EmptyMemory(), server_api=SimpleServerAPI(), config=AgentConfig())
+    events = list(agent.chat_stream("你好"))
+    types = [e[0] for e in events]
+    assert "text_delta" in types
+    assert "text_done" in types
+    assert "done" in types
+    assert types[-1] == "done"
+    full_content = next((e.get("content") for t, e in events if t == "text_done"), "")
+    assert "流式" in full_content and "回复" in full_content and "内容" in full_content
+
+
 def run_all():
     """运行本模块所有 test_ 函数"""
     g = globals()

@@ -152,30 +152,24 @@ class AgentResponseParser:
             }
         
         elif isinstance(operation, TaskUpdateOperation):
-            # 尝试从task_id提取数字ID
-            task_id = 0
-            if operation.task_id and operation.task_id.isdigit():
-                task_id = int(operation.task_id)
-            
+            # task_id 可能是 str 或 int，安全转换为 int
+            tid = operation.task_id
+            task_id = int(tid) if isinstance(tid, str) and tid.isdigit() else (tid if isinstance(tid, int) else 0)
             return "update_task_title", {
                 "task_id": task_id,
                 "title": operation.task.info.description
             }
         
         elif isinstance(operation, TaskDeleteOperation):
-            task_id = 0
-            if operation.task_id and operation.task_id.isdigit():
-                task_id = int(operation.task_id)
-            
+            tid = operation.task_id
+            task_id = int(tid) if isinstance(tid, str) and tid.isdigit() else (tid if isinstance(tid, int) else 0)
             return "remove_task", {
                 "task_id": task_id
             }
         
         elif isinstance(operation, TaskCompleteOperation):
-            task_id = 0
-            if operation.task_id and operation.task_id.isdigit():
-                task_id = int(operation.task_id)
-            
+            tid = operation.task_id
+            task_id = int(tid) if isinstance(tid, str) and tid.isdigit() else (tid if isinstance(tid, int) else 0)
             return "set_task_completed", {
                 "task_id": task_id,
                 "completed": True
