@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://5tg6ylsf5x50"]
+
+[ext_resource type="Script" uid="uid://clv4sft364dyg" path="res://scenes/main/ui/charts_module/charts_test_panel.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/charts_module/bar_chart.tscn" id="2_bar"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/charts_module/line_chart.tscn" id="3_line"]
+[ext_resource type="Script" uid="uid://lao0fghtlkr" path="res://scenes/main/ui/charts_module/chart_style.gd" id="3_mpiux"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/charts_module/pie_chart.tscn" id="4_pie"]
+
+[sub_resource type="Resource" id="Resource_13wtx"]
+script = ExtResource("3_mpiux")
+bar_animation_duration = 5.0
+metadata/_custom_type_script = "uid://lao0fghtlkr"
+
+[node name="ChartsTestPanel" type="Control" unique_id=1740936705]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=598340575]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=832961533]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=2081094495]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer" unique_id=1001759955]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="AnimationButtons" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=339499579]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BarAnimBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AnimationButtons" unique_id=1372100153]
+layout_mode = 2
+text = "条形图动画"
+
+[node name="LineAnimBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AnimationButtons" unique_id=675567144]
+layout_mode = 2
+text = "折线图动画"
+
+[node name="PieAnimBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AnimationButtons" unique_id=898529024]
+layout_mode = 2
+text = "饼图动画"
+
+[node name="BarChartSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1571279184]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BarTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/BarChartSection" unique_id=806138193]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "条形图（可改 Chart Style 或本节点下 BarChart 的 export 看实时效果）"
+
+[node name="BarChart" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/BarChartSection" unique_id=1816763790 instance=ExtResource("2_bar")]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+size_flags_horizontal = 3
+chart_style = SubResource("Resource_13wtx")
+
+[node name="LineChartSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=1475035637]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LineTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/LineChartSection" unique_id=1931832205]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "折线图"
+
+[node name="LineChart" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/LineChartSection" unique_id=666703038 instance=ExtResource("3_line")]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PieChartSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer" unique_id=963277240]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PieTitle" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PieChartSection" unique_id=1088145191]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "饼图"
+
+[node name="PieChart" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/PieChartSection" unique_id=1741193736 instance=ExtResource("4_pie")]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+size_flags_horizontal = 3
