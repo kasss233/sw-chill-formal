@@ -5,7 +5,7 @@ extends EditorScenePostImport
 # 1. 普通卡通材质 (实心物体)
 const TOON_SHADER = preload("res://assets/shaders/flexible_toon.gdshader")
 # 2. 玻璃/水体材质 (上一轮优化好的透明 Shader)
-const GLASS_SHADER = preload("res://assets/shaders/flexible_toon_transparent.gdshader") 
+const GLASS_SHADER = preload("res://assets/shaders/flexible_toon_transparent.gdshader")
 # 3. 描边材质
 const OUTLINE_SHADER = preload("res://assets/shaders/outline.gdshader")
 
@@ -103,6 +103,18 @@ func transfer_parameters(old_mat: Material, new_mat: ShaderMaterial, is_transpar
 		texture = old_mat.albedo_texture
 		# 迁移顶点颜色开关
 		new_mat.set_shader_parameter("use_vertex_color", old_mat.vertex_color_use_as_albedo)
+	elif old_mat is ShaderMaterial:
+		# 兼容再次导入场景时，旧材质已是 ShaderMaterial 的情况。
+		# 优先读取当前 Shader 参数，避免覆盖掉在编辑器里手动调整的颜色。
+		var shader_color = old_mat.get_shader_parameter("albedo")
+		if shader_color is Color:
+			color = shader_color
+		var shader_texture = old_mat.get_shader_parameter("albedo_texture")
+		if shader_texture:
+			texture = shader_texture
+		var shader_use_vertex_color = old_mat.get_shader_parameter("use_vertex_color")
+		if shader_use_vertex_color is bool:
+			new_mat.set_shader_parameter("use_vertex_color", shader_use_vertex_color)
 	
 	# 或者尝试通用属性获取 (兼容 ORM 材质等)
 	else:
@@ -114,7 +126,7 @@ func transfer_parameters(old_mat: Material, new_mat: ShaderMaterial, is_transpar
 	# --- 赋值 ---
 	# 如果是玻璃，必须保留 Alpha；如果是实心，Alpha 通常设为 1.0 (除非你想做半透明实心)
 	if not is_transparent:
-		color.a = 1.0 
+		color.a = 1.0
 	
 	new_mat.set_shader_parameter("albedo", color)
 	

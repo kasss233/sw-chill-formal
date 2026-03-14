@@ -1,0 +1,257 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/setting/auth_panel.gd" id="1_auth"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_mbtn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_login_n"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_login_p"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_login_h"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_login_d"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_login_f"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reg_n"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reg_p"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reg_h"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reg_d"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reg_f"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_logout_n"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_logout_p"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_logout_h"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_logout_d"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_logout_f"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="AuthPanel" type="VBoxContainer"]
+offset_right = 325.0
+offset_bottom = 120.0
+script = ExtResource("1_auth")
+
+[node name="HSeparator" type="HSeparator" parent="."]
+layout_mode = 2
+
+[node name="ServerRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="ServerRow"]
+layout_mode = 2
+text = "服务器地址"
+
+[node name="ServerUrlInput" type="LineEdit" parent="ServerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "http://localhost:8000/api/v1"
+
+[node name="LoggedOutRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Label" type="Label" parent="LoggedOutRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "账号"
+
+[node name="LoginButton" type="Button" parent="LoggedOutRow"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_login_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_login_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_login_h")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_login_d")
+theme_override_styles/focus = SubResource("StyleBoxFlat_login_f")
+text = "登录"
+script = ExtResource("2_mbtn")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="RegisterButton" type="Button" parent="LoggedOutRow"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_reg_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_reg_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_reg_h")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_reg_d")
+theme_override_styles/focus = SubResource("StyleBoxFlat_reg_f")
+text = "注册"
+script = ExtResource("2_mbtn")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="LoggedInRow" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="UserLabel" type="Label" parent="LoggedInRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "已登录: "
+
+[node name="LogoutButton" type="Button" parent="LoggedInRow"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_logout_n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_logout_p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_logout_h")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_logout_d")
+theme_override_styles/focus = SubResource("StyleBoxFlat_logout_f")
+text = "登出"
+script = ExtResource("2_mbtn")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"

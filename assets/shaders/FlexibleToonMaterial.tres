@@ -19,6 +19,7 @@ shader_parameter/cuts = 4
 shader_parameter/wrap = 0.0
 shader_parameter/steepness = 1.0
 shader_parameter/shadow_brightness = 0.5
+shader_parameter/light_threshold = 0.15
 shader_parameter/use_attenuation = true
 shader_parameter/clamp_diffuse_to_max = true
 shader_parameter/use_specular = true

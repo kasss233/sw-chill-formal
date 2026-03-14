@@ -14,6 +14,11 @@ extends Node3D
 @export var SUNNY_LIGHT_ENERGY := 0.7
 @export var rain: Node3D
 @export var snow: Node3D
+@export var planet: Node3D
+@export var window_side: Node3D
+@export var side_desk: Node3D
+@export var wall: Node3D
+@export var on_desk: Node3D
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -42,6 +47,19 @@ func _connect_signals() -> void:
 	if SettingState and SettingState.has_signal("snow_changed"):
 		if not SettingState.snow_changed.is_connected(_on_snow_amount_changed):
 			SettingState.snow_changed.connect(_on_snow_amount_changed)
+	#if SettingState and SettingState.has_signal("outdoor_1_changed"):
+		#if not SettingState.outdoor_1_changed.is_connected(_on_out_door_1_button_state_changed):
+			#SettingState.outdoor_1_changed.connect(_on_out_door_1_button_state_changed)
+	#if SettingState and SettingState.has_signal("outdoor_2_changed"):
+		#if not SettingState.outdoor_2_changed.is_connected(_on_out_door_2_button_state_changed):
+			#SettingState.outdoor_2_changed.connect(_on_out_door_2_button_state_changed)
+	## fog
+	if SettingState and SettingState.has_signal("fog_changed"):
+		if not SettingState.fog_changed.is_connected(_on_fog_button_state_changed):
+			SettingState.fog_changed.connect(_on_fog_button_state_changed)
+	if SettingState and SettingState.has_signal("camera_changed"):
+		if not SettingState.camera_changed.is_connected(_on_camera_changed):
+			SettingState.camera_changed.connect(_on_camera_changed)
 	if PomodoroState and PomodoroState.has_signal("work_phase_started"):
 		if not PomodoroState.work_phase_started.is_connected(_on_work_phase_started):
 			PomodoroState.work_phase_started.connect(_on_work_phase_started)
@@ -64,6 +82,13 @@ func _connect_signals() -> void:
 	if TaskState and TaskState.has_signal("task_completed"):
 		if not TaskState.task_completed.is_connected(_on_task_completed):
 			TaskState.task_completed.connect(_on_task_completed)
+	if RoomDecorState and RoomDecorState.has_signal("room_decor_selected"):
+		if not RoomDecorState.room_decor_selected.is_connected(_on_room_decor_selected):
+			RoomDecorState.room_decor_selected.connect(_on_room_decor_selected)
+	## signal room_decor_category_unselected(category: String)
+	if RoomDecorState and RoomDecorState.has_signal("room_decor_category_unselected"):
+		if not RoomDecorState.room_decor_category_unselected.is_connected(_on_room_decor_category_unselected):
+			RoomDecorState.room_decor_category_unselected.connect(_on_room_decor_category_unselected)
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
@@ -174,3 +199,69 @@ func _on_rain_amount_changed(amount: int) -> void:
 	set_rain_amount(amount)
 func _on_snow_amount_changed(amount: int) -> void:
 	set_snow_amount(amount)
+#func _on_out_door_1_button_state_changed(state: int) -> void:
+	#if state == 0:
+		#cherry_blossom.visible = true
+	#elif state == 1:
+		#cherry_blossom.visible = false
+#func _on_out_door_2_button_state_changed(state: int) -> void:
+	#if state == 0:
+		#planet.visible = true
+	#elif state == 1:
+		#planet.visible = false
+func _on_fog_button_state_changed(state: int) -> void:
+	if state == 0:
+		sky3d.fog_enabled = true
+	elif state == 1:
+		sky3d.fog_enabled = false
+func _on_room_decor_selected(item_name: String, item_category: String) -> void:
+	print("Selected decor item: %s (Category: %s)" % [item_name, item_category])
+	if item_category == "planet":
+		match item_name:
+			"black hole":
+				planet.call("show_black_hole")
+			"purple planet":
+				planet.call("show_purple_planet")
+			"fire planet":
+				planet.call("show_fire_planet")
+	if item_category == "windowside":
+		match item_name:
+			"cherry":
+				window_side.call("show_cherry")
+			"whale":
+				window_side.call("show_whale")
+	if item_category == "sidedesk":
+		match item_name:
+			"cat":
+				side_desk.call("show_cat")
+			"flowers":
+				side_desk.call("show_flowers")
+	if item_category == "wall":
+		match item_name:
+			pass
+	if item_category == "ondesk":
+		match item_name:
+			"alarm clock":
+				on_desk.call("show_alarm_clock")
+			"night light":
+				on_desk.call("show_night_light")
+func _on_room_decor_category_unselected(category: String) -> void:
+	print("Unselected decor category: %s" % category)
+	match category:
+		"planet":
+			planet.call("hide_all")
+		"windowside":
+			window_side.call("hide_all")
+		"sidedesk":
+			side_desk.call("hide_all")
+		"ondesk":
+			on_desk.call("hide_all")
+
+func _on_camera_changed(value: int) -> void:
+	## 输出调试信息
+	print("Camera mode changed to: %d" % value)
+	match value:
+		0:
+			side_camera.current = true
+		1:
+			central_camera.current = true

@@ -16,6 +16,8 @@ var categories: Array[String] = []
 var created_at: int = 0
 # 最后修改时间戳
 var updated_at: int = 0
+# 服务器端 ID（0 = 未同步）
+var server_id: int = 0
 
 
 func _init(p_id: int = 0, p_title: String = "", p_content: String = "", p_categories: Array[String] = []):
@@ -76,7 +78,8 @@ func to_dict() -> Dictionary:
 		"content": content,
 		"categories": categories.duplicate(),
 		"created_at": created_at,
-		"updated_at": updated_at
+		"updated_at": updated_at,
+		"server_id": server_id
 	}
 
 
@@ -96,4 +99,5 @@ static func from_dict(d: Dictionary) -> NoteData:
 	)
 	note.created_at = d.get("created_at", 0)
 	note.updated_at = d.get("updated_at", 0)
+	note.server_id = d.get("server_id", 0)
 	return note

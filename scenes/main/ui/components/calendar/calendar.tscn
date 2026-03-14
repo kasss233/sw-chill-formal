@@ -3033,19 +3033,13 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
-[node name="Calendar" type="Control" unique_id=1379783385]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Calendar" type="MarginContainer" unique_id=120044797]
+offset_right = 332.0
+offset_bottom = 312.0
 script = ExtResource("1_ia4ai")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1628291850]
-layout_mode = 0
-offset_right = 332.0
-offset_bottom = 319.0
+layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1972166914]
 layout_mode = 2

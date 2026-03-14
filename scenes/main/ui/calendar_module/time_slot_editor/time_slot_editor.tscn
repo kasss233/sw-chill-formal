@@ -1,0 +1,59 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/time_slot_editor/time_slot_editor.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_btn"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/add_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_add"]
+
+[node name="TimeSlotEditor" type="PanelContainer"]
+visible = false
+script = ExtResource("1_script")
+
+[node name="EditorContent" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderRow" type="HBoxContainer" parent="EditorContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="NameHeader" type="Label" parent="EditorContent/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "名称"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="StartHeader" type="Label" parent="EditorContent/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "开始"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="EndHeader" type="Label" parent="EditorContent/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(60, 0)
+text = "结束"
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="Placeholder" type="Control" parent="EditorContent/HeaderRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(32, 0)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="EditorContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 250)
+horizontal_scroll_mode = 0
+
+[node name="SlotsContainer" type="VBoxContainer" parent="EditorContent/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="AddSlotBtn" type="Button" parent="EditorContent"]
+layout_mode = 2
+text = "添加时间段"
+script = ExtResource("2_btn")
+button_icon = ExtResource("3_add")
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"

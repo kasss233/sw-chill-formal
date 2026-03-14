@@ -5,7 +5,7 @@
 [ext_resource type="Theme" uid="uid://ctpnw50ym2lbi" path="res://assets/ui/themes/material.tres" id="3_5f0gk"]
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="4_4d0mp"]
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="4_7h8iw"]
-[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="4_q6hjx"]
+[ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="4_q6hjx"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="5_0jev0"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="5_2nk6s"]
 [ext_resource type="Texture2D" uid="uid://cqggp4we4c6m8" path="res://assets/ui/icons/task_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="5_thglr"]
@@ -117,116 +117,6 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5q5lj"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0rcg4"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nsmwc"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2k5ow"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2tpsu"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0f3s8"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6laa8"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c8u1j"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vs0r8"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_26mcx"]
-content_margin_left = 14.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [node name="AchievementModule" type="MarginContainer" unique_id=2007027537]
 offset_right = 48.0
 offset_bottom = 48.0
@@ -235,6 +125,7 @@ script = ExtResource("2_2myy5")
 item_scene = ExtResource("1_8g0ha")
 
 [node name="Button" type="Button" parent="." unique_id=1108034387]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
@@ -254,8 +145,10 @@ button_size = 3
 metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2013903617]
+unique_name_in_owner = true
 
 [node name="PanelContainer" type="PanelContainer" parent="CanvasLayer" unique_id=762706795]
+unique_name_in_owner = true
 material = SubResource("ShaderMaterial_ar0jg")
 anchors_preset = 8
 anchor_left = 0.5
@@ -282,48 +175,22 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="ModuleTitleLabel" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=2118844585]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "成就模块"
 vertical_alignment = 1
 
-[node name="TabButtons" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1664879877]
+[node name="TabSegmentedButton" type="Control" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1664879877]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
-theme_override_constants/separation = 6
-
-[node name="DailyTaskButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons" unique_id=49060023]
-clip_contents = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme = ExtResource("3_5f0gk")
-theme_override_styles/normal = SubResource("StyleBoxFlat_5q5lj")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_0rcg4")
-theme_override_styles/hover = SubResource("StyleBoxFlat_nsmwc")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_2k5ow")
-theme_override_styles/focus = SubResource("StyleBoxFlat_2tpsu")
-text = "每日任务"
 script = ExtResource("4_q6hjx")
-padding_horizontal = 14
-padding_vertical = 7
-
-[node name="AchievementButton" type="Button" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons" unique_id=531933995]
-clip_contents = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme = ExtResource("3_5f0gk")
-theme_override_styles/normal = SubResource("StyleBoxFlat_0f3s8")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_6laa8")
-theme_override_styles/hover = SubResource("StyleBoxFlat_c8u1j")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_vs0r8")
-theme_override_styles/focus = SubResource("StyleBoxFlat_26mcx")
-text = "成就"
-script = ExtResource("4_q6hjx")
-padding_horizontal = 14
-padding_vertical = 7
+editor_segments = Array[String](["每日任务", "成就"])
+selected_index = 0
+button_height = 32
+metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=1274443928]
 layout_mode = 2
@@ -337,17 +204,20 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
 [node name="DailyTaskList" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=2121413013]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 30
 
 [node name="AchievementList" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=13641101]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 30
 
 [node name="EmptyLabel" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=1224922960]
+unique_name_in_owner = true
 layout_mode = 2
 text = "暂无数据"
 horizontal_alignment = 1
@@ -366,5 +236,4 @@ layout_id = "achievement"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="state_changed" from="Button" to="." method="_on_button_state_changed"]
-[connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons/DailyTaskButton" to="." method="_on_daily_task_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabButtons/AchievementButton" to="." method="_on_achievement_button_pressed"]
+[connection signal="segment_selected" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabSegmentedButton" to="." method="_on_tab_segment_selected"]

@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://dumeuvinhlojt" path="res://assets/ui/icons/attach_file_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="16_jrj2p"]
 [ext_resource type="Texture2D" uid="uid://yt13eb3qmlhb" path="res://assets/ui/icons/delete_forever_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="17_qt744"]
 [ext_resource type="Texture2D" uid="uid://bacfiakk3i74p" path="res://assets/ui/icons/sort_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.png" id="18_5skq3"]
+[ext_resource type="Script" path="res://scenes/main/ui/components/drag_handle/MaterialDragHandle.gd" id="19_3ka36"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_f82j1"]
 frequency = 0.1
@@ -29,12 +30,14 @@ noise = SubResource("FastNoiseLite_f82j1")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_5skq3"]
 shader = ExtResource("1_kys82")
-shader_parameter/corner_radius = 12.0
+shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 4.0
-shader_parameter/tint_color = Color(0.23, 0.23, 0.23, 0.4)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
 shader_parameter/noise_amount = 0.0
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_w4rb6")
 shader_parameter/show_shadow = true
@@ -288,24 +291,43 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_noee0"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_noee0"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_0p81l"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_noee0")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_noee0"]
+shader = ExtResource("1_kys82")
+shader_parameter/corner_radius = 16.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_0p81l")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(200, 16)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0p81l"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.15, 0.15, 0.15, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.3, 0.5)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [sub_resource type="Resource" id="Resource_048ov"]
 script = ExtResource("15_bpp07")
@@ -330,24 +352,43 @@ text = "分类"
 icon = ExtResource("18_5skq3")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0p81l"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_n6alu"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_sqc6t"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_n6alu")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tyu8p"]
+shader = ExtResource("1_kys82")
+shader_parameter/corner_radius = 16.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_sqc6t")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(200, 16)
+shader_parameter/shadow_padding = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0vqo5"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.15, 0.15, 0.15, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.3, 0.5)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [sub_resource type="Resource" id="Resource_5skq3"]
 script = ExtResource("15_bpp07")
@@ -362,11 +403,12 @@ icon = ExtResource("17_qt744")
 metadata/_custom_type_script = "uid://bpt2no6rofvg6"
 
 [node name="NoteBookMobile" type="MarginContainer" unique_id=1653565754]
-offset_right = 224.0
-offset_bottom = 364.0
+offset_right = 308.0
+offset_bottom = 494.0
 script = ExtResource("9_module")
 
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=1059877106]
+unique_name_in_owner = true
 material = SubResource("ShaderMaterial_5skq3")
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_3ka36")
@@ -378,16 +420,28 @@ metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer" unique_id=1256340247]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(284, 470)
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=748646142]
+[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=968082662]
+layout_mode = 2
+theme_override_constants/margin_top = 9
+
+[node name="HBoxContainer" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer" unique_id=748646142]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=662381232]
+[node name="Label" type="Label" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer" unique_id=662381232]
 layout_mode = 2
-text = "笔记"
+theme_override_font_sizes/font_size = 23
+text = "  笔记"
 
-[node name="MaterialButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1587114148]
+[node name="Control" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer" unique_id=696593138]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MaterialButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer" unique_id=1587114148]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -403,7 +457,7 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="MaterialMenuButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer" unique_id=572165632 node_paths=PackedStringArray("menu")]
+[node name="MaterialMenuButton" type="Button" parent="FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/HBoxContainer" unique_id=572165632 node_paths=PackedStringArray("menu")]
 clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -414,13 +468,14 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_1dp5e")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_mwxne")
 theme_override_styles/focus = SubResource("StyleBoxFlat_048ov")
 script = ExtResource("12_lrlqg")
-menu = NodePath("../../../../../CanvasLayer/MaterialMenu2")
+menu = NodePath("../../../../../../CanvasLayer/MaterialMenu2")
 button_icon = ExtResource("13_5skq3")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://motk0vag3i7k"
 
 [node name="SmoothScrollContainer" type="ScrollContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=581600933]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 horizontal_scroll_mode = 0
@@ -431,14 +486,21 @@ metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer" unique_id=2044196367]
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="MaterialTextField" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=903750300]
-custom_minimum_size = Vector2(200, 48)
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 38)
 layout_mode = 2
 mouse_filter = 1
 script = ExtResource("6_rimwk")
 background_style = 1
 placeholder_text = "搜索笔记"
+bg_opacity = 0.2
+border_color = Color(0.7, 0.7, 0.7, 0)
+shadow_size = 0
+text_field_height = 38
+tint_color = Color(0.23, 0.23, 0.23, 0.3019608)
 icon = ExtResource("7_xswc4")
 metadata/_custom_type_script = "uid://b71ahu6gbysxo"
 
@@ -453,9 +515,11 @@ dragging_scroll_damper = SubResource("Resource_bpp07")
 metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer" unique_id=589328267]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="AllChip" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer/HBoxContainer2" unique_id=448150874]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(76, 32)
 layout_mode = 2
 mouse_filter = 1
@@ -466,10 +530,12 @@ text = "全部"
 is_selected = true
 metadata/_custom_type_script = "uid://3xl08c2pg3qt"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1212638255]
+[node name="NoteItemsContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1212638255]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="NoteVBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer" unique_id=840363240]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
@@ -477,6 +543,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="BackButton" type="Button" parent="FrostedPanel/MarginContainer/NoteVBoxContainer/HBoxContainer" unique_id=1314921969]
+unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -492,6 +559,10 @@ button_icon = ExtResource("10_aguge")
 padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="Control" type="Control" parent="FrostedPanel/MarginContainer/NoteVBoxContainer/HBoxContainer" unique_id=537483618]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="MenuButton" type="Button" parent="FrostedPanel/MarginContainer/NoteVBoxContainer/HBoxContainer" unique_id=1111733107 node_paths=PackedStringArray("menu")]
 clip_contents = true
@@ -514,23 +585,44 @@ metadata/_custom_type_script = "uid://motk0vag3i7k"
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=86310039]
 
 [node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=1176404503]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_noee0")
 custom_minimum_size = Vector2(200, 0)
 offset_left = 273.0
 offset_top = 110.0
 offset_right = 473.0
 offset_bottom = 126.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_noee0")
+theme_override_styles/panel = SubResource("StyleBoxFlat_0p81l")
 script = ExtResource("14_3ka36")
 editor_items = Array[ExtResource("15_bpp07")]([SubResource("Resource_048ov"), SubResource("Resource_xh2le"), SubResource("Resource_jrj2p"), SubResource("Resource_qt744")])
+noise_texture = SubResource("NoiseTexture2D_0p81l")
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="MaterialMenu2" type="PanelContainer" parent="CanvasLayer" unique_id=1486713255]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_tyu8p")
 custom_minimum_size = Vector2(200, 0)
 offset_left = 265.0
 offset_top = 306.0
 offset_right = 465.0
 offset_bottom = 322.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_0p81l")
+theme_override_styles/panel = SubResource("StyleBoxFlat_0vqo5")
 script = ExtResource("14_3ka36")
 editor_items = Array[ExtResource("15_bpp07")]([SubResource("Resource_5skq3"), SubResource("Resource_hno56")])
+noise_texture = SubResource("NoiseTexture2D_sqc6t")
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
+
+[node name="Control" type="Control" parent="." unique_id=477042221]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="MaterialDragHandle" type="Control" parent="Control" unique_id=556393023 node_paths=PackedStringArray("drag_target", "visual_target")]
+anchors_preset = 0
+offset_left = 113.0
+offset_top = 18.0
+offset_right = 199.0
+offset_bottom = 58.0
+script = ExtResource("19_3ka36")
+drag_target = NodePath("../..")
+visual_target = NodePath("../../FrostedPanel")

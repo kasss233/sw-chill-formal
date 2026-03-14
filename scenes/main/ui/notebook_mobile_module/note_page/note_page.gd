@@ -76,7 +76,7 @@ func _on_content_changed() -> void:
 	content_changed.emit(_text_edit.text)
 
 
-## 设置内容（可选打字动画，15字符/秒）
+## 设置内容（可选打字动画，15字符/秒，最长不超过5秒）
 func set_content(text: String, animate: bool = false) -> void:
 	stop_typing()
 	if not animate or text.is_empty():
@@ -86,7 +86,7 @@ func set_content(text: String, animate: bool = false) -> void:
 	_text_edit.editable = false
 	_text_edit.text = ""
 	var char_count = text.length()
-	var duration = char_count / 15.0
+	var duration = minf(char_count / 15.0, 5.0)
 	_tween = create_tween()
 	_tween.tween_method(func(progress: float) -> void:
 		var count = int(progress * char_count)
