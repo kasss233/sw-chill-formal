@@ -23,13 +23,23 @@ import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional, Dict, Any
 
 from agent import Agent, AgentConfig
 from agent.reflection_agent import ReflectionAgent, ReflectionAgentConfig
+from agent.core.config_loader import (
+    load_settings,
+    load_chat_agent_config,
+    load_reflection_agent_config,
+)
+from agent.core.logger import get_logger, setup_logging
 from interfaces.llm_implementations.ollama_llm import OllamaLLM
 from interfaces.memory import MemoryInterface
 from interfaces.simple_server_api import SimpleServerAPI
+from interfaces.real_server_api import RealServerAPI
+
+logger = get_logger(__name__)
 
 
 # ====== 简单 Memory 实现（与示例类似） ======
@@ -54,49 +64,65 @@ class DummyMemory(MemoryInterface):
         return ""
 
 
-# ====== Agent 实例初始化（全局单例） ======
+# ====== 从配置文件加载并初始化（全局单例） ======
 
-def _init_llm() -> OllamaLLM:
-    # 与示例保持一致，默认使用 qwen2:1.5b
-    return OllamaLLM(
-        base_url="http://localhost:11434",
-        model="qwen2:1.5b",
+def _load_config(config_dir: Optional[Path] = None) -> None:
+    """加载 config 目录下的配置并初始化全局 Agent、LLM 等。"""
+    global LLM_INSTANCE, MEMORY_INSTANCE, SERVER_API_INSTANCE, CHAT_AGENT, REFLECTION_AGENT
+    settings = load_settings(config_dir)
+    chat_cfg = load_chat_agent_config(config_dir)
+    reflection_cfg = load_reflection_agent_config(config_dir)
+
+    # 日志
+    log_level = (settings.get("logging") or {}).get("level", "info")
+    setup_logging(level=log_level)
+    logger.info("配置已加载: settings=%s", bool(settings))
+
+    # LLM：优先配置文件
+    llm_opts = settings.get("llm") or {}
+    base_url = llm_opts.get("base_url", "http://localhost:11434")
+    model = llm_opts.get("model", "qwen2:1.5b")
+    LLM_INSTANCE = OllamaLLM(base_url=base_url, model=model)
+    MEMORY_INSTANCE = DummyMemory()
+    backend = settings.get("backend") or {}
+    if backend.get("use_real_api"):
+        SERVER_API_INSTANCE = RealServerAPI(
+            base_url=backend.get("base_url", "http://106.54.18.206:8000/api/v1"),
+            access_token=backend.get("access_token") or None,
+        )
+        logger.info("使用 RealServerAPI: %s", backend.get("base_url"))
+    else:
+        SERVER_API_INSTANCE = SimpleServerAPI()
+
+    # 只保留 Pydantic 模型支持的键，避免 extra 报错
+    def _agent_config_keys():
+        return {f for f in AgentConfig.model_fields}
+    def _reflection_config_keys():
+        return {f for f in ReflectionAgentConfig.model_fields}
+
+    chat_dict = {k: v for k, v in chat_cfg.items() if k in _agent_config_keys()}
+    reflection_dict = {k: v for k, v in reflection_cfg.items() if k in _reflection_config_keys()}
+
+    agent_config = AgentConfig.model_validate(chat_dict) if chat_dict else AgentConfig()
+    reflection_agent_config = ReflectionAgentConfig.model_validate(reflection_dict) if reflection_dict else ReflectionAgentConfig()
+
+    CHAT_AGENT = Agent(
+        llm=LLM_INSTANCE,
+        memory=MEMORY_INSTANCE,
+        server_api=SERVER_API_INSTANCE,
+        config=agent_config,
+    )
+    REFLECTION_AGENT = ReflectionAgent(
+        llm=LLM_INSTANCE,
+        server_api=SERVER_API_INSTANCE,
+        memory=MEMORY_INSTANCE,
+        config=reflection_agent_config,
     )
 
 
-LLM_INSTANCE = _init_llm()
-MEMORY_INSTANCE: MemoryInterface = DummyMemory()
-SERVER_API_INSTANCE = SimpleServerAPI()
-
-# 主聊天 Agent
-CHAT_AGENT = Agent(
-    llm=LLM_INSTANCE,
-    memory=MEMORY_INSTANCE,
-    server_api=SERVER_API_INSTANCE,
-    config=AgentConfig(
-        character_name="女孩",
-        character_personality="温柔、体贴，以鼓励和支持为主",
-        temperature=0.7,
-        max_tokens=800,
-    ),
-)
-
-# 反思 Agent
-REFLECTION_AGENT = ReflectionAgent(
-    llm=LLM_INSTANCE,
-    server_api=SERVER_API_INSTANCE,
-    memory=MEMORY_INSTANCE,
-    config=ReflectionAgentConfig(
-        character_name="女孩",
-        character_personality=(
-            "温柔、体贴，作为一个独立的虚拟形象陪在用户身边，"
-            "善于站在自己的视角观察用户的状态，"
-            "既会肯定用户的努力，也能温和地指出问题并给出具体建议"
-        ),
-        temperature=0.7,
-        max_tokens=800,
-    ),
-)
+# 默认配置目录：http_server 的上级目录下的 config
+_CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
+_load_config(_CONFIG_DIR)
 
 
 # ====== HTTP 处理器 ======
@@ -114,6 +140,15 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
     def _set_headers(self, status: int = 200, content_type: str = "application/json; charset=utf-8") -> None:
         self.send_response(status)
         self.send_header("Content-Type", content_type)
+        self.end_headers()
+
+    def _set_sse_headers(self) -> None:
+        """设置 SSE 流式响应头"""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("X-Accel-Buffering", "no")
         self.end_headers()
 
     def _read_json_body(self) -> Optional[Dict[str, Any]]:
@@ -156,6 +191,10 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
 
     # ---- 具体处理逻辑 ----
 
+    def _get_user_id(self, body: Dict[str, Any]) -> Optional[str]:
+        """从请求体读取用户 UUID，支持 user_id 或 uuid 字段。"""
+        return (body or {}).get("user_id") or (body or {}).get("uuid") or None
+
     def _handle_chat(self) -> None:
         body = self._read_json_body()
         if body is None:
@@ -169,14 +208,52 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "缺少 message 字段或为空"}).encode("utf-8"))
             return
 
+        user_id = self._get_user_id(body)
+
+        # 流式：Accept: text/event-stream 或 query ?stream=true
+        want_stream = (
+            "text/event-stream" in (self.headers.get("Accept") or "")
+            or (urlparse(self.path).query or "").lower().find("stream=true") >= 0
+        )
+        if want_stream:
+            self._handle_chat_stream(message, body.get("session_id"), user_id=user_id)
+            return
+
         try:
             response = CHAT_AGENT.chat(message)
-            # 直接返回 AgentResponse 的 JSON
+            out = json.loads(response.json(ensure_ascii=False))
+            if user_id is not None:
+                out["user_id"] = user_id
             self._set_headers(200)
-            self.wfile.write(response.json(ensure_ascii=False).encode("utf-8"))
+            self.wfile.write(json.dumps(out, ensure_ascii=False).encode("utf-8"))
         except Exception as e:
             self._set_headers(500)
             self.wfile.write(json.dumps({"error": f"Agent 处理失败: {e}"}).encode("utf-8"))
+
+    def _handle_chat_stream(
+        self,
+        message: str,
+        session_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+    ) -> None:
+        """以 SSE 流式返回 /chat 结果。done 事件中带回 user_id。"""
+        try:
+            self._set_sse_headers()
+            for event_type, data in CHAT_AGENT.chat_stream(message, session_id=session_id):
+                if event_type == "done" and user_id is not None:
+                    data = {**data, "user_id": user_id}
+                line = f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+                self.wfile.write(line.encode("utf-8"))
+                self.wfile.flush()
+        except Exception as e:
+            logger.exception("流式 chat 失败: %s", e)
+            # 已发送 SSE 头时无法再改状态码，只能发 error 事件
+            err_line = f"event: error\ndata: {json.dumps({'code': 500, 'message': str(e)}, ensure_ascii=False)}\n\n"
+            try:
+                self.wfile.write(err_line.encode("utf-8"))
+                self.wfile.flush()
+            except Exception:
+                pass
 
     def _handle_reflection_summary(self) -> None:
         body = self._read_json_body()
@@ -227,8 +304,12 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 precomputed_stats=precomputed_stats,
                 extra_context=extra_context,
             )
+            out = json.loads(response.json(ensure_ascii=False))
+            user_id = self._get_user_id(body)
+            if user_id is not None:
+                out["user_id"] = user_id
             self._set_headers(200)
-            self.wfile.write(response.json(ensure_ascii=False).encode("utf-8"))
+            self.wfile.write(json.dumps(out, ensure_ascii=False).encode("utf-8"))
         except Exception as e:
             self._set_headers(500)
             self.wfile.write(json.dumps({"error": f"ReflectionAgent 处理失败: {e}"}).encode("utf-8"))
@@ -236,18 +317,25 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
 
 # ====== 启动入口 ======
 
-def run_server(host: str = "127.0.0.1", port: int = 8000) -> None:
-    server_address = (host, port)
+def run_server(
+    host: Optional[str] = None,
+    port: Optional[int] = None,
+    config_dir: Optional[Path] = None,
+) -> None:
+    """启动 HTTP 服务。host/port 未传时从 config/settings 读取。"""
+    if host is None or port is None:
+        settings = load_settings(config_dir or _CONFIG_DIR)
+        srv = settings.get("server") or {}
+        host = host or srv.get("host", "127.0.0.1")
+        port = port or srv.get("port", 8000)
+    server_address = (host, int(port))
     httpd = HTTPServer(server_address, AgentHTTPRequestHandler)
-    print(f"Agent HTTP 服务已启动，监听地址：http://{host}:{port}")
-    print("可用接口：")
-    print("  GET  /health")
-    print("  POST /chat")
-    print("  POST /reflection/summary")
+    logger.info("Agent HTTP 服务已启动，监听地址：http://%s:%s", host, port)
+    logger.info("可用接口：GET /health, POST /chat, POST /reflection/summary")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\n收到中断信号，正在关闭 HTTP 服务...")
+        logger.info("收到中断信号，正在关闭 HTTP 服务...")
         httpd.server_close()
 
 

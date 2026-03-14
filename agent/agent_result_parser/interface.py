@@ -9,12 +9,13 @@ from response import AgentResponse
 from .agent_response_parser import AgentResponseParser, FunctionCallEvent
 
 
-def agent_response_to_sse_text_list(agent_response_json: str) -> List[str]:
+def agent_response_to_sse_text_list(agent_response_json: str, quiet: bool = False) -> List[str]:
     """
     将Agent的JSON回复转换为SSE文本列表
     
     Args:
         agent_response_json: Agent响应的JSON字符串（AgentResponse的JSON格式）
+        quiet: 为 True 时不打印解析过程和结果，便于库化/后端集成
         
     Returns:
         SSE文本列表，每个元素是一个SSE事件格式的字符串
@@ -69,23 +70,24 @@ def agent_response_to_sse_text_list(agent_response_json: str) -> List[str]:
     }, ensure_ascii=False)
     sse_text_list.append(f"event: done\ndata: {done_data}\n")
     
-    # 4. 打印结果
-    print("=" * 80)
-    print("Agent响应转换为SSE文本列表")
-    print("=" * 80)
-    print(f"\n原始AgentResponse JSON:")
-    print(json.dumps(json.loads(agent_response_json), ensure_ascii=False, indent=2))
-    print(f"\n解析结果:")
-    print(f"  - 文本回复: {agent_response.text[:50]}..." if len(agent_response.text) > 50 else f"  - 文本回复: {agent_response.text}")
-    print(f"  - Function Call数量: {len(function_calls)}")
-    print(f"  - SSE事件数量: {len(sse_text_list)}")
-    print(f"\nSSE文本列表:")
-    print("-" * 80)
-    for i, sse_text in enumerate(sse_text_list, 1):
-        print(f"[事件 {i}]")
-        print(sse_text)
-    print("-" * 80)
-    print("=" * 80)
+    # 4. 打印结果（quiet 时跳过，便于后端/库化使用）
+    if not quiet:
+        print("=" * 80)
+        print("Agent响应转换为SSE文本列表")
+        print("=" * 80)
+        print(f"\n原始AgentResponse JSON:")
+        print(json.dumps(json.loads(agent_response_json), ensure_ascii=False, indent=2))
+        print(f"\n解析结果:")
+        print(f"  - 文本回复: {agent_response.text[:50]}..." if len(agent_response.text) > 50 else f"  - 文本回复: {agent_response.text}")
+        print(f"  - Function Call数量: {len(function_calls)}")
+        print(f"  - SSE事件数量: {len(sse_text_list)}")
+        print(f"\nSSE文本列表:")
+        print("-" * 80)
+        for i, sse_text in enumerate(sse_text_list, 1):
+            print(f"[事件 {i}]")
+            print(sse_text)
+        print("-" * 80)
+        print("=" * 80)
     
     return sse_text_list
 

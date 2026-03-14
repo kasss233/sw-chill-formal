@@ -164,19 +164,25 @@ class SSEParser:
             }
         
         elif isinstance(operation, TaskUpdateOperation):
+            tid = operation.task_id
+            task_id = int(tid) if isinstance(tid, str) and tid.isdigit() else (tid if isinstance(tid, int) else 0)
             return "update_task_title", {
-                "task_id": int(operation.task_id) if operation.task_id.isdigit() else 0,
+                "task_id": task_id,
                 "title": operation.task.info.description
             }
         
         elif isinstance(operation, TaskDeleteOperation):
+            tid = operation.task_id
+            task_id = int(tid) if isinstance(tid, str) and tid.isdigit() else (tid if isinstance(tid, int) else 0)
             return "remove_task", {
-                "task_id": int(operation.task_id) if operation.task_id.isdigit() else 0
+                "task_id": task_id
             }
         
         elif isinstance(operation, TaskCompleteOperation):
+            tid = operation.task_id
+            task_id = int(tid) if isinstance(tid, str) and tid.isdigit() else (tid if isinstance(tid, int) else 0)
             return "set_task_completed", {
-                "task_id": int(operation.task_id) if operation.task_id.isdigit() else 0,
+                "task_id": task_id,
                 "completed": True
             }
         

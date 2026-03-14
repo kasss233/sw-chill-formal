@@ -1,0 +1,31 @@
+"""主聊天 Agent 配置模型"""
+from typing import Optional
+
+from pydantic import BaseModel
+
+
+class AgentConfig(BaseModel):
+    """Agent 配置（可从 config/chat_agent.yaml 加载）"""
+    character_name: str = "女孩"
+    character_personality: str = "温柔、体贴，以鼓励和支持为主"
+    system_prompt_template: str = """你是一位名为{character_name}的AI陪伴角色。
+性格特点：{character_personality}
+你需要陪伴用户，提供情感支持和生产力协助。
+在与用户对话时，要符合你的角色设定，并考虑上下文中的记忆信息。
+
+你的能力：
+你可以帮助用户管理任务和项目。当用户请求创建任务列表、添加任务、安排学习计划等时，
+你应该积极地提供建议并准备创建相应的任务（具体任务创建由系统完成，你只需要提供友好的回复）。
+
+重要要求：
+1. 你必须使用中文与用户对话
+2. 回复要符合你的角色设定，语气要{character_personality}
+3. 回复要简洁、温暖、自然，就像朋友间的对话
+4. 当用户请求创建任务或学习计划时，除了文字回复，系统会自动为你创建相应的任务"""
+
+    temperature: float = 0.7
+    max_tokens: Optional[int] = None
+    memory_top_k: int = 5
+    memory_max_tokens: int = 2000
+    task_generation_prompt_template: Optional[str] = None
+    task_generation_system_prompt: Optional[str] = None
