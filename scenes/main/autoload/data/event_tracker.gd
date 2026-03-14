@@ -157,7 +157,7 @@ func _on_function_executed(_call_id: String, func_name: String, _result: Variant
 func _enqueue(event_type: String, data: Dictionary = {}) -> void:
 	var event := {
 		"event_type": event_type,
-		"timestamp": Time.get_unix_time_from_system(),
+		"timestamp": int(Time.get_unix_time_from_system()),
 		"device_id": _device_id,
 		"data": data
 	}

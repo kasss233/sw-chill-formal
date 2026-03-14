@@ -16,6 +16,7 @@ signal collection_completed(context: Dictionary)
 @export var collect_pomodoro: bool = true
 @export var collect_environment: bool = true
 @export var collect_notes: bool = false  ## 便签内容可能较大，默认关闭
+@export var collect_habits: bool = true  ## 习惯状态
 
 
 ## 收集所有上下文信息
@@ -39,6 +40,9 @@ func collect() -> Dictionary:
 
 	if collect_notes:
 		context["notes"] = _collect_notes()
+
+	if collect_habits:
+		context["habits"] = _collect_habits()
 
 	collection_completed.emit(context)
 	return context
@@ -105,6 +109,22 @@ func _collect_notes() -> Dictionary:
 	}
 
 
+## 收集习惯状态
+func _collect_habits() -> Dictionary:
+	var habits = HabitState.get_active_habits()
+	var week_key = HabitState.get_current_week_key()
+	var stats = HabitState.get_week_stats(week_key)
+	var recent: Array = []
+	for h in habits.slice(0, 5):
+		recent.append({"name": h.name, "minutes": h.estimated_minutes})
+	return {
+		"habit_count": habits.size(),
+		"current_week": week_key,
+		"week_completion_rate": stats.get("completion_rate", 0.0),
+		"recent_habits": recent
+	}
+
+
 ## 格式化上下文为提示词片段
 ## 将收集的上下文转换为自然语言描述，可直接插入 system prompt
 func format_as_prompt(context: Dictionary = {}) -> String:
@@ -115,7 +135,7 @@ func format_as_prompt(context: Dictionary = {}) -> String:
 
 	# 时间
 	if context.has("datetime"):
-		parts.append("当前时间: " + str(context["datetime"]))
+		parts.append("当前时间: " + str(context["datetime"]) + "（UTC+8）")
 
 	# 任务
 	if context.has("tasks") and not context["tasks"].is_empty():
@@ -134,7 +154,9 @@ func format_as_prompt(context: Dictionary = {}) -> String:
 				var item_text = "  - " + str(t.get("title", ""))
 				var due: int = t.get("due_timestamp", 0)
 				if due > 0:
-					var due_dict = Time.get_datetime_dict_from_unix_time(due)
+					# 转换为本地时间显示（UTC+8）
+					var due_local = due + 8 * 3600
+					var due_dict = Time.get_datetime_dict_from_unix_time(due_local)
 					item_text += "（截止: %d-%02d-%02d %02d:%02d）" % [
 						due_dict.get("year", 0), due_dict.get("month", 0), due_dict.get("day", 0),
 						due_dict.get("hour", 0), due_dict.get("minute", 0)
@@ -182,6 +204,18 @@ func format_as_prompt(context: Dictionary = {}) -> String:
 		var time_text = time_names[time_mode] if time_mode < time_names.size() else "未知"
 		var weather_text = weather_names[weather_mode] if weather_mode < weather_names.size() else "未知"
 		parts.append("环境: %s / %s" % [time_text, weather_text])
+
+	# 习惯
+	if context.has("habits") and not context["habits"].is_empty():
+		var habits: Dictionary = context["habits"]
+		var habit_count: int = habits.get("habit_count", 0)
+		if habit_count > 0:
+			var rate: float = habits.get("week_completion_rate", 0.0)
+			parts.append("习惯: %d 个活跃习惯，本周完成率 %d%%（%s）" % [
+				habit_count, int(rate * 100), habits.get("current_week", "")])
+			var recent_habits: Array = habits.get("recent_habits", [])
+			for h in recent_habits:
+				parts.append("  - %s（%d分钟）" % [h.get("name", ""), h.get("minutes", 0)])
 
 	if parts.is_empty():
 		return ""

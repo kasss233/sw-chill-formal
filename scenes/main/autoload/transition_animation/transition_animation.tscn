@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cxgotlmjp0f0n"]
+
+[ext_resource type="Script" uid="uid://lddieqpraks8" path="res://scenes/main/autoload/transition_animation/transition_animation.gd" id="1_p2313"]
+
+[node name="TransitionAnimation" type="Node2D" unique_id=142903165]
+script = ExtResource("1_p2313")
+shutter_duration = 1.5
+focus_pulse_duration = 0.5

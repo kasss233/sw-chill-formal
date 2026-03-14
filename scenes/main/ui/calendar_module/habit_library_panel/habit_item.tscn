@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_item.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b2k45kgxcbsaq" path="res://scenes/main/ui/components/switch/MaterialSwitch.gd" id="2_switch"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_btn"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/edit_24dp.svg" id="4_edit"]
+[ext_resource type="Script" uid="uid://8ulxt3tc2ua5" path="res://scenes/main/ui/components/menu/MaterialContextMenu.gd" id="5_menu"]
+
+[node name="HabitItem" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+theme_override_constants/separation = 8
+script = ExtResource("1_script")
+
+[node name="ColorMark" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(4, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="InfoBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="InfoBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+
+[node name="ChipsContainer" type="HBoxContainer" parent="InfoBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ActiveSwitch" type="CheckBox" parent="."]
+layout_mode = 2
+script = ExtResource("2_switch")
+active_color = Color(0.35, 0.65, 0.95, 0.8)
+metadata/_custom_type_script = "uid://b2k45kgxcbsaq"
+
+[node name="EditButton" type="Button" parent="."]
+layout_mode = 2
+script = ExtResource("3_btn")
+button_icon = ExtResource("4_edit")
+button_size = 0
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="ContextMenu" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 2
+script = ExtResource("5_menu")
+metadata/_custom_type_script = "uid://8ulxt3tc2ua5"

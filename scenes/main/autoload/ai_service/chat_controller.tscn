@@ -7,8 +7,6 @@
 
 [node name="ChatController" type="Node" unique_id=408435930]
 script = ExtResource("1_chat")
-use_backend = true
-backend_api_url = "127.0.0.1:8000"
 
 [node name="AgentExecutor" type="Node" parent="." unique_id=1855840712]
 script = ExtResource("2_agent")

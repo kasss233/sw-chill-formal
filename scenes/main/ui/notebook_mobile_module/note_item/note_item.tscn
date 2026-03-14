@@ -43,6 +43,8 @@ layout_mode = 2
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 text = "标题"
+clip_text = true
+text_overrun_behavior = 3
 
 [node name="ContentLabel" type="Label" parent="InnerPanel/VBoxContainer" unique_id=1892915006]
 layout_mode = 2

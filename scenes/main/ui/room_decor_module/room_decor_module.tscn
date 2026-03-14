@@ -1,0 +1,236 @@
+[gd_scene format=3 uid="uid://bgbv8yre2k242"]
+
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_q6yil"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_v1ed3"]
+[ext_resource type="Script" uid="uid://bhqvi0yuiryrd" path="res://scenes/main/ui/room_decor_module/room_decor_module.gd" id="3_ha2cr"]
+[ext_resource type="PackedScene" uid="uid://bu654g2pcq3yk" path="res://scenes/main/ui/room_decor_module/room_decor_item/room_decor_item.tscn" id="4_j0rqg"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="5_30aeb"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="6_ql3sb"]
+[ext_resource type="Texture2D" uid="uid://0bhcvchib8d0" path="res://assets/ui/icons/local_florist_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_j412a"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="8_ql3sb"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_j063l"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tbtju"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_j063l")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ql3sb"]
+shader = ExtResource("1_q6yil")
+shader_parameter/corner_radius = 12.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_tbtju")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(548, 563)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j412a"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ljhog"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nxbn"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq8fo"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w20c3"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s4qcs"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="Resource" id="Resource_ume71"]
+script = ExtResource("6_ql3sb")
+icon = ExtResource("7_j412a")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_8tdj8"]
+script = ExtResource("6_ql3sb")
+state_name = "2"
+icon = ExtResource("7_j412a")
+icon_color = Color(0, 0, 0, 1)
+background_color = Color(1, 1, 1, 0.7411765)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="RoomDecorModule" type="MarginContainer" unique_id=1442530485]
+offset_right = 48.0
+offset_bottom = 48.0
+script = ExtResource("3_ha2cr")
+item_scene = ExtResource("4_j0rqg")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2008160506]
+
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=1111612907]
+material = SubResource("ShaderMaterial_ql3sb")
+offset_left = 312.0
+offset_top = 34.0
+offset_right = 860.0
+offset_bottom = 597.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_j412a")
+script = ExtResource("2_v1ed3")
+noise_texture = SubResource("NoiseTexture2D_tbtju")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="BoxContainer" type="BoxContainer" parent="CanvasLayer/FrostedPanel" unique_id=1369902248]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer" unique_id=1479931656]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer" unique_id=1499814621]
+layout_mode = 2
+
+[node name="ModuleTitleLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Header" unique_id=1500352552]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "房间装饰"
+
+[node name="ItemCountLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Header" unique_id=1878822312]
+layout_mode = 2
+text = "已解锁 0 / 0"
+horizontal_alignment = 2
+
+[node name="Content" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer" unique_id=1011741534]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EmptyLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content" unique_id=1344283677]
+layout_mode = 2
+text = "暂无装饰物品"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content" unique_id=338460065]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CategoryList" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer" unique_id=1631578345]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 100
+
+[node name="CategorySectionTemplate" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList" unique_id=1299448726]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Header" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate" unique_id=1880231452]
+layout_mode = 2
+
+[node name="CategoryTitle" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate/Header" unique_id=1292680046]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "位置：category_string"
+
+[node name="CountLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate/Header" unique_id=837310102]
+layout_mode = 2
+text = "0/0"
+horizontal_alignment = 2
+
+[node name="CategoryGrid" type="GridContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate" unique_id=876190343]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="Button" type="Button" parent="." unique_id=536673203]
+clip_contents = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_ljhog")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_6nxbn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_iq8fo")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_w20c3")
+theme_override_styles/focus = SubResource("StyleBoxFlat_s4qcs")
+script = ExtResource("5_30aeb")
+states = Array[ExtResource("6_ql3sb")]([SubResource("Resource_ume71"), SubResource("Resource_8tdj8")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="GuiTransition" type="Node" parent="." unique_id=135567749]
+script = ExtResource("8_ql3sb")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.4
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/FrostedPanel")
+layout_id = "room_decor"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[connection signal="state_changed" from="Button" to="." method="_on_button_state_changed"]

@@ -24,3 +24,9 @@ func show_module() -> void:
 		LayerManager.bring_to_front(canvas_layer)
 		GuiTransitions.show("pomodorotechnique")
 		pomodoro_button.set_state_no_signal(1)
+
+
+func hide_module() -> void:
+	if pomodoro_technique.visible:
+		GuiTransitions.hide("pomodorotechnique")
+		pomodoro_button.set_state_no_signal(0)

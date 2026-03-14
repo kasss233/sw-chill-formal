@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://bm6qmn542a7yi"]
+[gd_scene format=3 uid="uid://bm6qmn542a7yi"]
 
 [ext_resource type="Script" uid="uid://denv8v77ew5gy" path="res://scenes/main/ui/components/progress_indicator/ProgressIndicatorDemo.gd" id="1_demo"]
 [ext_resource type="Script" uid="uid://qac15j88w15i" path="res://scenes/main/ui/components/progress_indicator/MaterialProgressIndicator.gd" id="2_progress"]
 
-[node name="ProgressIndicatorDemo" type="Control"]
+[node name="ProgressIndicatorDemo" type="Control" unique_id=1700634753]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_demo")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1393800854]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,7 +21,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.12, 0.12, 0.14, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1607672160]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -36,45 +36,45 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 32
 
-[node name="Title" type="Label" parent="VBoxContainer"]
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=829201026]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "MaterialProgressIndicator 演示"
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1708365263]
 layout_mode = 2
 theme_override_constants/separation = 48
 alignment = 1
 
-[node name="VBox1" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="VBox1" type="VBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=398596107]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label1" type="Label" parent="VBoxContainer/HBoxContainer/VBox1"]
+[node name="Label1" type="Label" parent="VBoxContainer/HBoxContainer/VBox1" unique_id=1634982032]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Linear Determinate"
 horizontal_alignment = 1
 
-[node name="LinearDeterminate" type="Control" parent="VBoxContainer/HBoxContainer/VBox1"]
+[node name="LinearDeterminate" type="Control" parent="VBoxContainer/HBoxContainer/VBox1" unique_id=320103206]
 custom_minimum_size = Vector2(200, 4)
 layout_mode = 2
 size_flags_horizontal = 4
 script = ExtResource("2_progress")
 progress = 0.45
 
-[node name="VBox2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="VBox2" type="VBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=1137488501]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/VBox2"]
+[node name="Label2" type="Label" parent="VBoxContainer/HBoxContainer/VBox2" unique_id=1005077209]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Linear Indeterminate"
 horizontal_alignment = 1
 
-[node name="LinearIndeterminate" type="Control" parent="VBoxContainer/HBoxContainer/VBox2"]
+[node name="LinearIndeterminate" type="Control" parent="VBoxContainer/HBoxContainer/VBox2" unique_id=1885254489]
 custom_minimum_size = Vector2(200, 7)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -82,23 +82,23 @@ script = ExtResource("2_progress")
 progress_mode = 1
 track_thickness = 7
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=2093997437]
 layout_mode = 2
 theme_override_constants/separation = 64
 alignment = 1
 
-[node name="VBox3" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2"]
+[node name="VBox3" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2" unique_id=1060947175]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer2/VBox3"]
+[node name="Label3" type="Label" parent="VBoxContainer/HBoxContainer2/VBox3" unique_id=152219352]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Circular Determinate"
 horizontal_alignment = 1
 
-[node name="CircularDeterminate" type="Control" parent="VBoxContainer/HBoxContainer2/VBox3"]
+[node name="CircularDeterminate" type="Control" parent="VBoxContainer/HBoxContainer2/VBox3" unique_id=556477025]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -107,18 +107,18 @@ indicator_type = 1
 progress = 0.6
 track_thickness = 5
 
-[node name="VBox4" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2"]
+[node name="VBox4" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2" unique_id=1033974144]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="Label4" type="Label" parent="VBoxContainer/HBoxContainer2/VBox4"]
+[node name="Label4" type="Label" parent="VBoxContainer/HBoxContainer2/VBox4" unique_id=568552755]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Circular Indeterminate"
 horizontal_alignment = 1
 
-[node name="CircularIndeterminate" type="Control" parent="VBoxContainer/HBoxContainer2/VBox4"]
+[node name="CircularIndeterminate" type="Control" parent="VBoxContainer/HBoxContainer2/VBox4" unique_id=1043730795]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -127,47 +127,47 @@ indicator_type = 1
 progress_mode = 1
 track_thickness = 7
 
-[node name="ControlPanel" type="HBoxContainer" parent="VBoxContainer"]
+[node name="ControlPanel" type="HBoxContainer" parent="VBoxContainer" unique_id=281503966]
 layout_mode = 2
 theme_override_constants/separation = 16
 alignment = 1
 
-[node name="ProgressLabel" type="Label" parent="VBoxContainer/ControlPanel"]
+[node name="ProgressLabel" type="Label" parent="VBoxContainer/ControlPanel" unique_id=1247631037]
 layout_mode = 2
 text = "进度: 0%"
 
-[node name="ProgressSlider" type="HSlider" parent="VBoxContainer/ControlPanel"]
+[node name="ProgressSlider" type="HSlider" parent="VBoxContainer/ControlPanel" unique_id=1631258459]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 max_value = 1.0
 step = 0.01
 
-[node name="ButtonPanel" type="HBoxContainer" parent="VBoxContainer"]
+[node name="ButtonPanel" type="HBoxContainer" parent="VBoxContainer" unique_id=845458308]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="Btn0" type="Button" parent="VBoxContainer/ButtonPanel"]
+[node name="Btn0" type="Button" parent="VBoxContainer/ButtonPanel" unique_id=740761136]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "0%"
 
-[node name="Btn25" type="Button" parent="VBoxContainer/ButtonPanel"]
+[node name="Btn25" type="Button" parent="VBoxContainer/ButtonPanel" unique_id=1757421399]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "25%"
 
-[node name="Btn50" type="Button" parent="VBoxContainer/ButtonPanel"]
+[node name="Btn50" type="Button" parent="VBoxContainer/ButtonPanel" unique_id=1017806623]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "50%"
 
-[node name="Btn75" type="Button" parent="VBoxContainer/ButtonPanel"]
+[node name="Btn75" type="Button" parent="VBoxContainer/ButtonPanel" unique_id=116292052]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "75%"
 
-[node name="Btn100" type="Button" parent="VBoxContainer/ButtonPanel"]
+[node name="Btn100" type="Button" parent="VBoxContainer/ButtonPanel" unique_id=2132493194]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 text = "100%"

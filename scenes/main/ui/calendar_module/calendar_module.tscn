@@ -1,0 +1,121 @@
+[gd_scene format=3 uid="uid://xv83kmr2vgxv"]
+
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_f22lk"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_2abcq"]
+[ext_resource type="PackedScene" uid="uid://6fuhdgrxtkgs" path="res://scenes/main/ui/components/calendar/calendar.tscn" id="3_j22rv"]
+[ext_resource type="Script" uid="uid://crblmymjhjluk" path="res://scenes/main/ui/calendar_module/calendar_module.gd" id="4_module"]
+[ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="5_seg"]
+[ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="5_vl4l1"]
+[ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="6_54iuj"]
+[ext_resource type="PackedScene" path="res://scenes/main/ui/calendar_module/week_schedule_view/week_schedule_view.tscn" id="6_wsv"]
+[ext_resource type="PackedScene" uid="uid://8rtsyrvshb4i" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_library_panel.tscn" id="7_hlp"]
+[ext_resource type="PackedScene" uid="uid://ciolkbp3ftvkm" path="res://scenes/main/ui/calendar_module/summary_panel/summary_panel.tscn" id="8_sp"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_jna6j"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_t7cdk"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_jna6j")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vl4l1"]
+shader = ExtResource("1_f22lk")
+shader_parameter/corner_radius = 21.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_t7cdk")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(356, 464)
+shader_parameter/shadow_padding = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_54iuj"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="Resource" id="Resource_7r7e4"]
+script = ExtResource("6_54iuj")
+
+[sub_resource type="Resource" id="Resource_j6ohy"]
+script = ExtResource("6_54iuj")
+
+[node name="CalendarModule" type="MarginContainer" unique_id=814536265]
+offset_right = 24.0
+offset_bottom = 24.0
+script = ExtResource("4_module")
+
+[node name="FrostedPanel" type="PanelContainer" parent="." unique_id=740828074]
+material = SubResource("ShaderMaterial_vl4l1")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_54iuj")
+script = ExtResource("2_2abcq")
+noise_texture = SubResource("NoiseTexture2D_t7cdk")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="MarginContainer" type="MarginContainer" parent="FrostedPanel" unique_id=2130159540]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer" unique_id=1995842805]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=434790813]
+layout_mode = 2
+
+[node name="TabBar" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=1721151689]
+custom_minimum_size = Vector2(320, 32)
+layout_mode = 2
+mouse_filter = 1
+script = ExtResource("5_seg")
+editor_segments = Array[String](["月历", "课表", "习惯", "统计"])
+selected_index = 0
+corner_radius = 16
+button_height = 32
+metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
+
+[node name="SmoothScrollContainer" type="ScrollContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=57814239]
+custom_minimum_size = Vector2(0, 380)
+layout_mode = 2
+horizontal_scroll_mode = 0
+script = ExtResource("5_vl4l1")
+wheel_scroll_damper = SubResource("Resource_7r7e4")
+dragging_scroll_damper = SubResource("Resource_j6ohy")
+metadata/_custom_type_script = "uid://bgqglerkcylxx"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer" unique_id=204331445]
+layout_mode = 2
+
+[node name="Calendar" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1379783385 instance=ExtResource("3_j22rv")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="WeekScheduleView" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=613761063 instance=ExtResource("6_wsv")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HabitLibraryPanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=273000626 instance=ExtResource("7_hlp")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SummaryPanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1425640857 instance=ExtResource("8_sp")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2

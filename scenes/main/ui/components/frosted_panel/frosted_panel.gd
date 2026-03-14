@@ -3,7 +3,7 @@ class_name FrostedPanel
 extends PanelContainer
 
 @export_group("Corner & Border")
-@export var corner_radius: float = 12.0:
+@export var corner_radius: float = 21.0:
 	set(value):
 		corner_radius = value
 		_update_shader_params()

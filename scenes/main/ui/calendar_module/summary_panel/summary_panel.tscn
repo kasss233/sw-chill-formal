@@ -1,0 +1,697 @@
+[gd_scene format=3 uid="uid://ciolkbp3ftvkm"]
+
+[ext_resource type="Script" uid="uid://8hpywkc6bjfl" path="res://scenes/main/ui/calendar_module/summary_panel/summary_panel.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_btn"]
+[ext_resource type="Texture2D" uid="uid://1g34yvsn1tq0" path="res://assets/ui/icons/keyboard_arrow_left_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_left"]
+[ext_resource type="Texture2D" uid="uid://cqb73su40nwpo" path="res://assets/ui/icons/keyboard_arrow_right_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_right"]
+[ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="5_panel"]
+[ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="5_r3tkq"]
+[ext_resource type="Script" uid="uid://qac15j88w15i" path="res://scenes/main/ui/components/progress_indicator/MaterialProgressIndicator.gd" id="6_progress"]
+[ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="7_seg"]
+[ext_resource type="Script" uid="uid://k1inoosa1blg" path="res://scenes/main/ui/calendar_module/summary_panel/focus_bar_chart.gd" id="8_chart"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_470pc"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ku0gv"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wgcwc"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gxu2y"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rwf7r"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sg84n"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7lr38"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7fqp5"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f71d8"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b1tfu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v5vpu"]
+shader = ExtResource("5_r3tkq")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(324, 56)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5786"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6vjux"]
+shader = ExtResource("5_r3tkq")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(324, 47)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjul0"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sodv0"]
+shader = ExtResource("5_r3tkq")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(324, 107)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lp7b1"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t8axq"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c2se2"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sqj4o"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qrvbf"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e6tv4"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pwjh8"]
+shader = ExtResource("5_r3tkq")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(324, 393)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8e5aa"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2rvvt"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jl5lr"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r7d81"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxp0t"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5f8aa"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3rvb3"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3wm27"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wtp51"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8jly6"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_golwq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5dkox"]
+shader = ExtResource("5_r3tkq")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(146, 59)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquij"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qqoxp"]
+shader = ExtResource("5_r3tkq")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(146, 59)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y2br2"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="SummaryPanel" type="VBoxContainer" unique_id=612686879]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+
+[node name="NavBar" type="HBoxContainer" parent="." unique_id=482126339]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="PrevWeekBtn" type="Button" parent="NavBar" unique_id=1588105213]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_470pc")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ku0gv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_wgcwc")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_gxu2y")
+theme_override_styles/focus = SubResource("StyleBoxFlat_rwf7r")
+script = ExtResource("2_btn")
+button_size = 0
+button_icon = ExtResource("3_left")
+icon_size = 18
+padding_horizontal = 12
+padding_vertical = 6
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="WeekLabel" type="Label" parent="NavBar" unique_id=371208825]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="NextWeekBtn" type="Button" parent="NavBar" unique_id=942828705]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_sg84n")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_7lr38")
+theme_override_styles/hover = SubResource("StyleBoxFlat_7fqp5")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_f71d8")
+theme_override_styles/focus = SubResource("StyleBoxFlat_b1tfu")
+script = ExtResource("2_btn")
+button_size = 0
+button_icon = ExtResource("4_right")
+icon_size = 18
+padding_horizontal = 12
+padding_vertical = 6
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="OverallPanel" type="PanelContainer" parent="." unique_id=972007481]
+material = SubResource("ShaderMaterial_v5vpu")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_d5786")
+script = ExtResource("5_panel")
+content_padding = 12.0
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="OverallVBox" type="VBoxContainer" parent="OverallPanel" unique_id=70817478]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OverallRateLabel" type="Label" parent="OverallPanel/OverallVBox" unique_id=306809888]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "本周完成率: 0%"
+
+[node name="OverallProgress" type="Control" parent="OverallPanel/OverallVBox" unique_id=814163958]
+custom_minimum_size = Vector2(300, 6)
+layout_mode = 2
+script = ExtResource("6_progress")
+track_thickness = 6
+linear_width = 300
+metadata/_custom_type_script = "uid://qac15j88w15i"
+
+[node name="HeatmapPanel" type="PanelContainer" parent="." unique_id=997404408]
+material = SubResource("ShaderMaterial_6vjux")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hjul0")
+script = ExtResource("5_panel")
+content_padding = 12.0
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="HeatmapVBox" type="VBoxContainer" parent="HeatmapPanel" unique_id=729659847]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeatmapTitle" type="Label" parent="HeatmapPanel/HeatmapVBox" unique_id=1844609424]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "每日打卡"
+
+[node name="HeatmapContainer" type="HBoxContainer" parent="HeatmapPanel/HeatmapVBox" unique_id=807669372]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="HabitsScroll" type="ScrollContainer" parent="." unique_id=903637796]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="HabitsContainer" type="VBoxContainer" parent="HabitsScroll" unique_id=312771577]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ReflectionPanel" type="PanelContainer" parent="." unique_id=826845901]
+material = SubResource("ShaderMaterial_sodv0")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lp7b1")
+script = ExtResource("5_panel")
+content_padding = 12.0
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="ReflectionVBox" type="VBoxContainer" parent="ReflectionPanel" unique_id=340809020]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ReflectionTitle" type="Label" parent="ReflectionPanel/ReflectionVBox" unique_id=1021311443]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "反思总结"
+
+[node name="ReflectionLabel" type="Label" parent="ReflectionPanel/ReflectionVBox" unique_id=203171065]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 13
+text = "暂无反思总结"
+autowrap_mode = 3
+
+[node name="GenerateBtn" type="Button" parent="ReflectionPanel/ReflectionVBox" unique_id=1108833408]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_t8axq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_c2se2")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sqj4o")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_qrvbf")
+theme_override_styles/focus = SubResource("StyleBoxFlat_e6tv4")
+text = "生成反思总结"
+script = ExtResource("2_btn")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="FocusStatsPanel" type="PanelContainer" parent="." unique_id=628687371]
+material = SubResource("ShaderMaterial_pwjh8")
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_8e5aa")
+script = ExtResource("5_panel")
+content_padding = 12.0
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="FocusVBox" type="VBoxContainer" parent="FocusStatsPanel" unique_id=1086990610]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FocusTitleLabel" type="Label" parent="FocusStatsPanel/FocusVBox" unique_id=2057915922]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "专注统计"
+
+[node name="FocusViewMode" type="Control" parent="FocusStatsPanel/FocusVBox" unique_id=405707745]
+custom_minimum_size = Vector2(240, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 1
+script = ExtResource("7_seg")
+editor_segments = Array[String](["周", "月", "年"])
+selected_index = 0
+corner_radius = 16
+button_height = 32
+metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
+
+[node name="FocusNavBar" type="HBoxContainer" parent="FocusStatsPanel/FocusVBox" unique_id=450991186]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="FocusPrevBtn" type="Button" parent="FocusStatsPanel/FocusVBox/FocusNavBar" unique_id=1594679303]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2rvvt")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_jl5lr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_r7d81")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_mxp0t")
+theme_override_styles/focus = SubResource("StyleBoxFlat_5f8aa")
+script = ExtResource("2_btn")
+button_size = 0
+button_icon = ExtResource("3_left")
+icon_size = 18
+padding_horizontal = 12
+padding_vertical = 6
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="FocusDateLabel" type="Label" parent="FocusStatsPanel/FocusVBox/FocusNavBar" unique_id=863539831]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="FocusNextBtn" type="Button" parent="FocusStatsPanel/FocusVBox/FocusNavBar" unique_id=1531593159]
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_3rvb3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3wm27")
+theme_override_styles/hover = SubResource("StyleBoxFlat_wtp51")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_8jly6")
+theme_override_styles/focus = SubResource("StyleBoxFlat_golwq")
+script = ExtResource("2_btn")
+button_size = 0
+button_icon = ExtResource("4_right")
+icon_size = 18
+padding_horizontal = 12
+padding_vertical = 6
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="FocusCardsRow" type="HBoxContainer" parent="FocusStatsPanel/FocusVBox" unique_id=1670218516]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TodayCard" type="PanelContainer" parent="FocusStatsPanel/FocusVBox/FocusCardsRow" unique_id=1510776007]
+material = SubResource("ShaderMaterial_5dkox")
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_lquij")
+script = ExtResource("5_panel")
+content_padding = 10.0
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="TodayVBox" type="VBoxContainer" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard" unique_id=839614807]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TodayTitle" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard/TodayVBox" unique_id=526139334]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "今日专注"
+
+[node name="TodayValue" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard/TodayVBox" unique_id=1024776236]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+text = "0h 0m"
+
+[node name="PeriodCard" type="PanelContainer" parent="FocusStatsPanel/FocusVBox/FocusCardsRow" unique_id=574698371]
+material = SubResource("ShaderMaterial_qqoxp")
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_y2br2")
+script = ExtResource("5_panel")
+content_padding = 10.0
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="PeriodVBox" type="VBoxContainer" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard" unique_id=1633229150]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PeriodTitle" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard/PeriodVBox" unique_id=1178020107]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "本周合计"
+
+[node name="PeriodValue" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard/PeriodVBox" unique_id=1421831825]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+text = "0h 0m"
+
+[node name="FocusChart" type="Control" parent="FocusStatsPanel/FocusVBox" unique_id=1242572835]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+script = ExtResource("8_chart")

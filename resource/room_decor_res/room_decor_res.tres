@@ -1,0 +1,76 @@
+[gd_resource type="Resource" format=3 uid="uid://bs61n06lcg6tu"]
+
+[ext_resource type="Script" uid="uid://rnfs55jsskvs" path="res://resource/room_decor_res/roon_decor_item/room_decor_item.gd" id="1_2gecy"]
+[ext_resource type="Script" uid="uid://dgpcvfir2tjid" path="res://resource/room_decor_res/room_decor_res.gd" id="1_8761q"]
+[ext_resource type="Texture2D" uid="uid://b5bv2drbmksjb" path="res://assets/ui/3d_item_tex/black_hole.png" id="2_l68k4"]
+[ext_resource type="Texture2D" uid="uid://dbvwp48h7fp31" path="res://assets/ui/3d_item_tex/purple_planet.png" id="3_xqban"]
+[ext_resource type="Texture2D" uid="uid://cxxjalscinuau" path="res://assets/ui/3d_item_tex/fire_planet.png" id="4_iyl6n"]
+[ext_resource type="Texture2D" uid="uid://cytvd0klh0p1i" path="res://assets/ui/3d_item_tex/sakura.png" id="5_08u7g"]
+[ext_resource type="Texture2D" uid="uid://enfcrpd771u4" path="res://assets/ui/3d_item_tex/whale.png" id="6_hhdqy"]
+[ext_resource type="Texture2D" uid="uid://bg3dvk37kuuxd" path="res://assets/ui/3d_item_tex/side_cat.png" id="7_fyonx"]
+[ext_resource type="Texture2D" uid="uid://dn4hfg3nddoi2" path="res://assets/ui/3d_item_tex/side_flowers.png" id="8_6deep"]
+
+[sub_resource type="Resource" id="Resource_rkhps"]
+script = ExtResource("1_2gecy")
+name = "black hole"
+category = "planet"
+icon = ExtResource("2_l68k4")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_2gecy"]
+script = ExtResource("1_2gecy")
+name = "purple planet"
+category = "planet"
+icon = ExtResource("3_xqban")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_shu76"]
+script = ExtResource("1_2gecy")
+name = "fire planet"
+category = "planet"
+icon = ExtResource("4_iyl6n")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_lwreo"]
+script = ExtResource("1_2gecy")
+name = "cherry"
+category = "windowside"
+icon = ExtResource("5_08u7g")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_l2by2"]
+script = ExtResource("1_2gecy")
+name = "whale"
+category = "windowside"
+icon = ExtResource("6_hhdqy")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_qreuf"]
+script = ExtResource("1_2gecy")
+name = "cat"
+category = "sidedesk"
+icon = ExtResource("7_fyonx")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_p2tlr"]
+script = ExtResource("1_2gecy")
+name = "flowers"
+category = "sidedesk"
+icon = ExtResource("8_6deep")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_l68k4"]
+script = ExtResource("1_2gecy")
+name = "alarm clock"
+category = "ondesk"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_xqban"]
+script = ExtResource("1_2gecy")
+name = "night light"
+category = "ondesk"
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[resource]
+script = ExtResource("1_8761q")
+decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2"), SubResource("Resource_qreuf"), SubResource("Resource_p2tlr"), SubResource("Resource_l68k4"), SubResource("Resource_xqban")])

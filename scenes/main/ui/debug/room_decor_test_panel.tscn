@@ -1,0 +1,118 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/room_decor_test_panel.gd" id="1_room_decor_test"]
+
+[node name="RoomDecorTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_room_decor_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="NameInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "物品名（空则自动生成）"
+
+[node name="CategoryInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "位置分类（如：地面/墙面/桌面）"
+text = "地面"
+
+[node name="RequiredLevelInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "解锁等级（>=1）"
+text = "1"
+
+[node name="IconPathInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "图标路径（可选，res://...）"
+
+[node name="ItemIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "物品ID（选择/删除时使用）"
+
+[node name="ButtonSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "RoomDecorState 调试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddItemBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "添加物品 (add_item)"
+
+[node name="SelectItemBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "选择物品 (select_item)"
+
+[node name="RemoveItemBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "删除物品 (remove_item)"
+
+[node name="ClearAllBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "删除全部装饰 (clear_all_items)"
+
+[node name="ClearAllCategoriesBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "删除全部分类 (clear_all_categories)"
+
+[node name="GetAllBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "获取全部物品 (get_all_items)"
+
+[node name="GetSelectedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "获取分类选中映射 (get_selected_item_ids_by_category)"
+
+[node name="AddSampleSetBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ButtonSection"]
+layout_mode = 2
+text = "添加示例分类数据"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]RoomDecor 调试日志将显示在这里...[/color]"
+scroll_following = true

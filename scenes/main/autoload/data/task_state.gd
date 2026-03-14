@@ -126,6 +126,7 @@ func update_task_title(id: int, title: String) -> bool:
 	if task == null:
 		return false
 	task.title = title
+	task.updated_at = int(Time.get_unix_time_from_system())
 	_save_data()
 	task_updated.emit(task)
 	print("[TaskState] Updated task(id: %d) title to '%s'" % [id, title])
@@ -142,11 +143,13 @@ func set_task_completed(id: int, completed: bool) -> bool:
 
 	if completed:
 		task.finish_timestamp = int(Time.get_unix_time_from_system())
+		task.updated_at = int(Time.get_unix_time_from_system())
 		# 停止截止时间检查
 		_warned_15min.erase(id)
 		_warned_deadline.erase(id)
 	else:
 		task.finish_timestamp = 0
+		task.updated_at = int(Time.get_unix_time_from_system())
 		# 取消完成时，如果截止时间已过期，重置截止时间
 		if task.due_timestamp > 0:
 			var now = Time.get_unix_time_from_system()
@@ -181,6 +184,7 @@ func set_task_due_time(id: int, timestamp: int) -> bool:
 	if task == null:
 		return false
 	task.due_timestamp = timestamp
+	task.updated_at = int(Time.get_unix_time_from_system())
 
 	# 重置警告标志
 	_warned_15min.erase(id)
@@ -213,6 +217,7 @@ func reorder_task(id: int, new_position: int, is_completed: bool) -> bool:
 
 	target_index = clamp(target_index, 0, _tasks.size())
 	_tasks.insert(target_index, task)
+	task.updated_at = int(Time.get_unix_time_from_system())
 	_update_orders()
 	_save_data()
 	tasks_reordered.emit()
@@ -233,6 +238,7 @@ func reorder_by_drag(task_id: int, new_data_index: int, new_completed: bool) -> 
 	# 插入到新位置
 	new_data_index = clamp(new_data_index, 0, _tasks.size())
 	_tasks.insert(new_data_index, task)
+	task.updated_at = int(Time.get_unix_time_from_system())
 
 	# 如果跨区域拖拽，改变完成状态
 	if was_completed != new_completed:
@@ -399,3 +405,79 @@ func _check_deadlines() -> void:
 func _update_orders() -> void:
 	for i in range(_tasks.size()):
 		_tasks[i].order = i
+
+# ======================== 同步辅助 API ========================
+
+## 按 server_id 查找任务
+func get_task_by_server_id(sid: int) -> TaskData:
+	for task in _tasks:
+		if task.server_id == sid:
+			return task
+	return null
+
+## 从远程数据创建任务（不自增 _next_id，直接追加）
+func sync_create_task(task: TaskData) -> void:
+	# 确保 id 不与现有冲突，必要时更新 _next_id
+	if task.id >= _next_id:
+		_next_id = task.id + 1
+	_tasks.insert(0, task)
+	_update_orders()
+	_save_data()
+	task_added.emit(task)
+	print("[TaskState] Sync created task(id: %d, server_id: %d)" % [task.id, task.server_id])
+
+## 按字段精确更新（同步用）
+func sync_update_task(local_id: int, fields: Dictionary) -> bool:
+	var task = get_task_by_id(local_id)
+	if task == null:
+		return false
+	if fields.has("title"):
+		task.title = fields["title"]
+	if fields.has("is_completed"):
+		task.is_completed = fields["is_completed"]
+	if fields.has("due_timestamp"):
+		task.due_timestamp = fields["due_timestamp"]
+	if fields.has("finish_timestamp"):
+		task.finish_timestamp = fields["finish_timestamp"]
+	if fields.has("updated_at"):
+		task.updated_at = fields["updated_at"]
+	if fields.has("server_id"):
+		task.server_id = fields["server_id"]
+	_save_data()
+	task_updated.emit(task)
+	print("[TaskState] Sync updated task(id: %d)" % local_id)
+	return true
+
+## 删除任务（同步用，不触发截止时间清理之外的副作用）
+func sync_remove_task(local_id: int) -> bool:
+	for i in range(_tasks.size()):
+		if _tasks[i].id == local_id:
+			_tasks.remove_at(i)
+			_warned_15min.erase(local_id)
+			_warned_deadline.erase(local_id)
+			_update_orders()
+			_save_data()
+			task_removed.emit(local_id)
+			print("[TaskState] Sync removed task(id: %d)" % local_id)
+			return true
+	return false
+
+## 全量替换（full sync 用）
+func sync_replace_all(tasks: Array[TaskData]) -> void:
+	_tasks.clear()
+	_warned_15min.clear()
+	_warned_deadline.clear()
+	for task in tasks:
+		_tasks.append(task)
+		if task.id >= _next_id:
+			_next_id = task.id + 1
+	_update_orders()
+	_save_data()
+	print("[TaskState] Sync replaced all: %d tasks" % _tasks.size())
+	data_loaded.emit()
+
+## 分配新的本地 ID
+func allocate_id() -> int:
+	var id = _next_id
+	_next_id += 1
+	return id
