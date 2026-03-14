@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://enfcrpd771u4" path="res://assets/ui/3d_item_tex/whale.png" id="6_hhdqy"]
 [ext_resource type="Texture2D" uid="uid://bg3dvk37kuuxd" path="res://assets/ui/3d_item_tex/side_cat.png" id="7_fyonx"]
 [ext_resource type="Texture2D" uid="uid://dn4hfg3nddoi2" path="res://assets/ui/3d_item_tex/side_flowers.png" id="8_6deep"]
+[ext_resource type="Texture2D" uid="uid://dp3mep2ox6my4" path="res://assets/ui/3d_item_tex/clock.png" id="9_xqban"]
+[ext_resource type="Texture2D" uid="uid://cgf3e7al2mxr8" path="res://assets/ui/3d_item_tex/night_light.png" id="10_iyl6n"]
 
 [sub_resource type="Resource" id="Resource_rkhps"]
 script = ExtResource("1_2gecy")
@@ -63,12 +65,14 @@ metadata/_custom_type_script = "uid://rnfs55jsskvs"
 script = ExtResource("1_2gecy")
 name = "alarm clock"
 category = "ondesk"
+icon = ExtResource("9_xqban")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_xqban"]
 script = ExtResource("1_2gecy")
 name = "night light"
 category = "ondesk"
+icon = ExtResource("10_iyl6n")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [resource]
