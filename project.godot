@@ -46,8 +46,8 @@ EventTracker="*res://scenes/main/autoload/data/event_tracker.gd"
 LevelState="*uid://cosfe6ux5f6ci"
 SyncState="*uid://cngm81h6ehphb"
 HabitState="*res://scenes/main/autoload/data/habit_state.gd"
-StatsState="*res://scenes/main/autoload/data/stats_state.gd"
 TransitionAnimation="*res://scenes/main/autoload/transition_animation/transition_animation.tscn"
+StatsState="*res://scenes/main/autoload/data/stats_state.gd"
 
 [display]
 
