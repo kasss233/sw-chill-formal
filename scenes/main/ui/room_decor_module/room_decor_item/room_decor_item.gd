@@ -15,9 +15,14 @@ var _syncing: bool = false
 
 
 func _ready() -> void:
-	pass
-	#if toggle_button and not toggle_button.pressed.is_connected(_on_toggle_button_pressed):
-		#toggle_button.pressed.connect(_on_toggle_button_pressed)
+	_enable_scroll_passthrough(self)
+
+
+static func _enable_scroll_passthrough(node: Node) -> void:
+	if node is Control and node.mouse_filter == Control.MOUSE_FILTER_STOP:
+		node.mouse_filter = Control.MOUSE_FILTER_PASS
+	for child in node.get_children():
+		_enable_scroll_passthrough(child)
 
 
 func set_data(data: Dictionary) -> void:

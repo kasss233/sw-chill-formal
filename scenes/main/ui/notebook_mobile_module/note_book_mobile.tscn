@@ -28,7 +28,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_f82j1")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5skq3"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3ka36"]
 shader = ExtResource("1_kys82")
 shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
@@ -47,7 +47,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(0, 0)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ka36"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpp07"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -59,23 +59,12 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpp07"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jrj2p"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -86,7 +75,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -97,7 +86,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -108,7 +97,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -130,7 +119,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -141,7 +130,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -152,13 +141,24 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_048ov"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xh2le"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -181,23 +181,12 @@ script = ExtResource("5_kyho3")
 [sub_resource type="Resource" id="Resource_bpp07"]
 script = ExtResource("5_kyho3")
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xh2le"]
-content_margin_left = 42.0
-content_margin_top = 7.0
-content_margin_right = 14.0
-content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ted7b"]
 content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -208,7 +197,7 @@ content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -219,7 +208,7 @@ content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -230,29 +219,29 @@ content_margin_left = 42.0
 content_margin_top = 7.0
 content_margin_right = 14.0
 content_margin_bottom = 7.0
-bg_color = Color(1, 1, 1, 0)
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btwkk"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
+content_margin_left = 42.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
 bg_color = Color(1, 1, 1, 0)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pu47j"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.35, 0.35, 0.35, 0.14)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -263,7 +252,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.4, 0.4, 0.4, 0.16)
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -274,13 +263,24 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.2, 0.2, 0.2, 0.08)
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_57mc0"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_noee0"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -299,7 +299,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_noee0")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_noee0"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0p81l"]
 shader = ExtResource("1_kys82")
 shader_parameter/corner_radius = 16.0
 shader_parameter/show_border = true
@@ -318,7 +318,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(200, 16)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0p81l"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tyu8p"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -360,7 +360,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_n6alu")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tyu8p"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0vqo5"]
 shader = ExtResource("1_kys82")
 shader_parameter/corner_radius = 16.0
 shader_parameter/show_border = true
@@ -379,7 +379,7 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(200, 16)
 shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0vqo5"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n6alu"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
@@ -409,9 +409,9 @@ script = ExtResource("9_module")
 
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=1059877106]
 unique_name_in_owner = true
-material = SubResource("ShaderMaterial_5skq3")
+material = SubResource("ShaderMaterial_3ka36")
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_3ka36")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bpp07")
 script = ExtResource("2_xswc4")
 noise_texture = SubResource("NoiseTexture2D_w4rb6")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -446,11 +446,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_bpp07")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_jrj2p")
-theme_override_styles/hover = SubResource("StyleBoxFlat_qt744")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_xw33p")
-theme_override_styles/focus = SubResource("StyleBoxFlat_odokx")
+theme_override_styles/normal = SubResource("StyleBoxFlat_jrj2p")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_qt744")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xw33p")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_odokx")
+theme_override_styles/focus = SubResource("StyleBoxFlat_rmw2d")
 script = ExtResource("3_pna0s")
 button_icon = ExtResource("5_rimwk")
 padding_horizontal = 14
@@ -462,11 +462,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_rmw2d")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_q3tci")
-theme_override_styles/hover = SubResource("StyleBoxFlat_1dp5e")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_mwxne")
-theme_override_styles/focus = SubResource("StyleBoxFlat_048ov")
+theme_override_styles/normal = SubResource("StyleBoxFlat_q3tci")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1dp5e")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mwxne")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_048ov")
+theme_override_styles/focus = SubResource("StyleBoxFlat_xh2le")
 script = ExtResource("12_lrlqg")
 menu = NodePath("../../../../../../CanvasLayer/MaterialMenu2")
 button_icon = ExtResource("13_5skq3")
@@ -548,11 +548,11 @@ clip_contents = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_xh2le")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_ted7b")
-theme_override_styles/hover = SubResource("StyleBoxFlat_wstgn")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_hno56")
-theme_override_styles/focus = SubResource("StyleBoxFlat_2w006")
+theme_override_styles/normal = SubResource("StyleBoxFlat_ted7b")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_wstgn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hno56")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_2w006")
+theme_override_styles/focus = SubResource("StyleBoxFlat_btwkk")
 text = "返回"
 script = ExtResource("3_pna0s")
 button_icon = ExtResource("10_aguge")
@@ -569,11 +569,11 @@ clip_contents = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_btwkk")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_pu47j")
-theme_override_styles/hover = SubResource("StyleBoxFlat_0wka5")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_x7iwq")
-theme_override_styles/focus = SubResource("StyleBoxFlat_57mc0")
+theme_override_styles/normal = SubResource("StyleBoxFlat_pu47j")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0wka5")
+theme_override_styles/hover = SubResource("StyleBoxFlat_x7iwq")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_57mc0")
+theme_override_styles/focus = SubResource("StyleBoxFlat_noee0")
 script = ExtResource("12_lrlqg")
 menu = NodePath("../../../../../CanvasLayer/MaterialMenu")
 popup_position = 2
@@ -586,13 +586,13 @@ metadata/_custom_type_script = "uid://motk0vag3i7k"
 
 [node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=1176404503]
 unique_name_in_owner = true
-material = SubResource("ShaderMaterial_noee0")
+material = SubResource("ShaderMaterial_0p81l")
 custom_minimum_size = Vector2(200, 0)
 offset_left = 273.0
 offset_top = 110.0
 offset_right = 473.0
 offset_bottom = 126.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_0p81l")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tyu8p")
 script = ExtResource("14_3ka36")
 editor_items = Array[ExtResource("15_bpp07")]([SubResource("Resource_048ov"), SubResource("Resource_xh2le"), SubResource("Resource_jrj2p"), SubResource("Resource_qt744")])
 noise_texture = SubResource("NoiseTexture2D_0p81l")
@@ -600,13 +600,13 @@ metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="MaterialMenu2" type="PanelContainer" parent="CanvasLayer" unique_id=1486713255]
 unique_name_in_owner = true
-material = SubResource("ShaderMaterial_tyu8p")
+material = SubResource("ShaderMaterial_0vqo5")
 custom_minimum_size = Vector2(200, 0)
 offset_left = 265.0
 offset_top = 306.0
 offset_right = 465.0
 offset_bottom = 322.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_0vqo5")
+theme_override_styles/panel = SubResource("StyleBoxFlat_n6alu")
 script = ExtResource("14_3ka36")
 editor_items = Array[ExtResource("15_bpp07")]([SubResource("Resource_5skq3"), SubResource("Resource_hno56")])
 noise_texture = SubResource("NoiseTexture2D_sqc6t")

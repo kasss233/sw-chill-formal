@@ -65,6 +65,7 @@ button_size = 0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(0, 280)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 1

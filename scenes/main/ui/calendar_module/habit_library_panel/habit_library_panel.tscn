@@ -36,6 +36,7 @@ text = "还没有习惯，点击按钮添加"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1199723151]
+custom_minimum_size = Vector2(0, 280)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0

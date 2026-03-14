@@ -24,13 +24,13 @@ signal segment_selected(index: int, text: String)
 		_update_selection()
 
 ## 背景颜色（容器）
-@export var background_color: Color = Color(0.15, 0.15, 0.15, 1):
+@export var background_color: Color = Color("26262632"):
 	set(value):
 		background_color = value
 		_update_style()
 
 ## 选中项背景颜色
-@export var selected_color: Color = Color(0.35, 0.65, 0.95, 1):
+@export var selected_color: Color = Color("ffffff"):
 	set(value):
 		selected_color = value
 		_update_selection()
@@ -42,7 +42,7 @@ signal segment_selected(index: int, text: String)
 		_update_segment_colors()
 
 ## 选中文字颜色
-@export var selected_text_color: Color = Color.WHITE:
+@export var selected_text_color: Color = Color.BLACK:
 	set(value):
 		selected_text_color = value
 		_update_segment_colors()

@@ -8,7 +8,6 @@ signal item_selected(item_id: int, item_data: Dictionary)
 @onready var item_count_label: Label = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Header/ItemCountLabel
 @onready var empty_label: Label = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/EmptyLabel
 @onready var category_list: VBoxContainer = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList
-@onready var category_section_template: VBoxContainer = $CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate
 @onready var panel = $CanvasLayer/FrostedPanel
 @onready var button = $Button
 @onready var canvas_layer = $CanvasLayer
@@ -20,8 +19,6 @@ var _category_sections: Dictionary = {}
 func _ready() -> void:
 	if item_scene == null:
 		item_scene = preload("res://scenes/main/ui/room_decor_module/room_decor_item/room_decor_item.tscn")
-	if category_section_template and is_instance_valid(category_section_template):
-		category_section_template.visible = false
 
 	if RoomDecorState.has_signal("room_decor_added"):
 		RoomDecorState.room_decor_added.connect(_on_state_item_added)
@@ -183,7 +180,7 @@ func _normalize_category(category: String) -> String:
 	return normalized
 
 
-func _get_or_create_category_grid(category: String) -> GridContainer:
+func _get_or_create_category_grid(category: String) -> Container:
 	var normalized := _normalize_category(category)
 	if _category_sections.has(normalized):
 		var existing_section: VBoxContainer = _category_sections[normalized] as VBoxContainer
@@ -191,49 +188,50 @@ func _get_or_create_category_grid(category: String) -> GridContainer:
 			var existing_title := existing_section.get_node("Header/CategoryTitle") as Label
 			if existing_title:
 				existing_title.text = "位置：%s" % normalized
-			return existing_section.get_node("CategoryGrid") as GridContainer
+			return existing_section.get_node("CategoryScroll/CategoryItems") as HBoxContainer
 
-	var section: VBoxContainer
-	if category_section_template and is_instance_valid(category_section_template):
-		section = category_section_template.duplicate() as VBoxContainer
-		section.visible = true
-	else:
-		section = VBoxContainer.new()
-		section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		section.add_theme_constant_override("separation", 6)
+	var section := VBoxContainer.new()
+	section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	section.add_theme_constant_override("separation", 6)
 
-		var fallback_header = HBoxContainer.new()
-		fallback_header.name = "Header"
+	var header = HBoxContainer.new()
+	header.name = "Header"
 
-		var fallback_title = Label.new()
-		fallback_title.name = "CategoryTitle"
-		fallback_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		fallback_header.add_child(fallback_title)
+	var title = Label.new()
+	title.name = "CategoryTitle"
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.text = "位置：%s" % normalized
+	header.add_child(title)
 
-		var fallback_count_label = Label.new()
-		fallback_count_label.name = "CountLabel"
-		fallback_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		fallback_header.add_child(fallback_count_label)
+	var count_label = Label.new()
+	count_label.name = "CountLabel"
+	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	header.add_child(count_label)
 
-		section.add_child(fallback_header)
+	section.add_child(header)
 
-		var fallback_grid = GridContainer.new()
-		fallback_grid.name = "CategoryGrid"
-		fallback_grid.columns = 3
-		fallback_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		fallback_grid.add_theme_constant_override("h_separation", 8)
-		fallback_grid.add_theme_constant_override("v_separation", 8)
-		section.add_child(fallback_grid)
+	var h_scroll = SmoothScrollContainer.new()
+	h_scroll.name = "CategoryScroll"
+	h_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	h_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	h_scroll.allow_vertical_scroll = false
+	h_scroll.allow_horizontal_scroll = true
+	h_scroll.hide_scrollbar_over_time = true
+	h_scroll.scrollbar_hide_time = 0.5
+	section.add_child(h_scroll)
+
+	var hbox = HBoxContainer.new()
+	hbox.name = "CategoryItems"
+	hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	hbox.add_theme_constant_override("separation", 8)
+	h_scroll.add_child(hbox)
 
 	section.name = "CategorySection_%s" % normalized
-	var title := section.get_node("Header/CategoryTitle") as Label
-	if title:
-		title.text = "位置：%s" % normalized
-
 	category_list.add_child(section)
 	_category_sections[normalized] = section
 	_refresh_category_count(normalized)
-	return section.get_node("CategoryGrid") as GridContainer
+	return hbox
 
 
 func _refresh_category_count(category: String) -> void:
@@ -241,7 +239,7 @@ func _refresh_category_count(category: String) -> void:
 	var section = _category_sections.get(normalized)
 	if section == null or not is_instance_valid(section):
 		return
-	var grid := section.get_node("CategoryGrid") as GridContainer
+	var grid := section.get_node("CategoryScroll/CategoryItems") as Container
 	var count_label := section.get_node("Header/CountLabel") as Label
 	if grid == null or count_label == null:
 		return
@@ -260,7 +258,7 @@ func _try_remove_empty_category_section(category: String) -> void:
 	var section = _category_sections.get(normalized)
 	if section == null or not is_instance_valid(section):
 		return
-	var grid := section.get_node("CategoryGrid") as GridContainer
+	var grid := section.get_node("CategoryScroll/CategoryItems") as Container
 	if grid and grid.get_child_count() == 0:
 		section.queue_free()
 		_category_sections.erase(normalized)

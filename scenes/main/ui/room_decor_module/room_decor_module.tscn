@@ -8,6 +8,9 @@
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="6_ql3sb"]
 [ext_resource type="Texture2D" uid="uid://0bhcvchib8d0" path="res://assets/ui/icons/local_florist_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="7_j412a"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="8_ql3sb"]
+[ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="9_smooth"]
+[ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="10_damper"]
+[ext_resource type="FontFile" uid="uid://dadhn30uf1pnn" path="res://assets/ui/fonts/SourceHanSansCN-Light.otf" id="11_font"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_j063l"]
 frequency = 0.1
@@ -17,13 +20,13 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_j063l")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ql3sb"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6nxbn"]
 shader = ExtResource("1_q6yil")
-shader_parameter/corner_radius = 12.0
+shader_parameter/corner_radius = 21.555
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.5
+shader_parameter/blur_amount = 5.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -33,10 +36,10 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(548, 563)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(308, 494)
+shader_parameter/shadow_padding = 0.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j412a"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq8fo"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -48,7 +51,13 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ljhog"]
+[sub_resource type="Resource" id="Resource_scroll1"]
+script = ExtResource("10_damper")
+
+[sub_resource type="Resource" id="Resource_scroll2"]
+script = ExtResource("10_damper")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w20c3"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -59,7 +68,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6nxbn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s4qcs"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -70,7 +79,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq8fo"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ume71"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -81,7 +90,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w20c3"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8tdj8"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -92,7 +101,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s4qcs"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gtshj"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -125,13 +134,23 @@ item_scene = ExtResource("4_j0rqg")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=2008160506]
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=1111612907]
-material = SubResource("ShaderMaterial_ql3sb")
-offset_left = 312.0
-offset_top = 34.0
-offset_right = 860.0
-offset_bottom = 597.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_j412a")
+material = SubResource("ShaderMaterial_6nxbn")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -154.0
+offset_top = -247.0
+offset_right = 154.0
+offset_bottom = 247.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_iq8fo")
 script = ExtResource("2_v1ed3")
+corner_radius = 21.555
+blur_amount = 5.0
 noise_texture = SubResource("NoiseTexture2D_tbtju")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
@@ -150,6 +169,9 @@ layout_mode = 2
 [node name="ModuleTitleLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Header" unique_id=1500352552]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("11_font")
+theme_override_font_sizes/font_size = 23
 text = "房间装饰"
 
 [node name="ItemCountLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Header" unique_id=1878822312]
@@ -170,37 +192,18 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+script = ExtResource("9_smooth")
+wheel_scroll_damper = SubResource("Resource_scroll1")
+dragging_scroll_damper = SubResource("Resource_scroll2")
+hide_scrollbar_over_time = true
+scrollbar_hide_time = 0.5
+metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="CategoryList" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer" unique_id=1631578345]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 100
-
-[node name="CategorySectionTemplate" type="VBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList" unique_id=1299448726]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="Header" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate" unique_id=1880231452]
-layout_mode = 2
-
-[node name="CategoryTitle" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate/Header" unique_id=1292680046]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "位置：category_string"
-
-[node name="CountLabel" type="Label" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate/Header" unique_id=837310102]
-layout_mode = 2
-text = "0/0"
-horizontal_alignment = 2
-
-[node name="CategoryGrid" type="GridContainer" parent="CanvasLayer/FrostedPanel/BoxContainer/VBoxContainer/Content/ScrollContainer/CategoryList/CategorySectionTemplate" unique_id=876190343]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
-columns = 3
+theme_override_constants/separation = 20
 
 [node name="Button" type="Button" parent="." unique_id=536673203]
 clip_contents = true
@@ -211,11 +214,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_ljhog")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_6nxbn")
-theme_override_styles/hover = SubResource("StyleBoxFlat_iq8fo")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_w20c3")
-theme_override_styles/focus = SubResource("StyleBoxFlat_s4qcs")
+theme_override_styles/normal = SubResource("StyleBoxFlat_w20c3")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_s4qcs")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ume71")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_8tdj8")
+theme_override_styles/focus = SubResource("StyleBoxFlat_gtshj")
 script = ExtResource("5_30aeb")
 states = Array[ExtResource("6_ql3sb")]([SubResource("Resource_ume71"), SubResource("Resource_8tdj8")])
 button_size = 3

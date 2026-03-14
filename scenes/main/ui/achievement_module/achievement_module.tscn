@@ -89,7 +89,7 @@ noise = SubResource("FastNoiseLite_thglr")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ar0jg"]
 shader = ExtResource("4_7h8iw")
-shader_parameter/corner_radius = 12.0
+shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
@@ -104,7 +104,7 @@ shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(306, 482)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qfi2h"]
 content_margin_left = 12.0
@@ -183,9 +183,11 @@ vertical_alignment = 1
 
 [node name="TabSegmentedButton" type="Control" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1664879877]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 32)
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
+mouse_filter = 1
 script = ExtResource("4_q6hjx")
 editor_segments = Array[String](["每日任务", "成就"])
 selected_index = 0
