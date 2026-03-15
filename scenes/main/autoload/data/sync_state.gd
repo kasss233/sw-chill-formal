@@ -2,6 +2,7 @@ extends Node
 
 ## 云同步状态管理单例（Data Autoload）
 ## 负责变更追踪、push/pull/full 同步、设备注册、ID 映射
+## 支持增量同步（task/note/category）和全量 bundle 同步（habit/achievement/level/room_decor/stats）
 
 # --- 信号 ---
 signal sync_started
@@ -28,6 +29,12 @@ var _id_mapping: IdMapping = null
 var _auto_sync_timer: Timer = null
 var _debounce_timer: Timer = null
 var _consecutive_failures: int = 0
+
+# 全量同步 bundle 注册表
+# key: bundle_type, value: { "export": Callable, "merge": Callable }
+var _full_sync_bundles: Dictionary = {}
+# bundle 脏标记（数据变更时标记，push 后清除）
+var _bundle_dirty: Dictionary = {}
 
 
 func _ready() -> void:
@@ -69,11 +76,88 @@ func _ready() -> void:
 	NoteState.category_added.connect(_on_category_added)
 	NoteState.category_removed.connect(_on_category_removed)
 
+	# 注册全量同步 bundles 并连接脏标记信号
+	_register_full_sync_bundles()
+	_connect_bundle_dirty_signals()
+
 	# 如果已登录，延迟触发同步启动（AuthState 的信号在 SyncState 初始化前已发射）
 	if AuthState.is_logged_in():
 		call_deferred("_deferred_login_sync")
 
 	print("[SyncState] 初始化完成, device_id=%s, registered=%s" % [_device_id, _is_registered])
+
+
+# ======================== Bundle 注册与脏标记 ========================
+
+func _register_full_sync_bundles() -> void:
+	_register_bundle("habit_bundle", HabitState, "export_data", "import_sync_data")
+	_register_bundle("achievement_bundle", AchievementState, "export_data", "import_sync_data")
+	_register_bundle("level", LevelState, "export_data", "import_sync_data")
+	_register_bundle("room_decor_bundle", RoomDecorState, "export_data", "import_sync_data")
+	_register_bundle("stats_bundle", StatsState, "export_data", "import_sync_data")
+
+
+func _register_bundle(bundle_type: String, state_node: Node, export_method: String, merge_method: String) -> void:
+	if state_node == null:
+		push_warning("[SyncState] 无法注册 bundle '%s': State 节点为空" % bundle_type)
+		return
+	_full_sync_bundles[bundle_type] = {
+		"export": Callable(state_node, export_method),
+		"merge": Callable(state_node, merge_method),
+	}
+	_bundle_dirty[bundle_type] = false
+
+
+func _connect_bundle_dirty_signals() -> void:
+	# HabitState
+	if HabitState:
+		HabitState.habit_added.connect(_on_bundle_dirty.bind("habit_bundle"))
+		HabitState.habit_removed.connect(_on_bundle_dirty.bind("habit_bundle"))
+		HabitState.habit_updated.connect(_on_bundle_dirty.bind("habit_bundle"))
+		HabitState.schedule_updated.connect(_on_bundle_dirty.bind("habit_bundle"))
+		HabitState.execution_updated.connect(_on_bundle_dirty.bind("habit_bundle"))
+	# AchievementState
+	if AchievementState:
+		AchievementState.daily_task_state_updated.connect(_on_bundle_dirty.bind("achievement_bundle"))
+		AchievementState.daily_task_reward_claimed.connect(_on_bundle_dirty.bind("achievement_bundle"))
+		AchievementState.achievement_state_updated.connect(_on_bundle_dirty.bind("achievement_bundle"))
+		AchievementState.achievement_reward_claimed.connect(_on_bundle_dirty.bind("achievement_bundle"))
+	# LevelState
+	if LevelState:
+		LevelState.level_state_changed.connect(_on_bundle_dirty.bind("level"))
+	# RoomDecorState
+	if RoomDecorState:
+		RoomDecorState.room_decor_state_changed.connect(_on_bundle_dirty.bind("room_decor_bundle"))
+	# StatsState
+	if StatsState:
+		StatsState.record_added.connect(_on_bundle_dirty.bind("stats_bundle"))
+
+
+func _on_bundle_dirty(_arg1 = null, bundle_type: String = "") -> void:
+	if _is_applying_remote:
+		return
+	if bundle_type != "":
+		_bundle_dirty[bundle_type] = true
+
+
+func _has_dirty_bundles() -> bool:
+	for bt in _bundle_dirty:
+		if _bundle_dirty[bt]:
+			return true
+	return false
+
+
+func _push_dirty_bundles() -> void:
+	for bundle_type in _bundle_dirty:
+		if not _bundle_dirty[bundle_type]:
+			continue
+		if not _full_sync_bundles.has(bundle_type):
+			continue
+		var bundle_info = _full_sync_bundles[bundle_type]
+		var export_data: Dictionary = bundle_info["export"].call()
+		_record_change(SyncChange.new(bundle_type, "full_replace", 0, bundle_type, export_data))
+		_bundle_dirty[bundle_type] = false
+	print("[SyncState] 已将脏 bundle 加入推送队列")
 
 
 # ======================== 认证状态响应 ========================
@@ -100,7 +184,9 @@ func _on_auth_state_changed(is_logged_in: bool) -> void:
 	else:
 		print("[SyncState] 用户已登出")
 		# 登出前尝试最后一次 push
-		if _is_registered and _change_queue.size() > 0:
+		if _is_registered and (_change_queue.size() > 0 or _has_dirty_bundles()):
+			if _has_dirty_bundles():
+				_push_dirty_bundles()
 			await _do_push()
 		_stop_auto_sync()
 		_reset_sync_state()
@@ -236,6 +322,15 @@ func _record_change(change: SyncChange) -> void:
 
 ## 智能合并变更队列
 func _merge_change(new_change: SyncChange) -> void:
+	# full_replace：同 resource 只保留最新一条
+	if new_change.action == "full_replace":
+		for i in range(_change_queue.size() - 1, -1, -1):
+			var existing: SyncChange = _change_queue[i]
+			if existing.resource == new_change.resource and existing.action == "full_replace":
+				_change_queue.remove_at(i)
+		_change_queue.append(new_change)
+		return
+
 	# 查找同资源同 key 的已有变更
 	for i in range(_change_queue.size() - 1, -1, -1):
 		var existing: SyncChange = _change_queue[i]
@@ -370,6 +465,8 @@ func _convert_to_push_format(change: SyncChange) -> Dictionary:
 				return {}  # 没有映射说明服务器没有此数据
 			item["data"] = {"id": server_id}
 		"reorder":
+			item["data"] = change.data.duplicate(true)
+		"full_replace":
 			item["data"] = change.data.duplicate(true)
 
 	return item
@@ -588,9 +685,14 @@ func do_full_sync() -> void:
 	sync_started.emit()
 	print("[SyncState] 开始全量同步...")
 
+	# 构建请求：增量资源 + bundle 类型
+	var resources: Array = ["task", "note", "category"]
+	for bundle_type in _full_sync_bundles:
+		resources.append(bundle_type)
+
 	var body = {
 		"device_id": _device_id,
-		"resources": ["task", "note", "category"]
+		"resources": resources
 	}
 
 	var result = await ApiClient.api_post("/sync/full", body)
@@ -617,9 +719,13 @@ func do_full_sync() -> void:
 	var server_categories = data.get("categories", [])
 	_merge_full_sync_categories(server_categories)
 
+	# 处理 bundles
+	_merge_full_sync_bundles(data)
+
 	_is_applying_remote = false
 
-	# 上传本地独有数据
+	# 上传本地独有数据（包括 bundle）
+	_push_local_only_bundles(data)
 	if _change_queue.size() > 0:
 		await _do_push()
 
@@ -627,165 +733,191 @@ func do_full_sync() -> void:
 	_save_sync_data()
 	_id_mapping.save_to_file()
 
+	# 全量同步完成后清除所有 bundle 脏标记
+	for bt in _bundle_dirty:
+		_bundle_dirty[bt] = false
+
 	_consecutive_failures = 0
 	_is_syncing = false
 	sync_completed.emit(true, {"type": "full"})
 	print("[SyncState] 全量同步完成")
 
 
-## 全量同步 - 合并 tasks
+## 全量同步 - 合并 bundles
+func _merge_full_sync_bundles(server_data: Dictionary) -> void:
+	for bundle_type in _full_sync_bundles:
+		var bundle_key = bundle_type  # 响应中 key 与 bundle_type 相同
+		if not server_data.has(bundle_key):
+			continue
+		var server_bundle = server_data[bundle_key]
+		if not server_bundle is Dictionary:
+			continue
+		var bundle_info = _full_sync_bundles[bundle_type]
+		bundle_info["merge"].call(server_bundle)
+		print("[SyncState] 已合并 bundle: %s" % bundle_type)
+
+
+## 全量同步 - 推送服务器端没有的 bundles
+func _push_local_only_bundles(server_data: Dictionary) -> void:
+	for bundle_type in _full_sync_bundles:
+		if server_data.has(bundle_type):
+			continue  # 服务器已有，跳过
+		var bundle_info = _full_sync_bundles[bundle_type]
+		var export_data: Dictionary = bundle_info["export"].call()
+		if export_data.is_empty():
+			continue
+		_change_queue.append(SyncChange.new(bundle_type, "full_replace", 0, bundle_type, export_data))
+		print("[SyncState] 推送本地 bundle: %s" % bundle_type)
+
+
+## 全量同步 - 合并 tasks（通用方法 wrapper）
 func _merge_full_sync_tasks(server_tasks: Array) -> void:
-	var local_tasks = TaskState.get_all_tasks()
-
-	for st in server_tasks:
-		if not st is Dictionary:
-			continue
-		var server_id = st.get("id", 0)
-
-		# 检查是否已有映射
-		if _id_mapping.has_server_id("task", server_id):
-			# 已映射，比较 updated_at 取较新
-			var local_key = _id_mapping.get_local_key("task", server_id)
-			var local_task = TaskState.get_task_by_id(int(local_key))
-			if local_task:
-				var server_updated = st.get("updated_at", 0)
-				var local_updated = _to_ms(local_task.updated_at)
-				if server_updated > local_updated:
-					# 服务器更新，应用远程数据
-					var fields = {}
-					if st.has("title"):
-						fields["title"] = st["title"]
-					if st.has("is_completed"):
-						fields["is_completed"] = st["is_completed"]
-					if st.has("due_timestamp"):
-						fields["due_timestamp"] = st["due_timestamp"]
-					if st.has("finish_timestamp"):
-						fields["finish_timestamp"] = st["finish_timestamp"]
-					if st.has("updated_at"):
-						fields["updated_at"] = _to_sec(st["updated_at"])
-					TaskState.sync_update_task(local_task.id, fields)
-			continue
-
-		# 尝试匹配本地未映射项
-		var matched = false
-		for lt in local_tasks:
-			if lt.server_id > 0:
-				continue  # 已有 server_id 的跳过
-			if _id_mapping.get_server_id("task", str(lt.id)) > 0:
-				continue  # 已有映射的跳过
-			# 匹配条件：title 相同 + created_at 差值 < 60s
-			if lt.title == st.get("title", "") and abs(_to_ms(lt.created_at) - st.get("created_at", 0)) < 60000:
-				# 匹配成功，建立映射
-				_id_mapping.set_mapping("task", str(lt.id), server_id)
-				lt.server_id = server_id
-				# 比较 updated_at 取较新
-				var server_updated = st.get("updated_at", 0)
-				var local_updated = _to_ms(lt.updated_at)
-				if server_updated > local_updated:
-					var fields = {}
-					if st.has("title"):
-						fields["title"] = st["title"]
-					if st.has("is_completed"):
-						fields["is_completed"] = st["is_completed"]
-					if st.has("due_timestamp"):
-						fields["due_timestamp"] = st["due_timestamp"]
-					if st.has("finish_timestamp"):
-						fields["finish_timestamp"] = st["finish_timestamp"]
-					if st.has("updated_at"):
-						fields["updated_at"] = _to_sec(st["updated_at"])
-					TaskState.sync_update_task(lt.id, fields)
-				matched = true
-				break
-
-		if not matched:
-			# 服务器有本地无 → 创建本地项
+	_merge_full_sync_items(
+		"task", server_tasks,
+		TaskState.get_all_tasks,
+		func(item): return item.id,
+		func(item): return item.server_id,
+		func(item, sid): item.server_id = sid,
+		func(item): return item.title,
+		func(item): return item.created_at,
+		func(item): return item.updated_at,
+		["title", "is_completed", "due_timestamp", "finish_timestamp", "updated_at"],
+		func(st, _sid):
 			var local_id = TaskState.allocate_id()
 			var task = TaskData.new(local_id, st.get("title", ""), st.get("due_timestamp", 0), st.get("is_completed", false))
 			task.finish_timestamp = st.get("finish_timestamp", 0)
 			task.created_at = _to_sec(st.get("created_at", 0))
 			task.updated_at = _to_sec(st.get("updated_at", 0))
-			task.server_id = server_id
+			task.server_id = _sid
 			TaskState.sync_create_task(task)
-			_id_mapping.set_mapping("task", str(local_id), server_id)
-
-	# 本地有服务器无（server_id == 0 且未匹配） → 作为 create 加入 push 队列
-	for lt in local_tasks:
-		if lt.server_id == 0 and _id_mapping.get_server_id("task", str(lt.id)) == 0:
-			_change_queue.append(SyncChange.new("task", "create", lt.id, str(lt.id), {
-				"title": lt.title,
-				"due_timestamp": lt.due_timestamp,
-				"finish_timestamp": lt.finish_timestamp,
-				"is_completed": lt.is_completed,
-				"created_at": lt.created_at,
-				"position": lt.order
-			}))
+			return local_id,
+		func(local_id, fields): TaskState.sync_update_task(local_id, fields),
+		func(item): return {
+			"title": item.title,
+			"due_timestamp": item.due_timestamp,
+			"finish_timestamp": item.finish_timestamp,
+			"is_completed": item.is_completed,
+			"created_at": item.created_at,
+			"position": item.order
+		}
+	)
 
 
-## 全量同步 - 合并 notes
+## 全量同步 - 合并 notes（通用方法 wrapper）
 func _merge_full_sync_notes(server_notes: Array) -> void:
-	var local_notes = NoteState.get_all_notes()
-
-	for sn in server_notes:
-		if not sn is Dictionary:
-			continue
-		var server_id = sn.get("id", 0)
-
-		if _id_mapping.has_server_id("note", server_id):
-			var local_key = _id_mapping.get_local_key("note", server_id)
-			var local_note = NoteState.get_note_by_id(int(local_key))
-			if local_note:
-				var server_updated = sn.get("updated_at", 0)
-				var local_updated = _to_ms(local_note.updated_at)
-				if server_updated > local_updated:
-					var fields = {}
-					if sn.has("title"):
-						fields["title"] = sn["title"]
-					if sn.has("content"):
-						fields["content"] = sn["content"]
-					if sn.has("updated_at"):
-						fields["updated_at"] = _to_sec(sn["updated_at"])
-					NoteState.sync_update_note(local_note.id, fields)
-			continue
-
-		var matched = false
-		for ln in local_notes:
-			if ln.server_id > 0:
-				continue
-			if _id_mapping.get_server_id("note", str(ln.id)) > 0:
-				continue
-			if ln.title == sn.get("title", "") and abs(_to_ms(ln.created_at) - sn.get("created_at", 0)) < 60000:
-				_id_mapping.set_mapping("note", str(ln.id), server_id)
-				ln.server_id = server_id
-				var server_updated = sn.get("updated_at", 0)
-				var local_updated = _to_ms(ln.updated_at)
-				if server_updated > local_updated:
-					var fields = {}
-					if sn.has("title"):
-						fields["title"] = sn["title"]
-					if sn.has("content"):
-						fields["content"] = sn["content"]
-					if sn.has("updated_at"):
-						fields["updated_at"] = _to_sec(sn["updated_at"])
-					NoteState.sync_update_note(ln.id, fields)
-				matched = true
-				break
-
-		if not matched:
+	_merge_full_sync_items(
+		"note", server_notes,
+		NoteState.get_all_notes,
+		func(item): return item.id,
+		func(item): return item.server_id,
+		func(item, sid): item.server_id = sid,
+		func(item): return item.title,
+		func(item): return item.created_at,
+		func(item): return item.updated_at,
+		["title", "content", "updated_at"],
+		func(sn, _sid):
 			var local_id = NoteState.allocate_id()
 			var note = NoteData.new(local_id, sn.get("title", ""), sn.get("content", ""))
 			note.created_at = _to_sec(sn.get("created_at", 0))
 			note.updated_at = _to_sec(sn.get("updated_at", 0))
-			note.server_id = server_id
+			note.server_id = _sid
 			NoteState.sync_create_note(note)
-			_id_mapping.set_mapping("note", str(local_id), server_id)
+			return local_id,
+		func(local_id, fields): NoteState.sync_update_note(local_id, fields),
+		func(item): return {
+			"title": item.title,
+			"content": item.content,
+			"created_at": item.created_at,
+		}
+	)
 
-	for ln in local_notes:
-		if ln.server_id == 0 and _id_mapping.get_server_id("note", str(ln.id)) == 0:
-			_change_queue.append(SyncChange.new("note", "create", ln.id, str(ln.id), {
-				"title": ln.title,
-				"content": ln.content,
-				"created_at": ln.created_at,
-			}))
+
+## 通用全量合并方法
+## 提取 _merge_full_sync_tasks 和 _merge_full_sync_notes 的共同逻辑
+func _merge_full_sync_items(
+	resource_name: String,
+	server_items: Array,
+	get_local_items: Callable,
+	get_item_id: Callable,
+	get_item_server_id: Callable,
+	set_item_server_id: Callable,
+	get_item_title: Callable,
+	get_item_created_at: Callable,
+	get_item_updated_at: Callable,
+	sync_field_names: Array,
+	create_local_item: Callable,
+	sync_update_item: Callable,
+	to_push_data: Callable,
+) -> void:
+	var local_items = get_local_items.call()
+
+	for si in server_items:
+		if not si is Dictionary:
+			continue
+		var server_id = si.get("id", 0)
+
+		# 检查是否已有映射
+		if _id_mapping.has_server_id(resource_name, server_id):
+			var local_key = _id_mapping.get_local_key(resource_name, server_id)
+			var local_item = _find_local_item_by_id(local_items, get_item_id, int(local_key))
+			if local_item != null:
+				var server_updated = si.get("updated_at", 0)
+				var local_updated = _to_ms(get_item_updated_at.call(local_item))
+				if server_updated > local_updated:
+					var fields = _extract_sync_fields(si, sync_field_names)
+					sync_update_item.call(get_item_id.call(local_item), fields)
+			continue
+
+		# 尝试匹配本地未映射项
+		var matched = false
+		for li in local_items:
+			if get_item_server_id.call(li) > 0:
+				continue
+			if _id_mapping.get_server_id(resource_name, str(get_item_id.call(li))) > 0:
+				continue
+			if get_item_title.call(li) == si.get("title", "") and abs(_to_ms(get_item_created_at.call(li)) - si.get("created_at", 0)) < 60000:
+				_id_mapping.set_mapping(resource_name, str(get_item_id.call(li)), server_id)
+				set_item_server_id.call(li, server_id)
+				var server_updated = si.get("updated_at", 0)
+				var local_updated = _to_ms(get_item_updated_at.call(li))
+				if server_updated > local_updated:
+					var fields = _extract_sync_fields(si, sync_field_names)
+					sync_update_item.call(get_item_id.call(li), fields)
+				matched = true
+				break
+
+		if not matched:
+			var local_id = create_local_item.call(si, server_id)
+			_id_mapping.set_mapping(resource_name, str(local_id), server_id)
+
+	# 本地有服务器无 → 作为 create 加入 push 队列
+	for li in local_items:
+		if get_item_server_id.call(li) == 0 and _id_mapping.get_server_id(resource_name, str(get_item_id.call(li))) == 0:
+			var push_data = to_push_data.call(li)
+			_change_queue.append(SyncChange.new(resource_name, "create", get_item_id.call(li), str(get_item_id.call(li)), push_data))
+
+
+## 从服务器数据中提取同步字段
+func _extract_sync_fields(server_data: Dictionary, field_names: Array) -> Dictionary:
+	var fields = {}
+	for field_name in field_names:
+		if server_data.has(field_name):
+			var value = server_data[field_name]
+			if field_name == "updated_at" and value is float:
+				value = int(value)
+			if field_name == "updated_at":
+				fields[field_name] = _to_sec(int(value))
+			else:
+				fields[field_name] = value
+	return fields
+
+
+## 在本地列表中查找指定 id 的项
+func _find_local_item_by_id(local_items: Array, get_id: Callable, target_id: int):
+	for item in local_items:
+		if get_id.call(item) == target_id:
+			return item
+	return null
 
 
 ## 全量同步 - 合并 categories
@@ -839,7 +971,7 @@ func _on_debounce_timeout() -> void:
 		await _do_push()
 
 
-## 执行一次完整的同步周期（push + pull）
+## 执行一次完整的同步周期（push + pull + bundle push）
 func _do_sync_cycle() -> void:
 	if _is_syncing:
 		return
@@ -848,6 +980,10 @@ func _do_sync_cycle() -> void:
 
 	_is_syncing = true
 	sync_started.emit()
+
+	# 推送脏 bundles
+	if _has_dirty_bundles():
+		_push_dirty_bundles()
 
 	var push_ok = await _do_push()
 	var pull_ok = await _do_pull()
@@ -904,6 +1040,8 @@ func _reset_sync_state() -> void:
 	_is_registered = false
 	_consecutive_failures = 0
 	_id_mapping.clear_all()
+	for bt in _bundle_dirty:
+		_bundle_dirty[bt] = false
 	_save_sync_data()
 	_save_change_queue()
 	_id_mapping.save_to_file()

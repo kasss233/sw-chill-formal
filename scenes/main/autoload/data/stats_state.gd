@@ -91,7 +91,7 @@ func get_day_total(record_type: String, date_key: String, value_key: String) -> 
 
 func get_week_daily_totals(record_type: String, monday_date: String, value_key: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var monday_unix = _date_str_to_unix(monday_date)
+	var monday_unix = DateUtil.date_str_to_unix(monday_date)
 	for i in range(7):
 		var day_unix = monday_unix + i * 86400
 		var day_dict = Time.get_datetime_dict_from_unix_time(day_unix)
@@ -103,7 +103,7 @@ func get_week_daily_totals(record_type: String, monday_date: String, value_key: 
 
 func get_month_daily_totals(record_type: String, year: int, month: int, value_key: String) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var days_in_month = _get_days_in_month(year, month)
+	var days_in_month = DateUtil.get_days_in_month(year, month)
 	for day in range(1, days_in_month + 1):
 		var dk = "%04d-%02d-%02d" % [year, month, day]
 		var total = get_day_total(record_type, dk, value_key)
@@ -115,7 +115,7 @@ func get_year_monthly_totals(record_type: String, year: int, value_key: String) 
 	var result: Array[Dictionary] = []
 	for month in range(1, 13):
 		var total: float = 0.0
-		var days_in_month = _get_days_in_month(year, month)
+		var days_in_month = DateUtil.get_days_in_month(year, month)
 		for day in range(1, days_in_month + 1):
 			var dk = "%04d-%02d-%02d" % [year, month, day]
 			total += get_day_total(record_type, dk, value_key)
@@ -126,7 +126,7 @@ func get_year_monthly_totals(record_type: String, year: int, value_key: String) 
 # ======================== Focus 便捷方法 ========================
 
 func get_today_focus_seconds() -> int:
-	var today = _get_today_date_key()
+	var today = DateUtil.get_today_key()
 	return int(get_day_total("focus", today, "duration_seconds"))
 
 
@@ -169,7 +169,7 @@ func _record_focus_session(completed: bool) -> void:
 		print("[StatsState] 专注时间不足60秒，不记录")
 		_focus_start_time = 0
 		return
-	var date_key = _get_today_date_key()
+	var date_key = DateUtil.get_today_key()
 	var record_data = {
 		"start_timestamp": _focus_start_time,
 		"duration_seconds": duration,
@@ -179,38 +179,6 @@ func _record_focus_session(completed: bool) -> void:
 	add_record("focus", date_key, record_data)
 	print("[StatsState] 记录专注: %d秒, 完成: %s" % [duration, str(completed)])
 	_focus_start_time = 0
-
-
-# ======================== 日期工具 ========================
-
-func _get_today_date_key() -> String:
-	var now = Time.get_datetime_dict_from_system()
-	return "%04d-%02d-%02d" % [now["year"], now["month"], now["day"]]
-
-
-func _date_str_to_unix(date_str: String) -> int:
-	var parts = date_str.split("-")
-	if parts.size() < 3:
-		return 0
-	var dt = {
-		"year": int(parts[0]),
-		"month": int(parts[1]),
-		"day": int(parts[2]),
-		"hour": 12,
-		"minute": 0,
-		"second": 0,
-	}
-	return int(Time.get_unix_time_from_datetime_dict(dt))
-
-
-func _get_days_in_month(year: int, month: int) -> int:
-	if month == 2:
-		if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
-			return 29
-		return 28
-	if month in [4, 6, 9, 11]:
-		return 30
-	return 31
 
 
 # ======================== 持久化 ========================
@@ -258,3 +226,39 @@ func _load_data() -> void:
 	for d in records_array:
 		_records.append(StatsRecord.from_dict(d))
 	print("[StatsState] 已加载 %d 条记录" % _records.size())
+
+
+# ======================== 同步 API ========================
+
+func export_data() -> Dictionary:
+	var records_array: Array = []
+	for r in _records:
+		records_array.append(r.to_dict())
+	return {
+		"version": 1,
+		"next_id": _next_id,
+		"records": records_array,
+	}
+
+
+func import_sync_data(data: Dictionary) -> void:
+	# 统计记录只追加，合并策略：取并集（用三元组去重）
+	var server_records = data.get("records", [])
+	var local_keys: Dictionary = {}
+	for r in _records:
+		var key = "%s_%s_%d" % [r.record_type, r.date_key, r.created_at]
+		local_keys[key] = true
+	var added: int = 0
+	for sr in server_records:
+		if not sr is Dictionary:
+			continue
+		var key = "%s_%s_%d" % [sr.get("record_type", ""), sr.get("date_key", ""), int(sr.get("created_at", 0))]
+		if not local_keys.has(key):
+			var record = StatsRecord.from_dict(sr)
+			record.id = _next_id
+			_next_id += 1
+			_records.append(record)
+			added += 1
+	if added > 0:
+		_save_data()
+		print("[StatsState] 同步导入 %d 条新记录" % added)

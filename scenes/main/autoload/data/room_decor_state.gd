@@ -457,3 +457,26 @@ func _emit_unselected_categories(prev_selected_map: Dictionary) -> void:
 		if _get_selected_id(normalized) > 0:
 			continue
 		room_decor_category_unselected.emit(normalized)
+
+
+# ===== 同步 API =====
+func export_data() -> Dictionary:
+	var items_data: Array = []
+	for item in _items:
+		items_data.append(item.to_dict())
+	return {
+		"version": 1,
+		"next_id": _next_id,
+		"selected_item_ids_by_category": _selected_item_ids_by_category.duplicate(),
+		"items": items_data
+	}
+
+
+func import_sync_data(data: Dictionary) -> void:
+	if not data.has("selected_item_ids_by_category"):
+		return
+	var remote_selected = data.get("selected_item_ids_by_category", {})
+	# 合并策略：以服务器端选中状态为准（装饰变更不频繁）
+	_selected_item_ids_by_category = remote_selected.duplicate()
+	_save_data()
+	_emit_startup_sync_signals()

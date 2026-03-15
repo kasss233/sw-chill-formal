@@ -136,3 +136,20 @@ func _connect_signals() -> void:
 
 func _on_daily_task_reward_claimed(_data: Dictionary) -> void:
 	add_xp(50, "完成每日任务奖励", true)
+
+
+# ===== 同步 API =====
+func export_data() -> Dictionary:
+	return {"version": 1, "level": level, "xp": xp}
+
+
+func import_sync_data(data: Dictionary) -> void:
+	var remote_level = int(data.get("level", 1))
+	var remote_xp = int(data.get("xp", 0))
+	# 取等级高者；同级取经验多者
+	if remote_level > level or (remote_level == level and remote_xp > xp):
+		level = remote_level
+		xp = remote_xp
+		save_data()
+		_clear_pending_gain_context()
+		_emit_state_changed()

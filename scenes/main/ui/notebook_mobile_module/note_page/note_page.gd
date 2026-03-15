@@ -11,16 +11,16 @@ signal content_changed(text: String)
 var _note_id: int = -1
 var _tween: Tween = null
 
-@onready var _title_edit: LineEdit = $VBoxContainer/TitleEdit
-@onready var _info_label: Label = $VBoxContainer/Label
-@onready var _text_edit: TextEdit = $VBoxContainer/TextEdit
+@onready var _title_edit: LineEdit = $MarginContainer/VBoxContainer/TitleEdit
+@onready var _info_label: Label = $MarginContainer/VBoxContainer/Label
+@onready var _text_edit: TextEdit = $MarginContainer/VBoxContainer/TextEdit
 
 
 func _ready() -> void:
 	# 确保填满父容器
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	$VBoxContainer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	$MarginContainer/VBoxContainer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_text_edit.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
 	_title_edit.text_changed.connect(_on_title_changed)

@@ -9,6 +9,8 @@ const DEVICE_ID_PATH: String = "user://device_id.txt"
 var _event_queue: Array[Dictionary] = []
 var _device_id: String = ""
 var _flush_timer: Timer = null
+# 暂停计数（focus_end 事件需附带）
+var _pause_count: int = 0
 
 
 func _ready() -> void:
@@ -50,13 +52,15 @@ func track_ai_suggestion_rejected(name: String) -> void:
 ## ===== 信号连接 =====
 
 func _connect_signals() -> void:
-	# 番茄钟信号
+	# 番茄钟信号 - focus_start 和 focus_interrupt（实时行为事件）
 	PomodoroState.pomodoro_started.connect(_on_pomodoro_started)
-	PomodoroState.work_phase_stopped.connect(_on_work_phase_stopped)
-	PomodoroState.rest_phase_stopped.connect(_on_rest_phase_stopped)
 	PomodoroState.work_phase_paused.connect(_on_work_phase_paused)
 	PomodoroState.rest_phase_paused.connect(_on_rest_phase_paused)
-	PomodoroState.all_completed.connect(_on_all_completed)
+	# 休息阶段停止（StatsState 不追踪休息阶段）
+	PomodoroState.rest_phase_stopped.connect(_on_rest_phase_stopped)
+
+	# focus_end 改为监听 StatsState 的 record_added，复用其 duration 计算
+	StatsState.record_added.connect(_on_stats_record_added)
 
 	# 任务信号
 	TaskState.task_state_changed.connect(_on_task_state_changed)
@@ -76,10 +80,7 @@ func _connect_signals() -> void:
 ## ===== 番茄钟事件处理 =====
 
 func _on_pomodoro_started(data: Dictionary) -> void:
-	# 记录启动时间戳到 PomodoroState 的 meta
-	PomodoroState.set_meta("et_start_time", Time.get_unix_time_from_system())
-	PomodoroState.set_meta("et_pause_count", 0)
-
+	_pause_count = 0
 	_enqueue("focus_start", {
 		"work_duration": data.get("work_duration", 0),
 		"rest_duration": data.get("rest_duration", 0),
@@ -87,52 +88,40 @@ func _on_pomodoro_started(data: Dictionary) -> void:
 	})
 
 
-func _on_work_phase_stopped() -> void:
-	_emit_focus_end(false)
-
-
-func _on_rest_phase_stopped() -> void:
-	_emit_focus_end(false)
-
-
 func _on_work_phase_paused() -> void:
-	var count: int = PomodoroState.get_meta("et_pause_count", 0)
-	PomodoroState.set_meta("et_pause_count", count + 1)
+	_pause_count += 1
 	_enqueue("focus_interrupt", {
 		"phase": "work"
 	})
 
 
 func _on_rest_phase_paused() -> void:
-	var count: int = PomodoroState.get_meta("et_pause_count", 0)
-	PomodoroState.set_meta("et_pause_count", count + 1)
+	_pause_count += 1
 	_enqueue("focus_interrupt", {
 		"phase": "rest"
 	})
 
 
-func _on_all_completed() -> void:
-	_emit_focus_end(true)
-
-
-func _emit_focus_end(completed: bool) -> void:
-	var start_time: float = PomodoroState.get_meta("et_start_time", 0.0)
-	var pause_count: int = PomodoroState.get_meta("et_pause_count", 0)
-	var duration: float = 0.0
-	if start_time > 0:
-		duration = Time.get_unix_time_from_system() - start_time
-
+func _on_rest_phase_stopped() -> void:
+	# 休息阶段停止不经过 StatsState，直接生成 focus_end
 	_enqueue("focus_end", {
-		"completed": completed,
-		"duration_seconds": int(duration),
-		"pause_count": pause_count
+		"completed": false,
+		"duration_seconds": 0,
+		"pause_count": _pause_count
 	})
+	_pause_count = 0
 
-	# 清理 meta
-	if PomodoroState.has_meta("et_start_time"):
-		PomodoroState.remove_meta("et_start_time")
-	if PomodoroState.has_meta("et_pause_count"):
-		PomodoroState.remove_meta("et_pause_count")
+
+## 监听 StatsState 的 record_added，复用 duration 计算生成 focus_end 事件
+func _on_stats_record_added(record: StatsRecord) -> void:
+	if record.record_type != "focus":
+		return
+	_enqueue("focus_end", {
+		"completed": record.data.get("completed", false),
+		"duration_seconds": int(record.data.get("duration_seconds", 0)),
+		"pause_count": _pause_count
+	})
+	_pause_count = 0
 
 
 ## ===== 任务事件处理 =====

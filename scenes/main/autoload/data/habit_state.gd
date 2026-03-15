@@ -96,25 +96,7 @@ func get_day_schedule(week_key: String, day: int) -> Array:
 
 
 func get_current_week_key() -> String:
-	var now = Time.get_datetime_dict_from_system()
-	# 计算 ISO 周数
-	var date_str = "%04d-%02d-%02d" % [now["year"], now["month"], now["day"]]
-	var unix = Time.get_unix_time_from_datetime_string(date_str + "T12:00:00")
-	var dict = Time.get_datetime_dict_from_unix_time(unix)
-	# weekday: 0=Sunday, 1=Monday ... 6=Saturday
-	var weekday = dict["weekday"]
-	# 转为 ISO: Monday=1 ... Sunday=7
-	var iso_weekday = weekday if weekday != 0 else 7
-	# ISO 周算法：找到本周四所在年的第几天
-	var thursday_unix = unix + (4 - iso_weekday) * 86400
-	var thursday_dict = Time.get_datetime_dict_from_unix_time(thursday_unix)
-	var year = thursday_dict["year"]
-	# 计算周四是今年第几天
-	var jan1_str = "%04d-01-01T12:00:00" % year
-	var jan1_unix = Time.get_unix_time_from_datetime_string(jan1_str)
-	var day_of_year = int((thursday_unix - jan1_unix) / 86400) + 1
-	var week_num = int((day_of_year - 1) / 7) + 1
-	return "%04d-W%02d" % [year, week_num]
+	return DateUtil.get_current_week_key()
 
 
 func check_conflict(week_key: String, day: int, time_slot_id: int, exclude_id: int = -1) -> bool:
@@ -205,6 +187,18 @@ func get_week_stats(week_key: String) -> Dictionary:
 		"pending": pending,
 		"completion_rate": get_week_completion_rate(week_key),
 	}
+
+
+## 获取某天的习惯完成统计 {"total": int, "completed": int}
+func get_day_completion(week_key: String, day: int) -> Dictionary:
+	var day_entries := get_day_schedule(week_key, day)
+	var date_key := DateUtil.week_key_to_date(week_key, day)
+	var records := get_records_by_date(date_key)
+	var completed: int = 0
+	for r in records:
+		if r.status == HabitData.ExecutionRecord.Status.COMPLETED:
+			completed += 1
+	return {"total": day_entries.size(), "completed": completed}
 
 
 # ======================== 修改 API - 习惯库 ========================
@@ -406,8 +400,8 @@ func set_execution_status(entry_id: int, date_key: String, status: int) -> Habit
 
 func ensure_daily_records(date_key: String) -> void:
 	# 获取当前周 key
-	var week_key = _date_key_to_week_key(date_key)
-	var day = _date_key_to_day_of_week(date_key)
+	var week_key = DateUtil.date_to_week_key(date_key)
+	var day = DateUtil.get_day_of_week(date_key)
 	var day_entries = get_day_schedule(week_key, day)
 
 	for entry in day_entries:
@@ -631,31 +625,6 @@ func _remove_records_by_entry(entry_id: int) -> void:
 		i -= 1
 
 
-func _date_key_to_week_key(date_key: String) -> String:
-	var unix = Time.get_unix_time_from_datetime_string(date_key + "T12:00:00")
-	var dict = Time.get_datetime_dict_from_unix_time(unix)
-	var weekday = dict["weekday"]
-	var iso_weekday = weekday if weekday != 0 else 7
-	var thursday_unix = unix + (4 - iso_weekday) * 86400
-	var thursday_dict = Time.get_datetime_dict_from_unix_time(thursday_unix)
-	var year = thursday_dict["year"]
-	var jan1_str = "%04d-01-01T12:00:00" % year
-	var jan1_unix = Time.get_unix_time_from_datetime_string(jan1_str)
-	var day_of_year = int((thursday_unix - jan1_unix) / 86400) + 1
-	var week_num = int((day_of_year - 1) / 7) + 1
-	return "%04d-W%02d" % [year, week_num]
-
-
-func _date_key_to_day_of_week(date_key: String) -> int:
-	var unix = Time.get_unix_time_from_datetime_string(date_key + "T12:00:00")
-	var dict = Time.get_datetime_dict_from_unix_time(unix)
-	var weekday = dict["weekday"]  # 0=Sunday
-	# 转为 0=Monday ... 6=Sunday
-	if weekday == 0:
-		return 6
-	return weekday - 1
-
-
 ## 导出数据
 func export_data() -> Dictionary:
 	var data = {
@@ -704,3 +673,35 @@ func import_data(data: Dictionary) -> void:
 	_save_data()
 	print("[HabitState] Imported data")
 	data_loaded.emit()
+
+
+## 同步导入数据（比较 updated_at 决定是否覆盖）
+func import_sync_data(data: Dictionary) -> void:
+	if not data.has("habits"):
+		return
+	# 比较 bundle 级 updated_at（取 habits 中最大值）
+	var remote_max_updated: int = _get_max_updated_at_from_data(data)
+	var local_max_updated: int = get_max_updated_at()
+	if remote_max_updated > local_max_updated:
+		import_data(data)
+		print("[HabitState] 同步覆盖本地数据 (remote=%d > local=%d)" % [remote_max_updated, local_max_updated])
+
+
+## 获取本地数据最大 updated_at
+func get_max_updated_at() -> int:
+	var max_val: int = 0
+	for h in _habits:
+		if h.updated_at > max_val:
+			max_val = h.updated_at
+	return max_val
+
+
+## 从导出数据中提取最大 updated_at
+func _get_max_updated_at_from_data(data: Dictionary) -> int:
+	var max_val: int = 0
+	for h in data.get("habits", []):
+		if h is Dictionary:
+			var val = int(h.get("updated_at", 0))
+			if val > max_val:
+				max_val = val
+	return max_val

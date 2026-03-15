@@ -13,9 +13,7 @@ const SAVE_PATH = "user://id_mapping.json"
 
 
 func _init():
-	for res in ["task", "note", "category"]:
-		_maps[res] = {}
-		_reverse[res] = {}
+	pass
 
 
 ## 设置映射关系
@@ -90,9 +88,6 @@ func to_dict() -> Dictionary:
 func load_from_dict(d: Dictionary) -> void:
 	_maps.clear()
 	_reverse.clear()
-	for res in ["task", "note", "category"]:
-		_maps[res] = {}
-		_reverse[res] = {}
 	for resource in d:
 		if not _maps.has(resource):
 			_maps[resource] = {}

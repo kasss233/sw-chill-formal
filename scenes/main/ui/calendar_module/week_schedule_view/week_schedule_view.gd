@@ -59,7 +59,7 @@ func _refresh_grid() -> void:
 	var entries = HabitState.get_week_schedule(_current_week_key)
 
 	# 获取今天是周几 (0=周一)
-	var today_dow = _get_today_day_of_week()
+	var today_dow := DateUtil.get_today_day_of_week()
 
 	# 表头行：空 + 周一~周日
 	var corner = _create_header_cell("")
@@ -87,27 +87,28 @@ func _create_header_cell(text: String) -> Label:
 	var label = Label.new()
 	label.text = text
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	label.add_theme_font_size_override("font_size", 12)
-	label.custom_minimum_size = Vector2(40, 28)
+	label.add_theme_color_override("font_color", Color(0.93, 0.93, 0.93))
+	label.add_theme_font_size_override("font_size", 13)
+	label.custom_minimum_size = Vector2(40, 32)
 	return label
 
 
 func _create_slot_label(slot: HabitData.TimeSlotTemplate) -> VBoxContainer:
 	var vbox = VBoxContainer.new()
-	vbox.custom_minimum_size = Vector2(55, 40)
+	vbox.custom_minimum_size = Vector2(52, 46)
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 
 	var name_label = Label.new()
 	name_label.text = slot.name
-	name_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	name_label.add_theme_font_size_override("font_size", 10)
+	name_label.add_theme_color_override("font_color", Color(0.93, 0.93, 0.93))
+	name_label.add_theme_font_size_override("font_size", 11)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(name_label)
 
 	var time_label = Label.new()
 	time_label.text = slot.start_time
-	time_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
-	time_label.add_theme_font_size_override("font_size", 9)
+	time_label.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78))
+	time_label.add_theme_font_size_override("font_size", 10)
 	time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(time_label)
 
@@ -123,20 +124,20 @@ func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) ->
 			break
 
 	var cell = Panel.new()
-	cell.custom_minimum_size = Vector2(40, 40)
+	cell.custom_minimum_size = Vector2(40, 46)
 
 	var style = StyleBoxFlat.new()
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
 
 	if entry:
 		var habit = HabitState.get_habit_by_id(entry.habit_id)
 		if habit:
 			var color = Color.from_string(habit.color, Color(0.3, 0.5, 0.3))
-			style.bg_color = Color(color.r, color.g, color.b, 0.3)
-			style.border_color = Color(color.r, color.g, color.b, 0.6)
+			style.bg_color = Color(color.r, color.g, color.b, 0.35)
+			style.border_color = Color(color.r, color.g, color.b, 0.7)
 			style.border_width_bottom = 1
 			style.border_width_top = 1
 			style.border_width_left = 1
@@ -145,15 +146,15 @@ func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) ->
 			# 习惯名缩写
 			var label = Label.new()
 			label.text = habit.name.left(2)
-			label.add_theme_color_override("font_color", Color(0.9, 0.9, 0.9))
-			label.add_theme_font_size_override("font_size", 10)
+			label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+			label.add_theme_font_size_override("font_size", 12)
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			label.anchors_preset = Control.PRESET_FULL_RECT
 			cell.add_child(label)
 
 			# 检查执行状态
-			var date_key = _get_date_key_for_day(day)
+			var date_key := DateUtil.week_key_to_date(_current_week_key, day)
 			var records = HabitState.get_records_by_date(date_key)
 			for r in records:
 				if r.entry_id == entry.id:
@@ -166,12 +167,12 @@ func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) ->
 		# 点击已排期格子 → 弹出操作菜单
 		cell.gui_input.connect(_on_cell_input.bind(entry, day))
 	else:
-		style.bg_color = Color(0.15, 0.15, 0.15, 0.5)
+		style.bg_color = Color(0.2, 0.2, 0.2, 0.5)
 		# 点击空格子 → 选择习惯
 		cell.gui_input.connect(_on_empty_cell_input.bind(slot.id, day))
 
 	# 当日高亮
-	if day == _get_today_day_of_week() and _is_current_week():
+	if day == DateUtil.get_today_day_of_week() and _is_current_week():
 		style.border_color = Color(0.35, 0.65, 0.95, 0.5)
 		style.border_width_bottom = 1
 		style.border_width_top = 1
@@ -197,7 +198,7 @@ func _show_entry_actions(entry: HabitData.ScheduleEntry, day: int) -> void:
 	var menu = MaterialContextMenu.new()
 	add_child(menu)
 
-	var date_key = _get_date_key_for_day(day)
+	var date_key := DateUtil.week_key_to_date(_current_week_key, day)
 	menu.add_item("完成", preload("res://assets/ui/icons/check_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg"))
 	menu.add_item("跳过")
 	menu.add_item("延后")
@@ -238,17 +239,17 @@ func _show_habit_picker(slot_id: int, day: int) -> void:
 
 
 func _on_prev_week() -> void:
-	_current_week_key = _offset_week(_current_week_key, -1)
+	_current_week_key = DateUtil.offset_week(_current_week_key, -1)
 	_refresh_grid()
 
 
 func _on_next_week() -> void:
-	_current_week_key = _offset_week(_current_week_key, 1)
+	_current_week_key = DateUtil.offset_week(_current_week_key, 1)
 	_refresh_grid()
 
 
 func _on_copy_to_next_week() -> void:
-	var next_week = _offset_week(_current_week_key, 1)
+	var next_week := DateUtil.offset_week(_current_week_key, 1)
 	HabitState.copy_week_schedule(_current_week_key, next_week)
 
 
@@ -269,59 +270,6 @@ func _update_week_label() -> void:
 
 func _is_current_week() -> bool:
 	return _current_week_key == HabitState.get_current_week_key()
-
-
-func _get_today_day_of_week() -> int:
-	var dict = Time.get_datetime_dict_from_system()
-	var weekday = dict["weekday"]  # 0=Sunday
-	if weekday == 0:
-		return 6
-	return weekday - 1
-
-
-func _get_date_key_for_day(day_of_week: int) -> String:
-	# 从 week_key 计算指定 day_of_week 的日期
-	var parts = _current_week_key.split("-W")
-	if parts.size() != 2:
-		return ""
-	var year = int(parts[0])
-	var week = int(parts[1])
-
-	# 计算该年第一天是周几
-	var jan1_str = "%04d-01-01T12:00:00" % year
-	var jan1_unix = Time.get_unix_time_from_datetime_string(jan1_str)
-	var jan1_dict = Time.get_datetime_dict_from_unix_time(jan1_unix)
-	var jan1_weekday = jan1_dict["weekday"]  # 0=Sunday
-	var jan1_iso = jan1_weekday if jan1_weekday != 0 else 7  # 1=Monday
-
-	# 第1周的周一
-	var week1_monday_unix: int
-	if jan1_iso <= 4:
-		week1_monday_unix = jan1_unix - (jan1_iso - 1) * 86400
-	else:
-		week1_monday_unix = jan1_unix + (8 - jan1_iso) * 86400
-
-	# 目标日期
-	var target_unix = week1_monday_unix + ((week - 1) * 7 + day_of_week) * 86400
-	var target_dict = Time.get_datetime_dict_from_unix_time(target_unix)
-	return "%04d-%02d-%02d" % [target_dict["year"], target_dict["month"], target_dict["day"]]
-
-
-func _offset_week(week_key: String, offset: int) -> String:
-	var parts = week_key.split("-W")
-	if parts.size() != 2:
-		return week_key
-	var year = int(parts[0])
-	var week = int(parts[1]) + offset
-
-	if week < 1:
-		year -= 1
-		week = 52  # 简化处理
-	elif week > 52:
-		year += 1
-		week = 1
-
-	return "%04d-W%02d" % [year, week]
 
 
 func get_current_week_key() -> String:

@@ -19,6 +19,7 @@ extends UI
 @onready var _pomodoro_module = $MarginContainer/VBoxContainer/BottomBar/ModulePanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule
 @onready var _achievement_module = $AchievementModule
 @onready var _room_decor_module = $RoomDecorModule
+@onready var _calendar_tab = $CalendarTab
 @onready var _env_setter = $EnvSetter
 @onready var _music_module_mobile = $MusicModuleMobile
 
@@ -57,6 +58,7 @@ func _register_modules() -> void:
 	_register("pomodorotechnique", _pomodoro_module, _pomodoro_module.pomodoro_button)
 	_register("achievement", _achievement_module, _achievement_module.button)
 	_register("room_decor", _room_decor_module, _room_decor_module.button)
+	_register("calendar", _calendar_tab, _calendar_tab.toggle_button)
 	_register("setter", _env_setter, null)
 
 
@@ -200,6 +202,7 @@ func _on_portrait_response_started() -> void:
 
 func _setup_more_menu() -> void:
 	_more_menu.add_item("成就")
+	_more_menu.add_item("日历")
 	_more_menu.add_item("房间装饰")
 	_more_menu.add_item("环境设置")
 	_more_button.pressed.connect(_on_more_button_pressed)
@@ -213,8 +216,9 @@ func _on_more_button_pressed() -> void:
 func _on_more_menu_item_pressed(index: int, _item) -> void:
 	match index:
 		0: _open_module("achievement")
-		1: _open_module("room_decor")
-		2: _open_module("setter")
+		1: _open_module("calendar")
+		2: _open_module("room_decor")
+		3: _open_module("setter")
 
 
 func _open_module(layout_id: String) -> void:

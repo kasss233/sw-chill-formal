@@ -79,15 +79,9 @@ func _refresh_heatmap() -> void:
 
 	var day_names = ["一", "二", "三", "四", "五", "六", "日"]
 	for day in range(7):
-		var day_entries = HabitState.get_day_schedule(_current_week_key, day)
-		var date_key = _get_date_key_for_day(day)
-		var records = HabitState.get_records_by_date(date_key)
-
-		var total = day_entries.size()
-		var completed: int = 0
-		for r in records:
-			if r.status == HabitData.ExecutionRecord.Status.COMPLETED:
-				completed += 1
+		var stats := HabitState.get_day_completion(_current_week_key, day)
+		var total: int = stats["total"]
+		var completed: int = stats["completed"]
 
 		var day_vbox = VBoxContainer.new()
 		day_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -112,7 +106,7 @@ func _refresh_heatmap() -> void:
 
 		var day_label = Label.new()
 		day_label.text = day_names[day]
-		day_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+		day_label.add_theme_color_override("font_color", Color(0.88, 0.88, 0.88))
 		day_label.add_theme_font_size_override("font_size", 10)
 		day_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		day_vbox.add_child(day_label)
@@ -149,7 +143,7 @@ func _refresh_habit_stats() -> void:
 		# 创建卡片
 		var card = InnerPanel.new()
 		card.content_padding = 10.0
-		card.background_color = Color(1, 1, 1, 0.05)
+		card.background_color = Color(1, 1, 1, 0.08)
 
 		var hbox = HBoxContainer.new()
 		hbox.add_theme_constant_override("separation", 8)
@@ -164,7 +158,7 @@ func _refresh_habit_stats() -> void:
 		# 名称
 		var name_label = Label.new()
 		name_label.text = habit.name
-		name_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		name_label.add_theme_color_override("font_color", Color(1, 1, 1))
 		name_label.add_theme_font_size_override("font_size", 13)
 		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		hbox.add_child(name_label)
@@ -181,7 +175,7 @@ func _refresh_habit_stats() -> void:
 		# 完成数
 		var count_label = Label.new()
 		count_label.text = "%d/%d" % [completed, total]
-		count_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+		count_label.add_theme_color_override("font_color", Color(0.88, 0.88, 0.88))
 		count_label.add_theme_font_size_override("font_size", 12)
 		hbox.add_child(count_label)
 
@@ -206,14 +200,14 @@ func _refresh_reflection() -> void:
 
 
 func _on_prev_week() -> void:
-	_current_week_key = _offset_week(_current_week_key, -1)
+	_current_week_key = DateUtil.offset_week(_current_week_key, -1)
 	_refresh_stats()
 	if _focus_view == 0:
 		_refresh_focus_stats()
 
 
 func _on_next_week() -> void:
-	_current_week_key = _offset_week(_current_week_key, 1)
+	_current_week_key = DateUtil.offset_week(_current_week_key, 1)
 	_refresh_stats()
 	if _focus_view == 0:
 		_refresh_focus_stats()
@@ -225,42 +219,6 @@ func _update_week_label() -> void:
 		_week_label.text = "%s年 第%s周 统计" % [parts[0], parts[1]]
 	else:
 		_week_label.text = _current_week_key
-
-
-func _offset_week(week_key: String, offset: int) -> String:
-	var parts = week_key.split("-W")
-	if parts.size() != 2:
-		return week_key
-	var year = int(parts[0])
-	var week = int(parts[1]) + offset
-	if week < 1:
-		year -= 1
-		week = 52
-	elif week > 52:
-		year += 1
-		week = 1
-	return "%04d-W%02d" % [year, week]
-
-
-func _get_date_key_for_day(day_of_week: int) -> String:
-	var parts = _current_week_key.split("-W")
-	if parts.size() != 2:
-		return ""
-	var year = int(parts[0])
-	var week = int(parts[1])
-	var jan1_str = "%04d-01-01T12:00:00" % year
-	var jan1_unix = Time.get_unix_time_from_datetime_string(jan1_str)
-	var jan1_dict = Time.get_datetime_dict_from_unix_time(jan1_unix)
-	var jan1_weekday = jan1_dict["weekday"]
-	var jan1_iso = jan1_weekday if jan1_weekday != 0 else 7
-	var week1_monday_unix: int
-	if jan1_iso <= 4:
-		week1_monday_unix = jan1_unix - (jan1_iso - 1) * 86400
-	else:
-		week1_monday_unix = jan1_unix + (8 - jan1_iso) * 86400
-	var target_unix = week1_monday_unix + ((week - 1) * 7 + day_of_week) * 86400
-	var target_dict = Time.get_datetime_dict_from_unix_time(target_unix)
-	return "%04d-%02d-%02d" % [target_dict["year"], target_dict["month"], target_dict["day"]]
 
 
 # ======================== 专注统计面板 ========================
@@ -311,12 +269,12 @@ func _update_focus_nav_label() -> void:
 		0:  # 周 - FocusNavBar 已隐藏，仅更新周期标题
 			_period_title.text = "本周合计"
 		1:  # 月
-			var ref = _get_month_year_for_offset(_focus_offset)
+			var ref := DateUtil.get_month_for_offset(_focus_offset)
 			_focus_date_label.text = "%d年%d月" % [ref["year"], ref["month"]]
 			_period_title.text = "本月合计"
 		2:  # 年
-			var now = Time.get_datetime_dict_from_system()
-			var year = int(now["year"]) + _focus_offset
+			var now := Time.get_datetime_dict_from_system()
+			var year: int = int(now["year"]) + _focus_offset
 			_focus_date_label.text = "%d年" % year
 			_period_title.text = "全年合计"
 
@@ -326,30 +284,30 @@ func _update_focus_cards() -> void:
 		return
 
 	# 今日卡片
-	var today_seconds = StatsState.get_today_focus_seconds()
-	_today_value.text = _format_duration(today_seconds)
+	var today_seconds := StatsState.get_today_focus_seconds()
+	_today_value.text = DateUtil.format_duration(today_seconds)
 
 	# 周期卡片
 	var period_seconds: int = 0
 	match _focus_view:
 		0:  # 周 - 复用顶部 NavBar 的周
-			var monday = _get_date_key_for_day(0)
-			var totals = StatsState.get_week_daily_totals("focus", monday, "duration_seconds")
+			var monday := DateUtil.get_monday_for_week(_current_week_key)
+			var totals := StatsState.get_week_daily_totals("focus", monday, "duration_seconds")
 			for item in totals:
 				period_seconds += int(item["value"])
 		1:  # 月
-			var ref = _get_month_year_for_offset(_focus_offset)
-			var totals = StatsState.get_month_daily_totals("focus", ref["year"], ref["month"], "duration_seconds")
+			var ref := DateUtil.get_month_for_offset(_focus_offset)
+			var totals := StatsState.get_month_daily_totals("focus", ref["year"], ref["month"], "duration_seconds")
 			for item in totals:
 				period_seconds += int(item["value"])
 		2:  # 年
-			var now = Time.get_datetime_dict_from_system()
-			var year = int(now["year"]) + _focus_offset
-			var totals = StatsState.get_year_monthly_totals("focus", year, "duration_seconds")
+			var now := Time.get_datetime_dict_from_system()
+			var year: int = int(now["year"]) + _focus_offset
+			var totals := StatsState.get_year_monthly_totals("focus", year, "duration_seconds")
 			for item in totals:
 				period_seconds += int(item["value"])
 
-	_period_value.text = _format_duration(period_seconds)
+	_period_value.text = DateUtil.format_duration(period_seconds)
 
 
 func _update_focus_chart() -> void:
@@ -361,8 +319,8 @@ func _update_focus_chart() -> void:
 
 	match _focus_view:
 		0:  # 周 - 复用顶部 NavBar 的周
-			var monday = _get_date_key_for_day(0)
-			var totals = StatsState.get_week_focus_totals(monday)
+			var monday := DateUtil.get_monday_for_week(_current_week_key)
+			var totals := StatsState.get_week_focus_totals(monday)
 			for i in range(totals.size()):
 				var label = day_labels[i] if i < day_labels.size() else str(i)
 				chart_data.append({"label": label, "value": totals[i]["value"]})
@@ -378,8 +336,8 @@ func _update_focus_chart() -> void:
 			_focus_chart.set_average_line(avg)
 
 		1:  # 月
-			var ref = _get_month_year_for_offset(_focus_offset)
-			var totals = StatsState.get_month_daily_totals("focus", ref["year"], ref["month"], "duration_seconds")
+			var ref := DateUtil.get_month_for_offset(_focus_offset)
+			var totals := StatsState.get_month_daily_totals("focus", ref["year"], ref["month"], "duration_seconds")
 			for i in range(totals.size()):
 				var hours = float(totals[i]["value"]) / 3600.0
 				chart_data.append({"label": str(i + 1), "value": hours})
@@ -391,9 +349,9 @@ func _update_focus_chart() -> void:
 			_focus_chart.set_average_line(avg)
 
 		2:  # 年
-			var now = Time.get_datetime_dict_from_system()
-			var year = int(now["year"]) + _focus_offset
-			var totals = StatsState.get_year_monthly_totals("focus", year, "duration_seconds")
+			var now := Time.get_datetime_dict_from_system()
+			var year: int = int(now["year"]) + _focus_offset
+			var totals := StatsState.get_year_monthly_totals("focus", year, "duration_seconds")
 			var month_labels = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"]
 			for i in range(totals.size()):
 				var hours = float(totals[i]["value"]) / 3600.0
@@ -406,62 +364,3 @@ func _update_focus_chart() -> void:
 			_focus_chart.set_average_line(avg)
 
 	_focus_chart.set_chart_data(chart_data)
-
-
-# ======================== 专注统计日期工具 ========================
-
-func _get_monday_for_offset(offset: int) -> String:
-	var now = Time.get_datetime_dict_from_system()
-	var dt = {
-		"year": int(now["year"]),
-		"month": int(now["month"]),
-		"day": int(now["day"]),
-		"hour": 12,
-		"minute": 0,
-		"second": 0,
-	}
-	var unix = int(Time.get_unix_time_from_datetime_dict(dt))
-	var weekday = int(Time.get_datetime_dict_from_unix_time(unix)["weekday"])
-	# weekday: 0=Sunday, 1=Monday...6=Saturday
-	var days_since_monday = (weekday + 6) % 7
-	var monday_unix = unix - days_since_monday * 86400 + offset * 7 * 86400
-	var monday_dict = Time.get_datetime_dict_from_unix_time(monday_unix)
-	return "%04d-%02d-%02d" % [monday_dict["year"], monday_dict["month"], monday_dict["day"]]
-
-
-func _offset_date_str(date_str: String, days: int) -> String:
-	var parts = date_str.split("-")
-	if parts.size() < 3:
-		return date_str
-	var dt = {
-		"year": int(parts[0]),
-		"month": int(parts[1]),
-		"day": int(parts[2]),
-		"hour": 12,
-		"minute": 0,
-		"second": 0,
-	}
-	var unix = int(Time.get_unix_time_from_datetime_dict(dt)) + days * 86400
-	var result = Time.get_datetime_dict_from_unix_time(unix)
-	return "%04d-%02d-%02d" % [result["year"], result["month"], result["day"]]
-
-
-func _get_month_year_for_offset(offset: int) -> Dictionary:
-	var now = Time.get_datetime_dict_from_system()
-	var year = int(now["year"])
-	var month = int(now["month"]) + offset
-	while month < 1:
-		year -= 1
-		month += 12
-	while month > 12:
-		year += 1
-		month -= 12
-	return {"year": year, "month": month}
-
-
-func _format_duration(seconds: int) -> String:
-	var hours = seconds / 3600
-	var minutes = (seconds % 3600) / 60
-	if hours > 0:
-		return "%dh %dm" % [hours, minutes]
-	return "%dm" % minutes

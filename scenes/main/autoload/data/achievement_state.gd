@@ -19,7 +19,6 @@ signal data_loaded
 
 # 存档路径：遵循 user:// 持久化约定
 const SAVE_PATH := "user://achievement_data.json"
-const DAILY_TIMEZONE_OFFSET_SEC := 8 * 3600
 
 const AUTO_DAILY_TASK_DEFS := [
 	{
@@ -127,7 +126,7 @@ func add_daily_task_by_config(config: Dictionary) -> Dictionary:
 	var target: int = max(1, int(config.get("target", 1)))
 	var current: int = int(config.get("current", 0))
 	var auto_key := str(config.get("auto_key", ""))
-	var today_key := _get_today_key()
+	var today_key := DateUtil.get_today_key()
 
 	if not auto_key.is_empty():
 		var existing := _get_daily_task_ref_by_auto_key(auto_key)
@@ -232,7 +231,7 @@ func set_daily_task_completed(item_id: int, completed: bool = true) -> bool:
 	if item.is_empty():
 		return false
 	if _is_new_day_for_item(item):
-		_reset_daily_task_item(item, _get_today_key())
+		_reset_daily_task_item(item, DateUtil.get_today_key())
 
 	var old_completed := bool(item.get("completed", false))
 	var old_current := int(item.get("current", 0))
@@ -251,7 +250,7 @@ func set_daily_task_completed(item_id: int, completed: bool = true) -> bool:
 	item["completed"] = completed
 	item["current"] = new_current
 	item["reward_claimed"] = new_reward_claimed
-	item["daily_date_key"] = _get_today_key()
+	item["daily_date_key"] = DateUtil.get_today_key()
 	_save_data()
 	if completed and not old_completed:
 		_emit_completed("daily_task", item)
@@ -411,6 +410,11 @@ func import_data(data: Dictionary) -> void:
 	data_loaded.emit()
 	_refresh_daily_tasks()
 
+
+## 同步导入数据（直接导入后刷新每日任务）
+func import_sync_data(data: Dictionary) -> void:
+	import_data(data)
+
 ## 写入本地文件
 func _save_data() -> void:
 	var data := {
@@ -497,7 +501,7 @@ func _on_pomodoro_work_phase_completed() -> void:
 
 
 func _refresh_daily_tasks() -> void:
-	var today_key := _get_today_key()
+	var today_key := DateUtil.get_today_key()
 
 	if _last_daily_refresh_key != today_key:
 		_reset_all_daily_tasks_for_new_day(today_key)
@@ -521,7 +525,7 @@ func _ensure_builtin_achievements() -> void:
 
 
 func _sync_todo_completed_daily_task() -> void:
-	var today_key := _get_today_key()
+	var today_key := DateUtil.get_today_key()
 	var completed_today := 0
 	if TaskState and TaskState.has_method("get_completed_tasks"):
 		var completed_tasks = TaskState.get_completed_tasks()
@@ -531,7 +535,7 @@ func _sync_todo_completed_daily_task() -> void:
 			var finish_timestamp := int(task.finish_timestamp)
 			if finish_timestamp <= 0:
 				continue
-			if _get_day_key_from_unix(finish_timestamp) == today_key:
+			if DateUtil.get_day_key_from_unix(finish_timestamp) == today_key:
 				completed_today += 1
 
 	var task := _get_daily_task_ref_by_auto_key("todo_complete_5")
@@ -597,7 +601,7 @@ func _reset_all_daily_tasks_for_new_day(today_key: String) -> void:
 
 
 func _is_new_day_for_item(item: Dictionary) -> bool:
-	return str(item.get("daily_date_key", "")) != _get_today_key()
+	return str(item.get("daily_date_key", "")) != DateUtil.get_today_key()
 
 
 func _reset_daily_task_item(item: Dictionary, today_key: String) -> void:
@@ -665,14 +669,10 @@ func _get_achievement_ref_by_auto_key(auto_key: String) -> Dictionary:
 	return {}
 
 
-func _get_today_key() -> String:
-	return _get_day_key_from_unix(int(Time.get_unix_time_from_system()))
-
-
 func _is_auto_daily_reward_claimed_today(auto_key: String) -> bool:
 	if auto_key.is_empty():
 		return false
-	var today_key := _get_today_key()
+	var today_key := DateUtil.get_today_key()
 	var day_records = _daily_claimed_records.get(today_key, {})
 	if not (day_records is Dictionary):
 		return false
@@ -682,18 +682,13 @@ func _is_auto_daily_reward_claimed_today(auto_key: String) -> bool:
 func _mark_auto_daily_reward_claimed_today(auto_key: String) -> void:
 	if auto_key.is_empty():
 		return
-	var today_key := _get_today_key()
+	var today_key := DateUtil.get_today_key()
 	var day_records = _daily_claimed_records.get(today_key, {})
 	if not (day_records is Dictionary):
 		day_records = {}
 	day_records[auto_key] = true
 	_daily_claimed_records[today_key] = day_records
 
-
-func _get_day_key_from_unix(unix_time: int) -> String:
-	var local_unix := unix_time + DAILY_TIMEZONE_OFFSET_SEC
-	var dt := Time.get_datetime_dict_from_unix_time(local_unix)
-	return "%04d-%02d-%02d" % [int(dt.get("year", 1970)), int(dt.get("month", 1)), int(dt.get("day", 1))]
 
 ## 标准化存档条目并进行安全兜底
 func _normalize_item(data: Dictionary) -> Dictionary:
@@ -783,7 +778,7 @@ func _set_progress(category: String, item_id: int, current: int, target: int) ->
 	if item.is_empty():
 		return false
 	if category == "daily_task" and _is_new_day_for_item(item):
-		_reset_daily_task_item(item, _get_today_key())
+		_reset_daily_task_item(item, DateUtil.get_today_key())
 
 	var old_target := int(item.get("target", 1))
 	var old_current := int(item.get("current", 0))
@@ -796,7 +791,7 @@ func _set_progress(category: String, item_id: int, current: int, target: int) ->
 	item["current"] = clampi(current, 0, safe_target)
 	item["completed"] = int(item.get("current", 0)) >= safe_target
 	if category == "daily_task":
-		item["daily_date_key"] = _get_today_key()
+		item["daily_date_key"] = DateUtil.get_today_key()
 		if not bool(item.get("completed", false)):
 			item["reward_claimed"] = false
 

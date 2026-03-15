@@ -124,8 +124,8 @@ corner_radius_bottom_left = 16
 shader = ExtResource("5_r3tkq")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/border_color = Color(1, 1, 1, 0.15)
+shader_parameter/background_color = Color(1, 1, 1, 0.08)
 shader_parameter/size = Vector2(324, 56)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d5786"]
@@ -144,8 +144,8 @@ corner_detail = 5
 shader = ExtResource("5_r3tkq")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/border_color = Color(1, 1, 1, 0.15)
+shader_parameter/background_color = Color(1, 1, 1, 0.08)
 shader_parameter/size = Vector2(324, 47)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hjul0"]
@@ -164,8 +164,8 @@ corner_detail = 5
 shader = ExtResource("5_r3tkq")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/border_color = Color(1, 1, 1, 0.15)
+shader_parameter/background_color = Color(1, 1, 1, 0.08)
 shader_parameter/size = Vector2(324, 107)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lp7b1"]
@@ -239,8 +239,8 @@ corner_radius_bottom_left = 6
 shader = ExtResource("5_r3tkq")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/border_color = Color(1, 1, 1, 0.15)
+shader_parameter/background_color = Color(1, 1, 1, 0.08)
 shader_parameter/size = Vector2(324, 393)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8e5aa"]
@@ -369,8 +369,8 @@ corner_radius_bottom_left = 16
 shader = ExtResource("5_r3tkq")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/border_color = Color(1, 1, 1, 0.15)
+shader_parameter/background_color = Color(1, 1, 1, 0.08)
 shader_parameter/size = Vector2(146, 59)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquij"]
@@ -389,8 +389,8 @@ corner_detail = 5
 shader = ExtResource("5_r3tkq")
 shader_parameter/corner_radius = 8.0
 shader_parameter/border_width = 1.0
-shader_parameter/border_color = Color(1, 1, 1, 0.1)
-shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/border_color = Color(1, 1, 1, 0.15)
+shader_parameter/background_color = Color(1, 1, 1, 0.08)
 shader_parameter/size = Vector2(146, 59)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y2br2"]
@@ -437,7 +437,7 @@ metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 [node name="WeekLabel" type="Label" parent="NavBar" unique_id=371208825]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
@@ -473,7 +473,7 @@ theme_override_constants/separation = 8
 
 [node name="OverallRateLabel" type="Label" parent="OverallPanel/OverallVBox" unique_id=306809888]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 15
 text = "本周完成率: 0%"
 
@@ -499,7 +499,7 @@ theme_override_constants/separation = 8
 
 [node name="HeatmapTitle" type="Label" parent="HeatmapPanel/HeatmapVBox" unique_id=1844609424]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_colors/font_color = Color(0.93, 0.93, 0.93, 1)
 theme_override_font_sizes/font_size = 12
 text = "每日打卡"
 
@@ -532,13 +532,13 @@ theme_override_constants/separation = 8
 
 [node name="ReflectionTitle" type="Label" parent="ReflectionPanel/ReflectionVBox" unique_id=1021311443]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_colors/font_color = Color(0.93, 0.93, 0.93, 1)
 theme_override_font_sizes/font_size = 12
 text = "反思总结"
 
 [node name="ReflectionLabel" type="Label" parent="ReflectionPanel/ReflectionVBox" unique_id=203171065]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
 theme_override_font_sizes/font_size = 13
 text = "暂无反思总结"
 autowrap_mode = 3
@@ -573,7 +573,7 @@ theme_override_constants/separation = 12
 
 [node name="FocusTitleLabel" type="Label" parent="FocusStatsPanel/FocusVBox" unique_id=2057915922]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 15
 text = "专注统计"
 
@@ -615,7 +615,7 @@ metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 [node name="FocusDateLabel" type="Label" parent="FocusStatsPanel/FocusVBox/FocusNavBar" unique_id=863539831]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 
@@ -656,13 +656,13 @@ theme_override_constants/separation = 4
 
 [node name="TodayTitle" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard/TodayVBox" unique_id=526139334]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
 theme_override_font_sizes/font_size = 11
 text = "今日专注"
 
 [node name="TodayValue" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/TodayCard/TodayVBox" unique_id=1024776236]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "0h 0m"
 
@@ -681,13 +681,13 @@ theme_override_constants/separation = 4
 
 [node name="PeriodTitle" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard/PeriodVBox" unique_id=1178020107]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.88, 1)
 theme_override_font_sizes/font_size = 11
 text = "本周合计"
 
 [node name="PeriodValue" type="Label" parent="FocusStatsPanel/FocusVBox/FocusCardsRow/PeriodCard/PeriodVBox" unique_id=1421831825]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "0h 0m"
 
