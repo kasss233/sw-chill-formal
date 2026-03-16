@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://b4n1h3076uwh4"]
+
+[ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="1_6qixm"]
+[ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="2_52j2p"]
+[ext_resource type="Script" uid="uid://dlsbsc0torxs0" path="res://scenes/main/ui/components/slider/MaterialSlider.gd" id="3_xh8tb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j6sl3"]
+shader = ExtResource("1_6qixm")
+shader_parameter/corner_radius = 8.0
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.1)
+shader_parameter/background_color = Color(1, 1, 1, 0.05)
+shader_parameter/size = Vector2(197, 158)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jxt05"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="SoundSettings" type="Control" unique_id=855718691]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InnerPanel" type="PanelContainer" parent="." unique_id=1057513231]
+material = SubResource("ShaderMaterial_j6sl3")
+layout_mode = 0
+offset_right = 197.0
+offset_bottom = 158.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jxt05")
+script = ExtResource("2_52j2p")
+metadata/_custom_type_script = "uid://dk1b2ej7qpklo"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="InnerPanel" unique_id=1107748095]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InnerPanel/VBoxContainer" unique_id=1202614157]
+layout_mode = 2
+text = "环境音设置"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="InnerPanel/VBoxContainer" unique_id=280700078]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InnerPanel/VBoxContainer/HBoxContainer" unique_id=2085378271]
+layout_mode = 2
+text = "雨声"
+
+[node name="MaterialSlider" type="Control" parent="InnerPanel/VBoxContainer/HBoxContainer" unique_id=1484038099]
+clip_contents = true
+custom_minimum_size = Vector2(100, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("3_xh8tb")
+metadata/_custom_type_script = "uid://dlsbsc0torxs0"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="InnerPanel/VBoxContainer" unique_id=368507428]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InnerPanel/VBoxContainer/HBoxContainer2" unique_id=2081469892]
+layout_mode = 2
+text = "雨声"
+
+[node name="MaterialSlider" type="Control" parent="InnerPanel/VBoxContainer/HBoxContainer2" unique_id=379295133]
+clip_contents = true
+custom_minimum_size = Vector2(100, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("3_xh8tb")
+metadata/_custom_type_script = "uid://dlsbsc0torxs0"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="InnerPanel/VBoxContainer" unique_id=112637118]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="InnerPanel/VBoxContainer/HBoxContainer3" unique_id=1118881467]
+layout_mode = 2
+text = "雨声"
+
+[node name="MaterialSlider" type="Control" parent="InnerPanel/VBoxContainer/HBoxContainer3" unique_id=1235191612]
+clip_contents = true
+custom_minimum_size = Vector2(100, 32)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+script = ExtResource("3_xh8tb")
+metadata/_custom_type_script = "uid://dlsbsc0torxs0"
