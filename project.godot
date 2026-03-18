@@ -54,6 +54,7 @@ StatsState="*res://scenes/main/autoload/data/stats_state.gd"
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
+window/vsync/vsync_mode=2
 
 [editor_plugins]
 
