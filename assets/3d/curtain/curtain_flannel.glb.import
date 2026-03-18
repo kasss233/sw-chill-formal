@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bn1k3uojrmuhd"
-path="res://.godot/imported/cushion.glb-11d44206a48a26a6791b678ec1c5fd3a.scn"
+uid="uid://c0hhbahwmh1d5"
+path="res://.godot/imported/curtain_flannel.glb-3e1a10b8dbae0c32ca50a8fd9045531d.scn"
 
 [deps]
 
-source_file="res://assets/3d/decor/cushion.glb"
-dest_files=["res://.godot/imported/cushion.glb-11d44206a48a26a6791b678ec1c5fd3a.scn"]
+source_file="res://assets/3d/curtain/curtain_flannel.glb"
+dest_files=["res://.godot/imported/curtain_flannel.glb-3e1a10b8dbae0c32ca50a8fd9045531d.scn"]
 
 [params]
 
@@ -33,14 +33,14 @@ animation/fps=30
 animation/trimming=false
 animation/remove_immutable_tracks=true
 animation/import_rest_as_RESET=false
-import_script/path="uid://lpdvpoj4wmti"
+import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"Sketchfab_Scene_Object_0": {
-"generate/lightmap_uv": 0,
+"Sketchfab_Scene_Plane001_02 - Default_0": {
+"generate/lightmap_uv": 1,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
