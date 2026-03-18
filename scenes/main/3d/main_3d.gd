@@ -11,7 +11,7 @@ extends Node3D
 @export var TIME_OF_DUSK: float = 17
 @export var TIME_OF_EVENING: float = 21
 @export var RAINY_LIGHT_ENERGY := 0.2
-@export var SUNNY_LIGHT_ENERGY := 0.7
+@export var SUNNY_LIGHT_ENERGY := 0.4
 @export var rain: Node3D
 @export var snow: Node3D
 @export var planet: Node3D
