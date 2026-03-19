@@ -1,19 +1,20 @@
 shader_type canvas_item;
 
 // --- 基础参数 ---
-uniform float corner_radius : hint_range(0.0, 100.0) = 25.0; // 调大圆角更现代
+uniform float corner_radius : hint_range(0.0, 100.0) = 25.0; 
 uniform bool show_border = true;
 uniform float border_width : hint_range(0.0, 10.0) = 1.0;
-uniform vec4 border_color : source_color = vec4(1.0, 1.0, 1.0, 0.15); // 建议用半透明白
+uniform vec4 border_color : source_color = vec4(1.0, 1.0, 1.0, 0.15); 
 
 // --- 毛玻璃核心参数 ---
-uniform float blur_amount : hint_range(0.0, 5.0) = 3.5;       // 模糊强度
-uniform float saturation : hint_range(0.0, 3.0) = 1.6;      // 关键：背景饱和度提升
-uniform float brightness : hint_range(0.0, 2.0) = 1.1;      // 关键：背景亮度提升
-uniform vec4 tint_color : source_color = vec4(1.0, 1.0, 1.0, 0.1); // 建议用极淡的白色
+uniform float blur_amount : hint_range(0.0, 5.0) = 3.5;       
+uniform float saturation : hint_range(0.0, 3.0) = 1.6;      
+uniform float brightness : hint_range(0.0, 2.0) = 1.1;      
+uniform vec4 tint_color : source_color = vec4(1.0, 1.0, 1.0, 0.1); 
 
 // --- 杂点与阴影 ---
-uniform float noise_amount : hint_range(0.0, 1.0) = 0.02;
+// 注意：如果你觉得画面有细微的沙子感，可以把这里的 noise_amount 调到 0
+uniform float noise_amount : hint_range(0.0, 1.0) = 0.02; 
 uniform sampler2D noise_texture : repeat_enable, filter_linear;
 
 uniform bool show_shadow = true;
@@ -38,6 +39,28 @@ float rounded_rect_sdf(vec2 pos, vec2 rect_size, float radius) {
     return length(max(d_rect, 0.0)) + min(max(d_rect.x, d_rect.y), 0.0) - radius;
 }
 
+// 【新增】平滑模糊函数，消除 textureLod 带来的马赛克方块感
+vec4 smooth_glass_blur(sampler2D tex, vec2 uv, float lod) {
+    vec2 tex_size = vec2(textureSize(tex, 0));
+    vec2 pixel_size = 1.0 / tex_size;
+    
+    // 偏移量随着 Lod 层级放大，确保采样点在模糊的 Mipmap 上散开
+    vec2 offset = pixel_size * pow(2.0, lod) * 0.5;
+
+    // 9 点采样高斯模糊近似
+    vec4 col = textureLod(tex, uv, lod) * 4.0;
+    col += textureLod(tex, uv + vec2(-offset.x, -offset.y), lod);
+    col += textureLod(tex, uv + vec2( offset.x, -offset.y), lod);
+    col += textureLod(tex, uv + vec2(-offset.x,  offset.y), lod);
+    col += textureLod(tex, uv + vec2( offset.x,  offset.y), lod);
+    col += textureLod(tex, uv + vec2(0.0, -offset.y), lod) * 2.0;
+    col += textureLod(tex, uv + vec2(0.0,  offset.y), lod) * 2.0;
+    col += textureLod(tex, uv + vec2(-offset.x, 0.0), lod) * 2.0;
+    col += textureLod(tex, uv + vec2( offset.x, 0.0), lod) * 2.0;
+
+    return col / 16.0;
+}
+
 void fragment() {
     vec2 panel_size = size - shadow_padding * 2.0;
     vec2 pixel_pos = UV * size;
@@ -49,22 +72,23 @@ void fragment() {
     float panel_alpha = 1.0 - smoothstep(-edge_width, edge_width, panel_dist);
     
     // 2. 采样背景并处理质感
-    // 使用 textureLod 采样，Mipmap 会辅助模糊
-    vec4 screen_color = textureLod(SCREEN_TEXTURE, SCREEN_UV, blur_amount);
+    // 【修改点】使用自建的平滑模糊函数替代原始的 textureLod 单次采样
+    vec4 screen_color = smooth_glass_blur(SCREEN_TEXTURE, SCREEN_UV, blur_amount);
     
-    // 【改进点】提升饱和度和亮度，这是第二张图“通透”的秘诀
+    // 提升饱和度和亮度
     screen_color.rgb = adjust_saturation(screen_color.rgb, saturation);
     screen_color.rgb *= brightness;
     
-    // 3. 混合杂点 (使用 Overlay 模式而非简单 Mix，让杂点更自然)
-    float noise = texture(noise_texture, panel_pos / 200.0).r;
-    screen_color.rgb += (noise - 0.5) * noise_amount;
+    // 3. 混合杂点
+    if (noise_amount > 0.0) {
+        float noise = texture(noise_texture, panel_pos / 200.0).r;
+        screen_color.rgb += (noise - 0.5) * noise_amount;
+    }
 
     // 4. 混合色调 (Tint)
-    // 对于第二种图，tint_color 应该是透明度很低的纯白
     vec3 final_panel_rgb = mix(screen_color.rgb, tint_color.rgb, tint_color.a);
 
-    // 5. 边框 (使用叠加模式会让边缘有亮部感)
+    // 5. 边框 
     if (show_border && border_width > 0.01) {
         float border_mask = smoothstep(border_width + edge_width, border_width - edge_width, abs(panel_dist + border_width * 0.5));
         final_panel_rgb = mix(final_panel_rgb, border_color.rgb, border_mask * border_color.a);
@@ -83,7 +107,6 @@ void fragment() {
     float final_alpha;
 
     if (show_shadow) {
-        // Alpha Over 合成：面板叠加在阴影之上
         final_alpha = panel_alpha + shadow_alpha * (1.0 - panel_alpha);
         if (final_alpha > 0.001) {
             final_color = (final_panel_rgb * panel_alpha + shadow_color.rgb * shadow_alpha * (1.0 - panel_alpha)) / final_alpha;
