@@ -311,7 +311,7 @@ func _on_agent_hide_module(module_name: String) -> void:
 
 # === AI 流光 ===
 
-const _MIN_GLOW_SEC: float = 0.8
+const _MIN_GLOW_SEC: float = 1.6
 # 底栏共享面板的模块 layout_id
 const _BOTTOM_BAR_LAYOUTS: Array = ["task", "notebookmobile", "pomodorotechnique"]
 

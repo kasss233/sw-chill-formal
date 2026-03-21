@@ -10,7 +10,7 @@ extends UI
 @onready var _dialogue_box = $VBoxContainer/DialogueBox
 @onready var _music_module = $MusicModule
 
-const _MIN_GLOW_SEC: float = 0.8
+const _MIN_GLOW_SEC: float = 1.6
 
 var _glow_start_times: Dictionary = {}
 
