@@ -23,6 +23,8 @@ var _next_id: int = 1
 
 const SAVE_PATH = "user://note_data.json"
 const PROTECTED_CATEGORIES: Array[String] = ["反思总结"]
+const SAVE_DEBOUNCE_SEC := 0.5
+var _save_timer: SceneTreeTimer
 
 
 func _ready() -> void:
@@ -82,7 +84,7 @@ func add_note(title: String = "", content: String = "", category: String = "") -
 	var note = NoteData.new(_next_id, title, content, cats)
 	_next_id += 1
 	_notes.insert(0, note)
-	_save_data()
+	_queue_save()
 	note_added.emit(note)
 	print("[NoteState] Added note(id: %d)" % note.id)
 	return note
@@ -92,7 +94,7 @@ func remove_note(id: int) -> bool:
 	for i in range(_notes.size()):
 		if _notes[i].id == id:
 			_notes.remove_at(i)
-			_save_data()
+			_queue_save()
 			note_removed.emit(id)
 			print("[NoteState] Removed note(id: %d)" % id)
 			return true
@@ -106,7 +108,7 @@ func update_note_title(id: int, title: String) -> bool:
 		return false
 	note.title = title
 	note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	note_updated.emit(note)
 	return true
 
@@ -117,7 +119,7 @@ func update_note_content(id: int, content: String) -> bool:
 		return false
 	note.content = content
 	note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	note_updated.emit(note)
 	return true
 
@@ -129,7 +131,7 @@ func update_note(id: int, title: String, content: String) -> bool:
 	note.title = title
 	note.content = content
 	note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	note_updated.emit(note)
 	return true
 
@@ -144,7 +146,7 @@ func toggle_note_category(id: int, category: String) -> bool:
 	else:
 		note.categories.append(category)
 	note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	note_updated.emit(note)
 	return true
 
@@ -157,7 +159,7 @@ func set_note_category(id: int, category: String) -> bool:
 	if category != "":
 		note.categories.append(category)
 	note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	note_updated.emit(note)
 	return true
 
@@ -179,7 +181,7 @@ func agent_write_content(note_id: int, content: String) -> bool:
 		return false
 	note.content = content
 	note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	agent_content_written.emit(note_id, content)
 	return true
 
@@ -207,7 +209,7 @@ func add_category(cat_name: String) -> bool:
 	if cat_name in _categories:
 		return false
 	_categories.append(cat_name)
-	_save_data()
+	_queue_save()
 	category_added.emit(cat_name)
 	print("[NoteState] Added category: %s" % cat_name)
 	return true
@@ -227,7 +229,7 @@ func remove_category(cat_name: String) -> bool:
 		if cat_idx >= 0:
 			note.categories.remove_at(cat_idx)
 			note.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	category_removed.emit(cat_name)
 	print("[NoteState] Removed category: %s" % cat_name)
 	return true
@@ -238,6 +240,12 @@ func has_category(cat_name: String) -> bool:
 
 
 # ======================== 持久化 ========================
+
+func _queue_save() -> void:
+	if _save_timer and _save_timer.time_left > 0.0:
+		return
+	_save_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
+	_save_timer.timeout.connect(_save_data, CONNECT_ONE_SHOT)
 
 func _save_data() -> void:
 	var data = {
@@ -420,12 +428,19 @@ func sync_insert_category_at(cat_name: String, position: int) -> void:
 	category_added.emit(cat_name)
 	print("[NoteState] Sync inserted category '%s' at position %d" % [cat_name, position])
 
-## 静默删除分类（同步用，不从笔记中移除）
+## 删除分类（同步用，同时从笔记中移除，保持数据一致）
 func sync_remove_category(cat_name: String) -> void:
+	if cat_name in PROTECTED_CATEGORIES:
+		push_warning("[NoteState] Sync remove ignored for protected category: %s" % cat_name)
+		return
 	var idx = _categories.find(cat_name)
 	if idx < 0:
 		return
 	_categories.remove_at(idx)
+	for note in _notes:
+		var cat_idx = note.categories.find(cat_name)
+		if cat_idx >= 0:
+			note.categories.remove_at(cat_idx)
 	_save_data()
 	category_removed.emit(cat_name)
 	print("[NoteState] Sync removed category '%s'" % cat_name)

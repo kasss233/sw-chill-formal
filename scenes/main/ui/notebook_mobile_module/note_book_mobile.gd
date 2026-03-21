@@ -41,6 +41,12 @@ var _add_category_input: LineEdit = null
 var _updating_chips: bool = false
 
 
+func _configure_nested_scroll() -> void:
+	var category_scroll := get_node_or_null("FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer/SmoothScrollContainer") as SmoothScrollContainer
+	if category_scroll:
+		category_scroll.handle_input = false
+
+
 func _ready() -> void:
 	# 移除编辑器中的占位 NoteItem
 	for child in _items_container.get_children():
@@ -58,6 +64,7 @@ func _ready() -> void:
 	_back_button.pressed.connect(_close_page)
 	_search_field.text_changed.connect(_on_search_text_changed)
 	_all_chip.selected.connect(_on_all_chip_selected)
+	_configure_nested_scroll()
 
 	# 连接 NoteState 信号
 	NoteState.note_added.connect(_on_note_added)
@@ -151,6 +158,7 @@ func _add_category_chip(category: String) -> void:
 	chip.chip_type = MaterialChip.ChipType.FILTER
 	chip.text = category
 	chip.custom_minimum_size = Vector2(76, 32)
+	chip.mouse_filter = Control.MOUSE_FILTER_PASS
 	_chips_container.add_child(chip)
 	chip.selected.connect(_on_category_chip_selected.bind(category))
 	_category_chips[category] = chip

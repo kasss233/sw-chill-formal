@@ -17,6 +17,7 @@ extends UI
 @onready var _task_module = $MarginContainer/VBoxContainer/BottomBar/ModulePanel/FrostedPanel/MarginContainer/HBoxContainer/TaskModule
 @onready var _notebook_tab = $MarginContainer/VBoxContainer/BottomBar/ModulePanel/FrostedPanel/MarginContainer/HBoxContainer/NoteBookTab
 @onready var _pomodoro_module = $MarginContainer/VBoxContainer/BottomBar/ModulePanel/FrostedPanel/MarginContainer/HBoxContainer/PomodoroTechniqueModule
+@onready var _bottom_bar_panel: FrostedPanel = $MarginContainer/VBoxContainer/BottomBar/ModulePanel/FrostedPanel
 @onready var _achievement_module = $AchievementModule
 @onready var _room_decor_module = $RoomDecorModule
 @onready var _calendar_tab = $CalendarTab
@@ -30,6 +31,18 @@ var _dialogue_mode: bool = false
 
 # 模块注册表: { layout_id: { node, toggle } }
 var _module_registry: Dictionary = {}
+
+# 模块名 → layout_id 映射（供 Agent 调用）
+const _MODULE_NAME_MAP: Dictionary = {
+	"task": "task",
+	"notebook": "notebookmobile",
+	"pomodoro": "pomodorotechnique",
+	"achievement": "achievement",
+	"room_decor": "room_decor",
+	"calendar": "calendar",
+	"setting": "setter",
+	"music": "musiclist",
+}
 
 
 # === 生命周期 ===
@@ -46,8 +59,16 @@ func _ready() -> void:
 	_init_dialogue_hidden()
 	# 监听 ChatState 自动进入对话模式
 	ChatState.response_started.connect(_on_portrait_response_started)
+	# 监听 LayerManager 的 Agent 模块控制信号
+	LayerManager.module_show_requested.connect(_on_agent_show_module)
+	LayerManager.module_hide_requested.connect(_on_agent_hide_module)
 	# 监听音乐面板可见性
 	_music_module_mobile.panel.visibility_changed.connect(_on_music_panel_visibility_changed)
+	# AI 流光信号
+	ChatState.ai_glow_started.connect(_on_ai_glow_started)
+	ChatState.ai_glow_stopped.connect(_on_ai_glow_stopped)
+	ChatState.response_started.connect(_on_ai_response_glow_start)
+	ChatState.response_completed.connect(_on_ai_response_glow_stop)
 
 
 # === 模块注册 + 互斥 ===
@@ -254,3 +275,111 @@ func _process(_delta: float) -> void:
 	else:
 		bottom_h = _bottom_bar.size.y
 	_keyboard_spacer.custom_minimum_size.y = maxf(0.0, scaled_height - bottom_h)
+
+
+# === Agent 模块控制（监听 LayerManager 信号） ===
+
+func _on_agent_show_module(module_name: String) -> void:
+	var layout_id: String = _MODULE_NAME_MAP.get(module_name, "")
+	if layout_id.is_empty():
+		print("[UI] _on_agent_show_module: 未知模块名 ", module_name)
+		return
+	if layout_id == "musiclist":
+		_close_other_modules("musiclist")
+		_music_module_mobile.show_module()
+		_active_module_id = "musiclist"
+	else:
+		_open_module(layout_id)
+	print("[UI] _on_agent_show_module: 已显示模块 ", module_name)
+
+
+func _on_agent_hide_module(module_name: String) -> void:
+	var layout_id: String = _MODULE_NAME_MAP.get(module_name, "")
+	if layout_id.is_empty():
+		print("[UI] _on_agent_hide_module: 未知模块名 ", module_name)
+		return
+	if layout_id == "musiclist":
+		_music_module_mobile.hide_module()
+	else:
+		var info = _module_registry.get(layout_id)
+		if info:
+			info["node"].hide_module()
+	if _active_module_id == layout_id:
+		_active_module_id = ""
+	print("[UI] _on_agent_hide_module: 已隐藏模块 ", module_name)
+
+
+# === AI 流光 ===
+
+const _MIN_GLOW_SEC: float = 0.8
+# 底栏共享面板的模块 layout_id
+const _BOTTOM_BAR_LAYOUTS: Array = ["task", "notebookmobile", "pomodorotechnique"]
+
+var _glow_start_times: Dictionary = {}
+
+
+func _on_ai_glow_started(module_key: String) -> void:
+	_glow_start_times[module_key] = Time.get_ticks_msec()
+	var panel := _find_module_frosted_panel(module_key)
+	if panel:
+		panel.start_ai_glow()
+
+
+func _on_ai_glow_stopped(module_key: String) -> void:
+	var start_time: int = _glow_start_times.get(module_key, 0)
+	_glow_start_times.erase(module_key)
+	var elapsed: float = (Time.get_ticks_msec() - start_time) / 1000.0
+	var remaining: float = maxf(0.0, _MIN_GLOW_SEC - elapsed)
+
+	if remaining > 0.0:
+		get_tree().create_timer(remaining).timeout.connect(
+			_deferred_stop_glow.bind(module_key)
+		)
+	else:
+		_deferred_stop_glow(module_key)
+
+
+func _deferred_stop_glow(module_key: String) -> void:
+	var panel := _find_module_frosted_panel(module_key)
+	if panel:
+		panel.stop_ai_glow()
+
+
+func _on_ai_response_glow_start() -> void:
+	if not SettingState.get_ai_response_glow():
+		return
+	var panel := _dialogue_box.frosted_panel as FrostedPanel
+	if panel:
+		panel.start_ai_glow()
+
+
+func _on_ai_response_glow_stop(_full_text: String) -> void:
+	var panel := _dialogue_box.frosted_panel as FrostedPanel
+	if panel:
+		panel.stop_ai_glow()
+
+
+func _find_module_frosted_panel(module_key: String) -> FrostedPanel:
+	var layout_id: String = _MODULE_NAME_MAP.get(module_key, "")
+	if layout_id.is_empty():
+		return null
+	# 底栏模块共享同一个 FrostedPanel（它是模块节点的祖先而非后代）
+	if layout_id in _BOTTOM_BAR_LAYOUTS:
+		return _bottom_bar_panel
+	# 音乐模块特殊处理
+	if layout_id == "musiclist":
+		return _find_first_frosted_panel(_music_module_mobile)
+	var info = _module_registry.get(layout_id)
+	if not info:
+		return null
+	return _find_first_frosted_panel(info["node"])
+
+
+func _find_first_frosted_panel(node: Node) -> FrostedPanel:
+	if node is FrostedPanel:
+		return node
+	for child in node.get_children():
+		var found := _find_first_frosted_panel(child)
+		if found:
+			return found
+	return null

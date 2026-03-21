@@ -34,7 +34,7 @@ shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.5
+shader_parameter/blur_amount = 5.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -44,8 +44,8 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/size = Vector2(308, 494)
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bpp07"]
 content_margin_left = 12.0
@@ -315,7 +315,7 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(200, 16)
+shader_parameter/size = Vector2(200, 153)
 shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tyu8p"]
@@ -376,7 +376,7 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(200, 16)
+shader_parameter/size = Vector2(200, 96)
 shader_parameter/shadow_padding = 0.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n6alu"]
@@ -478,6 +478,7 @@ metadata/_custom_type_script = "uid://motk0vag3i7k"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 script = ExtResource("4_aguge")
 wheel_scroll_damper = SubResource("Resource_xw33p")

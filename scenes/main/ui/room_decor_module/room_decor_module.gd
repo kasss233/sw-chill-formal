@@ -217,6 +217,7 @@ func _get_or_create_category_grid(category: String) -> Container:
 	h_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	h_scroll.allow_vertical_scroll = false
 	h_scroll.allow_horizontal_scroll = true
+	h_scroll.handle_input = false
 	h_scroll.hide_scrollbar_over_time = true
 	h_scroll.scrollbar_hide_time = 0.5
 	section.add_child(h_scroll)

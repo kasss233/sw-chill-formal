@@ -15,6 +15,8 @@ signal snow_changed(_value: int)
 signal rain_changed(_value: int)
 ## 摄像头切换
 signal camera_changed(_value: int)
+## AI 回复流光开关变化
+signal ai_response_glow_changed(enabled: bool)
 ## 户外特效 1 状态变化
 # signal outdoor_1_changed(_state: int)
 ## 户外特效 2 状态变化
@@ -41,6 +43,8 @@ var _snow_amount: int = 500
 var _fog_state: int = 0
 ## 摄像头模式
 var _camera_mode: int = 0
+## AI 回复时对话框流光开关
+var _ai_response_glow: bool = true
 
 
 const SAVE_PATH = "user://settings.cfg"
@@ -135,6 +139,16 @@ func set_camera(mode: int) -> void:
 func get_camera_mode() -> int:
 	return _camera_mode
 
+func set_ai_response_glow(enabled: bool) -> void:
+	if _ai_response_glow == enabled:
+		return
+	_ai_response_glow = enabled
+	ai_response_glow_changed.emit(enabled)
+	_save_settings()
+
+func get_ai_response_glow() -> bool:
+	return _ai_response_glow
+
 func get_msaa() -> int:
 	return _msaa
 
@@ -183,6 +197,7 @@ func _save_settings() -> void:
 	config.set_value("env", "camera_mode", _camera_mode)
 	config.set_value("rendering", "msaa_3d", _msaa)
 	config.set_value("rendering", "screen_space_aa", _ssaa)
+	config.set_value("ai", "response_glow", _ai_response_glow)
 	config.save(SAVE_PATH)
 
 ## 防抖写盘（滑条等高频操作）
@@ -213,6 +228,7 @@ func _load_settings() -> void:
 	_camera_mode = int(config.get_value("env", "camera_mode", 0))
 	_msaa = int(config.get_value("rendering", "msaa_3d", 0))
 	_ssaa = int(config.get_value("rendering", "screen_space_aa", 0))
+	_ai_response_glow = config.get_value("ai", "response_glow", true) as bool
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
 	get_viewport().screen_space_aa = _ssaa as Viewport.ScreenSpaceAA
 
@@ -225,3 +241,4 @@ func _emit_loaded_settings() -> void:
 	# outdoor_1/outdoor_2 功能已停用（信号已注释）
 	fog_changed.emit(_fog_state)
 	camera_changed.emit(_camera_mode)
+	ai_response_glow_changed.emit(_ai_response_glow)

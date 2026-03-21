@@ -45,7 +45,7 @@ shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.5
+shader_parameter/blur_amount = 5.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -55,8 +55,12 @@ shader_parameter/show_shadow = false
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(0, 0)
+shader_parameter/size = Vector2(232, 64)
 shader_parameter/shadow_padding = 0.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 3.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 1.5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8c0ih"]
 content_margin_left = 0.0
@@ -227,7 +231,11 @@ shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(288, 365)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/shadow_padding = 12.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 3.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 1.5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8puow"]
 content_margin_left = 12.0
@@ -667,24 +675,47 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nfsum"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_nfsum"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_k8p3q"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_nfsum")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jghnx"]
+shader = ExtResource("1_f1va3")
+shader_parameter/corner_radius = 8.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(0.3, 0.3, 0.3, 0.5)
+shader_parameter/blur_amount = 3.5
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_k8p3q")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0, 0, 0, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(200, 96)
+shader_parameter/shadow_padding = 0.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 3.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 1.5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1d2rq"]
 content_margin_left = 8.0
 content_margin_top = 8.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-bg_color = Color(0.15, 0.15, 0.15, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.3, 0.3, 0.3, 0.5)
+bg_color = Color(1, 1, 1, 0)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-shadow_color = Color(0, 0, 0, 0.3)
-shadow_size = 8
-shadow_offset = Vector2(0, 4)
 
 [sub_resource type="Resource" id="Resource_t1xwq"]
 script = ExtResource("11_3y0x8")
@@ -800,7 +831,7 @@ alignment = 1
 [node name="MaterialButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer/FrostedPanel2/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1330990145]
 unique_name_in_owner = true
 clip_contents = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0)
@@ -815,10 +846,13 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_qi0h7")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_lpdni")
 theme_override_styles/focus = SubResource("StyleBoxFlat_uetnd")
 text = "Never Gonna Give you up"
+clip_text = true
 script = ExtResource("6_k7cxi")
 padding_horizontal = 14
 padding_vertical = 7
+clip_button_text = true
 enable_text_scroll = true
+scroll_speed = 25.0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="Visualizer" type="ColorRect" parent="MarginContainer/HBoxContainer/VBoxContainer/FrostedPanel2/MarginContainer/HBoxContainer" unique_id=1768813267]
@@ -849,8 +883,6 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_8puow")
 script = ExtResource("2_wen68")
 corner_radius = 20.0
 blur_amount = 4.0
-saturation = null
-brightness = null
 tint_color = Color(0.23, 0.23, 0.23, 0.4)
 noise_texture = SubResource("NoiseTexture2D_t0g7c")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -956,6 +988,7 @@ theme_override_constants/margin_left = 12
 theme_override_constants/margin_right = 4
 
 [node name="HSeparator" type="HSeparator" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1896587898]
+visible = false
 layout_mode = 2
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer" unique_id=1437945826]
@@ -972,6 +1005,8 @@ layout_mode = 2
 [node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=906723382]
 layout_mode = 2
 text = "Never gonna give you up"
+clip_text = true
+text_overrun_behavior = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/HBoxContainer2/VBoxContainer" unique_id=356103242]
 layout_mode = 2
@@ -1050,23 +1085,19 @@ metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="MaterialMenu" type="PanelContainer" parent="CanvasLayer" unique_id=2108354029]
 visible = false
+material = SubResource("ShaderMaterial_jghnx")
 custom_minimum_size = Vector2(200, 0)
 offset_left = 277.0
 offset_top = 394.0
 offset_right = 477.0
 offset_bottom = 490.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_nfsum")
+theme_override_styles/panel = SubResource("StyleBoxFlat_1d2rq")
 script = ExtResource("10_ytdw2")
 editor_items = Array[ExtResource("11_3y0x8")]([SubResource("Resource_t1xwq"), SubResource("Resource_732up")])
 background_color = Color(0.15, 0.15, 0.15, 0.95)
 border_color = Color(0.3, 0.3, 0.3, 0.5)
 corner_radius = 8
-frosted_effect = null
-blur_amount = null
-saturation = null
-brightness = null
-tint_color = null
-noise_amount = null
+noise_texture = SubResource("NoiseTexture2D_k8p3q")
 metadata/_custom_type_script = "uid://c66rtlpmo48ps"
 
 [node name="GuiTransition" type="Node" parent="CanvasLayer" unique_id=908083110]

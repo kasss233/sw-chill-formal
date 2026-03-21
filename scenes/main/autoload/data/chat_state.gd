@@ -30,6 +30,11 @@ signal function_call_started(call_id: String, name: String)
 ## 函数调用完成
 signal function_call_completed(call_id: String, name: String, success: bool)
 
+## AI 流光开始（模块级）
+signal ai_glow_started(module_key: String)
+## AI 流光结束（模块级）
+signal ai_glow_stopped(module_key: String)
+
 # ============ 用户输入信号（InputBox -> ChatController）============
 ## 用户提交文本（由 InputBox 发出，ChatController 监听）
 signal text_submitted(text: String, attachments: Array)
@@ -45,6 +50,48 @@ signal input_clear_requested()
 # ============ 状态 ============
 var status: Status = Status.IDLE
 var current_response_text: String = ""
+
+# 函数名 → 模块 key 映射（用于流光定位）
+const _FUNC_MODULE_MAP: Dictionary = {
+	# 任务
+	"add_task": "task", "remove_task": "task", "update_task_title": "task",
+	"set_task_completed": "task", "set_task_due_time": "task",
+	"clear_completed_tasks": "task", "get_all_tasks": "task",
+	"get_incomplete_tasks": "task", "get_completed_tasks": "task",
+	"get_overdue_tasks": "task", "reorder_task": "task",
+	# 笔记
+	"create_note": "notebook", "write_note_content": "notebook",
+	"open_note": "notebook", "close_note": "notebook",
+	"remove_note": "notebook", "update_note": "notebook",
+	"search_notes": "notebook", "get_all_notes": "notebook",
+	"take_note": "notebook", "get_note_by_id": "notebook",
+	"add_category": "notebook", "remove_category": "notebook",
+	"toggle_note_category": "notebook", "get_categories": "notebook",
+	# 音乐
+	"play_music": "music", "pause_music": "music",
+	"toggle_playback": "music", "play_next": "music",
+	"play_previous": "music", "set_play_mode": "music",
+	"set_bgm_volume": "music", "get_music_state": "music",
+	"switch_playlist": "music", "create_playlist": "music",
+	"delete_playlist": "music", "add_track_to_playlist": "music",
+	"remove_track_from_playlist": "music", "get_all_playlists": "music",
+	"get_playlist_tracks": "music", "get_all_playlists_data": "music",
+	# 番茄钟
+	"start_pomodoro": "pomodoro", "stop_pomodoro": "pomodoro",
+	"toggle_pomodoro_pause": "pomodoro", "set_work_duration": "pomodoro",
+	"set_rest_duration": "pomodoro", "get_pomodoro_status": "pomodoro",
+	"get_pomodoro_remaining_time": "pomodoro",
+	# 环境设置
+	"set_time": "setting", "set_weather": "setting",
+	# 房间装饰
+	"add_room_decor_item": "room_decor", "select_room_decor_item": "room_decor",
+	# 习惯/日历
+	"add_habit": "calendar", "remove_habit": "calendar",
+	"update_habit": "calendar", "get_habits": "calendar",
+	"get_time_slots": "calendar", "generate_week_schedule": "calendar",
+	"get_week_schedule": "calendar", "set_habit_execution": "calendar",
+	"get_habit_stats": "calendar",
+}
 
 # ============ 状态管理 API（供 ChatController 调用）============
 
@@ -98,12 +145,18 @@ func notify_function_call_started(call_id: String, fname: String) -> void:
 	print("[ChatState] function_call_started: %s (call_id: %s)" % [fname, call_id])
 	set_status(Status.EXECUTING_FUNCTION)
 	function_call_started.emit(call_id, fname)
+	var module_key: String = _FUNC_MODULE_MAP.get(fname, "")
+	if not module_key.is_empty():
+		ai_glow_started.emit(module_key)
 
 
 func notify_function_call_completed(call_id: String, fname: String, success: bool) -> void:
 	print("[ChatState] function_call_completed: %s success=%s" % [fname, success])
 	set_status(Status.GENERATING)
 	function_call_completed.emit(call_id, fname, success)
+	var module_key: String = _FUNC_MODULE_MAP.get(fname, "")
+	if not module_key.is_empty():
+		ai_glow_stopped.emit(module_key)
 
 # ============ Agent API（供 AgentExecutor 调用）============
 

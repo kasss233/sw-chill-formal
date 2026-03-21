@@ -174,6 +174,10 @@ func _execute_operation(operation: Dictionary) -> Dictionary:
 			return _handle_start_focus(operation)
 		"end_focus":
 			return _handle_end_focus(operation)
+		"show_module":
+			return _handle_show_module(operation)
+		"hide_module":
+			return _handle_hide_module(operation)
 		_:
 			result["error"] = "未知的操作类型: " + action
 			print("[Parser] 错误: ", result["error"])
@@ -597,6 +601,33 @@ func _end_focus_internal(focus_record_id: String) -> bool:
 	# 专注模式结束功能待实现
 	print("[Parser] 警告: 结束专注模式功能未完全实现")
 	return true  # 待实现
+
+# ====== 模块显示/隐藏操作处理 ======
+func _handle_show_module(operation: Dictionary) -> Dictionary:
+	var result = {"success": false, "error": ""}
+
+	if not operation.has("module_name"):
+		result["error"] = "show_module 操作缺少 'module_name' 字段"
+		return result
+
+	var module_name = operation.get("module_name", "")
+	LayerManager.agent_show_module(module_name)
+	result["success"] = true
+	print("[Parser] 成功显示模块: ", module_name)
+	return result
+
+func _handle_hide_module(operation: Dictionary) -> Dictionary:
+	var result = {"success": false, "error": ""}
+
+	if not operation.has("module_name"):
+		result["error"] = "hide_module 操作缺少 'module_name' 字段"
+		return result
+
+	var module_name = operation.get("module_name", "")
+	LayerManager.agent_hide_module(module_name)
+	result["success"] = true
+	print("[Parser] 成功隐藏模块: ", module_name)
+	return result
 
 # ====== 演出脚本处理 ======
 func _handle_performance_sequence(performance_sequence: Variant) -> void:

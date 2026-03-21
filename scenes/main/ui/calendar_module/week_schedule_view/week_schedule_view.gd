@@ -1,29 +1,33 @@
 extends VBoxContainer
 
-## 周课表视图 - 显示一周的习惯排期网格
+## 周节奏视图，展示一周习惯安排并支持轻量微调
 
-signal ai_schedule_requested(week_key: String)
+signal ai_schedule_requested(week_key: String, style: String)
 
 var _current_week_key: String = ""
-var _cell_map: Dictionary = {}  # {"day_slot": Control}
+var _selected_day: int = -1
 
 @onready var _week_label: Label = $NavBar/WeekLabel
+@onready var _hint_label: Label = $RhythmHintLabel
 @onready var _grid_container: GridContainer = $ScrollContainer/GridContainer
 @onready var _time_slot_editor = $TimeSlotEditor
 @onready var _prev_btn: MaterialButton = $NavBar/PrevWeekBtn
 @onready var _next_btn: MaterialButton = $NavBar/NextWeekBtn
 @onready var _ai_btn: MaterialButton = $ActionRow/AIScheduleBtn
+@onready var _ai_disciplined_btn: MaterialButton = $ActionRow/AIDisciplinedBtn
 @onready var _copy_btn: MaterialButton = $ActionRow/CopyWeekBtn
 @onready var _edit_slots_btn: MaterialButton = $ActionRow/EditSlotsBtn
+@onready var _empty_hint_label: Label = $EmptyHintLabel
 
-const DAY_NAMES = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
 const DAY_SHORT = ["一", "二", "三", "四", "五", "六", "日"]
 
 
 func _ready() -> void:
-	# 设置按钮样式
 	_ai_btn.set_filled_style(Color(0.35, 0.65, 0.95))
-	_ai_btn.pressed.connect(func(): ai_schedule_requested.emit(_current_week_key))
+	_ai_btn.pressed.connect(func(): ai_schedule_requested.emit(_current_week_key, "relaxed"))
+
+	_ai_disciplined_btn.set_outlined_style(Color(0.6, 0.78, 1.0), 1)
+	_ai_disciplined_btn.pressed.connect(func(): ai_schedule_requested.emit(_current_week_key, "disciplined"))
 
 	_copy_btn.set_outlined_style(Color(0.5, 0.5, 0.5))
 	_copy_btn.pressed.connect(_on_copy_to_next_week)
@@ -35,56 +39,50 @@ func _ready() -> void:
 	_next_btn.pressed.connect(_on_next_week)
 
 	_current_week_key = HabitState.get_current_week_key()
+	_selected_day = DateUtil.get_today_day_of_week()
 	_refresh_grid()
 
-	# 连接信号
-	HabitState.schedule_entry_added.connect(func(_e): _refresh_grid())
-	HabitState.schedule_entry_removed.connect(func(_id): _refresh_grid())
-	HabitState.schedule_updated.connect(func(_wk): _refresh_grid())
-	HabitState.schedule_cleared.connect(func(_wk): _refresh_grid())
+	HabitState.schedule_entry_added.connect(func(_entry): _refresh_grid())
+	HabitState.schedule_entry_removed.connect(func(_entry_id): _refresh_grid())
+	HabitState.schedule_updated.connect(func(_week_key): _refresh_grid())
+	HabitState.schedule_cleared.connect(func(_week_key): _refresh_grid())
 	HabitState.time_slot_template_changed.connect(_refresh_grid)
-	HabitState.execution_updated.connect(func(_r): _refresh_grid())
+	HabitState.execution_updated.connect(func(_record): _refresh_grid())
 	HabitState.data_loaded.connect(_refresh_grid)
 
 
 func _refresh_grid() -> void:
 	_update_week_label()
-	_cell_map.clear()
 
-	# 清空网格
 	for child in _grid_container.get_children():
 		child.queue_free()
 
 	var templates = HabitState.get_time_slot_templates()
 	var entries = HabitState.get_week_schedule(_current_week_key)
+	var rhythm_data := HabitState.get_week_rhythm_data(_current_week_key)
+	_hint_label.text = "%s  ·  %s" % [str(rhythm_data.get("theme_title", "")), str(rhythm_data.get("theme_text", ""))]
+	_empty_hint_label.visible = entries.is_empty()
+	_empty_hint_label.text = str(rhythm_data.get("empty_state_text", ""))
 
-	# 获取今天是周几 (0=周一)
 	var today_dow := DateUtil.get_today_day_of_week()
 
-	# 表头行：空 + 周一~周日
-	var corner = _create_header_cell("")
-	_grid_container.add_child(corner)
-	for d in range(7):
-		var header = _create_header_cell(DAY_SHORT[d])
-		if d == today_dow and _is_current_week():
+	_grid_container.add_child(_create_header_cell(""))
+	for day in range(7):
+		var header = _create_header_cell(DAY_SHORT[day])
+		if day == _selected_day:
+			header.add_theme_color_override("font_color", Color(1.0, 0.92, 0.72))
+		elif day == today_dow and _is_current_week():
 			header.add_theme_color_override("font_color", Color(0.35, 0.65, 0.95))
 		_grid_container.add_child(header)
 
-	# 每个时间段一行
 	for slot in templates:
-		# 时间段名称列
-		var slot_label = _create_slot_label(slot)
-		_grid_container.add_child(slot_label)
-
-		# 7天的格子
+		_grid_container.add_child(_create_slot_label(slot))
 		for day in range(7):
-			var cell = _create_cell(slot, day, entries)
-			_grid_container.add_child(cell)
-			_cell_map["%d_%d" % [day, slot.id]] = cell
+			_grid_container.add_child(_create_cell(slot, day, entries))
 
 
 func _create_header_cell(text: String) -> Label:
-	var label = Label.new()
+	var label := Label.new()
 	label.text = text
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_color_override("font_color", Color(0.93, 0.93, 0.93))
@@ -94,18 +92,18 @@ func _create_header_cell(text: String) -> Label:
 
 
 func _create_slot_label(slot: HabitData.TimeSlotTemplate) -> VBoxContainer:
-	var vbox = VBoxContainer.new()
-	vbox.custom_minimum_size = Vector2(52, 46)
+	var vbox := VBoxContainer.new()
+	vbox.custom_minimum_size = Vector2(58, 48)
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 
-	var name_label = Label.new()
+	var name_label := Label.new()
 	name_label.text = slot.name
 	name_label.add_theme_color_override("font_color", Color(0.93, 0.93, 0.93))
 	name_label.add_theme_font_size_override("font_size", 11)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(name_label)
 
-	var time_label = Label.new()
+	var time_label := Label.new()
 	time_label.text = slot.start_time
 	time_label.add_theme_color_override("font_color", Color(0.78, 0.78, 0.78))
 	time_label.add_theme_font_size_override("font_size", 10)
@@ -116,26 +114,26 @@ func _create_slot_label(slot: HabitData.TimeSlotTemplate) -> VBoxContainer:
 
 
 func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) -> Control:
-	# 查找该格子的排期
-	var entry = null
-	for e in entries:
-		if e.day_of_week == day and e.time_slot_id == slot.id:
-			entry = e
+	var entry: HabitData.ScheduleEntry = null
+	for schedule_entry in entries:
+		if schedule_entry.day_of_week == day and schedule_entry.time_slot_id == slot.id:
+			entry = schedule_entry
 			break
 
-	var cell = Panel.new()
-	cell.custom_minimum_size = Vector2(40, 46)
+	var date_key := DateUtil.week_key_to_date(_current_week_key, day)
+	var cell := Panel.new()
+	cell.custom_minimum_size = Vector2(44, 48)
 
-	var style = StyleBoxFlat.new()
+	var style := StyleBoxFlat.new()
 	style.corner_radius_top_left = 6
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_left = 6
 	style.corner_radius_bottom_right = 6
 
-	if entry:
-		var habit = HabitState.get_habit_by_id(entry.habit_id)
-		if habit:
-			var color = Color.from_string(habit.color, Color(0.3, 0.5, 0.3))
+	if entry != null:
+		var habit: HabitData = HabitState.get_habit_by_id(entry.habit_id)
+		if habit != null:
+			var color := Color.from_string(habit.color, Color(0.3, 0.5, 0.3))
 			style.bg_color = Color(color.r, color.g, color.b, 0.35)
 			style.border_color = Color(color.r, color.g, color.b, 0.7)
 			style.border_width_bottom = 1
@@ -143,9 +141,8 @@ func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) ->
 			style.border_width_left = 1
 			style.border_width_right = 1
 
-			# 习惯名缩写
-			var label = Label.new()
-			label.text = habit.name.left(2)
+			var label := Label.new()
+			label.text = _build_entry_short_text(habit, entry.id, date_key)
 			label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
 			label.add_theme_font_size_override("font_size", 12)
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -153,26 +150,30 @@ func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) ->
 			label.anchors_preset = Control.PRESET_FULL_RECT
 			cell.add_child(label)
 
-			# 检查执行状态
-			var date_key := DateUtil.week_key_to_date(_current_week_key, day)
 			var records = HabitState.get_records_by_date(date_key)
-			for r in records:
-				if r.entry_id == entry.id:
-					if r.status == HabitData.ExecutionRecord.Status.COMPLETED:
-						style.bg_color = Color(color.r, color.g, color.b, 0.6)
-					elif r.status == HabitData.ExecutionRecord.Status.SKIPPED:
-						style.bg_color = Color(0.3, 0.3, 0.3, 0.3)
-					break
+			for record in records:
+				if record.entry_id != entry.id:
+					continue
+				if record.status == HabitData.ExecutionRecord.Status.COMPLETED:
+					style.bg_color = Color(color.r, color.g, color.b, 0.65)
+				elif record.status == HabitData.ExecutionRecord.Status.SKIPPED:
+					style.bg_color = Color(0.3, 0.3, 0.3, 0.32)
+				elif record.status == HabitData.ExecutionRecord.Status.DEFERRED:
+					style.bg_color = Color(color.r, color.g, color.b, 0.22)
+				break
 
-		# 点击已排期格子 → 弹出操作菜单
 		cell.gui_input.connect(_on_cell_input.bind(entry, day))
 	else:
 		style.bg_color = Color(0.2, 0.2, 0.2, 0.5)
-		# 点击空格子 → 选择习惯
 		cell.gui_input.connect(_on_empty_cell_input.bind(slot.id, day))
 
-	# 当日高亮
-	if day == DateUtil.get_today_day_of_week() and _is_current_week():
+	if day == _selected_day:
+		style.border_color = Color(1.0, 0.93, 0.72, 0.78)
+		style.border_width_bottom = 2
+		style.border_width_top = 2
+		style.border_width_left = 2
+		style.border_width_right = 2
+	elif day == DateUtil.get_today_day_of_week() and _is_current_week():
 		style.border_color = Color(0.35, 0.65, 0.95, 0.5)
 		style.border_width_bottom = 1
 		style.border_width_top = 1
@@ -185,32 +186,39 @@ func _create_cell(slot: HabitData.TimeSlotTemplate, day: int, entries: Array) ->
 
 func _on_cell_input(event: InputEvent, entry: HabitData.ScheduleEntry, day: int) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_selected_day = day
 		_show_entry_actions(entry, day)
+		_refresh_grid()
 
 
 func _on_empty_cell_input(event: InputEvent, slot_id: int, day: int) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		print("[WeekScheduleView] 空格子被点击: day=%d slot_id=%d" % [day, slot_id])
+		_selected_day = day
 		_show_habit_picker(slot_id, day)
+		_refresh_grid()
 
 
 func _show_entry_actions(entry: HabitData.ScheduleEntry, day: int) -> void:
-	var menu = MaterialContextMenu.new()
+	var menu := MaterialContextMenu.new()
 	add_child(menu)
 
 	var date_key := DateUtil.week_key_to_date(_current_week_key, day)
 	menu.add_item("完成", preload("res://assets/ui/icons/check_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg"))
 	menu.add_item("跳过")
-	menu.add_item("延后")
+	menu.add_item("稍后")
 	menu.add_separator()
 	menu.add_item("移除", preload("res://assets/ui/icons/delete_forever_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg"))
 
 	menu.item_pressed.connect(func(index: int, _item):
 		match index:
-			0: HabitState.set_execution_status(entry.id, date_key, HabitData.ExecutionRecord.Status.COMPLETED)
-			1: HabitState.set_execution_status(entry.id, date_key, HabitData.ExecutionRecord.Status.SKIPPED)
-			2: HabitState.set_execution_status(entry.id, date_key, HabitData.ExecutionRecord.Status.DEFERRED)
-			3: HabitState.remove_schedule_entry(entry.id)
+			0:
+				HabitState.set_execution_status(entry.id, date_key, HabitData.ExecutionRecord.Status.COMPLETED)
+			1:
+				HabitState.set_execution_status(entry.id, date_key, HabitData.ExecutionRecord.Status.SKIPPED)
+			2:
+				HabitState.set_execution_status(entry.id, date_key, HabitData.ExecutionRecord.Status.DEFERRED)
+			3:
+				HabitState.remove_schedule_entry(entry.id)
 		menu.queue_free()
 	)
 	menu.popup_at_mouse()
@@ -218,20 +226,16 @@ func _show_entry_actions(entry: HabitData.ScheduleEntry, day: int) -> void:
 
 func _show_habit_picker(slot_id: int, day: int) -> void:
 	var habits = HabitState.get_active_habits()
-	print("[WeekScheduleView] 活跃习惯数量: %d" % habits.size())
 	if habits.is_empty():
-		print("[WeekScheduleView] 没有活跃习惯，请先在习惯库中添加")
 		return
 
-	var menu = MaterialContextMenu.new()
+	var menu := MaterialContextMenu.new()
 	add_child(menu)
-
-	for h in habits:
-		menu.add_item(h.name)
+	for habit in habits:
+		menu.add_item(habit.name)
 
 	menu.item_pressed.connect(func(index: int, _item):
 		if index < habits.size():
-			print("[WeekScheduleView] 选择习惯: %s -> day=%d slot=%d" % [habits[index].name, day, slot_id])
 			HabitState.add_schedule_entry(habits[index].id, _current_week_key, day, slot_id)
 		menu.queue_free()
 	)
@@ -258,14 +262,26 @@ func _on_edit_slots() -> void:
 
 
 func _update_week_label() -> void:
-	# 解析 week_key "2026-W10" 获取显示文本
 	var parts = _current_week_key.split("-W")
 	if parts.size() == 2:
-		var year = parts[0]
-		var week = parts[1]
-		_week_label.text = "%s年 第%s周" % [year, week]
+		_week_label.text = "%s 年第 %s 周" % [parts[0], parts[1]]
 	else:
 		_week_label.text = _current_week_key
+
+
+func _build_entry_short_text(habit: HabitData, entry_id: int, date_key: String) -> String:
+	var records = HabitState.get_records_by_date(date_key)
+	for record in records:
+		if record.entry_id != entry_id:
+			continue
+		match record.status:
+			HabitData.ExecutionRecord.Status.COMPLETED:
+				return "OK%s" % habit.name.left(2)
+			HabitData.ExecutionRecord.Status.SKIPPED:
+				return "-%s" % habit.name.left(2)
+			HabitData.ExecutionRecord.Status.DEFERRED:
+				return "~%s" % habit.name.left(2)
+	return habit.name.left(2)
 
 
 func _is_current_week() -> bool:
@@ -274,3 +290,18 @@ func _is_current_week() -> bool:
 
 func get_current_week_key() -> String:
 	return _current_week_key
+
+
+func set_selected_date_key(date_key: String) -> void:
+	if date_key.is_empty():
+		return
+	_current_week_key = DateUtil.date_to_week_key(date_key)
+	_selected_day = DateUtil.get_day_of_week(date_key)
+	_refresh_grid()
+
+
+func show_for_week(week_key: String, selected_date_key: String = "") -> void:
+	_current_week_key = week_key
+	if not selected_date_key.is_empty():
+		_selected_day = DateUtil.get_day_of_week(selected_date_key)
+	_refresh_grid()

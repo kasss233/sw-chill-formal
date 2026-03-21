@@ -36,6 +36,8 @@ var is_work_mode: bool = true
 var _timer: Timer = null
 
 const CONFIG_PATH = "user://pomodoro_config.json"
+const SAVE_DEBOUNCE_SEC := 0.5
+var _save_config_timer: SceneTreeTimer
 
 
 func _ready() -> void:
@@ -58,7 +60,7 @@ func start_pomodoro(work_min: int, rest_min: int, loops: int) -> void:
 	rest_duration = max(1, rest_min)
 	total_loops = max(1, loops)
 	current_loop = 1
-	_save_config()
+	_queue_save_config()
 	_start_work()
 	pomodoro_started.emit({
 		"work_duration": work_duration,
@@ -86,9 +88,10 @@ func toggle_pause() -> void:
 
 func stop() -> void:
 	_timer.stop()
+	var was_work_mode = is_work_mode
 	_reset_state()
 	print("[PomodoroState] 已停止")
-	if is_work_mode:
+	if was_work_mode:
 		work_phase_stopped.emit()
 	else:
 		rest_phase_stopped.emit()
@@ -96,13 +99,13 @@ func stop() -> void:
 
 func set_work_duration(minutes: int) -> void:
 	work_duration = max(1, minutes)
-	_save_config()
+	_queue_save_config()
 	config_changed.emit(work_duration, rest_duration)
 
 
 func set_rest_duration(minutes: int) -> void:
 	rest_duration = max(1, minutes)
-	_save_config()
+	_queue_save_config()
 	config_changed.emit(work_duration, rest_duration)
 
 
@@ -276,6 +279,12 @@ func _reset_state() -> void:
 
 
 # ======================== 持久化 ========================
+
+func _queue_save_config() -> void:
+	if _save_config_timer and _save_config_timer.time_left > 0.0:
+		return
+	_save_config_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
+	_save_config_timer.timeout.connect(_save_config, CONNECT_ONE_SHOT)
 
 func _save_config() -> void:
 	var data = {

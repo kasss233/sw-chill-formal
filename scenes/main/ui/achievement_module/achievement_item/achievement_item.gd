@@ -16,6 +16,17 @@ var _data: Dictionary = {}
 var _category: String = "daily_task"
 var _is_updating: bool = false
 
+func _ready() -> void:
+	_enable_scroll_passthrough(self)
+	claim_button.mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+static func _enable_scroll_passthrough(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_PASS
+	for child in node.get_children():
+		_enable_scroll_passthrough(child)
+
 func set_data(data: Dictionary) -> void:
 	_data = data.duplicate(true)
 	_category = str(_data.get("category", "daily_task"))

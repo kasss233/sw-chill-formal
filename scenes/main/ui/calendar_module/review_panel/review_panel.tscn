@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://calendar_review_panel"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/review_panel/review_panel.gd" id="1_script"]
+
+[node name="ReviewPanel" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_script")

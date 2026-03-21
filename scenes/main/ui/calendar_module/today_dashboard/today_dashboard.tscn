@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://calendar_today_dashboard"]
+
+[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/today_dashboard/today_dashboard.gd" id="1_script"]
+
+[node name="TodayDashboard" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_script")
