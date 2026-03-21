@@ -93,7 +93,7 @@ shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 3.5
+shader_parameter/blur_amount = 5.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -104,7 +104,7 @@ shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(306, 482)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/shadow_padding = 12.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qfi2h"]
 content_margin_left = 12.0
@@ -168,30 +168,36 @@ metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer" unique_id=1639669864]
 layout_mode = 2
-theme_override_constants/separation = 10
 
 [node name="HeaderRow" type="HBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=221864130]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ModuleTitleLabel" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=2118844585]
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1975354142]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+
+[node name="ModuleTitleLabel" type="Label" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/MarginContainer" unique_id=2118844585]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "成就模块"
+theme_override_font_sizes/font_size = 24
+text = "成就"
 vertical_alignment = 1
 
-[node name="TabSegmentedButton" type="Control" parent="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow" unique_id=1664879877]
+[node name="TabSegmentedButton" type="Control" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=1664879877]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 32)
+custom_minimum_size = Vector2(240, 38)
 layout_mode = 2
-size_flags_horizontal = 6
+size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
 script = ExtResource("4_q6hjx")
 editor_segments = Array[String](["每日任务", "成就"])
 selected_index = 0
-button_height = 32
+button_height = 38
+min_button_width = 120
 metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/PanelContainer/VBoxContainer" unique_id=1274443928]
@@ -203,6 +209,7 @@ horizontal_scroll_mode = 0
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="DailyTaskList" type="VBoxContainer" parent="CanvasLayer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer" unique_id=2121413013]
@@ -238,4 +245,4 @@ layout_id = "achievement"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="state_changed" from="Button" to="." method="_on_button_state_changed"]
-[connection signal="segment_selected" from="CanvasLayer/PanelContainer/VBoxContainer/HeaderRow/TabSegmentedButton" to="." method="_on_tab_segment_selected"]
+[connection signal="segment_selected" from="CanvasLayer/PanelContainer/VBoxContainer/TabSegmentedButton" to="." method="_on_tab_segment_selected"]

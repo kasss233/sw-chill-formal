@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b8aqjm4e8p3u2"]
 
 [ext_resource type="PackedScene" uid="uid://do56ajkuwsf0t" path="res://scenes/main/ui/music_module/music_module.tscn" id="1_2q31f"]
-[ext_resource type="Script" uid="uid://rf5l6kbuqak1" path="res://scenes/main/ui/ui.gd" id="1_nf0va"]
+[ext_resource type="Script" uid="uid://bmt4a68sl0kd8" path="res://scenes/main/ui/ui_landscape.gd" id="1_nf0va"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_hkhhe"]
 [ext_resource type="PackedScene" uid="uid://bsk40q141nhng" path="res://scenes/main/ui/setting/setting.tscn" id="4_ex8bf"]
 [ext_resource type="PackedScene" uid="uid://ov68toccadt" path="res://scenes/main/ui/task_module_new/task_module.tscn" id="4_khr3h"]
@@ -47,6 +47,10 @@ shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(64, 428)
 shader_parameter/shadow_padding = 0.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 3.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 1.5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_djxf0"]
 content_margin_left = 0.0
@@ -159,6 +163,8 @@ corner_radius = 32.0
 blur_amount = 7.2
 noise_texture = SubResource("NoiseTexture2D_a7tfl")
 show_shadow = false
+glow_width = 3.0
+glow_softness = 1.5
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
 
 [node name="MarginContainer" type="MarginContainer" parent="TabPanel/FrostedPanel" unique_id=338894952]

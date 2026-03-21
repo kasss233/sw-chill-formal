@@ -33,6 +33,8 @@ var _next_entry_id: int = 1
 var _next_record_id: int = 1
 
 const SAVE_PATH = "user://habit_data.json"
+const SAVE_DEBOUNCE_SEC := 0.5
+var _save_timer: SceneTreeTimer
 
 
 func _ready() -> void:
@@ -201,13 +203,341 @@ func get_day_completion(week_key: String, day: int) -> Dictionary:
 	return {"total": day_entries.size(), "completed": completed}
 
 
+func get_day_dashboard_data(date_key: String) -> Dictionary:
+	var week_key := DateUtil.date_to_week_key(date_key)
+	var day_of_week := DateUtil.get_day_of_week(date_key)
+	var entries := get_day_schedule(week_key, day_of_week)
+	var records := get_records_by_date(date_key)
+	var record_map := {}
+	for record in records:
+		record_map[record.entry_id] = record
+
+	var timeline: Array = []
+	var top_cards: Array = []
+	var completed: int = 0
+	var pending: int = 0
+	var skipped: int = 0
+	var deferred: int = 0
+
+	for entry in entries:
+		var habit: HabitData = get_habit_by_id(entry.habit_id)
+		if habit == null:
+			continue
+		var record: HabitData.ExecutionRecord = record_map.get(entry.id, null)
+		var status := HabitData.ExecutionRecord.Status.PENDING
+		if record != null:
+			status = record.status
+
+		match status:
+			HabitData.ExecutionRecord.Status.COMPLETED:
+				completed += 1
+			HabitData.ExecutionRecord.Status.SKIPPED:
+				skipped += 1
+			HabitData.ExecutionRecord.Status.DEFERRED:
+				deferred += 1
+			_:
+				pending += 1
+
+		var slot: HabitData.TimeSlotTemplate = get_time_slot_by_id(entry.time_slot_id)
+		var item := {
+			"entry_id": entry.id,
+			"habit_id": habit.id,
+			"title": habit.name,
+			"minutes": habit.estimated_minutes,
+			"period_text": habit.get_period_name(),
+			"time_text": _build_time_slot_label(slot),
+			"color": habit.color,
+			"status": status,
+			"status_text": _execution_status_to_text(status),
+			"can_start": status != HabitData.ExecutionRecord.Status.COMPLETED,
+		}
+		timeline.append(item)
+		if top_cards.size() < 3 and status != HabitData.ExecutionRecord.Status.COMPLETED:
+			top_cards.append(item)
+
+	for habit in get_active_habits():
+		if top_cards.size() >= 3:
+			break
+		var already_added := false
+		for card in top_cards:
+			if int(card.get("habit_id", -1)) == habit.id:
+				already_added = true
+				break
+		if already_added:
+			continue
+		top_cards.append({
+			"entry_id": -1,
+			"habit_id": habit.id,
+			"title": habit.name,
+			"minutes": habit.estimated_minutes,
+			"period_text": habit.get_period_name(),
+			"time_text": "可作为轻量安排",
+			"color": habit.color,
+			"status": HabitData.ExecutionRecord.Status.PENDING,
+			"status_text": "可开始",
+			"can_start": true,
+		})
+
+	var total_count := entries.size()
+	var progress := 0.0
+	if total_count > 0:
+		progress = float(completed) / float(total_count)
+
+	var stats_text := "今天还没有安排，适合先从一个小习惯开始。"
+	if get_active_habits().is_empty():
+		stats_text = "还没有习惯安排，先添加一个想坚持的小目标吧。"
+	elif total_count == 0:
+		stats_text = "今天比较轻松，可以补一个 15 分钟的小习惯。"
+	elif completed == total_count:
+		stats_text = "今天的计划已经完成啦，适合放松一下或写个小回顾。"
+	elif pending > 0:
+		stats_text = "今天还剩 %d 个小步骤，先做最轻松的一项就好。" % pending
+	elif deferred > 0:
+		stats_text = "今天有一些项目往后顺延了，慢慢调整节奏也没关系。"
+	elif skipped > 0:
+		stats_text = "今天有些项目跳过了，挑一个最容易恢复的小动作重新开始吧。"
+
+	var dt := _date_key_to_dict(date_key)
+	return {
+		"date_key": date_key,
+		"week_key": week_key,
+		"day_of_week": day_of_week,
+		"date_title": "%d 月 %d 日" % [dt.get("month", 0), dt.get("day", 0)],
+		"status_text": stats_text,
+		"progress": progress,
+		"completed_count": completed,
+		"total_count": total_count,
+		"focus_minutes": _get_focus_minutes_for_date(date_key),
+		"top_cards": top_cards,
+		"timeline": timeline,
+		"calendar_marks": get_month_calendar_marks(int(dt.get("year", 0)), int(dt.get("month", 0))),
+	}
+
+
+func get_week_rhythm_data(week_key: String) -> Dictionary:
+	var entries := get_week_schedule(week_key)
+	var daily_loads: Array = []
+	var total_entries := 0
+	var total_completed := 0
+	var active_days := 0
+
+	for day in range(7):
+		var day_entries := get_day_schedule(week_key, day)
+		var day_completed := get_day_completion(week_key, day)
+		var completed := int(day_completed.get("completed", 0))
+		var total := day_entries.size()
+		if total > 0:
+			active_days += 1
+		total_entries += total
+		total_completed += completed
+		daily_loads.append({
+			"day": day,
+			"total": total,
+			"completed": completed,
+			"load_ratio": float(total) / 4.0,
+		})
+
+	var theme_title := "这一周节奏偏松"
+	var theme_text := "这一周安排比较轻，可以保留一点弹性。"
+	if total_entries >= 12:
+		theme_title = "这一周节奏偏紧"
+		theme_text = "安排比较充实，建议优先保证最重要的 1 到 2 件事。"
+	elif total_entries >= 6:
+		theme_title = "这一周节奏偏稳"
+		theme_text = "安排和恢复比较平衡，适合按节奏稳稳推进。"
+
+	if entries.is_empty():
+		theme_text = "这一周还是空白的，先试试让 AI 给你生成一个轻松版建议。"
+
+	return {
+		"week_key": week_key,
+		"theme_title": theme_title,
+		"theme_text": theme_text,
+		"total_entries": total_entries,
+		"completed_entries": total_completed,
+		"active_days": active_days,
+		"daily_loads": daily_loads,
+		"empty_state_text": "本周还没有安排，先生成一个建议节奏吧。",
+	}
+
+
+func get_review_summary(period_type: String, period_key: String) -> Dictionary:
+	var range_data: Dictionary = _resolve_period_range(period_type, period_key)
+	var raw_date_keys: Array = range_data.get("date_keys", [])
+	var date_keys: Array[String] = []
+	for value in raw_date_keys:
+		date_keys.append(str(value))
+	var week_key: String = str(range_data.get("week_key", ""))
+	var overview_completion: float = 0.0
+	var completed_count: int = 0
+	var total_count: int = 0
+	var focus_minutes: int = 0
+	var day_heatmap: Array[Dictionary] = []
+	var habit_buckets: Dictionary = {}
+	var period_counter: Dictionary = {"morning": 0, "afternoon": 0, "evening": 0}
+
+	for date_key in date_keys:
+		var date_key_str: String = date_key
+		var dashboard: Dictionary = get_day_dashboard_data(date_key_str)
+		total_count += int(dashboard.get("total_count", 0))
+		completed_count += int(dashboard.get("completed_count", 0))
+		focus_minutes += int(dashboard.get("focus_minutes", 0))
+		day_heatmap.append({
+			"date_key": date_key_str,
+			"completed": int(dashboard.get("completed_count", 0)),
+			"total": int(dashboard.get("total_count", 0)),
+		})
+
+		var records: Array = get_records_by_date(date_key_str)
+		for record in records:
+			if record.status != HabitData.ExecutionRecord.Status.COMPLETED:
+				continue
+			var habit: HabitData = get_habit_by_id(record.habit_id)
+			if habit == null:
+				continue
+			if not habit_buckets.has(habit.id):
+				habit_buckets[habit.id] = {
+					"name": habit.name,
+					"color": habit.color,
+					"completed": 0,
+					"planned": 0,
+				}
+			habit_buckets[habit.id]["completed"] += 1
+			match habit.preferred_period:
+				0:
+					period_counter["morning"] += 1
+				1:
+					period_counter["afternoon"] += 1
+				2:
+					period_counter["evening"] += 1
+
+	var all_entries: Array = []
+	if period_type == "week" and not week_key.is_empty():
+		all_entries = get_week_schedule(week_key)
+	else:
+		for entry in _schedule_entries:
+			var entry_date_key: String = DateUtil.week_key_to_date(entry.week_key, entry.day_of_week)
+			if entry_date_key in date_keys:
+				all_entries.append(entry)
+
+	for entry in all_entries:
+		var bucket = habit_buckets.get(entry.habit_id, null)
+		if bucket == null:
+			var habit := get_habit_by_id(entry.habit_id)
+			if habit == null:
+				continue
+			bucket = {
+				"name": habit.name,
+				"color": habit.color,
+				"completed": 0,
+				"planned": 0,
+			}
+			habit_buckets[entry.habit_id] = bucket
+		bucket["planned"] += 1
+
+	if total_count > 0:
+		overview_completion = float(completed_count) / float(total_count)
+
+	var habit_chart: Array = []
+	var strongest_habit := "还没有稳定习惯"
+	var strongest_value := -1
+	for habit_id in habit_buckets.keys():
+		var bucket: Dictionary = habit_buckets[habit_id]
+		var label: String = str(bucket.get("name", ""))
+		var value: int = int(bucket.get("completed", 0))
+		habit_chart.append({
+			"label": label.left(4),
+			"value": value,
+			"full_label": label,
+			"color": bucket.get("color", "#4CAF50"),
+		})
+		if value > strongest_value:
+			strongest_value = value
+			strongest_habit = label
+	habit_chart.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("value", 0.0)) > float(b.get("value", 0.0))
+	)
+	if habit_chart.size() > 6:
+		habit_chart = habit_chart.slice(0, 6)
+
+	var focus_chart := _build_focus_chart(period_type, range_data)
+	var trend_chart := _build_completion_trend_chart(period_type, range_data)
+	var easiest_period := _pick_strongest_period(period_counter)
+	var insights := [
+		"这段时间最稳定的是 %s。" % strongest_habit,
+		"你通常在%s更容易进入状态。" % easiest_period,
+		"完成率是 %d%%，继续保持一点点连续性就很好。" % int(round(overview_completion * 100.0)),
+	]
+
+	return {
+		"period_type": period_type,
+		"period_key": period_key,
+		"title": range_data.get("title", ""),
+		"overview": {
+			"completion_rate": overview_completion,
+			"focus_minutes": focus_minutes,
+			"best_habit_name": strongest_habit,
+			"best_period_text": easiest_period,
+		},
+		"heatmap_days": day_heatmap,
+		"habit_chart": habit_chart,
+		"focus_chart": focus_chart,
+		"trend_chart": trend_chart,
+		"insights": insights,
+		"reflection": get_period_reflection(period_type, period_key),
+		"calendar_marks": get_month_calendar_marks(int(range_data.get("display_year", 0)), int(range_data.get("display_month", 0))),
+	}
+
+
+func get_month_calendar_marks(year: int, month: int) -> Dictionary:
+	var marks := {}
+	if year <= 0 or month <= 0:
+		return marks
+	var days_in_month := DateUtil.get_days_in_month(year, month)
+	for day in range(1, days_in_month + 1):
+		var date_key := "%04d-%02d-%02d" % [year, month, day]
+		var week_key := DateUtil.date_to_week_key(date_key)
+		var day_of_week := DateUtil.get_day_of_week(date_key)
+		var completion := get_day_completion(week_key, day_of_week)
+		var total := int(completion.get("total", 0))
+		var completed := int(completion.get("completed", 0))
+		var completion_ratio := 0.0
+		if total > 0:
+			completion_ratio = float(completed) / float(total)
+
+		var focus_minutes := _get_focus_minutes_for_date(date_key)
+		var reflection_text := _find_period_reflection_text("day", date_key)
+		marks[date_key] = {
+			"completion_ratio": completion_ratio,
+			"focus_minutes": focus_minutes,
+			"has_reflection": not reflection_text.is_empty(),
+			"has_peak": completed >= 2 or focus_minutes >= 45,
+		}
+	return marks
+
+
+func get_period_reflection(period_type: String, period_key: String) -> Dictionary:
+	var content := _find_period_reflection_text(period_type, period_key)
+	if content.is_empty():
+		return {
+			"title": "还没有回顾",
+			"content": "先看看图表，再生成一段温和的回顾也不错。",
+			"source": "empty",
+		}
+	return {
+		"title": _period_title(period_type, period_key),
+		"content": content,
+		"source": "note",
+	}
+
+
 # ======================== 修改 API - 习惯库 ========================
 
 func add_habit(p_name: String, p_minutes: int = 30, p_period: int = 0, p_frequency: int = 0, p_color: String = "#4CAF50") -> HabitData:
 	var habit = HabitData.new(_next_habit_id, p_name, p_minutes, p_period, p_frequency, p_color)
 	_next_habit_id += 1
 	_habits.append(habit)
-	_save_data()
+	_queue_save()
 	habit_added.emit(habit)
 	print("[HabitState] Added habit(id: %d, name: %s)" % [habit.id, habit.name])
 	return habit
@@ -230,7 +560,7 @@ func update_habit(id: int, fields: Dictionary) -> bool:
 	if fields.has("is_active"):
 		habit.is_active = fields["is_active"]
 	habit.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	habit_updated.emit(habit)
 	print("[HabitState] Updated habit(id: %d)" % id)
 	return true
@@ -242,7 +572,7 @@ func remove_habit(id: int) -> bool:
 			_habits.remove_at(i)
 			# 同时移除关联的排期和执行记录
 			_remove_entries_by_habit(id)
-			_save_data()
+			_queue_save()
 			habit_removed.emit(id)
 			print("[HabitState] Removed habit(id: %d)" % id)
 			return true
@@ -259,7 +589,7 @@ func add_time_slot_template(p_name: String, p_start: String, p_end: String) -> H
 	var slot = HabitData.TimeSlotTemplate.new(_next_slot_template_id, p_name, p_start, p_end, _time_slot_templates.size())
 	_next_slot_template_id += 1
 	_time_slot_templates.append(slot)
-	_save_data()
+	_queue_save()
 	time_slot_template_changed.emit()
 	print("[HabitState] Added time slot template(id: %d, name: %s)" % [slot.id, slot.name])
 	return slot
@@ -275,7 +605,7 @@ func update_time_slot_template(id: int, fields: Dictionary) -> bool:
 		slot.start_time = fields["start_time"]
 	if fields.has("end_time"):
 		slot.end_time = fields["end_time"]
-	_save_data()
+	_queue_save()
 	time_slot_template_changed.emit()
 	return true
 
@@ -287,7 +617,7 @@ func remove_time_slot_template(id: int) -> bool:
 			_update_slot_orders()
 			# 移除使用该时间段的排期
 			_remove_entries_by_slot(id)
-			_save_data()
+			_queue_save()
 			time_slot_template_changed.emit()
 			print("[HabitState] Removed time slot template(id: %d)" % id)
 			return true
@@ -302,7 +632,7 @@ func reorder_time_slot_templates(ids: Array) -> void:
 			reordered.append(slot)
 	_time_slot_templates = reordered
 	_update_slot_orders()
-	_save_data()
+	_queue_save()
 	time_slot_template_changed.emit()
 
 
@@ -315,7 +645,7 @@ func add_schedule_entry(habit_id: int, week_key: String, day: int, time_slot_id:
 	var entry = HabitData.ScheduleEntry.new(_next_entry_id, habit_id, week_key, day, time_slot_id)
 	_next_entry_id += 1
 	_schedule_entries.append(entry)
-	_save_data()
+	_queue_save()
 	schedule_entry_added.emit(entry)
 	print("[HabitState] Added schedule entry(id: %d, habit: %d, week: %s, day: %d, slot: %d)" % [entry.id, habit_id, week_key, day, time_slot_id])
 	return entry
@@ -327,7 +657,7 @@ func remove_schedule_entry(id: int) -> bool:
 			_schedule_entries.remove_at(i)
 			# 移除关联的执行记录
 			_remove_records_by_entry(id)
-			_save_data()
+			_queue_save()
 			schedule_entry_removed.emit(id)
 			print("[HabitState] Removed schedule entry(id: %d)" % id)
 			return true
@@ -342,7 +672,7 @@ func clear_week_schedule(week_key: String) -> void:
 			_schedule_entries.remove_at(i)
 			_remove_records_by_entry(entry_id)
 		i -= 1
-	_save_data()
+	_queue_save()
 	schedule_cleared.emit(week_key)
 	print("[HabitState] Cleared week schedule: %s" % week_key)
 
@@ -379,7 +709,7 @@ func set_execution_status(entry_id: int, date_key: String, status: int) -> Habit
 				r.completed_at = int(Time.get_unix_time_from_system())
 			else:
 				r.completed_at = 0
-			_save_data()
+			_queue_save()
 			execution_updated.emit(r)
 			return r
 
@@ -392,7 +722,7 @@ func set_execution_status(entry_id: int, date_key: String, status: int) -> Habit
 	if status == HabitData.ExecutionRecord.Status.COMPLETED:
 		record.completed_at = int(Time.get_unix_time_from_system())
 	_execution_records.append(record)
-	_save_data()
+	_queue_save()
 	execution_updated.emit(record)
 	print("[HabitState] Set execution: entry=%d date=%s status=%d" % [entry_id, date_key, status])
 	return record
@@ -414,7 +744,7 @@ func ensure_daily_records(date_key: String) -> void:
 			var record = HabitData.ExecutionRecord.new(_next_record_id, entry.id, entry.habit_id, date_key, HabitData.ExecutionRecord.Status.PENDING)
 			_next_record_id += 1
 			_execution_records.append(record)
-	_save_data()
+	_queue_save()
 
 
 # ======================== Agent API ========================
@@ -435,6 +765,27 @@ func agent_generate_schedule(week_key: String, entries: Array) -> bool:
 	apply_schedule_batch(week_key, entries)
 	agent_schedule_generated.emit(week_key)
 	return true
+
+
+func agent_generate_week_schedule(week_key: String, style: String = "relaxed") -> bool:
+	if not ChatState:
+		return false
+	var style_text := "轻松版" if style == "relaxed" else "自律版"
+	var habits := agent_get_habits()
+	var summary := JSON.stringify(habits)
+	var prompt := "请根据我的习惯库和现有节奏，为 %s 生成一份%s周安排。请优先输出可落到日历中的课表建议，兼顾恢复感。习惯数据：%s" % [week_key, style_text, summary]
+	return ChatState.agent_set_input_text(prompt)
+
+
+func agent_generate_period_reflection(period_type: String, period_key: String) -> bool:
+	if not ChatState:
+		return false
+	var summary := get_review_summary(period_type, period_key)
+	var prompt := "请根据我的%s数据，生成一段温和、鼓励式的回顾总结。请包含亮点、节奏观察和下一步一小步建议。数据摘要：%s" % [
+		_period_title(period_type, period_key),
+		JSON.stringify(summary),
+	]
+	return ChatState.agent_set_input_text(prompt)
 
 
 func agent_get_week_schedule(week_key: String) -> Array:
@@ -473,6 +824,12 @@ func agent_get_time_slots() -> Array:
 
 
 # ======================== 持久化 ========================
+
+func _queue_save() -> void:
+	if _save_timer and _save_timer.time_left > 0.0:
+		return
+	_save_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
+	_save_timer.timeout.connect(_save_data, CONNECT_ONE_SHOT)
 
 func _save_data() -> void:
 	var data = {
@@ -705,3 +1062,169 @@ func _get_max_updated_at_from_data(data: Dictionary) -> int:
 			if val > max_val:
 				max_val = val
 	return max_val
+
+
+func _build_time_slot_label(slot: HabitData.TimeSlotTemplate) -> String:
+	if slot == null:
+		return "今天"
+	return "%s %s-%s" % [slot.name, slot.start_time, slot.end_time]
+
+
+func _execution_status_to_text(status: int) -> String:
+	match status:
+		HabitData.ExecutionRecord.Status.COMPLETED:
+			return "已完成"
+		HabitData.ExecutionRecord.Status.SKIPPED:
+			return "已跳过"
+		HabitData.ExecutionRecord.Status.DEFERRED:
+			return "稍后处理"
+		_:
+			return "待进行"
+
+
+func _date_key_to_dict(date_key: String) -> Dictionary:
+	var parts := date_key.split("-")
+	if parts.size() != 3:
+		return {"year": 0, "month": 0, "day": 0}
+	return {
+		"year": int(parts[0]),
+		"month": int(parts[1]),
+		"day": int(parts[2]),
+	}
+
+
+func _resolve_period_range(period_type: String, period_key: String) -> Dictionary:
+	var result := {
+		"date_keys": [],
+		"week_key": "",
+		"title": "",
+		"display_year": 0,
+		"display_month": 0,
+	}
+
+	match period_type:
+		"month":
+			var parts := period_key.split("-")
+			var now_dict: Dictionary = Time.get_datetime_dict_from_system()
+			var year: int = int(parts[0]) if parts.size() >= 2 else int(now_dict.get("year", 0))
+			var month: int = int(parts[1]) if parts.size() >= 2 else int(now_dict.get("month", 0))
+			var days_in_month := DateUtil.get_days_in_month(year, month)
+			for day in range(1, days_in_month + 1):
+				result["date_keys"].append("%04d-%02d-%02d" % [year, month, day])
+			result["title"] = "%d 年 %d 月回顾" % [year, month]
+			result["display_year"] = year
+			result["display_month"] = month
+		"recent30":
+			var end_date := period_key if not period_key.is_empty() else DateUtil.get_today_key()
+			for offset in range(29, -1, -1):
+				result["date_keys"].append(DateUtil.offset_date(end_date, -offset))
+			var end_dict := _date_key_to_dict(end_date)
+			result["title"] = "最近 30 天回顾"
+			result["display_year"] = int(end_dict.get("year", 0))
+			result["display_month"] = int(end_dict.get("month", 0))
+		_:
+			var week_key := period_key if not period_key.is_empty() else get_current_week_key()
+			for day in range(7):
+				result["date_keys"].append(DateUtil.week_key_to_date(week_key, day))
+			var monday := _date_key_to_dict(DateUtil.week_key_to_date(week_key, 0))
+			result["week_key"] = week_key
+			result["title"] = "%s 回顾" % week_key
+			result["display_year"] = int(monday.get("year", 0))
+			result["display_month"] = int(monday.get("month", 0))
+	return result
+
+
+func _build_focus_chart(period_type: String, range_data: Dictionary) -> Array:
+	var chart: Array = []
+	match period_type:
+		"month":
+			var year := int(range_data.get("display_year", 0))
+			var month := int(range_data.get("display_month", 0))
+			if StatsState:
+				for item in StatsState.get_month_daily_totals("focus", year, month, "duration_seconds"):
+					var date_key: String = item.get("date", "")
+					var day := int(date_key.get_slice("-", 2))
+					chart.append({"label": str(day), "value": float(item.get("value", 0.0)) / 3600.0})
+		"recent30":
+			for date_key in range_data.get("date_keys", []):
+				var date_key_str: String = str(date_key)
+				var day_label: String = date_key_str.substr(max(date_key_str.length() - 5, 0), 5)
+				chart.append({"label": day_label, "value": float(_get_focus_minutes_for_date(date_key_str)) / 60.0})
+		_:
+			var week_key: String = str(range_data.get("week_key", get_current_week_key()))
+			var labels: Array[String] = ["一", "二", "三", "四", "五", "六", "日"]
+			for day in range(7):
+				var date_key: String = DateUtil.week_key_to_date(week_key, day)
+				chart.append({"label": labels[day], "value": float(_get_focus_minutes_for_date(date_key)) / 60.0})
+	return chart
+
+
+func _build_completion_trend_chart(period_type: String, range_data: Dictionary) -> Array:
+	var chart: Array = []
+	match period_type:
+		"month", "recent30":
+			for date_key in range_data.get("date_keys", []):
+				var date_key_str: String = str(date_key)
+				var week_key: String = DateUtil.date_to_week_key(date_key_str)
+				var day: int = DateUtil.get_day_of_week(date_key_str)
+				var completion := get_day_completion(week_key, day)
+				var total := int(completion.get("total", 0))
+				var completed := int(completion.get("completed", 0))
+				var ratio: float = 0.0 if total == 0 else float(completed) / float(total)
+				var short_label: String = date_key_str.substr(max(date_key_str.length() - 5, 0), 5)
+				chart.append({"label": short_label, "value": ratio * 100.0})
+		_:
+			var base_week: String = str(range_data.get("week_key", get_current_week_key()))
+			for offset in range(-3, 1):
+				var week_key: String = DateUtil.offset_week(base_week, offset)
+				var rate: float = get_week_completion_rate(week_key) * 100.0
+				chart.append({"label": week_key.right(3), "value": rate})
+	return chart
+
+
+func _pick_strongest_period(period_counter: Dictionary) -> String:
+	var best_key := "morning"
+	var best_value := -1
+	for key in period_counter.keys():
+		var value := int(period_counter[key])
+		if value > best_value:
+			best_value = value
+			best_key = key
+	match best_key:
+		"afternoon":
+			return "下午"
+		"evening":
+			return "晚上"
+		_:
+			return "早晨"
+
+
+func _get_focus_minutes_for_date(date_key: String) -> int:
+	if not StatsState:
+		return 0
+	return int(round(float(StatsState.get_day_total("focus", date_key, "duration_seconds")) / 60.0))
+
+
+func _period_title(period_type: String, period_key: String) -> String:
+	match period_type:
+		"month":
+			return "%s 月度回顾" % period_key
+		"recent30":
+			return "最近30天回顾"
+		"day":
+			return "%s 当日回顾" % period_key
+		_:
+			return "%s 周回顾" % period_key
+
+
+func _find_period_reflection_text(period_type: String, period_key: String) -> String:
+	if not NoteState:
+		return ""
+	var notes = NoteState.get_notes_by_category("反思总结")
+	for note in notes:
+		var haystack := "%s\n%s" % [note.title, note.content]
+		if haystack.find(period_key) >= 0:
+			return note.content
+		if period_type == "recent30" and haystack.find("最近30天") >= 0:
+			return note.content
+	return ""

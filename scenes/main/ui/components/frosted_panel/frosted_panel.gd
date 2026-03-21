@@ -78,7 +78,26 @@ extends PanelContainer
 		_update_shadow_padding()
 		_update_shader_params()
 
+@export_group("AI Glow")
+@export var glow_width: float = 4.0:
+	set(value):
+		glow_width = value
+		_update_shader_params()
+
+@export var glow_speed: float = 0.8:
+	set(value):
+		glow_speed = value
+		_update_shader_params()
+
+@export var glow_softness: float = 2.0:
+	set(value):
+		glow_softness = value
+		_update_shader_params()
+
 var _shadow_padding: float = 0.0
+var _glow_intensity: float = 0.0
+var _glow_tween: Tween = null
+
 
 func _ready() -> void:
 	if material:
@@ -86,7 +105,7 @@ func _ready() -> void:
 	else:
 		material = ShaderMaterial.new()
 		material.shader = preload("res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader")
-	
+
 	# Default noise if none provided
 	if noise_texture == null:
 		var noise = FastNoiseLite.new()
@@ -97,11 +116,12 @@ func _ready() -> void:
 		noise_tex.height = 64
 		# We don't want to save this to disk, just use it
 		noise_texture = noise_tex
-	
+
 	_update_shadow_padding()
 	connect("resized", _on_resized)
 	_on_resized()
 	_update_shader_params()
+
 
 func _update_shadow_padding() -> void:
 	# Calculate padding needed for shadow
@@ -109,7 +129,7 @@ func _update_shadow_padding() -> void:
 		_shadow_padding = shadow_size + max(abs(shadow_offset.x), abs(shadow_offset.y))
 	else:
 		_shadow_padding = 0.0
-	
+
 	# Apply padding as theme override for content margin
 	var style = get_theme_stylebox("panel")
 	if style:
@@ -132,9 +152,11 @@ func _update_shadow_padding() -> void:
 		new_style.content_margin_bottom = _shadow_padding
 		add_theme_stylebox_override("panel", new_style)
 
+
 func _on_resized() -> void:
 	if material:
 		material.set_shader_parameter("size", size)
+
 
 func _update_shader_params() -> void:
 	if material:
@@ -154,3 +176,33 @@ func _update_shader_params() -> void:
 		material.set_shader_parameter("shadow_offset", shadow_offset)
 		material.set_shader_parameter("shadow_padding", _shadow_padding)
 		material.set_shader_parameter("size", size)
+		material.set_shader_parameter("glow_width", glow_width)
+		material.set_shader_parameter("glow_speed", glow_speed)
+		material.set_shader_parameter("glow_softness", glow_softness)
+		material.set_shader_parameter("glow_intensity", _glow_intensity)
+
+
+func start_ai_glow(duration: float = 0.4) -> void:
+	if _glow_tween:
+		_glow_tween.kill()
+	_glow_tween = create_tween()
+	_glow_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	_glow_tween.tween_method(_set_glow_intensity, _glow_intensity, 1.0, duration)
+
+
+func stop_ai_glow(duration: float = 0.6) -> void:
+	if _glow_tween:
+		_glow_tween.kill()
+	_glow_tween = create_tween()
+	_glow_tween.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	_glow_tween.tween_method(_set_glow_intensity, _glow_intensity, 0.0, duration)
+
+
+func is_ai_glow_active() -> bool:
+	return _glow_intensity > 0.001
+
+
+func _set_glow_intensity(value: float) -> void:
+	_glow_intensity = value
+	if material:
+		material.set_shader_parameter("glow_intensity", value)

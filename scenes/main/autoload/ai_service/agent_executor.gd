@@ -640,6 +640,26 @@ func _fn_get_habit_stats(args: Dictionary) -> Dictionary:
 
 
 # ============================================================
+# 函数实现 — UI 模块控制（2 个）
+# ============================================================
+
+func _fn_show_module(args: Dictionary) -> Dictionary:
+	var module_name = args.get("module_name", "")
+	if module_name.is_empty():
+		return {"success": false, "error": "module_name 不能为空"}
+	LayerManager.agent_show_module(module_name)
+	return {"success": true, "data": {"module_name": module_name}}
+
+
+func _fn_hide_module(args: Dictionary) -> Dictionary:
+	var module_name = args.get("module_name", "")
+	if module_name.is_empty():
+		return {"success": false, "error": "module_name 不能为空"}
+	LayerManager.agent_hide_module(module_name)
+	return {"success": true, "data": {"module_name": module_name}}
+
+
+# ============================================================
 # 辅助函数
 # ============================================================
 

@@ -2,12 +2,30 @@ extends Node
 
 ## 层级管理器 Autoload 单例
 ## 统一管理所有 CanvasLayer 的层级，避免模块依赖 UI 协调器
+## 同时提供 Agent 模块显示/隐藏的信号路由
 
 const BASE_LAYER: int = 10
 const COMPACT_THRESHOLD: int = 100
 
+## Agent 请求显示模块
+signal module_show_requested(module_name: String)
+## Agent 请求隐藏模块
+signal module_hide_requested(module_name: String)
+
 ## 所有已注册的 CanvasLayer（弱引用数组）
 var _registered_layers: Array[CanvasLayer] = []
+
+
+## Agent API：请求显示指定模块
+func agent_show_module(module_name: String) -> bool:
+	module_show_requested.emit(module_name)
+	return true
+
+
+## Agent API：请求隐藏指定模块
+func agent_hide_module(module_name: String) -> bool:
+	module_hide_requested.emit(module_name)
+	return true
 
 
 ## 注册一个 CanvasLayer，退出场景树时自动注销

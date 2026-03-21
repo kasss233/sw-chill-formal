@@ -606,6 +606,36 @@
 	}
   },
   {
+	"name": "show_module",
+	"description": "显示指定的 UI 模块面板（会自动关闭其他已打开的模块）",
+	"parameters": {
+	  "type": "object",
+	  "properties": {
+		"module_name": {
+		  "type": "string",
+		  "enum": ["task", "notebook", "pomodoro", "achievement", "room_decor", "calendar", "setting", "music"],
+		  "description": "模块名称：task=任务, notebook=笔记本, pomodoro=番茄钟, achievement=成就, room_decor=房间装饰, calendar=日历, setting=环境设置, music=音乐"
+		}
+	  },
+	  "required": ["module_name"]
+	}
+  },
+  {
+	"name": "hide_module",
+	"description": "隐藏指定的 UI 模块面板",
+	"parameters": {
+	  "type": "object",
+	  "properties": {
+		"module_name": {
+		  "type": "string",
+		  "enum": ["task", "notebook", "pomodoro", "achievement", "room_decor", "calendar", "setting", "music"],
+		  "description": "模块名称：task=任务, notebook=笔记本, pomodoro=番茄钟, achievement=成就, room_decor=房间装饰, calendar=日历, setting=环境设置, music=音乐"
+		}
+	  },
+	  "required": ["module_name"]
+	}
+  },
+  {
 	"name": "get_habit_stats",
 	"description": "获取某周的习惯统计数据（完成率、各状态计数等）",
 	"parameters": {

@@ -29,6 +29,11 @@ var _id_mapping: IdMapping = null
 var _auto_sync_timer: Timer = null
 var _debounce_timer: Timer = null
 var _consecutive_failures: int = 0
+var _task_server_hints: Dictionary = {}
+var _note_server_hints: Dictionary = {}
+var _category_server_hints: Dictionary = {}
+var _last_push_summary: Dictionary = {}
+var _last_pull_summary: Dictionary = {}
 
 # 全量同步 bundle 注册表
 # key: bundle_type, value: { "export": Callable, "merge": Callable }
@@ -79,6 +84,7 @@ func _ready() -> void:
 	# 注册全量同步 bundles 并连接脏标记信号
 	_register_full_sync_bundles()
 	_connect_bundle_dirty_signals()
+	_rebuild_sync_hints()
 
 	# 如果已登录，延迟触发同步启动（AuthState 的信号在 SyncState 初始化前已发射）
 	if AuthState.is_logged_in():
@@ -131,6 +137,7 @@ func _connect_bundle_dirty_signals() -> void:
 	# StatsState
 	if StatsState:
 		StatsState.record_added.connect(_on_bundle_dirty.bind("stats_bundle"))
+		StatsState.record_removed.connect(_on_bundle_dirty.bind("stats_bundle"))
 
 
 func _on_bundle_dirty(_arg1 = null, bundle_type: String = "") -> void:
@@ -163,6 +170,72 @@ func _push_dirty_bundles() -> void:
 # ======================== 认证状态响应 ========================
 
 ## 延迟启动同步（用于冷启动时 AuthState 信号已错过的场景）
+func _rebuild_sync_hints() -> void:
+	_task_server_hints.clear()
+	for task in TaskState.get_all_tasks():
+		_remember_task_sync_hint(task)
+
+	_note_server_hints.clear()
+	for note in NoteState.get_all_notes():
+		_remember_note_sync_hint(note)
+
+	_category_server_hints.clear()
+	for category in NoteState.get_categories():
+		_remember_category_sync_hint(category)
+
+
+func _remember_task_sync_hint(task: TaskData) -> void:
+	if task == null:
+		return
+	var server_id = task.server_id
+	if server_id <= 0:
+		server_id = _id_mapping.get_server_id("task", str(task.id))
+	if server_id > 0:
+		_task_server_hints[task.id] = server_id
+
+
+func _remember_note_sync_hint(note: NoteData) -> void:
+	if note == null:
+		return
+	var server_id = note.server_id
+	if server_id <= 0:
+		server_id = _id_mapping.get_server_id("note", str(note.id))
+	if server_id > 0:
+		_note_server_hints[note.id] = server_id
+
+
+func _remember_category_sync_hint(category: String) -> void:
+	if category == "":
+		return
+	var server_id = _id_mapping.get_server_id("category", category)
+	if server_id > 0:
+		_category_server_hints[category] = server_id
+
+
+func _forget_sync_hint(resource: String, local_id: int = 0, local_key: String = "") -> void:
+	match resource:
+		"task":
+			if local_id > 0:
+				_task_server_hints.erase(local_id)
+		"note":
+			if local_id > 0:
+				_note_server_hints.erase(local_id)
+		"category":
+			if local_key != "":
+				_category_server_hints.erase(local_key)
+
+
+func _make_delete_change(resource: String, local_id: int = 0, local_key: String = "") -> SyncChange:
+	var data: Dictionary = {}
+	var server_id = _resolve_server_id_from_state(resource, local_id, local_key)
+	if server_id > 0:
+		data["server_id_hint"] = server_id
+	print("[SyncState][DeleteTrace] record delete change resource=%s local_id=%d local_key=%s server_id_hint=%d" % [
+		resource, local_id, local_key, server_id
+	])
+	return SyncChange.new(resource, "delete", local_id, local_key, data)
+
+
 func _deferred_login_sync() -> void:
 	if not AuthState.is_logged_in():
 		return
@@ -222,6 +295,7 @@ func register_device() -> void:
 func _on_task_added(task: TaskData) -> void:
 	if _is_applying_remote:
 		return
+	_remember_task_sync_hint(task)
 	_record_change(SyncChange.new("task", "create", task.id, str(task.id), {
 		"title": task.title,
 		"due_timestamp": task.due_timestamp,
@@ -234,11 +308,12 @@ func _on_task_added(task: TaskData) -> void:
 func _on_task_removed(task_id: int) -> void:
 	if _is_applying_remote:
 		return
-	_record_change(SyncChange.new("task", "delete", task_id, str(task_id)))
+	_record_change(_make_delete_change("task", task_id, str(task_id)))
 
 func _on_task_updated(task: TaskData) -> void:
 	if _is_applying_remote:
 		return
+	_remember_task_sync_hint(task)
 	_record_change(SyncChange.new("task", "update", task.id, str(task.id), {
 		"title": task.title,
 		"due_timestamp": task.due_timestamp,
@@ -251,6 +326,7 @@ func _on_task_updated(task: TaskData) -> void:
 func _on_task_state_changed(task: TaskData) -> void:
 	if _is_applying_remote:
 		return
+	_remember_task_sync_hint(task)
 	_record_change(SyncChange.new("task", "update", task.id, str(task.id), {
 		"is_completed": task.is_completed,
 		"finish_timestamp": task.finish_timestamp,
@@ -269,12 +345,14 @@ func _on_tasks_reordered() -> void:
 			ordered_ids.append(sid)
 	if ordered_ids.size() > 0:
 		_record_change(SyncChange.new("task", "reorder", 0, "", {
+			"list_type": "all",
 			"ordered_ids": ordered_ids
 		}))
 
 func _on_note_added(note: NoteData) -> void:
 	if _is_applying_remote:
 		return
+	_remember_note_sync_hint(note)
 	_record_change(SyncChange.new("note", "create", note.id, str(note.id), {
 		"title": note.title,
 		"content": note.content,
@@ -284,11 +362,12 @@ func _on_note_added(note: NoteData) -> void:
 func _on_note_removed(note_id: int) -> void:
 	if _is_applying_remote:
 		return
-	_record_change(SyncChange.new("note", "delete", note_id, str(note_id)))
+	_record_change(_make_delete_change("note", note_id, str(note_id)))
 
 func _on_note_updated(note: NoteData) -> void:
 	if _is_applying_remote:
 		return
+	_remember_note_sync_hint(note)
 	_record_change(SyncChange.new("note", "update", note.id, str(note.id), {
 		"title": note.title,
 		"content": note.content,
@@ -298,6 +377,7 @@ func _on_note_updated(note: NoteData) -> void:
 func _on_category_added(cat_name: String) -> void:
 	if _is_applying_remote:
 		return
+	_remember_category_sync_hint(cat_name)
 	var position = NoteState.get_category_position(cat_name)
 	_record_change(SyncChange.new("category", "create", 0, cat_name, {
 		"name": cat_name,
@@ -307,7 +387,7 @@ func _on_category_added(cat_name: String) -> void:
 func _on_category_removed(cat_name: String) -> void:
 	if _is_applying_remote:
 		return
-	_record_change(SyncChange.new("category", "delete", 0, cat_name))
+	_record_change(_make_delete_change("category", 0, cat_name))
 
 
 ## 记录变更到队列，触发防抖
@@ -337,6 +417,10 @@ func _merge_change(new_change: SyncChange) -> void:
 		if existing.resource != new_change.resource:
 			continue
 
+		if new_change.action == "reorder" and existing.action == "reorder":
+			_change_queue.remove_at(i)
+			break
+
 		# 通过 local_key 匹配（category 用 name，其他用 id）
 		var same_item = false
 		if new_change.resource == "category":
@@ -346,11 +430,6 @@ func _merge_change(new_change: SyncChange) -> void:
 
 		if not same_item:
 			continue
-
-		# reorder：只保留最新一条
-		if new_change.action == "reorder" and existing.action == "reorder":
-			_change_queue.remove_at(i)
-			break
 
 		# create 后续 update → 合并到 create.data
 		if existing.action == "create" and new_change.action == "update":
@@ -387,14 +466,31 @@ func _do_push() -> bool:
 	if not _is_registered or _device_id == "":
 		return false
 
+	var pending_queue: Array = []
 	var changes_to_push: Array = []
+	var queued_changes: Array = []
 	for change in _change_queue:
 		var push_item = _convert_to_push_format(change)
 		if push_item.size() > 0:
+			if change.action == "delete":
+				print("[SyncState][DeleteTrace] queue delete for push resource=%s local_id=%d local_key=%s payload=%s" % [
+					change.resource, change.local_id, change.local_key, JSON.stringify(push_item)
+				])
+			queued_changes.append(change)
 			changes_to_push.append(push_item)
+		elif _should_drop_unpushable_change(change):
+			print("[SyncState] 丢弃无法推送的变更: resource=%s action=%s key=%s" % [
+				change.resource, change.action, change.local_key if change.local_key != "" else str(change.local_id)
+			])
+		else:
+			if change.action == "delete":
+				print("[SyncState][DeleteTrace] retain delete in pending queue resource=%s local_id=%d local_key=%s change_data=%s" % [
+					change.resource, change.local_id, change.local_key, JSON.stringify(change.data)
+				])
+			pending_queue.append(change)
 
 	if changes_to_push.size() == 0:
-		_change_queue.clear()
+		_change_queue = pending_queue
 		_save_change_queue()
 		return true
 
@@ -402,6 +498,12 @@ func _do_push() -> bool:
 		"device_id": _device_id,
 		"changes": changes_to_push
 	}
+	var delete_push_count := 0
+	for item in changes_to_push:
+		if item is Dictionary and item.get("action", "") == "delete":
+			delete_push_count += 1
+	if delete_push_count > 0:
+		print("[SyncState][DeleteTrace] pushing %d delete changes device_id=%s" % [delete_push_count, _device_id])
 
 	var result = await ApiClient.api_post("/sync/push", body)
 	if not result.success:
@@ -414,10 +516,11 @@ func _do_push() -> bool:
 
 	# 处理 results
 	var results = data.get("results", [])
-	_process_push_results(results)
-
-	# 清空已处理的变更队列
-	_change_queue.clear()
+	var push_summary = _process_push_results(queued_changes, results)
+	_last_push_summary = push_summary.duplicate(true)
+	_change_queue = pending_queue
+	for change in push_summary.get("retained_changes", []):
+		_change_queue.append(change)
 	_save_change_queue()
 	_id_mapping.save_to_file()
 
@@ -436,6 +539,34 @@ func _convert_to_push_format(change: SyncChange) -> Dictionary:
 		"data": {}
 	}
 
+	if change.action == "update":
+		var update_server_id = _resolve_server_id_for_change(change)
+		if update_server_id == 0:
+			print("[SyncState] Retain update change without server_id for retry: resource=%s key=%s" % [
+				change.resource, change.local_key if change.local_key != "" else str(change.local_id)
+			])
+			return {}
+		item["data"] = {"id": update_server_id, "fields": {}}
+		for key in change.data:
+			var value = change.data[key]
+			if key == "updated_at" and value is int:
+				value = _to_ms(value)
+			item["data"]["fields"][key] = value
+		return item
+
+	if change.action == "delete":
+		var delete_server_id: int = _resolve_server_id_for_change(change)
+		if delete_server_id == 0:
+			print("[SyncState] Retain delete change without server_id for retry: resource=%s key=%s" % [
+				change.resource, change.local_key if change.local_key != "" else str(change.local_id)
+			])
+			return {}
+		print("[SyncState][DeleteTrace] build delete payload resource=%s local_id=%d local_key=%s server_id=%d hint=%s" % [
+			change.resource, change.local_id, change.local_key, delete_server_id, JSON.stringify(change.data)
+		])
+		item["data"] = {"id": delete_server_id}
+		return item
+
 	match change.action:
 		"create":
 			item["data"] = change.data.duplicate(true)
@@ -444,8 +575,16 @@ func _convert_to_push_format(change: SyncChange) -> Dictionary:
 			if item["data"].has("created_at"):
 				item["data"]["created_at"] = _to_ms(item["data"]["created_at"])
 		"update":
-			var server_id = _id_mapping.get_server_id(change.resource, change.local_key)
+			var server_id = _resolve_server_id_for_change(change)
 			if server_id == 0:
+				print("[SyncState] 保留缺少 server_id 的 delete 变更重试: resource=%s key=%s" % [
+					change.resource, change.local_key if change.local_key != "" else str(change.local_id)
+				])
+				return {}
+				print("[SyncState] 保留缺少 server_id 的 update 变更重试: resource=%s key=%s" % [
+					change.resource, change.local_key if change.local_key != "" else str(change.local_id)
+				])
+				return {}
 				# 没有映射的项无法 update，跳过
 				return {}
 			item["data"] = {"id": server_id, "fields": {}}
@@ -456,11 +595,7 @@ func _convert_to_push_format(change: SyncChange) -> Dictionary:
 					value = _to_ms(value)
 				item["data"]["fields"][key] = value
 		"delete":
-			var server_id: int = 0
-			if change.resource == "category":
-				server_id = _id_mapping.get_server_id("category", change.local_key)
-			else:
-				server_id = _id_mapping.get_server_id(change.resource, str(change.local_id))
+			var server_id: int = _resolve_server_id_for_change(change)
 			if server_id == 0:
 				return {}  # 没有映射说明服务器没有此数据
 			item["data"] = {"id": server_id}
@@ -473,36 +608,77 @@ func _convert_to_push_format(change: SyncChange) -> Dictionary:
 
 
 ## 处理 push 返回的 results
-func _process_push_results(results: Array) -> void:
-	for r in results:
+func _process_push_results(queued_changes: Array, results: Array) -> Dictionary:
+	var retained_changes: Array = []
+	var accepted_count := 0
+	var rejected_count := 0
+
+	for i in range(queued_changes.size()):
+		var change: SyncChange = queued_changes[i]
+		var r: Dictionary = {}
+		if i < results.size() and results[i] is Dictionary:
+			r = results[i]
+		else:
+			print("[SyncState] Push 返回缺少结果，保留变更重试: resource=%s action=%s" % [change.resource, change.action])
+			retained_changes.append(change)
+			continue
+
 		if not r is Dictionary:
 			continue
 		var status = r.get("status", "")
 		var resource = r.get("resource", "")
 		var action = r.get("action", "")
 
-		if status == "accepted" and action == "create":
-			var server_id = r.get("server_id", 0)
-			var client_id = r.get("client_id", "")
-			if server_id > 0 and client_id != "":
-				# 从 client_id 解析本地 key
-				var local_key = ""
-				var local_id = 0
-				if client_id.begins_with("local-cat-"):
-					local_key = client_id.substr(10)  # "local-cat-" 长度 10
-				elif client_id.begins_with("local-"):
-					local_key = client_id.substr(6)
-					local_id = int(local_key)
-				_id_mapping.set_mapping(resource, local_key, server_id)
-				# 更新本地数据模型的 server_id
-				if resource == "task" and local_id > 0:
-					var task = TaskState.get_task_by_id(local_id)
-					if task:
-						task.server_id = server_id
-				elif resource == "note" and local_id > 0:
-					var note = NoteState.get_note_by_id(local_id)
-					if note:
-						note.server_id = server_id
+		if status == "accepted":
+			accepted_count += 1
+			if change.action == "delete":
+				print("[SyncState][DeleteTrace] delete push accepted resource=%s local_id=%d local_key=%s result=%s" % [
+					change.resource, change.local_id, change.local_key, JSON.stringify(r)
+				])
+			if action == "create":
+				var server_id = r.get("server_id", 0)
+				var client_id = r.get("client_id", "")
+				if server_id > 0 and client_id != "":
+					# 从 client_id 解析本地 key
+					var local_key = ""
+					var local_id = 0
+					if client_id.begins_with("local-cat-"):
+						local_key = client_id.substr(10)  # "local-cat-" 长度 10
+					elif client_id.begins_with("local-"):
+						local_key = client_id.substr(6)
+						local_id = int(local_key)
+					_id_mapping.set_mapping(resource, local_key, server_id)
+					# 更新本地数据模型的 server_id
+					if resource == "task" and local_id > 0:
+						var task = TaskState.get_task_by_id(local_id)
+						if task:
+							_persist_local_server_id("task", local_id, server_id)
+					elif resource == "note" and local_id > 0:
+						var note = NoteState.get_note_by_id(local_id)
+						if note:
+							_persist_local_server_id("note", local_id, server_id)
+					_repair_mapping(resource, local_id, local_key, server_id)
+			elif action == "delete":
+				_forget_sync_hint(change.resource, change.local_id, change.local_key)
+			continue
+
+		rejected_count += 1
+		if change.action == "delete":
+			print("[SyncState][DeleteTrace] delete push rejected resource=%s local_id=%d local_key=%s result=%s" % [
+				change.resource, change.local_id, change.local_key, JSON.stringify(r)
+			])
+		print("[SyncState] Push 结果被拒绝: resource=%s action=%s reason=%s" % [
+			resource, action, r.get("reason", "unknown")
+		])
+		if action == "reorder":
+			_apply_reorder_snapshot(resource, r.get("server_data", {}))
+		retained_changes.append(change)
+
+	return {
+		"accepted_count": accepted_count,
+		"rejected_count": rejected_count,
+		"retained_changes": retained_changes,
+	}
 
 
 # ======================== Pull 流程 ========================
@@ -511,6 +687,11 @@ func _do_pull() -> bool:
 	if not _is_registered or _device_id == "":
 		return false
 
+	_last_pull_summary = {
+		"applied_count": 0,
+		"mapping_repaired_count": 0,
+		"unresolved_count": 0,
+	}
 	var pull_count = 0
 	var has_more = true
 
@@ -532,7 +713,16 @@ func _do_pull() -> bool:
 
 		var changes = data.get("changes", [])
 		if changes.size() > 0:
-			_apply_remote_changes(changes)
+			var delete_changes: Array = []
+			for change in changes:
+				if change is Dictionary and change.get("action", "") == "delete":
+					delete_changes.append(change)
+			if not delete_changes.is_empty():
+				print("[SyncState][DeleteTrace] pull received %d delete changes page=%d payload=%s" % [
+					delete_changes.size(), pull_count + 1, JSON.stringify(delete_changes)
+				])
+			var page_summary = _apply_remote_changes(changes)
+			_last_pull_summary = _merge_remote_apply_summary(_last_pull_summary, page_summary)
 
 		_last_sync_time = data.get("server_time", _last_sync_time)
 		has_more = data.get("has_more", false)
@@ -546,7 +736,12 @@ func _do_pull() -> bool:
 
 
 ## 应用远程变更到本地
-func _apply_remote_changes(changes: Array) -> void:
+func _apply_remote_changes(changes: Array) -> Dictionary:
+	var summary = {
+		"applied_count": 0,
+		"mapping_repaired_count": 0,
+		"unresolved_count": 0,
+	}
 	_is_applying_remote = true
 
 	for change in changes:
@@ -555,16 +750,208 @@ func _apply_remote_changes(changes: Array) -> void:
 		var resource = change.get("resource", "")
 		var action = change.get("action", "")
 		var data = change.get("data", {})
+		if not data is Dictionary:
+			print("[SyncState] 跳过非法远端变更: resource=%s action=%s" % [resource, action])
+			continue
 
 		match resource:
 			"task":
-				_apply_remote_task_change(action, data)
+				var task_result = _apply_remote_task_change_v2(action, data)
+				summary = _merge_remote_apply_summary(summary, task_result)
 			"note":
-				_apply_remote_note_change(action, data)
+				var note_result = _apply_remote_note_change_v2(action, data)
+				summary = _merge_remote_apply_summary(summary, note_result)
 			"category":
-				_apply_remote_category_change(action, data)
+				var category_result = _apply_remote_category_change_v2(action, data)
+				summary = _merge_remote_apply_summary(summary, category_result)
 
 	_is_applying_remote = false
+	_rebuild_sync_hints()
+	return summary
+
+
+func _merge_remote_apply_summary(base: Dictionary, delta: Dictionary) -> Dictionary:
+	var merged = base.duplicate(true)
+	for key in ["applied_count", "mapping_repaired_count", "unresolved_count"]:
+		merged[key] = int(merged.get(key, 0)) + int(delta.get(key, 0))
+	return merged
+
+
+func _apply_remote_task_change_v2(action: String, data: Dictionary) -> Dictionary:
+	var summary = {"applied_count": 0, "mapping_repaired_count": 0, "unresolved_count": 0}
+	var server_id = int(data.get("id", 0))
+	var had_mapping = _id_mapping.get_local_key("task", server_id) != ""
+
+	match action:
+		"create":
+			var existing_local_id = _resolve_task_local_id(server_id, data)
+			if existing_local_id > 0:
+				if not had_mapping:
+					summary["mapping_repaired_count"] += 1
+				var create_fields = _extract_remote_fields(data, ["title", "is_completed", "due_timestamp", "finish_timestamp", "updated_at", "position"])
+				create_fields["server_id"] = server_id
+				if create_fields.has("updated_at"):
+					create_fields["updated_at"] = _to_sec(int(create_fields["updated_at"]))
+				TaskState.sync_update_task(existing_local_id, create_fields)
+				_remember_task_sync_hint(TaskState.get_task_by_id(existing_local_id))
+				summary["applied_count"] += 1
+				return summary
+			var local_id = TaskState.allocate_id()
+			var task = TaskData.new(local_id, data.get("title", ""), data.get("due_timestamp", 0), data.get("is_completed", false))
+			task.finish_timestamp = data.get("finish_timestamp", 0)
+			task.order = data.get("position", 0)
+			task.created_at = _to_sec(data.get("created_at", 0))
+			task.updated_at = _to_sec(data.get("updated_at", 0))
+			task.server_id = server_id
+			TaskState.sync_create_task(task)
+			_repair_mapping("task", local_id, str(local_id), server_id)
+			_remember_task_sync_hint(task)
+			summary["applied_count"] += 1
+
+		"update":
+			var local_id = _resolve_task_local_id(server_id, data)
+			if local_id == 0:
+				print("[SyncState] Skip task update: unresolved local target, server_id=%d" % server_id)
+				summary["unresolved_count"] += 1
+				return summary
+			if not had_mapping:
+				summary["mapping_repaired_count"] += 1
+			var fields = _extract_remote_fields(data, ["title", "is_completed", "due_timestamp", "finish_timestamp", "updated_at", "position"])
+			fields["server_id"] = server_id
+			if fields.has("updated_at"):
+				fields["updated_at"] = _to_sec(int(fields["updated_at"]))
+			TaskState.sync_update_task(local_id, fields)
+			_remember_task_sync_hint(TaskState.get_task_by_id(local_id))
+			summary["applied_count"] += 1
+
+		"delete":
+			var local_id = _resolve_task_local_id(server_id, data)
+			print("[SyncState][DeleteTrace] apply task delete server_id=%d resolved_local_id=%d mapping_key=%s data=%s" % [
+				server_id, local_id, _id_mapping.get_local_key("task", server_id), JSON.stringify(data)
+			])
+			if local_id == 0:
+				print("[SyncState] Skip task delete: unresolved local target, server_id=%d" % server_id)
+				summary["unresolved_count"] += 1
+				return summary
+			if not had_mapping:
+				summary["mapping_repaired_count"] += 1
+			TaskState.sync_remove_task(local_id)
+			_id_mapping.remove_by_server("task", server_id)
+			_forget_sync_hint("task", local_id)
+			summary["applied_count"] += 1
+
+	return summary
+
+
+func _apply_remote_note_change_v2(action: String, data: Dictionary) -> Dictionary:
+	var summary = {"applied_count": 0, "mapping_repaired_count": 0, "unresolved_count": 0}
+	var server_id = int(data.get("id", 0))
+	var had_mapping = _id_mapping.get_local_key("note", server_id) != ""
+
+	match action:
+		"create":
+			var existing_local_id = _resolve_note_local_id(server_id, data)
+			if existing_local_id > 0:
+				if not had_mapping:
+					summary["mapping_repaired_count"] += 1
+				var create_fields = _extract_remote_fields(data, ["title", "content", "categories", "updated_at", "position"])
+				create_fields["server_id"] = server_id
+				if create_fields.has("updated_at"):
+					create_fields["updated_at"] = _to_sec(int(create_fields["updated_at"]))
+				NoteState.sync_update_note(existing_local_id, create_fields)
+				_remember_note_sync_hint(NoteState.get_note_by_id(existing_local_id))
+				summary["applied_count"] += 1
+				return summary
+			var local_id = NoteState.allocate_id()
+			var note = NoteData.new(local_id, data.get("title", ""), data.get("content", ""))
+			note.created_at = _to_sec(data.get("created_at", 0))
+			note.updated_at = _to_sec(data.get("updated_at", 0))
+			note.server_id = server_id
+			NoteState.sync_create_note(note)
+			_repair_mapping("note", local_id, str(local_id), server_id)
+			_remember_note_sync_hint(note)
+			summary["applied_count"] += 1
+
+		"update":
+			var local_id = _resolve_note_local_id(server_id, data)
+			if local_id == 0:
+				print("[SyncState] Skip note update: unresolved local target, server_id=%d" % server_id)
+				summary["unresolved_count"] += 1
+				return summary
+			if not had_mapping:
+				summary["mapping_repaired_count"] += 1
+			var fields = _extract_remote_fields(data, ["title", "content", "categories", "updated_at", "position"])
+			fields["server_id"] = server_id
+			if fields.has("updated_at"):
+				fields["updated_at"] = _to_sec(int(fields["updated_at"]))
+			NoteState.sync_update_note(local_id, fields)
+			_remember_note_sync_hint(NoteState.get_note_by_id(local_id))
+			summary["applied_count"] += 1
+
+		"delete":
+			var local_id = _resolve_note_local_id(server_id, data)
+			print("[SyncState][DeleteTrace] apply note delete server_id=%d resolved_local_id=%d mapping_key=%s data=%s" % [
+				server_id, local_id, _id_mapping.get_local_key("note", server_id), JSON.stringify(data)
+			])
+			if local_id == 0:
+				print("[SyncState] Skip note delete: unresolved local target, server_id=%d" % server_id)
+				summary["unresolved_count"] += 1
+				return summary
+			if not had_mapping:
+				summary["mapping_repaired_count"] += 1
+			NoteState.sync_remove_note(local_id)
+			_id_mapping.remove_by_server("note", server_id)
+			_forget_sync_hint("note", local_id)
+			summary["applied_count"] += 1
+
+	return summary
+
+
+func _apply_remote_category_change_v2(action: String, data: Dictionary) -> Dictionary:
+	var summary = {"applied_count": 0, "mapping_repaired_count": 0, "unresolved_count": 0}
+	var server_id = int(data.get("id", 0))
+	var name = str(data.get("name", ""))
+	var had_mapping = _id_mapping.get_local_key("category", server_id) != ""
+
+	match action:
+		"create":
+			var local_key = _resolve_category_key(server_id, name)
+			if local_key != "":
+				if not had_mapping:
+					summary["mapping_repaired_count"] += 1
+				summary["applied_count"] += 1
+				return summary
+			var position = data.get("position", NoteState.get_categories().size())
+			NoteState.sync_insert_category_at(name, position)
+			_repair_mapping("category", 0, name, server_id)
+			summary["applied_count"] += 1
+
+		"update":
+			var update_key = _resolve_category_key(server_id, name)
+			if update_key == "":
+				summary["unresolved_count"] += 1
+				return summary
+			if not had_mapping:
+				summary["mapping_repaired_count"] += 1
+			summary["applied_count"] += 1
+
+		"delete":
+			var delete_key = _resolve_category_key(server_id, name)
+			print("[SyncState][DeleteTrace] apply category delete server_id=%d resolved_key=%s mapping_key=%s data=%s" % [
+				server_id, delete_key, _id_mapping.get_local_key("category", server_id), JSON.stringify(data)
+			])
+			if delete_key == "":
+				print("[SyncState] Skip category delete: unresolved local target, server_id=%d name=%s" % [server_id, name])
+				summary["unresolved_count"] += 1
+				return summary
+			if not had_mapping:
+				summary["mapping_repaired_count"] += 1
+			NoteState.sync_remove_category(delete_key)
+			_id_mapping.remove_by_server("category", server_id)
+			_forget_sync_hint("category", 0, delete_key)
+			summary["applied_count"] += 1
+
+	return summary
 
 
 func _apply_remote_task_change(action: String, data: Dictionary) -> void:
@@ -578,6 +965,7 @@ func _apply_remote_task_change(action: String, data: Dictionary) -> void:
 			var local_id = TaskState.allocate_id()
 			var task = TaskData.new(local_id, data.get("title", ""), data.get("due_timestamp", 0), data.get("is_completed", false))
 			task.finish_timestamp = data.get("finish_timestamp", 0)
+			task.order = data.get("position", 0)
 			task.created_at = _to_sec(data.get("created_at", 0))
 			task.updated_at = _to_sec(data.get("updated_at", 0))
 			task.server_id = server_id
@@ -587,24 +975,18 @@ func _apply_remote_task_change(action: String, data: Dictionary) -> void:
 		"update":
 			var local_key = _id_mapping.get_local_key("task", server_id)
 			if local_key == "":
+				print("[SyncState] 跳过 task update，缺少本地映射: server_id=%d" % server_id)
 				return
 			var local_id = int(local_key)
-			var fields = {}
-			if data.has("title"):
-				fields["title"] = data["title"]
-			if data.has("is_completed"):
-				fields["is_completed"] = data["is_completed"]
-			if data.has("due_timestamp"):
-				fields["due_timestamp"] = data["due_timestamp"]
-			if data.has("finish_timestamp"):
-				fields["finish_timestamp"] = data["finish_timestamp"]
-			if data.has("updated_at"):
-				fields["updated_at"] = _to_sec(data["updated_at"])
+			var fields = _extract_remote_fields(data, ["title", "is_completed", "due_timestamp", "finish_timestamp", "updated_at", "position"])
+			if fields.has("updated_at"):
+				fields["updated_at"] = _to_sec(fields["updated_at"])
 			TaskState.sync_update_task(local_id, fields)
 
 		"delete":
 			var local_key = _id_mapping.get_local_key("task", server_id)
 			if local_key == "":
+				print("[SyncState] 跳过 task delete，缺少本地映射: server_id=%d" % server_id)
 				return
 			var local_id = int(local_key)
 			TaskState.sync_remove_task(local_id)
@@ -629,20 +1011,18 @@ func _apply_remote_note_change(action: String, data: Dictionary) -> void:
 		"update":
 			var local_key = _id_mapping.get_local_key("note", server_id)
 			if local_key == "":
+				print("[SyncState] 跳过 note update，缺少本地映射: server_id=%d" % server_id)
 				return
 			var local_id = int(local_key)
-			var fields = {}
-			if data.has("title"):
-				fields["title"] = data["title"]
-			if data.has("content"):
-				fields["content"] = data["content"]
-			if data.has("updated_at"):
-				fields["updated_at"] = _to_sec(data["updated_at"])
+			var fields = _extract_remote_fields(data, ["title", "content", "categories", "updated_at", "position"])
+			if fields.has("updated_at"):
+				fields["updated_at"] = _to_sec(fields["updated_at"])
 			NoteState.sync_update_note(local_id, fields)
 
 		"delete":
 			var local_key = _id_mapping.get_local_key("note", server_id)
 			if local_key == "":
+				print("[SyncState] 跳过 note delete，缺少本地映射: server_id=%d" % server_id)
 				return
 			var local_id = int(local_key)
 			NoteState.sync_remove_note(local_id)
@@ -659,7 +1039,7 @@ func _apply_remote_category_change(action: String, data: Dictionary) -> void:
 				return
 			var position = data.get("position", NoteState.get_categories().size())
 			NoteState.sync_insert_category_at(name, position)
-			_id_mapping.set_mapping("category", name, server_id)
+			_repair_mapping("category", 0, name, server_id)
 
 		"update":
 			# category 目前只有 name 和 position，暂不处理 rename
@@ -786,6 +1166,7 @@ func _merge_full_sync_tasks(server_tasks: Array) -> void:
 			var local_id = TaskState.allocate_id()
 			var task = TaskData.new(local_id, st.get("title", ""), st.get("due_timestamp", 0), st.get("is_completed", false))
 			task.finish_timestamp = st.get("finish_timestamp", 0)
+			task.order = st.get("position", 0)
 			task.created_at = _to_sec(st.get("created_at", 0))
 			task.updated_at = _to_sec(st.get("updated_at", 0))
 			task.server_id = _sid
@@ -801,6 +1182,7 @@ func _merge_full_sync_tasks(server_tasks: Array) -> void:
 			"position": item.order
 		}
 	)
+	_prune_missing_full_sync_tasks(server_tasks)
 
 
 ## 全量同步 - 合并 notes（通用方法 wrapper）
@@ -830,6 +1212,7 @@ func _merge_full_sync_notes(server_notes: Array) -> void:
 			"created_at": item.created_at,
 		}
 	)
+	_prune_missing_full_sync_notes(server_notes)
 
 
 ## 通用全量合并方法
@@ -869,6 +1252,22 @@ func _merge_full_sync_items(
 			continue
 
 		# 尝试匹配本地未映射项
+		var matched_by_server_id = false
+		for li in local_items:
+			if get_item_server_id.call(li) != server_id:
+				continue
+			_repair_mapping(resource_name, get_item_id.call(li), str(get_item_id.call(li)), server_id)
+			sync_update_item.call(get_item_id.call(li), {"server_id": server_id})
+			var persisted_server_updated = si.get("updated_at", 0)
+			var persisted_local_updated = _to_ms(get_item_updated_at.call(li))
+			if persisted_server_updated > persisted_local_updated:
+				var persisted_fields = _extract_sync_fields(si, sync_field_names)
+				sync_update_item.call(get_item_id.call(li), persisted_fields)
+			matched_by_server_id = true
+			break
+		if matched_by_server_id:
+			continue
+
 		var matched = false
 		for li in local_items:
 			if get_item_server_id.call(li) > 0:
@@ -876,7 +1275,8 @@ func _merge_full_sync_items(
 			if _id_mapping.get_server_id(resource_name, str(get_item_id.call(li))) > 0:
 				continue
 			if get_item_title.call(li) == si.get("title", "") and abs(_to_ms(get_item_created_at.call(li)) - si.get("created_at", 0)) < 60000:
-				_id_mapping.set_mapping(resource_name, str(get_item_id.call(li)), server_id)
+				_repair_mapping(resource_name, get_item_id.call(li), str(get_item_id.call(li)), server_id)
+				sync_update_item.call(get_item_id.call(li), {"server_id": server_id})
 				set_item_server_id.call(li, server_id)
 				var server_updated = si.get("updated_at", 0)
 				var local_updated = _to_ms(get_item_updated_at.call(li))
@@ -888,7 +1288,7 @@ func _merge_full_sync_items(
 
 		if not matched:
 			var local_id = create_local_item.call(si, server_id)
-			_id_mapping.set_mapping(resource_name, str(local_id), server_id)
+			_repair_mapping(resource_name, local_id, str(local_id), server_id)
 
 	# 本地有服务器无 → 作为 create 加入 push 队列
 	for li in local_items:
@@ -920,28 +1320,75 @@ func _find_local_item_by_id(local_items: Array, get_id: Callable, target_id: int
 	return null
 
 
+func _prune_missing_full_sync_tasks(server_tasks: Array) -> void:
+	var server_ids: Dictionary = {}
+	for st in server_tasks:
+		if st is Dictionary:
+			var sid = int(st.get("id", 0))
+			if sid > 0:
+				server_ids[sid] = true
+
+	for task in TaskState.get_all_tasks():
+		var server_id = task.server_id
+		if server_id <= 0:
+			server_id = _id_mapping.get_server_id("task", str(task.id))
+		if server_id <= 0:
+			continue
+		if server_ids.has(server_id):
+			continue
+		print("[SyncState][DeleteTrace] full sync prune task local_id=%d server_id=%d" % [task.id, server_id])
+		TaskState.sync_remove_task(task.id)
+		_id_mapping.remove_by_server("task", server_id)
+		_forget_sync_hint("task", task.id)
+
+
+func _prune_missing_full_sync_notes(server_notes: Array) -> void:
+	var server_ids: Dictionary = {}
+	for sn in server_notes:
+		if sn is Dictionary:
+			var sid = int(sn.get("id", 0))
+			if sid > 0:
+				server_ids[sid] = true
+
+	for note in NoteState.get_all_notes():
+		var server_id = note.server_id
+		if server_id <= 0:
+			server_id = _id_mapping.get_server_id("note", str(note.id))
+		if server_id <= 0:
+			continue
+		if server_ids.has(server_id):
+			continue
+		print("[SyncState][DeleteTrace] full sync prune note local_id=%d server_id=%d" % [note.id, server_id])
+		NoteState.sync_remove_note(note.id)
+		_id_mapping.remove_by_server("note", server_id)
+		_forget_sync_hint("note", note.id)
+
+
 ## 全量同步 - 合并 categories
 func _merge_full_sync_categories(server_categories: Array) -> void:
 	var local_categories = NoteState.get_categories()
+	var server_ids: Dictionary = {}
 
 	for sc in server_categories:
 		if not sc is Dictionary:
 			continue
 		var server_id = sc.get("id", 0)
 		var name = sc.get("name", "")
+		if server_id > 0:
+			server_ids[int(server_id)] = true
 
 		if _id_mapping.has_server_id("category", server_id):
 			continue  # 已映射，跳过
 
 		# 按名称匹配
 		if name in local_categories:
-			_id_mapping.set_mapping("category", name, server_id)
+			_repair_mapping("category", 0, name, server_id)
 			continue
 
 		# 服务器有本地无 → 创建
 		var position = sc.get("position", NoteState.get_categories().size())
 		NoteState.sync_insert_category_at(name, position)
-		_id_mapping.set_mapping("category", name, server_id)
+		_repair_mapping("category", 0, name, server_id)
 
 	# 本地有服务器无 → 加入 push 队列
 	for cat in local_categories:
@@ -950,6 +1397,258 @@ func _merge_full_sync_categories(server_categories: Array) -> void:
 				"name": cat,
 				"position": NoteState.get_category_position(cat)
 			}))
+
+	for cat in NoteState.get_categories():
+		var server_id = _id_mapping.get_server_id("category", cat)
+		if server_id <= 0:
+			server_id = int(_category_server_hints.get(cat, 0))
+		if server_id <= 0:
+			continue
+		if server_ids.has(server_id):
+			continue
+		print("[SyncState][DeleteTrace] full sync prune category name=%s server_id=%d" % [cat, server_id])
+		NoteState.sync_remove_category(cat)
+		_id_mapping.remove_by_server("category", server_id)
+		_forget_sync_hint("category", 0, cat)
+
+
+func _extract_remote_fields(data: Dictionary, field_names: Array) -> Dictionary:
+	var source = data
+	if data.has("fields") and data["fields"] is Dictionary:
+		source = data["fields"]
+	var fields = {}
+	for field_name in field_names:
+		if source.has(field_name):
+			fields[field_name] = source[field_name]
+	return fields
+
+
+func _resolve_server_id_for_change(change: SyncChange) -> int:
+	if change.resource == "category":
+		return _resolve_server_id_from_state("category", 0, change.local_key, change.data)
+	return _resolve_server_id_from_state(change.resource, change.local_id, change.local_key, change.data)
+
+
+func _resolve_server_id_from_state(resource: String, local_id: int = 0, local_key: String = "", change_data: Dictionary = {}) -> int:
+	var mapping_key = local_key if local_key != "" else str(local_id)
+	var server_id = _id_mapping.get_server_id(resource, mapping_key)
+	if server_id > 0:
+		return server_id
+
+	if change_data.has("server_id_hint"):
+		server_id = int(change_data.get("server_id_hint", 0))
+		if server_id > 0:
+			print("[SyncState][DeleteTrace] resolve server_id from hint resource=%s local_id=%d local_key=%s server_id=%d" % [
+				resource, local_id, local_key, server_id
+			])
+			_repair_mapping(resource, local_id, local_key, server_id)
+			return server_id
+
+	match resource:
+		"task":
+			if local_id > 0 and _task_server_hints.has(local_id):
+				server_id = int(_task_server_hints[local_id])
+		"note":
+			if local_id > 0 and _note_server_hints.has(local_id):
+				server_id = int(_note_server_hints[local_id])
+		"category":
+			if local_key != "" and _category_server_hints.has(local_key):
+				server_id = int(_category_server_hints[local_key])
+	if server_id > 0:
+		print("[SyncState][DeleteTrace] resolve server_id from hint cache resource=%s local_id=%d local_key=%s server_id=%d" % [
+			resource, local_id, local_key, server_id
+		])
+		_repair_mapping(resource, local_id, local_key, server_id)
+		return server_id
+
+	match resource:
+		"task":
+			var task = TaskState.get_task_by_id(local_id)
+			if task != null and task.server_id > 0:
+				server_id = task.server_id
+		"note":
+			var note = NoteState.get_note_by_id(local_id)
+			if note != null and note.server_id > 0:
+				server_id = note.server_id
+	if server_id > 0:
+		print("[SyncState][DeleteTrace] resolve server_id from local model resource=%s local_id=%d local_key=%s server_id=%d" % [
+			resource, local_id, local_key, server_id
+		])
+		_repair_mapping(resource, local_id, local_key, server_id)
+	else:
+		print("[SyncState][DeleteTrace] failed to resolve server_id resource=%s local_id=%d local_key=%s change_data=%s" % [
+			resource, local_id, local_key, JSON.stringify(change_data)
+		])
+	return server_id
+
+
+func _repair_mapping(resource: String, local_id: int = 0, local_key: String = "", server_id: int = 0) -> void:
+	if server_id <= 0:
+		return
+	var resolved_key = local_key if local_key != "" else str(local_id)
+	if resolved_key == "":
+		return
+	_id_mapping.set_mapping(resource, resolved_key, server_id)
+	match resource:
+		"task":
+			if local_id > 0:
+				_task_server_hints[local_id] = server_id
+		"note":
+			if local_id > 0:
+				_note_server_hints[local_id] = server_id
+		"category":
+			_category_server_hints[resolved_key] = server_id
+
+
+func _persist_local_server_id(resource: String, local_id: int, server_id: int) -> void:
+	if local_id <= 0 or server_id <= 0:
+		return
+	print("[SyncState][DeleteTrace] persist server_id resource=%s local_id=%d server_id=%d" % [
+		resource, local_id, server_id
+	])
+	var old_flag = _is_applying_remote
+	_is_applying_remote = true
+	match resource:
+		"task":
+			TaskState.sync_update_task(local_id, {"server_id": server_id})
+		"note":
+			NoteState.sync_update_note(local_id, {"server_id": server_id})
+	_is_applying_remote = old_flag
+
+
+func _resolve_task_local_id(server_id: int, remote_data: Dictionary = {}) -> int:
+	if server_id <= 0:
+		return 0
+	var local_key = _id_mapping.get_local_key("task", server_id)
+	if local_key != "":
+		var local_id = int(local_key)
+		if TaskState.get_task_by_id(local_id) != null:
+			print("[SyncState][DeleteTrace] resolve task local by mapping server_id=%d local_id=%d" % [server_id, local_id])
+			_task_server_hints[local_id] = server_id
+			return local_id
+
+	var task = TaskState.get_task_by_server_id(server_id)
+	if task != null:
+		print("[SyncState][DeleteTrace] resolve task local by persisted server_id=%d local_id=%d" % [server_id, task.id])
+		_repair_mapping("task", task.id, str(task.id), server_id)
+		return task.id
+
+	var matched_task = _match_task_by_remote_data(remote_data)
+	if matched_task != null:
+		print("[SyncState][DeleteTrace] resolve task local by heuristic server_id=%d local_id=%d" % [server_id, matched_task.id])
+		TaskState.sync_update_task(matched_task.id, {"server_id": server_id})
+		_repair_mapping("task", matched_task.id, str(matched_task.id), server_id)
+		return matched_task.id
+	print("[SyncState][DeleteTrace] failed to resolve task local server_id=%d remote_data=%s" % [server_id, JSON.stringify(remote_data)])
+	return 0
+
+
+func _resolve_note_local_id(server_id: int, remote_data: Dictionary = {}) -> int:
+	if server_id <= 0:
+		return 0
+	var local_key = _id_mapping.get_local_key("note", server_id)
+	if local_key != "":
+		var local_id = int(local_key)
+		if NoteState.get_note_by_id(local_id) != null:
+			print("[SyncState][DeleteTrace] resolve note local by mapping server_id=%d local_id=%d" % [server_id, local_id])
+			_note_server_hints[local_id] = server_id
+			return local_id
+
+	var note = NoteState.get_note_by_server_id(server_id)
+	if note != null:
+		print("[SyncState][DeleteTrace] resolve note local by persisted server_id=%d local_id=%d" % [server_id, note.id])
+		_repair_mapping("note", note.id, str(note.id), server_id)
+		return note.id
+
+	var matched_note = _match_note_by_remote_data(remote_data)
+	if matched_note != null:
+		print("[SyncState][DeleteTrace] resolve note local by heuristic server_id=%d local_id=%d" % [server_id, matched_note.id])
+		NoteState.sync_update_note(matched_note.id, {"server_id": server_id})
+		_repair_mapping("note", matched_note.id, str(matched_note.id), server_id)
+		return matched_note.id
+	print("[SyncState][DeleteTrace] failed to resolve note local server_id=%d remote_data=%s" % [server_id, JSON.stringify(remote_data)])
+	return 0
+
+
+func _resolve_category_key(server_id: int, name: String) -> String:
+	if name == "":
+		return ""
+	var local_key = _id_mapping.get_local_key("category", server_id)
+	if local_key != "" and NoteState.has_category(local_key):
+		print("[SyncState][DeleteTrace] resolve category key by mapping server_id=%d key=%s" % [server_id, local_key])
+		_category_server_hints[local_key] = server_id
+		return local_key
+	if NoteState.has_category(name):
+		print("[SyncState][DeleteTrace] resolve category key by name server_id=%d key=%s" % [server_id, name])
+		_repair_mapping("category", 0, name, server_id)
+		return name
+	print("[SyncState][DeleteTrace] failed to resolve category key server_id=%d name=%s" % [server_id, name])
+	return ""
+
+
+func _match_task_by_remote_data(remote_data: Dictionary):
+	var title = str(remote_data.get("title", ""))
+	var created_at = int(remote_data.get("created_at", 0))
+	if title == "" or created_at <= 0:
+		return null
+	var matched_task = null
+	for task in TaskState.get_all_tasks():
+		if task.server_id > 0:
+			continue
+		if task.title != title:
+			continue
+		if abs(_to_ms(task.created_at) - created_at) > 60000:
+			continue
+		if matched_task != null:
+			return null
+		matched_task = task
+	return matched_task
+
+
+func _match_note_by_remote_data(remote_data: Dictionary):
+	var title = str(remote_data.get("title", ""))
+	var created_at = int(remote_data.get("created_at", 0))
+	if title == "" or created_at <= 0:
+		return null
+	var matched_note = null
+	for note in NoteState.get_all_notes():
+		if note.server_id > 0:
+			continue
+		if note.title != title:
+			continue
+		if abs(_to_ms(note.created_at) - created_at) > 60000:
+			continue
+		if matched_note != null:
+			return null
+		matched_note = note
+	return matched_note
+
+
+func _should_drop_unpushable_change(change: SyncChange) -> bool:
+	match change.action:
+		"update":
+			return false
+		"delete":
+			return false
+		"reorder":
+			return change.data.get("ordered_ids", []).is_empty()
+		_:
+			return false
+
+
+func _apply_reorder_snapshot(resource: String, server_data: Dictionary) -> void:
+	if not server_data is Dictionary:
+		return
+	var ordered_ids = server_data.get("ordered_ids", [])
+	if not ordered_ids is Array or ordered_ids.is_empty():
+		return
+	match resource:
+		"task":
+			for server_id in ordered_ids:
+				_resolve_task_local_id(int(server_id))
+			TaskState.sync_reorder_by_server_ids(ordered_ids)
+		_:
+			print("[SyncState] 暂未实现 %s 的远端排序快照应用" % resource)
 
 
 # ======================== 同步触发 ========================
@@ -985,6 +1684,7 @@ func _do_sync_cycle() -> void:
 	if _has_dirty_bundles():
 		_push_dirty_bundles()
 
+	_last_push_summary = {}
 	var push_ok = await _do_push()
 	var pull_ok = await _do_pull()
 
@@ -995,7 +1695,16 @@ func _do_sync_cycle() -> void:
 		_consecutive_failures += 1
 
 	_is_syncing = false
-	sync_completed.emit(success, {"type": "incremental", "push": push_ok, "pull": pull_ok})
+	sync_completed.emit(success, {
+		"type": "incremental",
+		"push": push_ok,
+		"pull": pull_ok,
+		"accepted_count": int(_last_push_summary.get("accepted_count", 0)),
+		"rejected_count": int(_last_push_summary.get("rejected_count", 0)),
+		"applied_remote_count": int(_last_pull_summary.get("applied_count", 0)),
+		"mapping_repaired_count": int(_last_pull_summary.get("mapping_repaired_count", 0)),
+		"unresolved_remote_count": int(_last_pull_summary.get("unresolved_count", 0)),
+	})
 
 
 ## 手动触发同步（供 UI 调用）

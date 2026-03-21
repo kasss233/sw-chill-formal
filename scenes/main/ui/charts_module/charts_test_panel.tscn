@@ -9,6 +9,39 @@
 [sub_resource type="Resource" id="Resource_13wtx"]
 script = ExtResource("3_mpiux")
 bar_animation_duration = 5.0
+line_animation_duration = 1.2
+pie_animation_duration = 1.2
+padding = Vector4(40, 24, 24, 32)
+background_color = Color(0, 0, 0, 0)
+empty_message_color = Color(0.6, 0.6, 0.6, 1)
+empty_message_font_size = 14
+title_color = Color(0.9, 0.9, 0.9, 1)
+title_font_size = 16
+label_color = Color(0.7, 0.7, 0.7, 1)
+label_font_size = 11
+value_color = Color(0.85, 0.85, 0.85, 1)
+value_font_size = 10
+grid_color = Color(1, 1, 1, 0.08)
+grid_line_width = 1.0
+axis_color = Color(1, 1, 1, 0.15)
+axis_line_width = 1.0
+bar_colors = Array[Color]([Color(0.35, 0.65, 0.95, 0.9)])
+bar_max_width = 48.0
+bar_width_ratio = 0.65
+bar_show_value_label = true
+bar_reference_line_color = Color(1, 0.85, 0.3, 0.6)
+bar_reference_line_width = 1.0
+bar_reference_line_dashed = true
+line_color = Color(0.35, 0.65, 0.95, 1)
+line_width = 2.0
+line_point_radius = 4.0
+line_point_color = Color(0.35, 0.65, 0.95, 1)
+line_fill_color = Color(0.35, 0.65, 0.95, 0.15)
+pie_colors = Array[Color]([Color(0.35, 0.65, 0.95, 0.9), Color(0.95, 0.55, 0.35, 0.9), Color(0.35, 0.85, 0.55, 0.9), Color(0.85, 0.55, 0.95, 0.9), Color(0.95, 0.85, 0.35, 0.9)])
+pie_stroke_color = Color(0.2, 0.2, 0.2, 0.5)
+pie_show_legend = true
+pie_legend_spacing = 16.0
+pie_label_mode = 2
 metadata/_custom_type_script = "uid://lao0fghtlkr"
 
 [node name="ChartsTestPanel" type="Control" unique_id=1740936705]

@@ -7,6 +7,10 @@ extends MarginContainer
 signal note_pressed(note_id: int)
 
 var _note_id: int = -1
+var _pressing: bool = false
+var _drag_distance: float = 0.0
+
+const TAP_DRAG_THRESHOLD := 12.0
 
 @onready var _inner_panel: PanelContainer = $InnerPanel
 @onready var _title_label: Label = $InnerPanel/VBoxContainer/TitleLabel
@@ -15,8 +19,16 @@ var _note_id: int = -1
 
 
 func _ready() -> void:
+	_enable_scroll_passthrough(self)
 	_inner_panel.gui_input.connect(_on_gui_input)
 	_inner_panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+
+
+static func _enable_scroll_passthrough(node: Node) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = Control.MOUSE_FILTER_PASS
+	for child in node.get_children():
+		_enable_scroll_passthrough(child)
 
 
 ## 更新展示数据
@@ -42,5 +54,23 @@ func play_entry_animation(delay: float = 0.0) -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		note_pressed.emit(_note_id)
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			_pressing = true
+			_drag_distance = 0.0
+		elif _pressing:
+			_pressing = false
+			if _drag_distance <= TAP_DRAG_THRESHOLD:
+				note_pressed.emit(_note_id)
+	elif event is InputEventMouseMotion and _pressing:
+		_drag_distance += event.relative.length()
+	elif event is InputEventScreenTouch:
+		if event.pressed:
+			_pressing = true
+			_drag_distance = 0.0
+		elif _pressing:
+			_pressing = false
+			if _drag_distance <= TAP_DRAG_THRESHOLD:
+				note_pressed.emit(_note_id)
+	elif event is InputEventScreenDrag and _pressing:
+		_drag_distance += event.relative.length()

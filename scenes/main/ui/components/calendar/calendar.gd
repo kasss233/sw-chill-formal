@@ -28,6 +28,8 @@ var current_month: int
 var selected_date: Dictionary = {}  # {year: int, month: int, day: int}
 # 日期按钮数组
 var day_buttons: Array[MaterialButton] = []
+var date_marks: Dictionary = {}
+var swipe_navigation_enabled: bool = true
 
 # 滑动手势
 var _slide_tween: Tween = null
@@ -88,7 +90,13 @@ func _collect_day_buttons():
 	day_buttons.clear()
 	for child in grid_container.get_children():
 		if child is MaterialButton:
+			child.mouse_filter = Control.MOUSE_FILTER_PASS
 			day_buttons.append(child)
+
+	prev_month_button.mouse_filter = Control.MOUSE_FILTER_PASS
+	next_month_button.mouse_filter = Control.MOUSE_FILTER_PASS
+	prev_year_button.mouse_filter = Control.MOUSE_FILTER_PASS
+	next_year_button.mouse_filter = Control.MOUSE_FILTER_PASS
 
 func _update_calendar():
 	"""更新日历显示"""
@@ -113,10 +121,12 @@ func _update_calendar():
 				button.text = ""
 				button.disabled = true
 				button.modulate = Color(1, 1, 1, 0.3)
+				button.background_color = Color(1, 1, 1, 0.02)
 			else:
 				# 是一个日期对象
 				button.text = str(day_data.day)
 				button.disabled = false
+				button.set_pressed_no_signal(false)
 				
 				# 判断是否是当前月份
 				if day_data.month == current_month:
@@ -124,6 +134,7 @@ func _update_calendar():
 				else:
 					# 相邻月份的日期，半透明显示
 					button.modulate = Color(1, 1, 1, 0.5)
+				button.background_color = _get_mark_color(day_data.year, day_data.month, day_data.day)
 				
 				# 高亮选中的日期
 				if (selected_date.has("year") and 
@@ -131,7 +142,7 @@ func _update_calendar():
 					selected_date["month"] == day_data.month and
 					selected_date["day"] == day_data.day):
 					button.modulate = Color(0.3, 0.7, 1.0, 1)  # 蓝色高亮
-					button.background_color = Color("ffffff00")
+					button.background_color = Color(0.2, 0.45, 0.85, 0.35)
 					button.set_pressed_no_signal(true)
 			
 			button_index += 1
@@ -186,6 +197,8 @@ func _on_day_button_pressed(button_index: int):
 					_switch_month(direction)
 				else:
 					_update_calendar()
+				if not action_container or not action_container.visible:
+					date_selected.emit(selected_date["year"], selected_date["month"], selected_date["day"])
 
 
 func get_selected_date() -> Dictionary:
@@ -208,6 +221,11 @@ func show_action_buttons(show: bool):
 	if action_container:
 		action_container.visible = show
 
+
+func set_date_marks(marks: Dictionary) -> void:
+	date_marks = marks.duplicate(true)
+	_update_calendar()
+
 func _on_confirm_pressed():
 	"""确认按钮被点击"""
 	if selected_date.has("year"):
@@ -220,6 +238,8 @@ func _on_cancel_pressed():
 # ===== 滑动手势识别 =====
 
 func _input(event: InputEvent):
+	if not swipe_navigation_enabled:
+		return
 	# 触摸事件
 	if event is InputEventScreenTouch:
 		if event.pressed:
@@ -321,3 +341,27 @@ func _animate_month_change(direction: int):
 		grid_container.modulate.a = 1.0
 		_is_animating = false
 	)
+
+
+func _get_mark_color(year: int, month: int, day: int) -> Color:
+	var date_key := "%04d-%02d-%02d" % [year, month, day]
+	if not date_marks.has(date_key):
+		return Color(1, 1, 1, 0.04)
+	var mark: Dictionary = date_marks.get(date_key, {})
+	var completion_ratio := float(mark.get("completion_ratio", 0.0))
+	var focus_minutes := int(mark.get("focus_minutes", 0))
+	var has_reflection := bool(mark.get("has_reflection", false))
+	var has_peak := bool(mark.get("has_peak", false))
+
+	var alpha := 0.05 + completion_ratio * 0.25
+	if focus_minutes >= 25:
+		alpha += 0.08
+	if has_reflection:
+		alpha += 0.04
+	if has_peak:
+		alpha += 0.06
+	return Color(0.35, 0.65, 0.95, clamp(alpha, 0.04, 0.38))
+
+
+func set_swipe_navigation_enabled(enabled: bool) -> void:
+	swipe_navigation_enabled = enabled

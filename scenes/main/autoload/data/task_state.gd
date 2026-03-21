@@ -21,6 +21,8 @@ var _warned_15min: Dictionary = {} # {task_id: bool}
 var _warned_deadline: Dictionary = {} # {task_id: bool}
 
 const SAVE_PATH = "user://task_data.json"
+const SAVE_DEBOUNCE_SEC := 0.5
+var _save_timer: SceneTreeTimer
 
 func _ready() -> void:
 	# 创建截止时间检查定时器
@@ -101,7 +103,7 @@ func add_task(title: String, due_timestamp: int = 0) -> TaskData:
 	# 更新所有 order
 	_update_orders()
 
-	_save_data()
+	_queue_save()
 	task_added.emit(task)
 	print("[TaskState] Added task(id: %d, title: %s)" % [task.id, task.title])
 	return task
@@ -114,7 +116,7 @@ func remove_task(id: int) -> bool:
 			_warned_15min.erase(id)
 			_warned_deadline.erase(id)
 			_update_orders()
-			_save_data()
+			_queue_save()
 			task_removed.emit(id)
 			print("[TaskState] Removed task(id: %d)" % id)
 			return true
@@ -127,7 +129,7 @@ func update_task_title(id: int, title: String) -> bool:
 		return false
 	task.title = title
 	task.updated_at = int(Time.get_unix_time_from_system())
-	_save_data()
+	_queue_save()
 	task_updated.emit(task)
 	print("[TaskState] Updated task(id: %d) title to '%s'" % [id, title])
 	return true
@@ -172,7 +174,7 @@ func set_task_completed(id: int, completed: bool) -> bool:
 		_tasks.insert(0, task)
 
 	_update_orders()
-	_save_data()
+	_queue_save()
 	task_state_changed.emit(task)
 	if completed:
 		task_completed.emit()
@@ -190,7 +192,7 @@ func set_task_due_time(id: int, timestamp: int) -> bool:
 	_warned_15min.erase(id)
 	_warned_deadline.erase(id)
 
-	_save_data()
+	_queue_save()
 	task_updated.emit(task)
 	print("[TaskState] Task(id: %d) due_time set to %d" % [id, timestamp])
 	return true
@@ -219,7 +221,7 @@ func reorder_task(id: int, new_position: int, is_completed: bool) -> bool:
 	_tasks.insert(target_index, task)
 	task.updated_at = int(Time.get_unix_time_from_system())
 	_update_orders()
-	_save_data()
+	_queue_save()
 	tasks_reordered.emit()
 	print("[TaskState] Task(id: %d) reordered to position %d" % [id, new_position])
 	return true
@@ -254,7 +256,7 @@ func reorder_by_drag(task_id: int, new_data_index: int, new_completed: bool) -> 
 					task.due_timestamp = 0
 
 	_update_orders()
-	_save_data()
+	_queue_save()
 
 	if was_completed != new_completed:
 		task_state_changed.emit(task)
@@ -280,11 +282,17 @@ func clear_completed() -> int:
 		i -= 1
 	if removed_count > 0:
 		_update_orders()
-		_save_data()
+		_queue_save()
 	print("[TaskState] Cleared %d completed tasks" % removed_count)
 	return removed_count
 
 # ======================== 持久化 ========================
+
+func _queue_save() -> void:
+	if _save_timer and _save_timer.time_left > 0.0:
+		return
+	_save_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
+	_save_timer.timeout.connect(_save_data, CONNECT_ONE_SHOT)
 
 func _save_data() -> void:
 	var data = {
@@ -420,8 +428,8 @@ func sync_create_task(task: TaskData) -> void:
 	# 确保 id 不与现有冲突，必要时更新 _next_id
 	if task.id >= _next_id:
 		_next_id = task.id + 1
-	_tasks.insert(0, task)
-	_update_orders()
+	var insert_index = clamp(task.order, 0, _tasks.size())
+	_tasks.insert(insert_index, task)
 	_save_data()
 	task_added.emit(task)
 	print("[TaskState] Sync created task(id: %d, server_id: %d)" % [task.id, task.server_id])
@@ -439,10 +447,15 @@ func sync_update_task(local_id: int, fields: Dictionary) -> bool:
 		task.due_timestamp = fields["due_timestamp"]
 	if fields.has("finish_timestamp"):
 		task.finish_timestamp = fields["finish_timestamp"]
+	if fields.has("position"):
+		task.order = fields["position"]
 	if fields.has("updated_at"):
 		task.updated_at = fields["updated_at"]
 	if fields.has("server_id"):
 		task.server_id = fields["server_id"]
+	if fields.has("position"):
+		_tasks.sort_custom(func(a: TaskData, b: TaskData): return a.order < b.order)
+		_update_orders()
 	_save_data()
 	task_updated.emit(task)
 	print("[TaskState] Sync updated task(id: %d)" % local_id)
@@ -461,6 +474,30 @@ func sync_remove_task(local_id: int) -> bool:
 			print("[TaskState] Sync removed task(id: %d)" % local_id)
 			return true
 	return false
+
+## 按 server_id 顺序重排（同步用）
+func sync_reorder_by_server_ids(server_ids: Array[int]) -> void:
+	if server_ids.is_empty():
+		return
+
+	var ordered_tasks: Array[TaskData] = []
+	var used_ids: Dictionary = {}
+
+	for server_id in server_ids:
+		var task = get_task_by_server_id(server_id)
+		if task != null and not used_ids.has(task.id):
+			ordered_tasks.append(task)
+			used_ids[task.id] = true
+
+	for task in _tasks:
+		if not used_ids.has(task.id):
+			ordered_tasks.append(task)
+
+	_tasks = ordered_tasks
+	_update_orders()
+	_save_data()
+	tasks_reordered.emit()
+	print("[TaskState] Sync reordered %d tasks by server ids" % server_ids.size())
 
 ## 全量替换（full sync 用）
 func sync_replace_all(tasks: Array[TaskData]) -> void:

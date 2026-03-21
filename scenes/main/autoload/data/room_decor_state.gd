@@ -20,6 +20,8 @@ var _selected_item_ids_by_category: Dictionary = {}
 
 const SAVE_PATH := "user://room_decor_data.json"
 const RESOURCE_PATH := "res://resource/room_decor_res/room_decor_res.tres"
+const SAVE_DEBOUNCE_SEC := 0.5
+var _save_timer: SceneTreeTimer
 
 
 # ===== 生命周期 =====
@@ -58,7 +60,7 @@ func add_item(item_name: String, category: String = "default", required_level: i
 	if _get_selected_id(final_category) <= 0 and _is_unlocked(item):
 		_selected_item_ids_by_category[final_category] = item.id
 
-	_save_data()
+	_queue_save()
 	room_decor_added.emit(_to_view_data(item))
 	_emit_state_changed()
 	return item
@@ -76,7 +78,7 @@ func remove_item(item_id: int) -> bool:
 			_selected_item_ids_by_category.erase(removed_category)
 			_assign_first_unlocked_for_category(removed_category)
 
-		_save_data()
+		_queue_save()
 		room_decor_removed.emit(item_id)
 		_emit_unselected_categories(prev_selected_map)
 		_emit_state_changed()
@@ -96,7 +98,7 @@ func clear_all_items() -> int:
 
 	_items.clear()
 	_selected_item_ids_by_category.clear()
-	_save_data()
+	_queue_save()
 
 	for item_id in removed_ids:
 		room_decor_removed.emit(item_id)
@@ -140,7 +142,7 @@ func select_item(item_id: int) -> bool:
 		return true
 
 	_selected_item_ids_by_category[category] = item_id
-	_save_data()
+	_queue_save()
 
 	if old_id > 0:
 		var old_item := _get_item_by_id(old_id)
@@ -162,7 +164,7 @@ func deselect_item(item_id: int) -> bool:
 		return false
 
 	_selected_item_ids_by_category.erase(category)
-	_save_data()
+	_queue_save()
 	room_decor_updated.emit(_to_view_data(item))
 	room_decor_category_unselected.emit(category)
 	_emit_state_changed()
@@ -244,6 +246,12 @@ func _emit_state_changed() -> void:
 		"current_level": int(LevelState.level) if typeof(LevelState) != TYPE_NIL else 1
 	})
 
+
+func _queue_save() -> void:
+	if _save_timer and _save_timer.time_left > 0.0:
+		return
+	_save_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
+	_save_timer.timeout.connect(_save_data, CONNECT_ONE_SHOT)
 
 func _save_data() -> void:
 	var data := {
@@ -443,7 +451,7 @@ func _on_level_state_changed(_data: Dictionary) -> void:
 
 	for item in _items:
 		room_decor_updated.emit(_to_view_data(item))
-	_save_data()
+	_queue_save()
 	_emit_unselected_categories(prev_selected_map)
 	_emit_state_changed()
 

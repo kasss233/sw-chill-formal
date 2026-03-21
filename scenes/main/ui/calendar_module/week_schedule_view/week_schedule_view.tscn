@@ -38,31 +38,52 @@ button_icon = ExtResource("4_right")
 button_size = 0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
-[node name="ActionRow" type="HBoxContainer" parent="."]
+[node name="RhythmHintLabel" type="Label" parent="."]
 layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 8
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.86, 0.86, 0.86, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="ActionRow" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 
 [node name="AIScheduleBtn" type="Button" parent="ActionRow"]
 layout_mode = 2
-text = "AI排期"
+text = "轻松版建议"
+script = ExtResource("2_btn")
+button_size = 0
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="AIDisciplinedBtn" type="Button" parent="ActionRow"]
+layout_mode = 2
+text = "自律版建议"
 script = ExtResource("2_btn")
 button_size = 0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="CopyWeekBtn" type="Button" parent="ActionRow"]
 layout_mode = 2
-text = "复制到下周"
+text = "沿用本周节奏"
 script = ExtResource("2_btn")
 button_size = 0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
 
 [node name="EditSlotsBtn" type="Button" parent="ActionRow"]
 layout_mode = 2
-text = "编辑时间段"
+text = "高级设置"
 script = ExtResource("2_btn")
 button_size = 0
 metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[node name="EmptyHintLabel" type="Label" parent="."]
+visible = false
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.76, 0.76, 0.76, 1)
+theme_override_font_sizes/font_size = 12
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 custom_minimum_size = Vector2(0, 280)
