@@ -64,6 +64,19 @@ var _last_idle_variation: StringName = &""
 var _blinking_token: int = 0
 var _blinking_scheduled: bool = false
 
+## Pose 配置：动作名 → 对应表情（null 表示不改变表情）
+const POSE_CONFIG: Dictionary = {
+	&"clap": &"happy",
+	&"think": &"angry",
+	&"cheer": &"happy",
+	&"watch": &"neutral",
+	&"greet": &"happy",
+	&"surprised": &"surprised",
+	&"disbelief": &"sad",
+	&"stretch": &"",
+	&"stretch2": &"",
+}
+
 func _ready() -> void:
 	if action_tree:
 		action_tree.active = true
@@ -216,30 +229,18 @@ func _trigger_random_idle_variation() -> void:
 		picked = pool[randi() % pool.size()]
 		reroll += 1
 	_last_idle_variation = picked
+	_trigger_one_shot_pose(picked)
 
-	match picked:
-		&"watch":
-			set_watch_pose()
-		&"stretch":
-			set_stretch_pose()
-		&"stretch2":
-			set_stretch2_pose()
-		&"think":
-			set_think_pose()
-		&"greet":
-			set_greet_pose()
-		&"clap":
-			set_clap_pose()
-		&"cheer":
-			set_cheer_pose()
-		&"surprised":
-			set_surprised_pose()
-		&"disbelief":
-			set_disbelief_pose()
-		_:
-			# 未知动作直接忽略
-			pass
-	
+## 通用一次性 pose 触发
+func _trigger_one_shot_pose(pose_name: StringName) -> void:
+	if not _can_trigger_one_shot_action():
+		return
+	if action_playback:
+		action_playback.travel(pose_name)
+	var emotion: StringName = POSE_CONFIG.get(pose_name, &"")
+	if emotion != &"" and emotion_playback:
+		emotion_playback.travel(emotion)
+
 ## 动作接口
 func set_idle_pose():
 	if action_playback:
@@ -257,57 +258,23 @@ func set_talk_pose():
 		action_playback.travel("talk")
 ## 以下动作都是一次性动作，播放完会自动回到idle
 func set_clap_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("clap")
-	set_happy()
+	_trigger_one_shot_pose(&"clap")
 func set_think_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("think")
-	set_angry()
+	_trigger_one_shot_pose(&"think")
 func set_cheer_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("cheer")
-	set_happy()
+	_trigger_one_shot_pose(&"cheer")
 func set_watch_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("watch")
-	set_neutral()
+	_trigger_one_shot_pose(&"watch")
 func set_greet_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("greet")
-	set_happy()
+	_trigger_one_shot_pose(&"greet")
 func set_surprised_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("surprised")
-	set_surprised()
+	_trigger_one_shot_pose(&"surprised")
 func set_disbelief_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("disbelief")
-	set_sad()
+	_trigger_one_shot_pose(&"disbelief")
 func set_stretch_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("stretch")
+	_trigger_one_shot_pose(&"stretch")
 func set_stretch2_pose():
-	if not _can_trigger_one_shot_action():
-		return
-	if action_playback:
-		action_playback.travel("stretch2")
+	_trigger_one_shot_pose(&"stretch2")
 
 ## 表情接口
 ## blinking为一次性动作，播放完会自动回到neutral

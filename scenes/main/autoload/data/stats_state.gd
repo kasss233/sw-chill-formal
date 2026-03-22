@@ -392,6 +392,42 @@ func get_ai_call_stats(period: String, reference: Dictionary = {}) -> Dictionary
 	}
 
 
+# ======================== Agent API ========================
+
+func agent_get_focus_stats(period: String = "week", reference: Dictionary = {}) -> Dictionary:
+	var totals := get_focus_totals(period, reference)
+	var total_seconds: int = 0
+	for item in totals:
+		total_seconds += int(float(item["value"]))
+
+	var period_days: int = totals.size() if not totals.is_empty() else 1
+	var avg_seconds: int = total_seconds / period_days if period_days > 0 else 0
+
+	return {
+		"period": period,
+		"total_seconds": total_seconds,
+		"total_formatted": DateUtil.format_duration(total_seconds),
+		"daily_avg_seconds": avg_seconds,
+		"daily_avg_formatted": DateUtil.format_duration(avg_seconds),
+		"today_seconds": get_today_focus_seconds(),
+		"today_formatted": DateUtil.format_duration(get_today_focus_seconds()),
+		"data_points": totals.size()
+	}
+
+
+func agent_get_task_stats(period: String = "week", reference: Dictionary = {}) -> Dictionary:
+	var totals := get_task_completion_totals(period, reference)
+	var total_count: int = 0
+	for item in totals:
+		total_count += int(item.get("value", 0))
+
+	return {
+		"period": period,
+		"completed_count": total_count,
+		"data_points": totals.size()
+	}
+
+
 # ======================== 持久化 ========================
 
 func _queue_save() -> void:

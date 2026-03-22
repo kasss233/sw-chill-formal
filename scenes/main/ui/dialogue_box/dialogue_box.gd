@@ -205,6 +205,25 @@ func _ready() -> void:
 	ChatState.function_call_completed.connect(_on_function_call_completed)
 
 
+func _exit_tree() -> void:
+	if ChatState.response_started.is_connected(_on_response_started):
+		ChatState.response_started.disconnect(_on_response_started)
+	if ChatState.response_text_delta.is_connected(_on_response_text_delta):
+		ChatState.response_text_delta.disconnect(_on_response_text_delta)
+	if ChatState.response_text_set.is_connected(_on_response_text_set):
+		ChatState.response_text_set.disconnect(_on_response_text_set)
+	if ChatState.response_completed.is_connected(_on_response_completed):
+		ChatState.response_completed.disconnect(_on_response_completed)
+	if ChatState.response_error.is_connected(_on_response_error):
+		ChatState.response_error.disconnect(_on_response_error)
+	if ChatState.response_cleared.is_connected(_on_response_cleared):
+		ChatState.response_cleared.disconnect(_on_response_cleared)
+	if ChatState.function_call_started.is_connected(_on_function_call_started):
+		ChatState.function_call_started.disconnect(_on_function_call_started)
+	if ChatState.function_call_completed.is_connected(_on_function_call_completed):
+		ChatState.function_call_completed.disconnect(_on_function_call_completed)
+
+
 # ============ 显示/隐藏 ============
 # 由 agent 模块调用
 

@@ -92,6 +92,34 @@ func _connect_music_state() -> void:
 	if status_button:
 		status_button.state_changed.connect(_on_status_button_state_changed)
 
+func _exit_tree() -> void:
+	if not MusicState:
+		return
+	if MusicState.track_changed.is_connected(_on_track_changed):
+		MusicState.track_changed.disconnect(_on_track_changed)
+	if MusicState.playback_state_changed.is_connected(_on_playback_state_changed):
+		MusicState.playback_state_changed.disconnect(_on_playback_state_changed)
+	if MusicState.play_mode_changed.is_connected(_on_play_mode_changed):
+		MusicState.play_mode_changed.disconnect(_on_play_mode_changed)
+	if MusicState.playlist_created.is_connected(_on_state_playlist_created):
+		MusicState.playlist_created.disconnect(_on_state_playlist_created)
+	if MusicState.playlist_deleted.is_connected(_on_state_playlist_deleted):
+		MusicState.playlist_deleted.disconnect(_on_state_playlist_deleted)
+	if MusicState.track_added_to_playlist.is_connected(_on_state_track_added):
+		MusicState.track_added_to_playlist.disconnect(_on_state_track_added)
+	if MusicState.track_removed_from_playlist.is_connected(_on_state_track_removed):
+		MusicState.track_removed_from_playlist.disconnect(_on_state_track_removed)
+	if MusicState.imported_track_added.is_connected(_on_state_imported_track_added):
+		MusicState.imported_track_added.disconnect(_on_state_imported_track_added)
+	if MusicState.imported_track_removed.is_connected(_on_state_imported_track_removed):
+		MusicState.imported_track_removed.disconnect(_on_state_imported_track_removed)
+	if MusicState.builtin_track_removed.is_connected(_on_state_builtin_track_removed):
+		MusicState.builtin_track_removed.disconnect(_on_state_builtin_track_removed)
+	if MusicState.playlist_changed.is_connected(_on_state_playlist_changed):
+		MusicState.playlist_changed.disconnect(_on_state_playlist_changed)
+	if MusicState.data_loaded.is_connected(_on_state_data_loaded):
+		MusicState.data_loaded.disconnect(_on_state_data_loaded)
+
 ## 延迟初始化
 func _deferred_init() -> void:
 	_init_first_music()

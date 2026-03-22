@@ -189,12 +189,24 @@ func agent_load_room_decor_from_resource() -> Dictionary:
 	load_from_resource()
 	var final_count := _items.size()
 	var loaded_count := final_count - initial_count
-	
+
 	return {
 		"success": loaded_count > 0,
 		"loaded_count": loaded_count,
 		"total_count": final_count
 	}
+
+
+func agent_get_all_room_decor() -> Array[Dictionary]:
+	return get_all_items()
+
+
+func agent_get_available_room_decor() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for item in _items:
+		if _is_unlocked(item):
+			result.append(_to_view_data(item))
+	return result
 
 
 # ===== 内部实现 =====

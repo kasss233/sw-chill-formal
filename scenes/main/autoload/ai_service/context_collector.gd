@@ -17,6 +17,8 @@ signal collection_completed(context: Dictionary)
 @export var collect_environment: bool = true
 @export var collect_notes: bool = false  ## 便签内容可能较大，默认关闭
 @export var collect_habits: bool = true  ## 习惯状态
+@export var collect_level: bool = true  ## 等级与经验
+@export var collect_stats: bool = true  ## 专注统计
 
 
 ## 收集所有上下文信息
@@ -43,6 +45,12 @@ func collect() -> Dictionary:
 
 	if collect_habits:
 		context["habits"] = _collect_habits()
+
+	if collect_level:
+		context["level"] = _collect_level()
+
+	if collect_stats:
+		context["focus_stats"] = _collect_focus_stats()
 
 	collection_completed.emit(context)
 	return context
@@ -123,6 +131,18 @@ func _collect_habits() -> Dictionary:
 		"week_completion_rate": stats.get("completion_rate", 0.0),
 		"recent_habits": recent
 	}
+
+
+## 收集等级状态
+func _collect_level() -> Dictionary:
+	return LevelState.agent_get_level_info()
+
+
+## 收集专注统计
+func _collect_focus_stats() -> Dictionary:
+	if not StatsState:
+		return {}
+	return StatsState.agent_get_focus_stats("week")
 
 
 ## 格式化上下文为提示词片段
@@ -216,6 +236,21 @@ func format_as_prompt(context: Dictionary = {}) -> String:
 			var recent_habits: Array = habits.get("recent_habits", [])
 			for h in recent_habits:
 				parts.append("  - %s（%d分钟）" % [h.get("name", ""), h.get("minutes", 0)])
+
+	# 等级
+	if context.has("level") and not context["level"].is_empty():
+		var lvl: Dictionary = context["level"]
+		parts.append("等级: Lv.%d（%d/%d XP，进度 %d%%）" % [
+			lvl.get("level", 1), lvl.get("xp", 0),
+			lvl.get("xp_for_next_level", 100),
+			int(lvl.get("progress", 0.0) * 100)])
+
+	# 专注统计
+	if context.has("focus_stats") and not context["focus_stats"].is_empty():
+		var fs: Dictionary = context["focus_stats"]
+		var today_str: String = fs.get("today_formatted", "0 分钟")
+		var avg_str: String = fs.get("daily_avg_formatted", "0 分钟")
+		parts.append("专注: 今日 %s，本周日均 %s" % [today_str, avg_str])
 
 	if parts.is_empty():
 		return ""

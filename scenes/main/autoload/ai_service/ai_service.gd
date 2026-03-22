@@ -54,6 +54,22 @@ func _ready() -> void:
 	_mutex = Mutex.new()
 
 
+# ============ 线程安全访问器 ============
+
+func _is_stopped() -> bool:
+	_mutex.lock()
+	var val = _should_stop
+	_mutex.unlock()
+	return val
+
+
+func _set_request_state(requesting: bool, streaming: bool) -> void:
+	_mutex.lock()
+	_is_requesting = requesting
+	_is_streaming = streaming
+	_mutex.unlock()
+
+
 ## 调试输出
 func _debug(message: String, data: Variant = null) -> void:
 	if not debug_enabled:
@@ -90,11 +106,12 @@ func send_message(user_message: String, images: Array = [], use_history: bool = 
 		request_failed.emit("API 密钥未设置")
 		return
 
-	_is_requesting = true
-	_is_streaming = true
+	_set_request_state(true, true)
 	_current_response = ""
 	_buffer = ""
+	_mutex.lock()
 	_should_stop = false
+	_mutex.unlock()
 
 	# 构建用户消息内容
 	var user_content = _build_user_content(user_message, images)
@@ -136,8 +153,10 @@ func cancel_request() -> void:
 	if _http_client:
 		_http_client.close()
 
-	_is_requesting = false
-	_is_streaming = false
+	if _stream_thread and _stream_thread.is_started():
+		_stream_thread.wait_to_finish()
+
+	_set_request_state(false, false)
 
 
 ## 清空对话历史
@@ -162,12 +181,18 @@ func add_assistant_message(content: String) -> void:
 
 ## 是否正在请求
 func is_requesting() -> bool:
-	return _is_requesting
+	_mutex.lock()
+	var val = _is_requesting
+	_mutex.unlock()
+	return val
 
 
 ## 是否正在流式传输
 func is_streaming() -> bool:
-	return _is_streaming
+	_mutex.lock()
+	var val = _is_streaming
+	_mutex.unlock()
+	return val
 
 
 # ============ 内部方法 ============
@@ -253,6 +278,7 @@ func _stream_request(messages: Array) -> void:
 	if err != OK:
 		call_deferred("_debug", "连接失败", {"error_code": err})
 		call_deferred("_emit_error", "无法连接到服务器: " + str(err))
+		_http_client.close()
 		return
 
 	# 等待连接
@@ -261,7 +287,7 @@ func _stream_request(messages: Array) -> void:
 	while _http_client.get_status() == HTTPClient.STATUS_CONNECTING or \
 		  _http_client.get_status() == HTTPClient.STATUS_RESOLVING:
 		_http_client.poll()
-		if _should_stop:
+		if _is_stopped():
 			call_deferred("_debug", "请求被用户取消")
 			_http_client.close()
 			return
@@ -325,7 +351,7 @@ func _stream_request(messages: Array) -> void:
 	timeout_start = Time.get_ticks_msec()
 	while _http_client.get_status() == HTTPClient.STATUS_REQUESTING:
 		_http_client.poll()
-		if _should_stop:
+		if _is_stopped():
 			call_deferred("_debug", "请求被用户取消")
 			_http_client.close()
 			return
@@ -377,7 +403,7 @@ func _stream_request(messages: Array) -> void:
 	_buffer = ""
 	var chunk_count = 0
 	while _http_client.get_status() == HTTPClient.STATUS_BODY:
-		if _should_stop:
+		if _is_stopped():
 			call_deferred("_debug", "流式读取被用户取消")
 			_http_client.close()
 			return
@@ -521,8 +547,7 @@ func _emit_chunk(chunk: String) -> void:
 
 
 func _emit_error(error: String) -> void:
-	_is_requesting = false
-	_is_streaming = false
+	_set_request_state(false, false)
 	request_failed.emit(error)
 
 
@@ -531,8 +556,7 @@ func _emit_connection_state(is_connected: bool) -> void:
 
 
 func _finish_stream() -> void:
-	_is_requesting = false
-	_is_streaming = false
+	_set_request_state(false, false)
 
 	# 将助手响应添加到历史
 	if not _current_response.is_empty():

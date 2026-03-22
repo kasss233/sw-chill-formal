@@ -138,6 +138,16 @@ func _on_daily_task_reward_claimed(_data: Dictionary) -> void:
 	add_xp(50, "完成每日任务奖励", true)
 
 
+# ===== Agent API =====
+func agent_get_level_info() -> Dictionary:
+	return {
+		"level": level,
+		"xp": xp,
+		"xp_for_next_level": get_xp_for_next_level(level),
+		"progress": get_progress()
+	}
+
+
 # ===== 同步 API =====
 func export_data() -> Dictionary:
 	return {"version": 1, "level": level, "xp": xp}

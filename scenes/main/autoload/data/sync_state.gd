@@ -184,24 +184,23 @@ func _rebuild_sync_hints() -> void:
 		_remember_category_sync_hint(category)
 
 
-func _remember_task_sync_hint(task: TaskData) -> void:
-	if task == null:
+## 通用 sync hint 记忆
+func _remember_sync_hint(resource: String, item) -> void:
+	if item == null:
 		return
-	var server_id = task.server_id
+	var server_id: int = item.server_id
 	if server_id <= 0:
-		server_id = _id_mapping.get_server_id("task", str(task.id))
+		server_id = _id_mapping.get_server_id(resource, str(item.id))
 	if server_id > 0:
-		_task_server_hints[task.id] = server_id
+		_get_server_hints(resource)[item.id] = server_id
+
+
+func _remember_task_sync_hint(task: TaskData) -> void:
+	_remember_sync_hint("task", task)
 
 
 func _remember_note_sync_hint(note: NoteData) -> void:
-	if note == null:
-		return
-	var server_id = note.server_id
-	if server_id <= 0:
-		server_id = _id_mapping.get_server_id("note", str(note.id))
-	if server_id > 0:
-		_note_server_hints[note.id] = server_id
+	_remember_sync_hint("note", note)
 
 
 func _remember_category_sync_hint(category: String) -> void:
@@ -954,105 +953,6 @@ func _apply_remote_category_change_v2(action: String, data: Dictionary) -> Dicti
 	return summary
 
 
-func _apply_remote_task_change(action: String, data: Dictionary) -> void:
-	var server_id = data.get("id", 0)
-
-	match action:
-		"create":
-			# 幂等检查
-			if _id_mapping.has_server_id("task", server_id):
-				return
-			var local_id = TaskState.allocate_id()
-			var task = TaskData.new(local_id, data.get("title", ""), data.get("due_timestamp", 0), data.get("is_completed", false))
-			task.finish_timestamp = data.get("finish_timestamp", 0)
-			task.order = data.get("position", 0)
-			task.created_at = _to_sec(data.get("created_at", 0))
-			task.updated_at = _to_sec(data.get("updated_at", 0))
-			task.server_id = server_id
-			TaskState.sync_create_task(task)
-			_id_mapping.set_mapping("task", str(local_id), server_id)
-
-		"update":
-			var local_key = _id_mapping.get_local_key("task", server_id)
-			if local_key == "":
-				print("[SyncState] 跳过 task update，缺少本地映射: server_id=%d" % server_id)
-				return
-			var local_id = int(local_key)
-			var fields = _extract_remote_fields(data, ["title", "is_completed", "due_timestamp", "finish_timestamp", "updated_at", "position"])
-			if fields.has("updated_at"):
-				fields["updated_at"] = _to_sec(fields["updated_at"])
-			TaskState.sync_update_task(local_id, fields)
-
-		"delete":
-			var local_key = _id_mapping.get_local_key("task", server_id)
-			if local_key == "":
-				print("[SyncState] 跳过 task delete，缺少本地映射: server_id=%d" % server_id)
-				return
-			var local_id = int(local_key)
-			TaskState.sync_remove_task(local_id)
-			_id_mapping.remove_by_server("task", server_id)
-
-
-func _apply_remote_note_change(action: String, data: Dictionary) -> void:
-	var server_id = data.get("id", 0)
-
-	match action:
-		"create":
-			if _id_mapping.has_server_id("note", server_id):
-				return
-			var local_id = NoteState.allocate_id()
-			var note = NoteData.new(local_id, data.get("title", ""), data.get("content", ""))
-			note.created_at = _to_sec(data.get("created_at", 0))
-			note.updated_at = _to_sec(data.get("updated_at", 0))
-			note.server_id = server_id
-			NoteState.sync_create_note(note)
-			_id_mapping.set_mapping("note", str(local_id), server_id)
-
-		"update":
-			var local_key = _id_mapping.get_local_key("note", server_id)
-			if local_key == "":
-				print("[SyncState] 跳过 note update，缺少本地映射: server_id=%d" % server_id)
-				return
-			var local_id = int(local_key)
-			var fields = _extract_remote_fields(data, ["title", "content", "categories", "updated_at", "position"])
-			if fields.has("updated_at"):
-				fields["updated_at"] = _to_sec(fields["updated_at"])
-			NoteState.sync_update_note(local_id, fields)
-
-		"delete":
-			var local_key = _id_mapping.get_local_key("note", server_id)
-			if local_key == "":
-				print("[SyncState] 跳过 note delete，缺少本地映射: server_id=%d" % server_id)
-				return
-			var local_id = int(local_key)
-			NoteState.sync_remove_note(local_id)
-			_id_mapping.remove_by_server("note", server_id)
-
-
-func _apply_remote_category_change(action: String, data: Dictionary) -> void:
-	var server_id = data.get("id", 0)
-	var name = data.get("name", "")
-
-	match action:
-		"create":
-			if _id_mapping.has_server_id("category", server_id):
-				return
-			var position = data.get("position", NoteState.get_categories().size())
-			NoteState.sync_insert_category_at(name, position)
-			_repair_mapping("category", 0, name, server_id)
-
-		"update":
-			# category 目前只有 name 和 position，暂不处理 rename
-			pass
-
-		"delete":
-			var local_key = _id_mapping.get_local_key("category", server_id)
-			if local_key == "":
-				return
-			NoteState.sync_remove_category(local_key)
-			_id_mapping.remove_by_server("category", server_id)
-
-
 # ======================== 全量同步 ========================
 
 func do_full_sync() -> void:
@@ -1182,7 +1082,7 @@ func _merge_full_sync_tasks(server_tasks: Array) -> void:
 			"position": item.order
 		}
 	)
-	_prune_missing_full_sync_tasks(server_tasks)
+	_prune_missing_full_sync_items("task", server_tasks)
 
 
 ## 全量同步 - 合并 notes（通用方法 wrapper）
@@ -1212,7 +1112,7 @@ func _merge_full_sync_notes(server_notes: Array) -> void:
 			"created_at": item.created_at,
 		}
 	)
-	_prune_missing_full_sync_notes(server_notes)
+	_prune_missing_full_sync_items("note", server_notes)
 
 
 ## 通用全量合并方法
@@ -1320,48 +1220,35 @@ func _find_local_item_by_id(local_items: Array, get_id: Callable, target_id: int
 	return null
 
 
-func _prune_missing_full_sync_tasks(server_tasks: Array) -> void:
+## 通用全量同步裁剪：删除本地有映射但服务器已不存在的项
+func _prune_missing_full_sync_items(resource: String, server_items: Array) -> void:
 	var server_ids: Dictionary = {}
-	for st in server_tasks:
-		if st is Dictionary:
-			var sid = int(st.get("id", 0))
+	for si in server_items:
+		if si is Dictionary:
+			var sid = int(si.get("id", 0))
 			if sid > 0:
 				server_ids[sid] = true
 
-	for task in TaskState.get_all_tasks():
-		var server_id = task.server_id
+	var all_items: Array
+	match resource:
+		"task": all_items = TaskState.get_all_tasks()
+		"note": all_items = NoteState.get_all_notes()
+		_: return
+
+	for item in all_items:
+		var server_id: int = item.server_id
 		if server_id <= 0:
-			server_id = _id_mapping.get_server_id("task", str(task.id))
+			server_id = _id_mapping.get_server_id(resource, str(item.id))
 		if server_id <= 0:
 			continue
 		if server_ids.has(server_id):
 			continue
-		print("[SyncState][DeleteTrace] full sync prune task local_id=%d server_id=%d" % [task.id, server_id])
-		TaskState.sync_remove_task(task.id)
-		_id_mapping.remove_by_server("task", server_id)
-		_forget_sync_hint("task", task.id)
-
-
-func _prune_missing_full_sync_notes(server_notes: Array) -> void:
-	var server_ids: Dictionary = {}
-	for sn in server_notes:
-		if sn is Dictionary:
-			var sid = int(sn.get("id", 0))
-			if sid > 0:
-				server_ids[sid] = true
-
-	for note in NoteState.get_all_notes():
-		var server_id = note.server_id
-		if server_id <= 0:
-			server_id = _id_mapping.get_server_id("note", str(note.id))
-		if server_id <= 0:
-			continue
-		if server_ids.has(server_id):
-			continue
-		print("[SyncState][DeleteTrace] full sync prune note local_id=%d server_id=%d" % [note.id, server_id])
-		NoteState.sync_remove_note(note.id)
-		_id_mapping.remove_by_server("note", server_id)
-		_forget_sync_hint("note", note.id)
+		print("[SyncState][DeleteTrace] full sync prune %s local_id=%d server_id=%d" % [resource, item.id, server_id])
+		match resource:
+			"task": TaskState.sync_remove_task(item.id)
+			"note": NoteState.sync_remove_note(item.id)
+		_id_mapping.remove_by_server(resource, server_id)
+		_forget_sync_hint(resource, item.id)
 
 
 ## 全量同步 - 合并 categories
@@ -1517,57 +1404,72 @@ func _persist_local_server_id(resource: String, local_id: int, server_id: int) -
 
 
 func _resolve_task_local_id(server_id: int, remote_data: Dictionary = {}) -> int:
-	if server_id <= 0:
-		return 0
-	var local_key = _id_mapping.get_local_key("task", server_id)
-	if local_key != "":
-		var local_id = int(local_key)
-		if TaskState.get_task_by_id(local_id) != null:
-			print("[SyncState][DeleteTrace] resolve task local by mapping server_id=%d local_id=%d" % [server_id, local_id])
-			_task_server_hints[local_id] = server_id
-			return local_id
-
-	var task = TaskState.get_task_by_server_id(server_id)
-	if task != null:
-		print("[SyncState][DeleteTrace] resolve task local by persisted server_id=%d local_id=%d" % [server_id, task.id])
-		_repair_mapping("task", task.id, str(task.id), server_id)
-		return task.id
-
-	var matched_task = _match_task_by_remote_data(remote_data)
-	if matched_task != null:
-		print("[SyncState][DeleteTrace] resolve task local by heuristic server_id=%d local_id=%d" % [server_id, matched_task.id])
-		TaskState.sync_update_task(matched_task.id, {"server_id": server_id})
-		_repair_mapping("task", matched_task.id, str(matched_task.id), server_id)
-		return matched_task.id
-	print("[SyncState][DeleteTrace] failed to resolve task local server_id=%d remote_data=%s" % [server_id, JSON.stringify(remote_data)])
-	return 0
+	return _resolve_local_id("task", server_id, remote_data)
 
 
 func _resolve_note_local_id(server_id: int, remote_data: Dictionary = {}) -> int:
+	return _resolve_local_id("note", server_id, remote_data)
+
+
+## 通用本地 ID 解析：mapping → server_id 查找 → 启发式匹配
+func _resolve_local_id(resource: String, server_id: int, remote_data: Dictionary = {}) -> int:
 	if server_id <= 0:
 		return 0
-	var local_key = _id_mapping.get_local_key("note", server_id)
+	var local_key = _id_mapping.get_local_key(resource, server_id)
 	if local_key != "":
 		var local_id = int(local_key)
-		if NoteState.get_note_by_id(local_id) != null:
-			print("[SyncState][DeleteTrace] resolve note local by mapping server_id=%d local_id=%d" % [server_id, local_id])
-			_note_server_hints[local_id] = server_id
+		if _get_item_by_id(resource, local_id) != null:
+			print("[SyncState][DeleteTrace] resolve %s local by mapping server_id=%d local_id=%d" % [resource, server_id, local_id])
+			_get_server_hints(resource)[local_id] = server_id
 			return local_id
 
-	var note = NoteState.get_note_by_server_id(server_id)
-	if note != null:
-		print("[SyncState][DeleteTrace] resolve note local by persisted server_id=%d local_id=%d" % [server_id, note.id])
-		_repair_mapping("note", note.id, str(note.id), server_id)
-		return note.id
+	var item = _get_item_by_server_id(resource, server_id)
+	if item != null:
+		var item_id: int = item.id
+		print("[SyncState][DeleteTrace] resolve %s local by persisted server_id=%d local_id=%d" % [resource, server_id, item_id])
+		_repair_mapping(resource, item_id, str(item_id), server_id)
+		return item_id
 
-	var matched_note = _match_note_by_remote_data(remote_data)
-	if matched_note != null:
-		print("[SyncState][DeleteTrace] resolve note local by heuristic server_id=%d local_id=%d" % [server_id, matched_note.id])
-		NoteState.sync_update_note(matched_note.id, {"server_id": server_id})
-		_repair_mapping("note", matched_note.id, str(matched_note.id), server_id)
-		return matched_note.id
-	print("[SyncState][DeleteTrace] failed to resolve note local server_id=%d remote_data=%s" % [server_id, JSON.stringify(remote_data)])
+	var matched = _match_by_title_and_created(resource, remote_data)
+	if matched != null:
+		var matched_id: int = matched.id
+		print("[SyncState][DeleteTrace] resolve %s local by heuristic server_id=%d local_id=%d" % [resource, server_id, matched_id])
+		_sync_update_item(resource, matched_id, {"server_id": server_id})
+		_repair_mapping(resource, matched_id, str(matched_id), server_id)
+		return matched_id
+	print("[SyncState][DeleteTrace] failed to resolve %s local server_id=%d remote_data=%s" % [resource, server_id, JSON.stringify(remote_data)])
 	return 0
+
+
+## 分发辅助：按 resource 获取本地项（by id）
+func _get_item_by_id(resource: String, local_id: int):
+	match resource:
+		"task": return TaskState.get_task_by_id(local_id)
+		"note": return NoteState.get_note_by_id(local_id)
+	return null
+
+
+## 分发辅助：按 resource 获取本地项（by server_id）
+func _get_item_by_server_id(resource: String, server_id: int):
+	match resource:
+		"task": return TaskState.get_task_by_server_id(server_id)
+		"note": return NoteState.get_note_by_server_id(server_id)
+	return null
+
+
+## 分发辅助：获取对应 resource 的 server_hints 字典
+func _get_server_hints(resource: String) -> Dictionary:
+	match resource:
+		"task": return _task_server_hints
+		"note": return _note_server_hints
+	return {}
+
+
+## 分发辅助：调用对应 resource 的 sync_update
+func _sync_update_item(resource: String, local_id: int, fields: Dictionary) -> void:
+	match resource:
+		"task": TaskState.sync_update_task(local_id, fields)
+		"note": NoteState.sync_update_note(local_id, fields)
 
 
 func _resolve_category_key(server_id: int, name: String) -> String:
@@ -1586,42 +1488,29 @@ func _resolve_category_key(server_id: int, name: String) -> String:
 	return ""
 
 
-func _match_task_by_remote_data(remote_data: Dictionary):
+## 通用启发式匹配：按 title + created_at 匹配未映射的本地项
+func _match_by_title_and_created(resource: String, remote_data: Dictionary):
 	var title = str(remote_data.get("title", ""))
 	var created_at = int(remote_data.get("created_at", 0))
 	if title == "" or created_at <= 0:
 		return null
-	var matched_task = null
-	for task in TaskState.get_all_tasks():
-		if task.server_id > 0:
+	var all_items: Array
+	match resource:
+		"task": all_items = TaskState.get_all_tasks()
+		"note": all_items = NoteState.get_all_notes()
+		_: return null
+	var matched = null
+	for item in all_items:
+		if item.server_id > 0:
 			continue
-		if task.title != title:
+		if item.title != title:
 			continue
-		if abs(_to_ms(task.created_at) - created_at) > 60000:
+		if abs(_to_ms(item.created_at) - created_at) > 60000:
 			continue
-		if matched_task != null:
+		if matched != null:
 			return null
-		matched_task = task
-	return matched_task
-
-
-func _match_note_by_remote_data(remote_data: Dictionary):
-	var title = str(remote_data.get("title", ""))
-	var created_at = int(remote_data.get("created_at", 0))
-	if title == "" or created_at <= 0:
-		return null
-	var matched_note = null
-	for note in NoteState.get_all_notes():
-		if note.server_id > 0:
-			continue
-		if note.title != title:
-			continue
-		if abs(_to_ms(note.created_at) - created_at) > 60000:
-			continue
-		if matched_note != null:
-			return null
-		matched_note = note
-	return matched_note
+		matched = item
+	return matched
 
 
 func _should_drop_unpushable_change(change: SyncChange) -> bool:

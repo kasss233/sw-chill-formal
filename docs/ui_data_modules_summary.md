@@ -26,7 +26,9 @@
 | 成就模块 | `achievement_module/achievement_module.gd` | AchievementState、LevelState（奖励联动） | 每日任务/成就双标签、完成/领取奖励 |
 | 等级条 | `level_bar/level_bar.gd` | LevelState | 等级进度、经验提示与来源展示 |
 | 角色交互 | `character_interactor/character_interactor.gd` | CharacterInteractorState | 3 次点击触发交互事件 |
-| 日历模块 | `calendar_module/calendar_module.gd` | HabitState（子面板使用）、ChatState | Tab 切换、请求 AI 生成周课表/反思 |
+| 个人中心模块 | `calendar_module/calendar_module.gd` | HabitState、AuthState、LevelState、TaskState、AchievementState、StatsState、SyncState | 三 Tab 容器（我的/统计/习惯库） |
+| ├ 个人资料 | `calendar_module/profile_view/profile_view.gd` | AuthState、LevelState、TaskState、AchievementState、StatsState、SyncState | 用户身份、等级、今日概览、数据同步 |
+| ├ 统计视图 | `calendar_module/stats_view/stats_view.gd` | StatsState、HabitState、TaskState、NoteState | 周/月/年统计、柱状图、热力图、反思生成 |
 | 房间装饰模块 | `room_decor_module/room_decor_module.gd` | RoomDecorState、LevelState | 装饰物展示、分类分组、选择/取消、解锁态展示 |
 
 ## 3. UI 主模块详细说明
@@ -170,11 +172,33 @@
 
 ### 3.16 `calendar_module/calendar_module.gd`
 
-- 日历容器模块，主职责是视图切换与 AI 请求转发。
-- `_on_tab_changed(index)`：切换 Calendar/WeekSchedule/HabitLibrary/Summary 视图。
-- `_on_date_selected(year, month, day)`：日期选择回调（当前用于日志输出）。
-- `_on_ai_schedule_requested(week_key)`：调用 `ChatState.agent_set_input_text(...)` 请求生成课表。
-- `_on_generate_reflection(week_key)`：调用 `ChatState.agent_set_input_text(...)` 请求生成反思。
+- 个人中心容器模块，管理"我的/统计/习惯库"三个 Tab 视图。
+- `_on_tab_changed(index, _text)`：切换 ProfileView / StatsView / HabitLibraryPanel 视图。
+- 通过 `%ProfileView`、`%StatsView`、`%HabitLibraryPanel` unique name 引用子视图。
+
+### 3.16a `calendar_module/profile_view/profile_view.gd`
+
+- 个人中心"我的"选项卡。
+- 用户身份：`AuthState.is_logged_in()`、`AuthState.get_username()`、`AuthState.login()`、`AuthState.register()`、`AuthState.logout()`。
+- 等级进度：`LevelState.level`、`LevelState.xp`、`LevelState.get_xp_for_next_level()`、`LevelState.get_progress()`。
+- 今日概览：`TaskState.get_completed_count()`、`TaskState.get_overdue_tasks()`、`AchievementState.get_daily_tasks()`、`StatsState.get_today_focus_seconds()`。
+- 数据同步：`SyncState.trigger_sync()`。
+- 内部对话框（代码创建）：登录、注册、登出三个 `MaterialDialog`。
+- 信号连接：`AuthState`、`LevelState`、`TaskState`、`AchievementState`、`StatsState`、`SyncState`。
+
+### 3.16b `calendar_module/stats_view/stats_view.gd`
+
+- 个人中心"统计"选项卡，支持周/月/年三种周期视图。
+- 概览卡片：专注时长、任务完成、习惯完成率、日均专注。
+  - 专注数据：`StatsState.get_week_daily_totals()` / `get_month_daily_totals()` / `get_year_monthly_totals()`。
+  - 任务完成：`StatsState.get_task_completion_totals()`。
+  - 习惯完成率：`HabitState.get_review_summary()`。
+- 柱状图：`StatsState.get_week_focus_totals()` 等，FocusBarChart 自定义绘制。
+- 时间线（仅周视图）：`StatsState.get_records("focus", date_key)` 展示当日专注段。
+- 热力图 + 洞察：`HabitState.get_review_summary()` 返回 heatmap_days / insights。
+- 反思生成：`HabitState.agent_generate_period_reflection()` → ChatState → AI 生成回顾摘要。
+- 动态内容（代码创建）：时间线行、热力图格子、洞察条目。
+- 信号连接：`HabitState`、`StatsState`、`NoteState`、`TaskState`。
 
 ### 3.17 `room_decor_module/room_decor_module.gd`
 
@@ -238,14 +262,14 @@
 
 #### `habit_state.gd`
 - 习惯系统主状态。
-- 核心信号：`habit_added/removed/updated`、`time_slot_template_changed`、`schedule_entry_added/removed/updated/cleared`、`execution_updated`、`agent_schedule_generated`、`data_loaded`。
+- 核心信号：`habit_added/removed/updated`、`time_slot_template_changed`、`schedule_entry_added/removed/updated/cleared`、`schedule_updated`、`execution_updated`、`agent_schedule_generated`、`data_loaded`。
 - 核心方法：
-  - 查询：`get_all_habits()`、`get_week_schedule()`、`get_day_schedule()`、`get_week_stats()` 等
+  - 查询：`get_all_habits()`、`get_week_schedule()`、`get_day_schedule()`、`get_week_stats()`、`get_review_summary()` 等
   - 习惯管理：`add_habit()`、`update_habit()`、`remove_habit()`、`set_habit_active()`
   - 时间段模板：`add/update/remove/reorder_time_slot_template*`
   - 排期：`add/remove/clear/copy/apply_schedule_batch`
   - 执行：`set_execution_status()`、`ensure_daily_records()`
-  - Agent：`agent_add_habit()`、`agent_generate_schedule()`、`agent_get_habit_stats()` 等
+  - Agent：`agent_add_habit()`、`agent_generate_schedule()`、`agent_generate_period_reflection()`、`agent_get_habit_stats()` 等
   - 持久化/同步：`load_data()`、`export_data()`、`import_data()`、`import_sync_data()`
 
 #### `layer_manager.gd`
@@ -256,6 +280,7 @@
 - 等级与经验状态。
 - 核心信号：`level_up`、`level_state_changed`、`data_loaded`。
 - 核心方法：`add_xp()`、`reset_level_and_xp()`、`get_xp_for_next_level()`、`get_progress()`、`save_data()`、`load_data()`、`export_data()`、`import_sync_data()`。
+- Agent 方法：`agent_get_level_info()`（返回等级、经验、进度）。
 
 #### `note_state.gd`
 - 笔记主状态。
@@ -280,7 +305,7 @@
 - 核心方法：
   - 查询：`get_all_items()`、`get_selected_item_ids_by_category()`
   - 操作：`add_item()`、`remove_item()`、`select_item()`、`deselect_item()`、`clear_all_items()`、`clear_all_categories()`
-  - Agent：`agent_add_room_decor_item()`、`agent_select_room_decor_item()`、`agent_load_room_decor_from_resource()`
+  - Agent：`agent_add_room_decor_item()`、`agent_select_room_decor_item()`、`agent_load_room_decor_from_resource()`、`agent_get_all_room_decor()`、`agent_get_available_room_decor()`
   - 持久化/同步：`load_data()`、`export_data()`、`import_sync_data()`
 
 #### `setting_state.gd`
@@ -295,8 +320,9 @@
 - 统计记录状态。
 - 核心信号：`record_added`、`record_removed`、`data_loaded`。
 - 核心方法：`add_record()`、`remove_record()`、`get_records()`、`get_records_in_range()`。
-- 统计辅助：`get_day_total()`、`get_week_daily_totals()`、`get_month_daily_totals()`、`get_year_monthly_totals()`。
+- 统计辅助：`get_day_total()`、`get_week_daily_totals()`、`get_month_daily_totals()`、`get_year_monthly_totals()`、`get_task_completion_totals()`。
 - 聚焦番茄钟统计：`get_today_focus_seconds()`、`get_week_focus_totals()`。
+- Agent 方法：`agent_get_focus_stats(period)`（返回总时长/日均/今日统计）、`agent_get_task_stats(period)`（返回任务完成统计）。
 
 #### `sticky_note_state.gd`
 - 便签计数与请求状态。
@@ -354,7 +380,7 @@
 ## 5. 模块关系补充说明
 
 - 音乐相关状态 `MusicState` 不在 `autoload/data` 目录，而在 `autoload/audio_player` 体系中；UI 音乐模块依然遵循“State 驱动 UI”的模式。
-- `calendar_module.gd` 主要做容器与事件转发；课表/习惯库/统计的具体业务在其子面板中（对应 HabitState）。
+- `calendar_module.gd` 做三 Tab 容器；`profile_view` 负责用户身份/等级/概览/同步，`stats_view` 负责周期统计/图表/热力图/AI 反思，`habit_library_panel` 负责习惯库管理。
 - `note_module.gd`（便签）与 `notebook_mobile_module`（笔记本）分别对应 `StickyNoteState` 与 `NoteState`，是两套用途不同的笔记形态。
 
 ## 6. 建议的文档维护方式

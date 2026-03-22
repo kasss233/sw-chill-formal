@@ -1,4 +1,7 @@
 class_name TTSPlayer extends Node
+## [STUB] TTS 播放器 -- 核心函数（_play_audio / _download_audio / _decode_audio）未实现
+## 保留文件结构和 ChatController 引用，等待后续接入真实 TTS 服务
+##
 ## TTS 语音播放器
 ## 负责播放 AI 返回的语音合成音频
 ##

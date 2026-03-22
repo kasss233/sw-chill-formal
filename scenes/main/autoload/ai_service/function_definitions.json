@@ -645,5 +645,40 @@
 	  },
 	  "required": ["week_key"]
 	}
+  },
+  {
+	"name": "get_level_info",
+	"description": "获取用户当前等级与经验信息",
+	"parameters": { "type": "object", "properties": {} }
+  },
+  {
+	"name": "get_focus_stats",
+	"description": "获取专注统计数据（总时长、日均、今日等）",
+	"parameters": {
+	  "type": "object",
+	  "properties": {
+		"period": { "type": "string", "enum": ["week", "month", "year"], "description": "统计周期，默认 week", "default": "week" }
+	  }
+	}
+  },
+  {
+	"name": "get_task_stats",
+	"description": "获取任务完成统计数据",
+	"parameters": {
+	  "type": "object",
+	  "properties": {
+		"period": { "type": "string", "enum": ["week", "month", "year"], "description": "统计周期，默认 week", "default": "week" }
+	  }
+	}
+  },
+  {
+	"name": "get_all_room_decor",
+	"description": "获取所有房间装饰物品列表（包含已锁定和未锁定）",
+	"parameters": { "type": "object", "properties": {} }
+  },
+  {
+	"name": "get_available_room_decor",
+	"description": "获取当前已解锁的房间装饰物品列表",
+	"parameters": { "type": "object", "properties": {} }
   }
 ]
