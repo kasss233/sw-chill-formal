@@ -455,8 +455,26 @@ func update_height() -> void:
 ## 设置文本内容（会自动更新高度）
 ## @param text: 要设置的文本
 func set_text(text: String) -> void:
+	_full_text = text
 	rich_text_label.text = text
 	_update_height()
+
+
+func show_demo_response(text: String, append: bool = false) -> void:
+	show_module()
+	_has_received_text = true
+	if append:
+		append_text(text)
+	else:
+		clear_dialogue()
+		set_text(text)
+	_set_display_state(DisplayState.SHOWING_TEXT)
+	_set_display_state(DisplayState.COMPLETED)
+
+
+func clear_demo_response() -> void:
+	clear_dialogue()
+	_set_display_state(DisplayState.HIDDEN)
 
 
 # ============ 内部方法 ============

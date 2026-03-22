@@ -11,6 +11,16 @@ extends UI
 @onready var _music_module = $MusicModule
 
 const _MIN_GLOW_SEC: float = 1.6
+const _MODULE_NAME_MAP: Dictionary = {
+	"task": "_task_module",
+	"notebook": "_notebook_tab",
+	"pomodoro": "_pomodoro_module",
+	"achievement": "_achievement_module",
+	"room_decor": "_room_decor_module",
+	"calendar": "_calendar_tab",
+	"setting": "_env_setter",
+	"music": "_music_module",
+}
 
 var _glow_start_times: Dictionary = {}
 
@@ -21,6 +31,10 @@ func _ready() -> void:
 	ChatState.ai_glow_stopped.connect(_on_ai_glow_stopped)
 	ChatState.response_started.connect(_on_ai_response_glow_start)
 	ChatState.response_completed.connect(_on_ai_response_glow_stop)
+	LayerManager.module_show_requested.connect(_on_agent_show_module)
+	LayerManager.module_hide_requested.connect(_on_agent_hide_module)
+	AIDemoController.demo_response_requested.connect(_on_demo_response_requested)
+	AIDemoController.demo_response_cleared.connect(_on_demo_response_cleared)
 
 
 func _on_ai_glow_started(module_key: String) -> void:
@@ -62,6 +76,41 @@ func _on_ai_response_glow_stop(_full_text: String) -> void:
 	var panel := _dialogue_box.frosted_panel as FrostedPanel
 	if panel:
 		panel.stop_ai_glow()
+
+
+func _on_demo_response_requested(text: String, append: bool) -> void:
+	_dialogue_box.show_demo_response(text, append)
+
+
+func _on_demo_response_cleared() -> void:
+	_dialogue_box.clear_demo_response()
+
+
+func _on_agent_show_module(module_name: String) -> void:
+	var module = _get_module_node(module_name)
+	if module == null:
+		print("[UI-Landscape] 未知模块名: %s" % module_name)
+		return
+	if module.has_method("show_module"):
+		module.show_module()
+		print("[UI-Landscape] 已显示模块: %s" % module_name)
+
+
+func _on_agent_hide_module(module_name: String) -> void:
+	var module = _get_module_node(module_name)
+	if module == null:
+		print("[UI-Landscape] 未知模块名: %s" % module_name)
+		return
+	if module.has_method("hide_module"):
+		module.hide_module()
+		print("[UI-Landscape] 已隐藏模块: %s" % module_name)
+
+
+func _get_module_node(module_name: String) -> Node:
+	var property_name := str(_MODULE_NAME_MAP.get(module_name, ""))
+	if property_name.is_empty():
+		return null
+	return get(property_name) as Node
 
 
 func _find_module_frosted_panel(module_key: String) -> FrostedPanel:

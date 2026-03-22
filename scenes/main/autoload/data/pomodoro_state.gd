@@ -1,10 +1,5 @@
 extends Node
 
-## 番茄钟状态管理单例（Data Autoload）
-## 完整的倒计时逻辑、工作/休息阶段切换、循环管理
-## 配置持久化到 user://pomodoro_config.json
-
-# --- UI 通知信号 ---
 signal pomodoro_started(data: Dictionary)
 signal work_phase_stopped
 signal work_phase_paused
@@ -22,11 +17,9 @@ signal all_completed
 signal config_changed(work_duration: int, rest_duration: int)
 signal data_loaded
 
-# --- 配置参数（分钟，持久化）---
 var work_duration: int = 25
 var rest_duration: int = 5
 
-# --- 运行时状态（不持久化）---
 var total_loops: int = 1
 var current_loop: int = 1
 var remaining_seconds: int = 0
@@ -48,10 +41,8 @@ func _ready() -> void:
 	add_child(_timer)
 	_load_config()
 	data_loaded.emit()
-	print("[PomodoroState] 初始化完成 (工作: %d分钟, 休息: %d分钟)" % [work_duration, rest_duration])
+	print("[PomodoroState] 初始化完成(工作: %d分钟, 休息: %d分钟)" % [work_duration, rest_duration])
 
-
-# ======================== 用户 API ========================
 
 func start_pomodoro(work_min: int, rest_min: int, loops: int) -> void:
 	if is_active():
@@ -88,7 +79,7 @@ func toggle_pause() -> void:
 
 func stop() -> void:
 	_timer.stop()
-	var was_work_mode = is_work_mode
+	var was_work_mode := is_work_mode
 	_reset_state()
 	print("[PomodoroState] 已停止")
 	if was_work_mode:
@@ -108,8 +99,6 @@ func set_rest_duration(minutes: int) -> void:
 	_queue_save_config()
 	config_changed.emit(work_duration, rest_duration)
 
-
-# ======================== 查询 API ========================
 
 func get_status() -> Dictionary:
 	return {
@@ -155,8 +144,6 @@ func is_in_work_mode() -> bool:
 	return is_work_mode
 
 
-# ======================== Agent API ========================
-
 func agent_start_pomodoro(work_min: int, rest_min: int, loops: int = 1) -> bool:
 	work_min = max(1, work_min)
 	rest_min = max(1, rest_min)
@@ -174,11 +161,10 @@ func agent_stop() -> bool:
 
 func agent_toggle_pause() -> bool:
 	if not is_active():
-		print("[PomodoroState] 番茄钟未运行，无法暂停/继续")
+		print("[PomodoroState] 番茄钟未运行，无法暂停或继续")
 		return false
 	toggle_pause()
-	var status_text = "暂停" if is_paused() else "继续"
-	print("[PomodoroState] Agent%s番茄钟" % status_text)
+	print("[PomodoroState] Agent%s番茄钟" % ("暂停" if is_paused() else "继续"))
 	return true
 
 
@@ -218,12 +204,54 @@ func agent_is_work_mode() -> bool:
 	return is_work_mode
 
 
-# ======================== 内部逻辑 ========================
+func agent_restore_snapshot(state: Dictionary) -> bool:
+	restore_snapshot(state)
+	return true
+
+
+func restore_snapshot(state: Dictionary) -> void:
+	if state.is_empty():
+		return
+
+	_timer.stop()
+	work_duration = max(1, int(state.get("work_duration", work_duration)))
+	rest_duration = max(1, int(state.get("rest_duration", rest_duration)))
+	total_loops = max(1, int(state.get("total_loops", 1)))
+	current_loop = clampi(int(state.get("current_loop", 1)), 1, total_loops)
+	is_work_mode = bool(state.get("is_work_mode", true))
+	current_mode_total = max(0, int(state.get("total_seconds", 0)))
+	remaining_seconds = max(0, int(state.get("remaining_seconds", 0)))
+	is_running = false
+
+	if current_mode_total <= 0 and remaining_seconds > 0:
+		current_mode_total = (work_duration if is_work_mode else rest_duration) * 60
+
+	_queue_save_config()
+	config_changed.emit(work_duration, rest_duration)
+
+	if remaining_seconds <= 0:
+		_reset_state()
+		return
+
+	tick.emit(remaining_seconds, current_mode_total, get_progress(), is_work_mode)
+
+	if bool(state.get("is_running", false)):
+		is_running = true
+		_timer.start()
+		if is_work_mode:
+			work_phase_continued.emit()
+		else:
+			rest_phase_continued.emit()
+	elif bool(state.get("is_paused", false)):
+		if is_work_mode:
+			work_phase_paused.emit()
+		else:
+			rest_phase_paused.emit()
+
 
 func _on_timer_tick() -> void:
 	remaining_seconds -= 1
-	var progress = get_progress()
-	tick.emit(remaining_seconds, current_mode_total, progress, is_work_mode)
+	tick.emit(remaining_seconds, current_mode_total, get_progress(), is_work_mode)
 	if remaining_seconds <= 0:
 		_on_phase_complete()
 
@@ -236,9 +264,8 @@ func _on_phase_complete() -> void:
 		if current_loop < total_loops:
 			_start_rest()
 		else:
-			# 最后一个循环的工作完成，番茄钟结束（不再进入休息）
 			all_completed.emit()
-			print("[PomodoroState] 番茄钟全部完成！")
+			print("[PomodoroState] 番茄钟全部完成")
 			_reset_state()
 	else:
 		rest_phase_completed.emit()
@@ -255,7 +282,7 @@ func _start_work() -> void:
 	_timer.start()
 	work_phase_started.emit()
 	tick.emit(remaining_seconds, current_mode_total, get_progress(), is_work_mode)
-	print("[PomodoroState] 工作开始 [%d/%d]: %d分钟" % [current_loop, total_loops, work_duration])
+	print("[PomodoroState] 工作开始[%d/%d]: %d分钟" % [current_loop, total_loops, work_duration])
 
 
 func _start_rest() -> void:
@@ -266,7 +293,7 @@ func _start_rest() -> void:
 	_timer.start()
 	rest_phase_started.emit()
 	tick.emit(remaining_seconds, current_mode_total, get_progress(), is_work_mode)
-	print("[PomodoroState] 休息开始 [%d/%d]: %d分钟" % [current_loop, total_loops, rest_duration])
+	print("[PomodoroState] 休息开始[%d/%d]: %d分钟" % [current_loop, total_loops, rest_duration])
 
 
 func _reset_state() -> void:
@@ -278,13 +305,12 @@ func _reset_state() -> void:
 	total_loops = 1
 
 
-# ======================== 持久化 ========================
-
 func _queue_save_config() -> void:
 	if _save_config_timer and _save_config_timer.time_left > 0.0:
 		return
 	_save_config_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
 	_save_config_timer.timeout.connect(_save_config, CONNECT_ONE_SHOT)
+
 
 func _save_config() -> void:
 	var data = {
@@ -292,8 +318,8 @@ func _save_config() -> void:
 		"work_duration": work_duration,
 		"rest_duration": rest_duration
 	}
-	var json_string = JSON.stringify(data, "\t")
-	var file = FileAccess.open(CONFIG_PATH, FileAccess.WRITE)
+	var json_string := JSON.stringify(data, "\t")
+	var file := FileAccess.open(CONFIG_PATH, FileAccess.WRITE)
 	if file:
 		file.store_string(json_string)
 		file.close()
@@ -305,21 +331,26 @@ func _load_config() -> void:
 	if not FileAccess.file_exists(CONFIG_PATH):
 		print("[PomodoroState] 无配置文件，使用默认值")
 		return
-	var file = FileAccess.open(CONFIG_PATH, FileAccess.READ)
+
+	var file := FileAccess.open(CONFIG_PATH, FileAccess.READ)
 	if not file:
 		push_error("[PomodoroState] 读取配置失败")
 		return
-	var json_string = file.get_as_text()
+
+	var json_string := file.get_as_text()
 	file.close()
-	var json = JSON.new()
-	var error = json.parse(json_string)
+
+	var json := JSON.new()
+	var error := json.parse(json_string)
 	if error != OK:
 		push_error("[PomodoroState] 配置解析失败: %s" % json.get_error_message())
 		return
+
 	var data = json.get_data()
 	if not data is Dictionary:
 		push_error("[PomodoroState] 配置格式无效")
 		return
-	work_duration = data.get("work_duration", 25)
-	rest_duration = data.get("rest_duration", 5)
+
+	work_duration = int(data.get("work_duration", 25))
+	rest_duration = int(data.get("rest_duration", 5))
 	print("[PomodoroState] 已加载配置: 工作%d分钟, 休息%d分钟" % [work_duration, rest_duration])

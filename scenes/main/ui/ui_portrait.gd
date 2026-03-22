@@ -69,6 +69,9 @@ func _ready() -> void:
 	ChatState.ai_glow_stopped.connect(_on_ai_glow_stopped)
 	ChatState.response_started.connect(_on_ai_response_glow_start)
 	ChatState.response_completed.connect(_on_ai_response_glow_stop)
+	AIDemoController.dialogue_visibility_requested.connect(_on_demo_dialogue_visibility_requested)
+	AIDemoController.demo_response_requested.connect(_on_demo_response_requested)
+	AIDemoController.demo_response_cleared.connect(_on_demo_response_cleared)
 
 
 # === 模块注册 + 互斥 ===
@@ -181,6 +184,22 @@ func _on_chat_button_pressed() -> void:
 
 func _on_close_dialogue_pressed() -> void:
 	_exit_dialogue_mode()
+
+
+func _on_demo_dialogue_visibility_requested(visible: bool) -> void:
+	if visible:
+		_enter_dialogue_mode()
+	else:
+		_exit_dialogue_mode()
+
+
+func _on_demo_response_requested(text: String, append: bool) -> void:
+	_enter_dialogue_mode()
+	_dialogue_box.show_demo_response(text, append)
+
+
+func _on_demo_response_cleared() -> void:
+	_dialogue_box.clear_demo_response()
 
 
 func _enter_dialogue_mode() -> void:
