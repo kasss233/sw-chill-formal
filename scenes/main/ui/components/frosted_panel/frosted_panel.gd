@@ -24,7 +24,7 @@ extends PanelContainer
 		_update_shader_params()
 
 @export_group("Frosted Effect")
-@export_range(0.0, 10.0) var blur_amount: float = 9.0:
+@export_range(0.0, 10.0) var blur_amount: float = 6.0:
 	set(value):
 		blur_amount = value
 		_update_shader_params()
