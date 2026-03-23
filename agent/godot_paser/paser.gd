@@ -3,14 +3,14 @@ extends Node
 
 # ====== 节点引用 ======
 # 这些节点引用在初始化时设置，用于调用实际的功能模块
-@export var ui_node: UI = null  # UI 主节点引用（包含所有模块）
-@export var music_module: MusicModule = null  # 音乐管理模块节点引用
-@export var note_module: NoteModule = null  # 笔记模块节点引用
-@export var pomodoro_module: PomodoroTechniqueModule = null  # 番茄钟模块节点引用（使用class_name）
+@export var ui_node: UI = null # UI 主节点引用（包含所有模块）
+@export var music_module: MusicModule = null # 音乐管理模块节点引用
+@export var note_module: NoteModule = null # 笔记模块节点引用
+@export var pomodoro_module: PomodoroTechniqueModule = null # 番茄钟模块节点引用（使用class_name）
 
 # 任务ID生成器（用于将字符串ID转换为整数ID）
 var _task_id_counter: int = 1
-var _task_id_map: Dictionary = {}  # 映射：字符串ID -> 整数ID
+var _task_id_map: Dictionary = {} # 映射：字符串ID -> 整数ID
 
 # ====== 初始化 ======
 func _ready() -> void:
@@ -49,8 +49,6 @@ func _initialize_node_references() -> void:
 		return
 	
 	
-
-
 ## 递归查找 UI 节点
 func _find_ui_node_recursive(node: Node) -> UI:
 	if node is UI:
@@ -360,7 +358,7 @@ func _create_project_internal(project_data: Dictionary) -> bool:
 	# 抽象层：本脚本内的处理方法
 	# 项目功能待实现
 	print("[Parser] 警告: 项目管理功能未实现")
-	return true  # 待实现
+	return true # 待实现
 
 func _handle_update_project(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -386,7 +384,7 @@ func _update_project_internal(project_id: String, project_data: Dictionary) -> b
 	# 抽象层：本脚本内的处理方法
 	# 项目功能待实现
 	print("[Parser] 警告: 项目管理功能未实现")
-	return true  # 待实现
+	return true # 待实现
 
 func _handle_delete_project(operation: Dictionary) -> Dictionary:
 	var result = {"success": false, "error": ""}
@@ -410,7 +408,7 @@ func _delete_project_internal(project_id: String) -> bool:
 	# 抽象层：本脚本内的处理方法
 	# 项目功能待实现
 	print("[Parser] 警告: 项目管理功能未实现")
-	return true  # 待实现
+	return true # 待实现
 
 # ====== 场景组件操作处理 ======
 func _handle_update_scene_components(operation: Dictionary) -> Dictionary:
@@ -435,7 +433,7 @@ func _update_scene_components_internal(components: Dictionary) -> bool:
 	# 抽象层：本脚本内的处理方法
 	# 场景组件功能待实现
 	print("[Parser] 警告: 场景组件管理功能未实现")
-	return true  # 待实现
+	return true # 待实现
 
 # ====== 背景音乐操作处理 ======
 func _handle_update_bgm(operation: Dictionary) -> Dictionary:
@@ -475,7 +473,7 @@ func _update_bgm_volume_internal(volume: float) -> bool:
 	# 抽象层：本脚本内的处理方法
 	# 音量调整功能待实现（需要通过 MusicState 单例）
 	print("[Parser] 警告: BGM音量调整功能未实现")
-	return true  # 待实现
+	return true # 待实现
 
 func _switch_bgm_track_internal(track_id: String) -> bool:
 	# 通过 MusicState 单例切换曲目
@@ -521,7 +519,7 @@ func _update_ambient_noise_internal(enabled: bool, volume: float) -> bool:
 	# 抽象层：本脚本内的处理方法
 	# 环境白噪音功能待实现
 	print("[Parser] 警告: 环境白噪音管理功能未实现")
-	return true  # 待实现
+	return true # 待实现
 
 # ====== 专注模式操作处理 ======
 func _handle_start_focus(operation: Dictionary) -> Dictionary:
@@ -600,7 +598,7 @@ func _end_focus_internal(focus_record_id: String) -> bool:
 	
 	# 专注模式结束功能待实现
 	print("[Parser] 警告: 结束专注模式功能未完全实现")
-	return true  # 待实现
+	return true # 待实现
 
 # ====== 模块显示/隐藏操作处理 ======
 func _handle_show_module(operation: Dictionary) -> Dictionary:
@@ -658,8 +656,8 @@ func _parse_datetime_to_timestamp(datetime_str: String) -> int:
 	if date_time_parts.size() != 2:
 		return 0
 	
-	var date_part = date_time_parts[0]  # "2026-01-21"
-	var time_part = date_time_parts[1]  # "15:33:06"
+	var date_part = date_time_parts[0] # "2026-01-21"
+	var time_part = date_time_parts[1] # "15:33:06"
 	
 	var date_parts = date_part.split("-")
 	var time_parts = time_part.split(":")
@@ -684,8 +682,8 @@ func _parse_datetime_to_timestamp(datetime_str: String) -> int:
 		"second": second
 	}
 	
-	var unix_time = Time.get_unix_time_from_datetime_dict(datetime_dict)
-	return unix_time
+	# 约定：输入字符串按中国时区(UTC+8)理解，统一转换为 UTC Unix 时间戳
+	return DateUtil.datetime_dict_cn_to_utc_unix(datetime_dict)
 
 """
 获取或创建任务ID映射（将字符串ID转换为整数ID）

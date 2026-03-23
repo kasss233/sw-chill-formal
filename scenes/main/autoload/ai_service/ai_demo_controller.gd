@@ -12,7 +12,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.0,
 		"record_restore": false,
 		"args": {
-			"text": "我今晚要做完实验，明天要去开会，抽空还要去运动，帮我安排一下任务。"
+			"text": "帮我把我还没完成的待办整理一下，顺便给我一些怎么推进的建议，并记录到一条笔记里。"
 		}
 	},
 	{
@@ -30,7 +30,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.25,
 		"record_restore": false,
 		"args": {
-			"text": "好的，我来帮你按照优先级从高到低的顺序安排一下待办任务。",
+			"text": "没问题。我先把未完成事项按优先级整理出来，再给你一份今晚/明天都能执行的推进建议，并同步写进笔记。",
 			"append": false,
 			"stream": false,
 			"chunk_delay": DEMO_RESPONSE_SPEED
@@ -38,11 +38,11 @@ var DEMO_STEPS: Array[Dictionary] = [
 	},
 	{
 		"type": "show_function_call_start",
-		"delay": 0.5,
+		"delay": 0.2,
 		"record_restore": false,
 		"args": {
-			"name": "add_task",
-			"call_id": "demo_add_task"
+			"name": "add_category",
+			"call_id": "demo_add_category"
 		}
 	},
 	{
@@ -50,67 +50,71 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": true,
 		"args": {
-			"module_name": "task"
+			"module_name": "notebook"
 		}
 	},
 	{
-		"type": "add_task",
+		"type": "add_category",
 		"delay": 0.2,
 		"record_restore": true,
 		"args": {
-			"title": "做实验-优先级最高",
-			"due_timestamp": int(Time.get_unix_time_from_datetime_dict({
-			"year": 2026,
-			"month": 3,
-			"day": 23,
-			"hour": 19,
-			"minute": 0,
-			"second": 0
-		})),
-			"save_as": "demo_task"
+			"category": "工作待办整理"
 		}
 	},
 	{
-		"type": "add_task",
-		"delay": 0.2,
+		"type": "create_note",
+		"delay": 0.4,
 		"record_restore": true,
 		"args": {
-			"title": "开会-优先级中等",
-			"due_timestamp": int(Time.get_unix_time_from_datetime_dict({
-			"year": 2026,
-			"month": 3,
-			"day": 24, # 明天
-			"hour": 12,
-			"minute": 0,
-			"second": 0
-		})),
-			"save_as": "demo_task"
+			"title": "会议材料整理",
+			"content": "",
+			"save_as": "demo_note"
 		}
 	},
 	{
-		"type": "add_task",
-		"delay": 0.2,
+		"type": "write_note",
+		"delay": 0.15,
 		"record_restore": true,
 		"args": {
-			"title": "运动-优先级最低",
-			"due_timestamp": int(Time.get_unix_time_from_datetime_dict({
-			"year": 2026,
-			"month": 3,
-			"day": 24, # 明天
-			"hour": 18,
-			"minute": 0,
-			"second": 0
-		})),
-			"save_as": "demo_task"
+			"note_ref": "demo_note",
+			"content": "未完成事项】\n1) 项目报告（最优先）\n2) 回复客户邮件\n3) 准备明天的会议材料\n\n【建议与行动清单】\n- 先推进项目报告：先列 3-5 条大纲，再补充关键数据/结论，避免卡在细节。\n- 客户邮件：先用模板写出核心结论 + 下一步（需要对方确认什么/你何时给出更新），控制在 5 分钟内发出首版。\n- 会议材料：先做 1 页大纲 + 关键结论页；细节内容放到明早补齐。\n\n【建议的时间安排（可按需调整）】\n- 现在起 60-90 分钟：项目报告（产出大纲 + 关键段落）\n- 15 分钟：客户邮件（发出首版）\n- 30 分钟：会议材料（大纲 + 关键结论）"
 		}
 	},
 	{
 		"type": "show_function_call_end",
-		"delay": 0.5,
+		"delay": 1.0,
 		"record_restore": false,
 		"args": {
-			"call_id": "demo_add_task",
-			"name": "add_task",
+			"call_id": "demo_add_category",
+			"name": "add_category",
+			"success": true
+		}
+	},
+	{
+		"type": "show_function_call_start",
+		"delay": 0.15,
+		"record_restore": false,
+		"args": {
+			"name": "toggle_note_category",
+			"call_id": "demo_toggle_note_category"
+		}
+	},
+	{
+		"type": "toggle_note_category",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"note_ref": "demo_note",
+			"category": "工作待办整理"
+		}
+	},
+	{
+		"type": "show_function_call_end",
+		"delay": 0.3,
+		"record_restore": false,
+		"args": {
+			"call_id": "demo_toggle_note_category",
+			"name": "toggle_note_category",
 			"success": true
 		}
 	},
@@ -119,7 +123,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": false,
 		"args": {
-			"module_name": "task"
+			"module_name": "notebook"
 		}
 	},
 	{
@@ -127,7 +131,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": false,
 		"args": {
-			"text": "已经帮你准备好任务，记得按时完成哦！",
+			"text": "笔记创建好了，并分类到了：工作待办整理，你可以照这个方式继续整理。",
 			"append": false,
 			"stream": false,
 			"chunk_delay": DEMO_RESPONSE_SPEED
@@ -267,6 +271,10 @@ func _execute_step(step: Dictionary, run_id: int) -> bool:
 			return _step_set_time(args)
 		"set_weather":
 			return _step_set_weather(args)
+		"add_category":
+			return _step_add_category(args, should_record)
+		"toggle_note_category":
+			return _step_toggle_note_category(args, should_record)
 		"wait":
 			return true
 		_:
@@ -463,6 +471,60 @@ func _restore_notes() -> void:
 						str(change.get("old_title", "")),
 						str(change.get("old_content", ""))
 					)
+			"category_added":
+				var cat := str(change.get("category", "")).strip_edges()
+				if not cat.is_empty() and NoteState.has_category(cat):
+					NoteState.remove_category(cat)
+			"note_categories_changed":
+				var note_id := int(change.get("note_id", 0))
+				var old_categories: Array = change.get("old_categories", [])
+				_restore_note_categories(note_id, old_categories)
+
+
+func _restore_note_categories(note_id: int, old_categories: Array) -> void:
+	var note := NoteState.get_note_by_id(note_id)
+	if note == null:
+		return
+	# 用 NoteState API 恢复（先清空，再逐个添加），避免直接改数据
+	NoteState.set_note_category(note_id, "")
+	for cat in old_categories:
+		var cat_name := str(cat).strip_edges()
+		if not cat_name.is_empty():
+			NoteState.toggle_note_category(note_id, cat_name)
+
+
+func _step_add_category(args: Dictionary, should_record: bool) -> bool:
+	var category := str(args.get("category", "")).strip_edges()
+	if category.is_empty():
+		return false
+	var ok := NoteState.add_category(category)
+	if should_record and ok:
+		applied_changes.append({
+			"kind": "category_added",
+			"category": category
+		})
+	return ok
+
+
+func _step_toggle_note_category(args: Dictionary, should_record: bool) -> bool:
+	var note_id := _resolve_ref_id(args, "note")
+	if note_id <= 0:
+		return false
+	var category := str(args.get("category", "")).strip_edges()
+	if category.is_empty():
+		return false
+	var note := NoteState.get_note_by_id(note_id)
+	if note == null:
+		return false
+	var old_categories := note.categories.duplicate()
+	var ok := NoteState.toggle_note_category(note_id, category)
+	if should_record and ok:
+		applied_changes.append({
+			"kind": "note_categories_changed",
+			"note_id": note_id,
+			"old_categories": old_categories
+		})
+	return ok
 
 
 func _restore_tasks() -> void:

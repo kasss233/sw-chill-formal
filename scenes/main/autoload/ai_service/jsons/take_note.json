@@ -1,0 +1,101 @@
+[
+	{
+		"type": "set_input_text",
+		"delay": 0.0,
+		"record_restore": false,
+		"args": {
+			"text": "帮我把我还没完成的待办整理一下，顺便给我一些怎么推进的建议，并记录到一条笔记里。"
+		}
+	},
+	{
+		"type": "clear_input",
+		"delay": 0.5,
+		"record_restore": false
+	},
+	{
+		"type": "enter_dialogue_mode",
+		"delay": 0,
+		"record_restore": false
+	},
+	{
+		"type": "show_response_text",
+		"delay": 0.25,
+		"record_restore": false,
+		"args": {
+			"text": "没问题。我先把未完成事项按优先级整理出来，再给你一份今晚/明天都能执行的推进建议，并同步写进笔记。",
+			"append": false,
+			"stream": false,
+			"chunk_delay": DEMO_RESPONSE_SPEED
+		}
+	},
+	{
+		"type": "show_function_call_start",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"name": "create_note",
+			"call_id": "demo_create_note"
+		}
+	},
+	{
+		"type": "show_module",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"module_name": "notebook"
+		}
+	},
+	{
+		"type": "create_note",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"title": "未完成待办总结与推进建议",
+			"content": "",
+			"save_as": "demo_note"
+		}
+	},
+	{
+		"type": "write_note",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"note_ref": "demo_note",
+			"content": "【未完成事项】\n1) 项目报告（最优先）\n2) 回复客户邮件\n3) 准备明天的会议材料\n\n【建议与行动清单】\n- 先推进项目报告：先列 3-5 条大纲，再补充关键数据/结论，避免卡在细节。\n- 客户邮件：先用模板写出核心结论 + 下一步（需要对方确认什么/你何时给出更新），控制在 5 分钟内发出首版。\n- 会议材料：先做 1 页大纲 + 关键结论页；细节内容放到明早补齐。\n\n【建议的时间安排（可按需调整）】\n- 现在起 60-90 分钟：项目报告（产出大纲 + 关键段落）\n- 15 分钟：客户邮件（发出首版）\n- 30 分钟：会议材料（大纲 + 关键结论）"
+		}
+	},
+	{
+		"type": "show_function_call_end",
+		"delay": 1,
+		"record_restore": false,
+		"args": {
+			"call_id": "demo_create_note",
+			"name": "create_note",
+			"success": true
+		}
+	},
+	{
+		"type": "hide_module",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"module_name": "notebook"
+		}
+	},
+	{
+		"type": "show_response_text",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"text": "我已经把专注安排和建议记录在笔记里了，记得按时去完成哦！",
+			"append": false,
+			"stream": false,
+			"chunk_delay": DEMO_RESPONSE_SPEED
+		}
+	},
+	{
+		"type": "clear_input",
+		"delay": 0.1,
+		"record_restore": false
+	}
+]

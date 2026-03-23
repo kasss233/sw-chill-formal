@@ -1,4 +1,4 @@
-	{
+[	{
 		"type": "enter_dialogue_mode",
 		"delay": 0.0,
 		"record_restore": false
@@ -232,3 +232,4 @@
 		"delay": 0.1,
 		"record_restore": false
 	}
+]

@@ -2,23 +2,36 @@ class_name DateUtil
 extends RefCounted
 
 ## 统一日期工具类（纯静态方法）
-## 所有日期计算集中于此，使用系统本地时间，消除各模块重复实现和时区不一致
+## 所有日期计算集中于此，统一按中国时区（UTC+8）显示与解析，消除各模块重复实现和时区不一致
+
+
+const CHINA_TIMEZONE_OFFSET_SEC := 8 * 3600
+
+
+## 中国时区(UTC+8) datetime_dict → UTC Unix 时间戳
+## 说明：Godot 的 get_unix_time_from_datetime_dict 不做时区换算，这里手动减去 +8 小时。
+static func datetime_dict_cn_to_utc_unix(datetime: Dictionary) -> int:
+	if datetime.is_empty():
+		return 0
+	return int(Time.get_unix_time_from_datetime_dict(datetime)) - CHINA_TIMEZONE_OFFSET_SEC
+
+
+## UTC Unix 时间戳 → 中国时区(UTC+8) datetime_dict（用于显示）
+static func utc_unix_to_datetime_dict_cn(unix_time: int) -> Dictionary:
+	return Time.get_datetime_dict_from_unix_time(unix_time + CHINA_TIMEZONE_OFFSET_SEC)
 
 
 # ======================== 基础日期 ========================
 
 ## 获取今天的日期 "YYYY-MM-DD"（系统本地时间）
 static func get_today_key() -> String:
-	var now := Time.get_datetime_dict_from_system()
+	var now := utc_unix_to_datetime_dict_cn(int(Time.get_unix_time_from_system()))
 	return "%04d-%02d-%02d" % [now["year"], now["month"], now["day"]]
 
 
 ## Unix 时间戳 → "YYYY-MM-DD"（系统本地时间）
 static func get_day_key_from_unix(unix_time: int) -> String:
-	var tz := Time.get_time_zone_from_system()
-	var bias_sec: int = int(tz.get("bias", 0)) * 60
-	var local_unix: int = unix_time + bias_sec
-	var dt := Time.get_datetime_dict_from_unix_time(local_unix)
+	var dt := utc_unix_to_datetime_dict_cn(unix_time)
 	return "%04d-%02d-%02d" % [dt["year"], dt["month"], dt["day"]]
 
 
@@ -35,7 +48,7 @@ static func date_str_to_unix(date_str: String) -> int:
 		"minute": 0,
 		"second": 0,
 	}
-	return int(Time.get_unix_time_from_datetime_dict(dt))
+	return datetime_dict_cn_to_utc_unix(dt)
 
 
 ## 日期偏移 N 天，返回新日期 "YYYY-MM-DD"
@@ -86,8 +99,8 @@ static func get_current_week_key() -> String:
 static func date_to_week_key(date_key: String) -> String:
 	var unix := Time.get_unix_time_from_datetime_string(date_key + "T12:00:00")
 	var dict := Time.get_datetime_dict_from_unix_time(unix)
-	var weekday: int = dict["weekday"]  # 0=Sunday, 1=Monday...6=Saturday
-	var iso_weekday: int = weekday if weekday != 0 else 7  # 1=Mon...7=Sun
+	var weekday: int = dict["weekday"] # 0=Sunday, 1=Monday...6=Saturday
+	var iso_weekday: int = weekday if weekday != 0 else 7 # 1=Mon...7=Sun
 	# ISO 规则：本周的周四决定了该周属于哪一年、第几周
 	var thursday_unix: int = unix + (4 - iso_weekday) * 86400
 	var thursday_dict := Time.get_datetime_dict_from_unix_time(thursday_unix)
@@ -110,8 +123,8 @@ static func week_key_to_date(week_key: String, day_of_week: int) -> String:
 	var jan1_str := "%04d-01-01T12:00:00" % year
 	var jan1_unix: int = Time.get_unix_time_from_datetime_string(jan1_str)
 	var jan1_dict := Time.get_datetime_dict_from_unix_time(jan1_unix)
-	var jan1_weekday: int = jan1_dict["weekday"]  # 0=Sunday
-	var jan1_iso: int = jan1_weekday if jan1_weekday != 0 else 7  # 1=Mon
+	var jan1_weekday: int = jan1_dict["weekday"] # 0=Sunday
+	var jan1_iso: int = jan1_weekday if jan1_weekday != 0 else 7 # 1=Mon
 	# ISO 第 1 周的周一
 	var week1_monday_unix: int
 	if jan1_iso <= 4:
@@ -145,7 +158,7 @@ static func offset_week(week_key: String, offset: int) -> String:
 static func get_day_of_week(date_key: String) -> int:
 	var unix := Time.get_unix_time_from_datetime_string(date_key + "T12:00:00")
 	var dict := Time.get_datetime_dict_from_unix_time(unix)
-	var weekday: int = dict["weekday"]  # 0=Sunday
+	var weekday: int = dict["weekday"] # 0=Sunday
 	if weekday == 0:
 		return 6
 	return weekday - 1

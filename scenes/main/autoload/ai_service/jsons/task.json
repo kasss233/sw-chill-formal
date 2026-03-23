@@ -1,0 +1,133 @@
+[
+	{
+		"type": "set_input_text",
+		"delay": 0.0,
+		"record_restore": false,
+		"args": {
+			"text": "我今晚要做完实验，明天要去开会，抽空还要去运动，帮我安排一下任务。"
+		}
+	},
+	{
+		"type": "clear_input",
+		"delay": 0.5,
+		"record_restore": false
+	},
+	{
+		"type": "enter_dialogue_mode",
+		"delay": 0,
+		"record_restore": false
+	},
+	{
+		"type": "show_response_text",
+		"delay": 0.25,
+		"record_restore": false,
+		"args": {
+			"text": "好的，我来帮你按照优先级从高到低的顺序安排一下待办任务。",
+			"append": false,
+			"stream": false,
+			"chunk_delay": DEMO_RESPONSE_SPEED
+		}
+	},
+	{
+		"type": "show_function_call_start",
+		"delay": 0.5,
+		"record_restore": false,
+		"args": {
+			"name": "add_task",
+			"call_id": "demo_add_task"
+		}
+	},
+	{
+		"type": "show_module",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"module_name": "task"
+		}
+	},
+	{
+		"type": "add_task",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"title": "做实验-优先级最高",
+			"due_timestamp": DateUtil.datetime_dict_cn_to_utc_unix({
+			"year": 2026,
+			"month": 3,
+			"day": 23,
+			"hour": 19,
+			"minute": 0,
+			"second": 0
+		}),
+			"save_as": "demo_task"
+		}
+	},
+	{
+		"type": "add_task",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"title": "开会-优先级中等",
+			"due_timestamp": DateUtil.datetime_dict_cn_to_utc_unix({
+			"year": 2026,
+			"month": 3,
+			"day": 24, # 明天
+			"hour": 12,
+			"minute": 0,
+			"second": 0
+		}),
+			"save_as": "demo_task"
+		}
+	},
+	{
+		"type": "add_task",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"title": "运动-优先级最低",
+			"due_timestamp": DateUtil.datetime_dict_cn_to_utc_unix({
+			"year": 2026,
+			"month": 3,
+			"day": 24, # 明天
+			"hour": 18,
+			"minute": 0,
+			"second": 0
+		}),
+			"save_as": "demo_task"
+		}
+	},
+	{
+		"type": "show_function_call_end",
+		"delay": 0.5,
+		"record_restore": false,
+		"args": {
+			"call_id": "demo_add_task",
+			"name": "add_task",
+			"success": true
+		}
+	},
+	{
+		"type": "hide_module",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"module_name": "task"
+		}
+	},
+	{
+		"type": "show_response_text",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"text": "已经帮你准备好任务，记得按时完成哦！",
+			"append": false,
+			"stream": false,
+			"chunk_delay": DEMO_RESPONSE_SPEED
+		}
+	},
+	{
+		"type": "clear_input",
+		"delay": 0.1,
+		"record_restore": false
+	}
+]
