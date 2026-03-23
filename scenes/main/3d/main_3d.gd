@@ -19,6 +19,8 @@ extends Node3D
 @export var side_desk: Node3D
 @export var wall: Node3D
 @export var on_desk: Node3D
+var _is_saying: bool = false
+
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
@@ -27,6 +29,25 @@ func _ready() -> void:
 	_connect_signals()
 	_init_time()
 	_init_weather()
+
+
+func _input(event: InputEvent) -> void:
+	# 小键盘 4 快捷键：播放招手动作
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_KP_4:
+			get_tree().root.set_input_as_handled()
+			if character:
+				character.set_greet_pose()
+		elif event.keycode == KEY_KP_5:
+			# 小键盘 5 快捷键：切换说话状态
+			get_tree().root.set_input_as_handled()
+			if character:
+				_is_saying = !_is_saying
+				if _is_saying:
+					character.set_saying()
+				else:
+					character.set_neutral()
+	
 
 func _connect_signals() -> void:
 	# 从 State 单例连接信号，而不是从场景文件连接
@@ -89,6 +110,18 @@ func _connect_signals() -> void:
 	if RoomDecorState and RoomDecorState.has_signal("room_decor_category_unselected"):
 		if not RoomDecorState.room_decor_category_unselected.is_connected(_on_room_decor_category_unselected):
 			RoomDecorState.room_decor_category_unselected.connect(_on_room_decor_category_unselected)
+	if DialogueState and DialogueState.has_signal("dialogue_started"):
+		if not DialogueState.dialogue_started.is_connected(_on_dialogue_started):
+			DialogueState.dialogue_started.connect(_on_dialogue_started)
+	if DialogueState and DialogueState.has_signal("dialogue_finished"):
+		if not DialogueState.dialogue_finished.is_connected(_on_dialogue_finished):
+			DialogueState.dialogue_finished.connect(_on_dialogue_finished)
+	if DialogueState and DialogueState.has_signal("function_executing"):
+		if not DialogueState.function_executing.is_connected(_on_function_executing):
+			DialogueState.function_executing.connect(_on_function_executing)
+	if DialogueState and DialogueState.has_signal("function_completed"):
+		if not DialogueState.function_completed.is_connected(_on_function_completed):
+			DialogueState.function_completed.connect(_on_function_completed)
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
@@ -265,3 +298,24 @@ func _on_camera_changed(value: int) -> void:
 			side_camera.current = true
 		1:
 			central_camera.current = true
+func _on_dialogue_started(text: String) -> void:
+	print("[main3d]Dialogue started, text length: %d" % text.length())
+	character.set_saying()
+	# 根据文本长度调整说话动画持续时间，最长不超过5秒
+	var duration = min(2.0 + text.length() * 0.03, 5.0)
+	var tween = create_tween()
+	tween.tween_interval(duration)
+	tween.tween_callback(character.set_neutral)
+func _on_dialogue_finished() -> void:
+	print("[main3d]Dialogue finished")
+	character.set_idle_pose()
+
+
+func _on_function_executing(func_name: String, call_id: String) -> void:
+	print("[main3d]Function executing: %s (id: %s)" % [func_name, call_id])
+	character.set_typing_pose()
+
+
+func _on_function_completed(func_name: String, call_id: String, success: bool) -> void:
+	print("[main3d]Function completed: %s (id: %s, success: %s)" % [func_name, call_id, success])
+	character.set_idle_pose()

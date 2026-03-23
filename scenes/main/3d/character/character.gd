@@ -4,6 +4,9 @@ extends Node3D
 @export var action_tree: AnimationTree
 @export var emotion_tree: AnimationTree
 
+## 全局开关：是否启用所有随机动作
+@export var random_actions_enabled: bool = true
+
 ## 运行时：idle 时随机做一些一次性小动作（不包含 typing）
 @export var idle_variation_enabled: bool = true
 @export_range(1.0, 60.0, 0.5) var idle_variation_min_delay_sec: float = 6.0
@@ -75,7 +78,6 @@ func _ready() -> void:
 	if Engine.is_editor_hint():
 		set_process(false)
 		return
-
 	randomize()
 	set_process(true)
 	# 初始化一次当前动作节点，避免刚启动时误触发
@@ -84,9 +86,8 @@ func _ready() -> void:
 		_schedule_idle_variation()
 	_schedule_blinking()
 
-
 func _process(_delta: float) -> void:
-	if Engine.is_editor_hint() or not idle_variation_enabled:
+	if Engine.is_editor_hint() or not random_actions_enabled or not idle_variation_enabled:
 		return
 	if not action_playback:
 		return
@@ -134,7 +135,7 @@ func _cancel_blinking() -> void:
 
 
 func _schedule_blinking() -> void:
-	if Engine.is_editor_hint() or not blinking_enabled:
+	if Engine.is_editor_hint() or not random_actions_enabled or not blinking_enabled:
 		return
 	if not emotion_playback:
 		return
@@ -331,6 +332,7 @@ func set_angry():
 	if emotion_playback:
 		emotion_playback.travel("angry")
 func set_saying():
+	print("[character]Set saying emotion")
 	if emotion_playback:
 		emotion_playback.travel("saying")
 

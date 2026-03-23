@@ -4,28 +4,33 @@ signal dialogue_visibility_requested(visible: bool)
 signal demo_response_requested(text: String, append: bool)
 signal demo_response_cleared
 
-const DEMO_RESPONSE_SPEED := 0.025
-const DEMO_DELAY_SCALE := 2.0
-const DEMO_STEPS: Array[Dictionary] = [
+const DEMO_RESPONSE_SPEED := 0.05
+const DEMO_DELAY_SCALE := 4
+var DEMO_STEPS: Array[Dictionary] = [
 	{
-		"type": "enter_dialogue_mode",
+		"type": "set_input_text",
 		"delay": 0.0,
+		"record_restore": false,
+		"args": {
+			"text": "我今晚要做完实验，明天要去开会，抽空还要去运动，帮我安排一下任务。"
+		}
+	},
+	{
+		"type": "clear_input",
+		"delay": 0.5,
 		"record_restore": false
 	},
 	{
-		"type": "set_input_text",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"text": "帮我安排一下今晚的专注流程，再顺手准备一条学习笔记。"
-		}
+		"type": "enter_dialogue_mode",
+		"delay": 0,
+		"record_restore": false
 	},
 	{
 		"type": "show_response_text",
 		"delay": 0.25,
 		"record_restore": false,
 		"args": {
-			"text": "当然，我来帮你整理今晚的任务、笔记和专注环境。",
+			"text": "好的，我来帮你按照优先级从高到低的顺序安排一下待办任务。",
 			"append": false,
 			"stream": false,
 			"chunk_delay": DEMO_RESPONSE_SPEED
@@ -33,7 +38,7 @@ const DEMO_STEPS: Array[Dictionary] = [
 	},
 	{
 		"type": "show_function_call_start",
-		"delay": 0.15,
+		"delay": 0.5,
 		"record_restore": false,
 		"args": {
 			"name": "add_task",
@@ -42,7 +47,7 @@ const DEMO_STEPS: Array[Dictionary] = [
 	},
 	{
 		"type": "show_module",
-		"delay": 0.1,
+		"delay": 0.2,
 		"record_restore": true,
 		"args": {
 			"module_name": "task"
@@ -50,16 +55,58 @@ const DEMO_STEPS: Array[Dictionary] = [
 	},
 	{
 		"type": "add_task",
-		"delay": 0.15,
+		"delay": 0.2,
 		"record_restore": true,
 		"args": {
-			"title": "整理演示视频脚本",
+			"title": "做实验-优先级最高",
+			"due_timestamp": int(Time.get_unix_time_from_datetime_dict({
+			"year": 2026,
+			"month": 3,
+			"day": 23,
+			"hour": 19,
+			"minute": 0,
+			"second": 0
+		})),
+			"save_as": "demo_task"
+		}
+	},
+	{
+		"type": "add_task",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"title": "开会-优先级中等",
+			"due_timestamp": int(Time.get_unix_time_from_datetime_dict({
+			"year": 2026,
+			"month": 3,
+			"day": 24, # 明天
+			"hour": 12,
+			"minute": 0,
+			"second": 0
+		})),
+			"save_as": "demo_task"
+		}
+	},
+	{
+		"type": "add_task",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"title": "运动-优先级最低",
+			"due_timestamp": int(Time.get_unix_time_from_datetime_dict({
+			"year": 2026,
+			"month": 3,
+			"day": 24, # 明天
+			"hour": 18,
+			"minute": 0,
+			"second": 0
+		})),
 			"save_as": "demo_task"
 		}
 	},
 	{
 		"type": "show_function_call_end",
-		"delay": 0.15,
+		"delay": 0.5,
 		"record_restore": false,
 		"args": {
 			"call_id": "demo_add_task",
@@ -69,160 +116,10 @@ const DEMO_STEPS: Array[Dictionary] = [
 	},
 	{
 		"type": "hide_module",
-		"delay": 0.25,
+		"delay": 0.2,
 		"record_restore": false,
 		"args": {
 			"module_name": "task"
-		}
-	},
-	{
-		"type": "show_function_call_start",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"name": "create_note",
-			"call_id": "demo_create_note"
-		}
-	},
-	{
-		"type": "show_module",
-		"delay": 0.1,
-		"record_restore": true,
-		"args": {
-			"module_name": "notebook"
-		}
-	},
-	{
-		"type": "create_note",
-		"delay": 0.1,
-		"record_restore": true,
-		"args": {
-			"title": "今晚专注安排",
-			"content": "",
-			"save_as": "demo_note"
-		}
-	},
-	{
-		"type": "write_note",
-		"delay": 0.2,
-		"record_restore": true,
-		"args": {
-			"note_ref": "demo_note",
-			"content": "1. 先完成视频脚本整理\n2. 录制 AI 演示片段\n3. 最后检查任务与环境切换效果"
-		}
-	},
-	{
-		"type": "show_function_call_end",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"call_id": "demo_create_note",
-			"name": "create_note",
-			"success": true
-		}
-	},
-	{
-		"type": "hide_module",
-		"delay": 0.25,
-		"record_restore": false,
-		"args": {
-			"module_name": "notebook"
-		}
-	},
-	{
-		"type": "show_function_call_start",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"name": "start_pomodoro",
-			"call_id": "demo_start_pomodoro"
-		}
-	},
-	{
-		"type": "show_module",
-		"delay": 0.1,
-		"record_restore": true,
-		"args": {
-			"module_name": "pomodoro"
-		}
-	},
-	{
-		"type": "start_pomodoro",
-		"delay": 0.15,
-		"record_restore": true,
-		"args": {
-			"work_min": 15,
-			"rest_min": 5,
-			"loops": 1
-		}
-	},
-	{
-		"type": "show_function_call_end",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"call_id": "demo_start_pomodoro",
-			"name": "start_pomodoro",
-			"success": true
-		}
-	},
-	{
-		"type": "hide_module",
-		"delay": 0.25,
-		"record_restore": false,
-		"args": {
-			"module_name": "pomodoro"
-		}
-	},
-	{
-		"type": "show_function_call_start",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"name": "set_weather",
-			"call_id": "demo_set_weather"
-		}
-	},
-	{
-		"type": "show_module",
-		"delay": 0.1,
-		"record_restore": true,
-		"args": {
-			"module_name": "setting"
-		}
-	},
-	{
-		"type": "set_time",
-		"delay": 0.1,
-		"record_restore": true,
-		"args": {
-			"mode": 2
-		}
-	},
-	{
-		"type": "set_weather",
-		"delay": 0.15,
-		"record_restore": true,
-		"args": {
-			"mode": 1
-		}
-	},
-	{
-		"type": "show_function_call_end",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"call_id": "demo_set_weather",
-			"name": "set_weather",
-			"success": true
-		}
-	},
-	{
-		"type": "hide_module",
-		"delay": 0.25,
-		"record_restore": false,
-		"args": {
-			"module_name": "setting"
 		}
 	},
 	{
@@ -230,8 +127,8 @@ const DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": false,
 		"args": {
-			"text": "\n已经帮你准备好任务、笔记、番茄钟和夜间雨景环境，可以直接开始录制演示。",
-			"append": true,
+			"text": "已经帮你准备好任务，记得按时完成哦！",
+			"append": false,
 			"stream": false,
 			"chunk_delay": DEMO_RESPONSE_SPEED
 		}

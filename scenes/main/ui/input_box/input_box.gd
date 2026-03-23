@@ -5,15 +5,16 @@ class_name InputBox
 ## 一开始使用 LineEdit 输入，当文本超出边界时自动切换到 TextEdit 多行输入
 
 # 信号
-signal text_submitted(text: String, attachments: Array)  # 用户提交文本时发出（包含附件）
-signal text_changed(text: String)    # 文本变化时发出
-signal generation_stopped  # 生成被停止时发出
+signal text_submitted(text: String, attachments: Array) # 用户提交文本时发出（包含附件）
+signal text_changed(text: String) # 文本变化时发出
+signal generation_stopped # 生成被停止时发出
 
 # 配置
-@export var max_text_edit_height: float = 200.0  # TextEdit 最大高度
-@export var min_text_edit_height: float = 36.0   # TextEdit 最小高度
-@export var transition_duration: float = 0.15    # 切换动画时长
-@export var singleline_threshold_ratio: float = 0.8  # 切换回单行模式的阈值比例（相对于可用宽度）
+@export var max_text_edit_height: float = 200.0 # TextEdit 最大高度
+@export var min_text_edit_height: float = 36.0 # TextEdit 最小高度
+@export var transition_duration: float = 0.15 # 切换动画时长
+@export var singleline_threshold_ratio: float = 0.8 # 切换回单行模式的阈值比例（相对于可用宽度）
+@export var show_snackbar: bool = true # 是否显示 snackbar 提示
 
 # 节点引用
 @onready var frosted_panel: PanelContainer = $FrostedPanel
@@ -31,11 +32,11 @@ signal generation_stopped  # 生成被停止时发出
 @onready var snackbar: MaterialSnackbar = $MaterialSnackbar
 
 # 状态
-var _is_multiline_mode: bool = false  # 是否处于多行模式
-var _is_transitioning: bool = false   # 是否正在切换动画中
-var _current_tween: Tween = null      # 当前动画 Tween
-var _height_tween: Tween = null       # 高度调整动画 Tween
-var _attachments: Array = []          # 附件列表（最多2个）
+var _is_multiline_mode: bool = false # 是否处于多行模式
+var _is_transitioning: bool = false # 是否正在切换动画中
+var _current_tween: Tween = null # 当前动画 Tween
+var _height_tween: Tween = null # 高度调整动画 Tween
+var _attachments: Array = [] # 附件列表（最多2个）
 
 # LineEdit 的原始最小宽度，用于保持布局稳定
 var _line_edit_min_width: float = 0.0
@@ -160,7 +161,8 @@ func _handle_submit() -> void:
 
 	# 检查文本是否为空
 	if current_text.is_empty():
-		snackbar.show_warning("消息文本不能为空")
+		if show_snackbar:
+			snackbar.show_warning("消息文本不能为空")
 		# 切换回状态 0
 		submit_button.current_state = 0
 		return
@@ -195,7 +197,7 @@ func _should_switch_to_multiline() -> bool:
 	var text_width := font.get_string_size(line_edit.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
 
 	# 计算 LineEdit 的可用宽度（减去内边距）
-	var available_width := line_edit.size.x - 16.0  # 大约的内边距
+	var available_width := line_edit.size.x - 16.0 # 大约的内边距
 
 	return text_width > available_width
 
@@ -225,7 +227,7 @@ func _should_switch_to_singleline() -> bool:
 	var font := line_edit.get_theme_font("font")
 	var font_size := line_edit.get_theme_font_size("font_size")
 	var text_width := font.get_string_size(current_text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
-	var available_width := line_edit.size.x - 16.0  # 减去内边距
+	var available_width := line_edit.size.x - 16.0 # 减去内边距
 
 	# 使用阈值比例避免在边界处频繁切换
 	return text_width <= available_width * singleline_threshold_ratio
@@ -446,9 +448,9 @@ func focus() -> void:
 ## 处理菜单项点击
 func _on_menu_item_pressed(index: int, item) -> void:
 	match index:
-		0:  # 添加图片
+		0: # 添加图片
 			_open_image_picker()
-		1:  # 拍照
+		1: # 拍照
 			# TODO: 实现拍照功能
 			pass
 
@@ -466,7 +468,8 @@ func _open_image_picker() -> void:
 
 ## 显示最大附件数量警告
 func _show_max_attachments_warning() -> void:
-	snackbar.show_message("最多只能添加两张图片")
+	if show_snackbar:
+		snackbar.show_message("最多只能添加两张图片")
 
 
 ## 处理文件选择
@@ -484,7 +487,8 @@ func _on_file_selected(path: String) -> void:
 
 ## 显示无效文件警告
 func _show_invalid_file_warning() -> void:
-	snackbar.show_warning("请选择有效的图片文件")
+	if show_snackbar:
+		snackbar.show_warning("请选择有效的图片文件")
 
 
 ## 更新附件UI
@@ -540,9 +544,9 @@ func _on_chat_status_changed(new_status: ChatState.Status) -> void:
 	print("[InputBox] _on_chat_status_changed: %s" % ChatState.Status.keys()[new_status])
 	match new_status:
 		ChatState.Status.GENERATING, ChatState.Status.EXECUTING_FUNCTION:
-			submit_button.current_state = 1  # 停止状态
+			submit_button.current_state = 1 # 停止状态
 		ChatState.Status.IDLE, ChatState.Status.ERROR:
-			submit_button.current_state = 0  # 发送状态
+			submit_button.current_state = 0 # 发送状态
 
 
 ## Agent 请求设置文本

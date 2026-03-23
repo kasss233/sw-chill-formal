@@ -4,7 +4,7 @@ class_name DialogueBox
 ## 支持流式传输（逐字显示）、自动高度调整、加载状态反馈、自动/手动退出
 
 # 显示状态枚举
-enum DisplayState { HIDDEN, LOADING, EXECUTING_FUNC, SHOWING_TEXT, COMPLETED }
+enum DisplayState {HIDDEN, LOADING, EXECUTING_FUNC, SHOWING_TEXT, COMPLETED}
 
 # 函数名 → 友好提示文本
 const FUNC_DISPLAY_NAMES: Dictionary = {
@@ -83,10 +83,7 @@ const FUNC_DISPLAY_NAMES: Dictionary = {
 }
 
 # 信号
-signal dialogue_started  # 对话开始时发出
-signal dialogue_finished  # 对话完成时发出
-signal dialogue_stopped  # 对话被停止时发出
-signal button_pressed(button_index: int)  # 按钮被点击时发出
+# 注：所有信号均通过 DialogueState 单例发送，不再使用本地信号
 
 # 配置
 @export_group("流式传输设置")
@@ -111,6 +108,10 @@ signal button_pressed(button_index: int)  # 按钮被点击时发出
 ## 长按触发关闭的持续时间（秒）
 @export var long_press_duration: float = 0.5
 
+@export_group("错误提示设置")
+## 是否显示报错信息
+@export var show_error_message: bool = true
+
 # 节点引用
 @onready var vbox_container: VBoxContainer = $VBoxContainer
 @onready var frosted_panel: PanelContainer = $VBoxContainer/FrostedPanel
@@ -125,20 +126,20 @@ signal button_pressed(button_index: int)  # 按钮被点击时发出
 @onready var loading_label: Label = $VBoxContainer/FrostedPanel/MarginContainer/VBoxContainer/HBoxContainer/Label
 
 # 内部状态
-var _full_text: String = ""  # 完整文本
-var _current_char_index: int = 0  # 当前显示到的字符索引
-var _is_streaming: bool = false  # 是否正在流式显示
-var _stream_timer: Timer = null  # 流式显示定时器
-var _height_tween: Tween = null  # 高度调整动画
-var _buttons: Array[Button] = []  # 按钮数组
+var _full_text: String = "" # 完整文本
+var _current_char_index: int = 0 # 当前显示到的字符索引
+var _is_streaming: bool = false # 是否正在流式显示
+var _stream_timer: Timer = null # 流式显示定时器
+var _height_tween: Tween = null # 高度调整动画
+var _buttons: Array[Button] = [] # 按钮数组
 var _display_state: DisplayState = DisplayState.HIDDEN
 var _loading_tween: Tween = null
 var _auto_hide_timer: Timer = null
 var _long_press_timer: Timer = null
-var _func_min_display_timer: Timer = null  # 函数执行状态最小显示时间
-var _has_received_text: bool = false  # 当前响应是否已收到文本
-var _current_func_name: String = ""  # 当前执行的函数名
-var _pending_func_complete: bool = false  # 函数已完成但等待最小显示时间
+var _func_min_display_timer: Timer = null # 函数执行状态最小显示时间
+var _has_received_text: bool = false # 当前响应是否已收到文本
+var _current_func_name: String = "" # 当前执行的函数名
+var _pending_func_complete: bool = false # 函数已完成但等待最小显示时间
 
 
 func _ready() -> void:
@@ -178,10 +179,10 @@ func _ready() -> void:
 
 	# 初始化 RichTextLabel
 	rich_text_label.bbcode_enabled = true
-	rich_text_label.fit_content = false  # 禁用自动适应内容，使用固定尺寸
+	rich_text_label.fit_content = false # 禁用自动适应内容，使用固定尺寸
 	rich_text_label.scroll_following = true
-	rich_text_label.scroll_active = true  # 启用滚动
-	rich_text_label.clip_contents = true  # 裁剪超出内容
+	rich_text_label.scroll_active = true # 启用滚动
+	rich_text_label.clip_contents = true # 裁剪超出内容
 
 	# 监听 RichTextLabel 的尺寸变化
 	rich_text_label.resized.connect(_on_rich_text_label_resized)
@@ -211,11 +212,15 @@ func _ready() -> void:
 func show_module() -> void:
 	if !visible:
 		GuiTransitions.show("dialogue")
+		DialogueState.emit_dialogue_shown()
 
 
 func hide_module() -> void:
 	if visible:
 		GuiTransitions.hide("dialogue")
+		DialogueState.emit_dialogue_hidden()
+		# 对话框关闭时发出对话完成信号
+		DialogueState.emit_dialogue_finished()
 
 
 # ============ 显示状态机 ============
@@ -367,8 +372,8 @@ func start_dialogue(text: String, speed_override: float = -1.0) -> void:
 	# 清空当前显示
 	rich_text_label.text = ""
 
-	# 发出开始信号
-	dialogue_started.emit()
+	# 通过 DialogueState 发出开始信号（包含文本内容）
+	DialogueState.emit_dialogue_started(text)
 
 	if enable_streaming:
 		# 启动流式显示
@@ -387,7 +392,7 @@ func stop_dialogue() -> void:
 
 	_is_streaming = false
 	_stream_timer.stop()
-	dialogue_stopped.emit()
+	DialogueState.emit_dialogue_stopped()
 
 
 ## 跳过动画，直接显示全部文本
@@ -403,7 +408,7 @@ func skip_to_end() -> void:
 	# 更新高度
 	_update_height()
 
-	dialogue_finished.emit()
+	DialogueState.emit_dialogue_finished()
 
 
 ## 清空对话内容
@@ -468,6 +473,8 @@ func show_demo_response(text: String, append: bool = false) -> void:
 	else:
 		clear_dialogue()
 		set_text(text)
+		# 演示模式下显示响应文本时发送信号
+		DialogueState.emit_dialogue_started(text)
 	_set_display_state(DisplayState.SHOWING_TEXT)
 	_set_display_state(DisplayState.COMPLETED)
 
@@ -485,7 +492,7 @@ func _on_stream_timer_timeout() -> void:
 		# 显示完成
 		_stream_timer.stop()
 		_is_streaming = false
-		dialogue_finished.emit()
+		DialogueState.emit_dialogue_finished()
 		return
 
 	# 显示下一个字符
@@ -565,7 +572,7 @@ func _update_buttons() -> void:
 
 ## 按钮点击回调
 func _on_button_pressed(button_index: int) -> void:
-	button_pressed.emit(button_index)
+	DialogueState.emit_button_pressed(button_index)
 
 
 # ============ ChatState 响应式回调 ============
@@ -576,13 +583,17 @@ func _on_response_started() -> void:
 	show_module()
 	clear_dialogue()
 	_set_display_state(DisplayState.LOADING)
+	# 对话开始时，文本为空，稍后通过 _on_response_text_set 或 _on_response_text_delta 获取
 
 
 func _on_response_text_delta(delta: String) -> void:
 	if !_has_received_text:
 		_has_received_text = true
 		_set_display_state(DisplayState.SHOWING_TEXT)
-	append_text(delta)
+		# 第一段文本到达时发送 dialogue_started 信号
+		DialogueState.emit_dialogue_started(delta)
+	else:
+		append_text(delta)
 
 
 func _on_response_text_set(text: String) -> void:
@@ -590,6 +601,8 @@ func _on_response_text_set(text: String) -> void:
 	if !_has_received_text and text.length() > 0:
 		_has_received_text = true
 		_set_display_state(DisplayState.SHOWING_TEXT)
+		# 第一次收到文本时，发送 dialogue_started 信号（包含文本内容）
+		DialogueState.emit_dialogue_started(text)
 	set_text(text)
 
 
@@ -604,6 +617,8 @@ func _on_response_completed(response_text: String) -> void:
 
 func _on_response_error(message: String) -> void:
 	print("[DialogueBox] _on_response_error: %s" % message)
+	if not show_error_message:
+		return
 	_has_received_text = true
 	show_module()
 	_set_display_state(DisplayState.SHOWING_TEXT)
@@ -627,10 +642,14 @@ func _on_function_call_started(_call_id: String, func_name: String) -> void:
 	# 启动最小显示定时器（确保用户能看到函数执行提示）
 	_func_min_display_timer.wait_time = 0.8
 	_func_min_display_timer.start()
+	# 发送函数执行信号
+	DialogueState.emit_function_executing(func_name, _call_id)
 
 
 func _on_function_call_completed(_call_id: String, _name: String, _success: bool) -> void:
 	print("[DialogueBox] _on_function_call_completed: %s success=%s" % [_name, _success])
+	# 发送函数完成信号
+	DialogueState.emit_function_completed(_name, _call_id, _success)
 	if _func_min_display_timer.time_left > 0:
 		# 最小显示时间未到，缓冲状态切换
 		_pending_func_complete = true
