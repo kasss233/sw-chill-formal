@@ -40,6 +40,21 @@ func _ready() -> void:
 	if TaskState.get_task_count() > 0:
 		_render_all()
 
+
+func _exit_tree() -> void:
+	if TaskState.task_added.is_connected(_on_state_task_added):
+		TaskState.task_added.disconnect(_on_state_task_added)
+	if TaskState.task_removed.is_connected(_on_state_task_removed):
+		TaskState.task_removed.disconnect(_on_state_task_removed)
+	if TaskState.task_updated.is_connected(_on_state_task_updated):
+		TaskState.task_updated.disconnect(_on_state_task_updated)
+	if TaskState.task_state_changed.is_connected(_on_state_task_state_changed):
+		TaskState.task_state_changed.disconnect(_on_state_task_state_changed)
+	if TaskState.tasks_reordered.is_connected(_on_state_tasks_reordered):
+		TaskState.tasks_reordered.disconnect(_on_state_tasks_reordered)
+	if TaskState.data_loaded.is_connected(_on_state_data_loaded):
+		TaskState.data_loaded.disconnect(_on_state_data_loaded)
+
 # ======================== TaskState 信号回调 ========================
 
 func _on_state_task_added(task: TaskData) -> void:

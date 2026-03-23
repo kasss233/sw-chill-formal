@@ -548,6 +548,41 @@ func _fn_select_room_decor_item(args: Dictionary) -> Dictionary:
 	return {"success": true, "data": {"item_id": item_id}}
 
 
+func _fn_get_all_room_decor(_args: Dictionary) -> Dictionary:
+	var data := RoomDecorState.agent_get_all_room_decor()
+	return {"success": true, "data": data}
+
+
+func _fn_get_available_room_decor(_args: Dictionary) -> Dictionary:
+	var data := RoomDecorState.agent_get_available_room_decor()
+	return {"success": true, "data": data}
+
+
+# ============================================================
+# 函数实现 — 等级与统计（3 个）
+# ============================================================
+
+func _fn_get_level_info(_args: Dictionary) -> Dictionary:
+	var data := LevelState.agent_get_level_info()
+	return {"success": true, "data": data}
+
+
+func _fn_get_focus_stats(args: Dictionary) -> Dictionary:
+	var period := str(args.get("period", "week"))
+	if period not in ["week", "month", "year"]:
+		period = "week"
+	var data := StatsState.agent_get_focus_stats(period)
+	return {"success": true, "data": data}
+
+
+func _fn_get_task_stats(args: Dictionary) -> Dictionary:
+	var period := str(args.get("period", "week"))
+	if period not in ["week", "month", "year"]:
+		period = "week"
+	var data := StatsState.agent_get_task_stats(period)
+	return {"success": true, "data": data}
+
+
 # ============================================================
 # 函数实现 — 习惯管理（9 个）
 # ============================================================

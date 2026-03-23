@@ -20,6 +20,8 @@ signal agent_close_note_requested
 var _notes: Array[NoteData] = []
 var _categories: Array[String] = []
 var _next_id: int = 1
+var _id_index: Dictionary = {}          # {int id → NoteData}
+var _server_id_index: Dictionary = {}   # {int server_id → NoteData}
 
 const SAVE_PATH = "user://note_data.json"
 const PROTECTED_CATEGORIES: Array[String] = ["反思总结"]
@@ -41,10 +43,7 @@ func get_all_notes() -> Array[NoteData]:
 
 ## 按 id 查找笔记
 func get_note_by_id(id: int) -> NoteData:
-	for note in _notes:
-		if note.id == id:
-			return note
-	return null
+	return _id_index.get(id, null)
 
 ## 获取指定分类的笔记
 func get_notes_by_category(category: String) -> Array[NoteData]:
@@ -84,6 +83,7 @@ func add_note(title: String = "", content: String = "", category: String = "") -
 	var note = NoteData.new(_next_id, title, content, cats)
 	_next_id += 1
 	_notes.insert(0, note)
+	_index_add(note)
 	_queue_save()
 	note_added.emit(note)
 	print("[NoteState] Added note(id: %d)" % note.id)
@@ -93,6 +93,7 @@ func add_note(title: String = "", content: String = "", category: String = "") -
 func remove_note(id: int) -> bool:
 	for i in range(_notes.size()):
 		if _notes[i].id == id:
+			_index_remove(_notes[i])
 			_notes.remove_at(i)
 			_queue_save()
 			note_removed.emit(id)
@@ -310,6 +311,7 @@ func load_data() -> void:
 		_notes.append(note)
 
 	print("[NoteState] Loaded %d notes, %d categories" % [_notes.size(), _categories.size()])
+	_rebuild_index()
 	data_loaded.emit()
 
 
@@ -347,22 +349,21 @@ func import_data(data: Dictionary) -> void:
 
 	_save_data()
 	print("[NoteState] Imported %d notes" % _notes.size())
+	_rebuild_index()
 	data_loaded.emit()
 
 # ======================== 同步辅助 API ========================
 
 ## 按 server_id 查找笔记
 func get_note_by_server_id(sid: int) -> NoteData:
-	for note in _notes:
-		if note.server_id == sid:
-			return note
-	return null
+	return _server_id_index.get(sid, null)
 
 ## 从远程数据创建笔记（同步用）
 func sync_create_note(note: NoteData) -> void:
 	if note.id >= _next_id:
 		_next_id = note.id + 1
 	_notes.insert(0, note)
+	_index_add(note)
 	_save_data()
 	note_added.emit(note)
 	print("[NoteState] Sync created note(id: %d, server_id: %d)" % [note.id, note.server_id])
@@ -372,6 +373,7 @@ func sync_update_note(local_id: int, fields: Dictionary) -> bool:
 	var note = get_note_by_id(local_id)
 	if note == null:
 		return false
+	var old_server_id = note.server_id
 	if fields.has("title"):
 		note.title = fields["title"]
 	if fields.has("content"):
@@ -384,6 +386,12 @@ func sync_update_note(local_id: int, fields: Dictionary) -> bool:
 		note.updated_at = fields["updated_at"]
 	if fields.has("server_id"):
 		note.server_id = fields["server_id"]
+	# 更新 server_id 索引
+	if note.server_id != old_server_id:
+		if old_server_id > 0:
+			_server_id_index.erase(old_server_id)
+		if note.server_id > 0:
+			_server_id_index[note.server_id] = note
 	_save_data()
 	note_updated.emit(note)
 	print("[NoteState] Sync updated note(id: %d)" % local_id)
@@ -393,6 +401,7 @@ func sync_update_note(local_id: int, fields: Dictionary) -> bool:
 func sync_remove_note(local_id: int) -> bool:
 	for i in range(_notes.size()):
 		if _notes[i].id == local_id:
+			_index_remove(_notes[i])
 			_notes.remove_at(i)
 			_save_data()
 			note_removed.emit(local_id)
@@ -411,6 +420,7 @@ func sync_replace_all(notes: Array[NoteData], categories: Array[String]) -> void
 		if note.id >= _next_id:
 			_next_id = note.id + 1
 	_save_data()
+	_rebuild_index()
 	print("[NoteState] Sync replaced all: %d notes, %d categories" % [_notes.size(), _categories.size()])
 	data_loaded.emit()
 
@@ -450,6 +460,30 @@ func allocate_id() -> int:
 	var id = _next_id
 	_next_id += 1
 	return id
+
+
+## 重建索引（load/import/sync_replace_all 后调用）
+func _rebuild_index() -> void:
+	_id_index.clear()
+	_server_id_index.clear()
+	for note in _notes:
+		_id_index[note.id] = note
+		if note.server_id > 0:
+			_server_id_index[note.server_id] = note
+
+
+## 索引维护：添加
+func _index_add(note: NoteData) -> void:
+	_id_index[note.id] = note
+	if note.server_id > 0:
+		_server_id_index[note.server_id] = note
+
+
+## 索引维护：移除
+func _index_remove(note: NoteData) -> void:
+	_id_index.erase(note.id)
+	if note.server_id > 0:
+		_server_id_index.erase(note.server_id)
 
 
 ## 确保受保护分类存在

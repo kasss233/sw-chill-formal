@@ -42,6 +42,32 @@ func _ready() -> void:
 	_refresh_module_title()
 	_refresh_empty_state()
 
+
+func _exit_tree() -> void:
+	if AchievementState.daily_task_added.is_connected(_on_state_daily_task_added):
+		AchievementState.daily_task_added.disconnect(_on_state_daily_task_added)
+	if AchievementState.daily_task_removed.is_connected(_on_state_daily_task_removed):
+		AchievementState.daily_task_removed.disconnect(_on_state_daily_task_removed)
+	if AchievementState.daily_task_state_updated.is_connected(_on_state_daily_task_state_updated):
+		AchievementState.daily_task_state_updated.disconnect(_on_state_daily_task_state_updated)
+	if AchievementState.daily_task_completed.is_connected(_on_state_daily_task_completed):
+		AchievementState.daily_task_completed.disconnect(_on_state_daily_task_completed)
+	if AchievementState.daily_task_reward_claimed.is_connected(_on_state_daily_task_reward_claimed):
+		AchievementState.daily_task_reward_claimed.disconnect(_on_state_daily_task_reward_claimed)
+	if AchievementState.achievement_added.is_connected(_on_state_achievement_added):
+		AchievementState.achievement_added.disconnect(_on_state_achievement_added)
+	if AchievementState.achievement_removed.is_connected(_on_state_achievement_removed):
+		AchievementState.achievement_removed.disconnect(_on_state_achievement_removed)
+	if AchievementState.achievement_state_updated.is_connected(_on_state_achievement_state_updated):
+		AchievementState.achievement_state_updated.disconnect(_on_state_achievement_state_updated)
+	if AchievementState.achievement_completed.is_connected(_on_state_achievement_completed):
+		AchievementState.achievement_completed.disconnect(_on_state_achievement_completed)
+	if AchievementState.achievement_reward_claimed.is_connected(_on_state_achievement_reward_claimed):
+		AchievementState.achievement_reward_claimed.disconnect(_on_state_achievement_reward_claimed)
+	if AchievementState.data_loaded.is_connected(_on_state_data_loaded):
+		AchievementState.data_loaded.disconnect(_on_state_data_loaded)
+
+
 func show_daily_task_tab() -> void:
 	_switch_tab(Tab.DAILY_TASK)
 

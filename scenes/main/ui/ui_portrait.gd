@@ -74,6 +74,29 @@ func _ready() -> void:
 	AIDemoController.demo_response_cleared.connect(_on_demo_response_cleared)
 
 
+func _exit_tree() -> void:
+	if ChatState.response_started.is_connected(_on_portrait_response_started):
+		ChatState.response_started.disconnect(_on_portrait_response_started)
+	if LayerManager.module_show_requested.is_connected(_on_agent_show_module):
+		LayerManager.module_show_requested.disconnect(_on_agent_show_module)
+	if LayerManager.module_hide_requested.is_connected(_on_agent_hide_module):
+		LayerManager.module_hide_requested.disconnect(_on_agent_hide_module)
+	if ChatState.ai_glow_started.is_connected(_on_ai_glow_started):
+		ChatState.ai_glow_started.disconnect(_on_ai_glow_started)
+	if ChatState.ai_glow_stopped.is_connected(_on_ai_glow_stopped):
+		ChatState.ai_glow_stopped.disconnect(_on_ai_glow_stopped)
+	if ChatState.response_started.is_connected(_on_ai_response_glow_start):
+		ChatState.response_started.disconnect(_on_ai_response_glow_start)
+	if ChatState.response_completed.is_connected(_on_ai_response_glow_stop):
+		ChatState.response_completed.disconnect(_on_ai_response_glow_stop)
+	if AIDemoController.dialogue_visibility_requested.is_connected(_on_demo_dialogue_visibility_requested):
+		AIDemoController.dialogue_visibility_requested.disconnect(_on_demo_dialogue_visibility_requested)
+	if AIDemoController.demo_response_requested.is_connected(_on_demo_response_requested):
+		AIDemoController.demo_response_requested.disconnect(_on_demo_response_requested)
+	if AIDemoController.demo_response_cleared.is_connected(_on_demo_response_cleared):
+		AIDemoController.demo_response_cleared.disconnect(_on_demo_response_cleared)
+
+
 # === 模块注册 + 互斥 ===
 
 func _register_modules() -> void:
@@ -242,7 +265,7 @@ func _on_portrait_response_started() -> void:
 
 func _setup_more_menu() -> void:
 	_more_menu.add_item("成就")
-	_more_menu.add_item("日历")
+	_more_menu.add_item("个人中心")
 	_more_menu.add_item("房间装饰")
 	_more_menu.add_item("环境设置")
 	_more_button.pressed.connect(_on_more_button_pressed)

@@ -2,14 +2,13 @@
 
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_f22lk"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_2abcq"]
-[ext_resource type="PackedScene" path="res://scenes/main/ui/calendar_module/today_dashboard/today_dashboard.tscn" id="3_today"]
 [ext_resource type="Script" uid="uid://crblmymjhjluk" path="res://scenes/main/ui/calendar_module/calendar_module.gd" id="4_module"]
 [ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="5_seg"]
 [ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="5_vl4l1"]
 [ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="6_54iuj"]
-[ext_resource type="PackedScene" path="res://scenes/main/ui/calendar_module/week_schedule_view/week_schedule_view.tscn" id="6_wsv"]
-[ext_resource type="PackedScene" uid="uid://8rtsyrvshb4i" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_library_panel.tscn" id="7_hlp"]
-[ext_resource type="PackedScene" path="res://scenes/main/ui/calendar_module/review_panel/review_panel.tscn" id="8_review"]
+[ext_resource type="PackedScene" uid="uid://bqdjeom0knkb0" path="res://scenes/main/ui/calendar_module/profile_view/profile_view.tscn" id="7_pv"]
+[ext_resource type="PackedScene" uid="uid://h31riftac41x" path="res://scenes/main/ui/calendar_module/stats_view/stats_view.tscn" id="8_sv"]
+[ext_resource type="PackedScene" uid="uid://8rtsyrvshb4i" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_library_panel.tscn" id="9_hlp"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_jna6j"]
 frequency = 0.1
@@ -19,13 +18,13 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_jna6j")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_vl4l1"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t5ymy"]
 shader = ExtResource("1_f22lk")
 shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 5.0
+shader_parameter/blur_amount = 6.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -38,11 +37,11 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(308, 494)
 shader_parameter/shadow_padding = 12.0
 shader_parameter/glow_intensity = 0.0
-shader_parameter/glow_width = 3.0
+shader_parameter/glow_width = 4.0
 shader_parameter/glow_speed = 0.8
-shader_parameter/glow_softness = 1.5
+shader_parameter/glow_softness = 2.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_54iuj"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vl4l1"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -66,10 +65,10 @@ offset_bottom = 494.0
 script = ExtResource("4_module")
 
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=740828074]
-material = SubResource("ShaderMaterial_vl4l1")
+material = SubResource("ShaderMaterial_t5ymy")
 clip_contents = true
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_54iuj")
+theme_override_styles/panel = SubResource("StyleBoxFlat_vl4l1")
 script = ExtResource("2_2abcq")
 noise_texture = SubResource("NoiseTexture2D_t7cdk")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -85,18 +84,18 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 24
-text = "生活节奏"
+text = "个人中心"
 
 [node name="TabBar" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=1721151689]
-custom_minimum_size = Vector2(240, 38)
+custom_minimum_size = Vector2(255, 38)
 layout_mode = 2
+size_flags_horizontal = 4
 mouse_filter = 1
 script = ExtResource("5_seg")
-editor_segments = Array[String](["今日", "节奏", "回顾", "习惯"])
+editor_segments = Array[String](["我的", "统计", "习惯"])
 selected_index = 0
-corner_radius = 16
 button_height = 38
-min_button_width = 60
+min_button_width = 85
 metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
 
 [node name="SmoothScrollContainer" type="ScrollContainer" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=410312941]
@@ -110,22 +109,19 @@ metadata/_custom_type_script = "uid://bgqglerkcylxx"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer" unique_id=204331445]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="TodayDashboard" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1379783385 instance=ExtResource("3_today")]
+[node name="ProfileView" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=446823414 instance=ExtResource("7_pv")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="WeekScheduleView" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=613761063 instance=ExtResource("6_wsv")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="ReviewPanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1425640857 instance=ExtResource("8_review")]
+[node name="StatsView" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1908574425 instance=ExtResource("8_sv")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="HabitLibraryPanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=273000626 instance=ExtResource("7_hlp")]
+[node name="HabitLibraryPanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=273000626 instance=ExtResource("9_hlp")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

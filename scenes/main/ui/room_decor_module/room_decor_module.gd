@@ -34,6 +34,19 @@ func _ready() -> void:
 	_render_all()
 
 
+func _exit_tree() -> void:
+	if RoomDecorState.has_signal("room_decor_added") and RoomDecorState.room_decor_added.is_connected(_on_state_item_added):
+		RoomDecorState.room_decor_added.disconnect(_on_state_item_added)
+	if RoomDecorState.has_signal("room_decor_removed") and RoomDecorState.room_decor_removed.is_connected(_on_state_item_removed):
+		RoomDecorState.room_decor_removed.disconnect(_on_state_item_removed)
+	if RoomDecorState.has_signal("room_decor_updated") and RoomDecorState.room_decor_updated.is_connected(_on_state_item_updated):
+		RoomDecorState.room_decor_updated.disconnect(_on_state_item_updated)
+	if RoomDecorState.has_signal("room_decor_state_changed") and RoomDecorState.room_decor_state_changed.is_connected(_on_state_changed):
+		RoomDecorState.room_decor_state_changed.disconnect(_on_state_changed)
+	if RoomDecorState.has_signal("data_loaded") and RoomDecorState.data_loaded.is_connected(_on_state_data_loaded):
+		RoomDecorState.data_loaded.disconnect(_on_state_data_loaded)
+
+
 func add_decor_item(item_name: String, category: String, required_level: int = 1, icon_path: String = "") -> Dictionary:
 	var item := RoomDecorState.add_item(item_name, category, required_level, icon_path)
 	if item == null:

@@ -15,6 +15,8 @@ signal task_deadline_warning(task: TaskData)
 var _tasks: Array[TaskData] = []
 var _next_id: int = 1
 var _deadline_timer: Timer = null
+var _id_index: Dictionary = {}          # {int id → TaskData}
+var _server_id_index: Dictionary = {}   # {int server_id → TaskData}
 
 # 截止时间警告记录
 var _warned_15min: Dictionary = {} # {task_id: bool}
@@ -54,10 +56,7 @@ func get_completed_tasks() -> Array[TaskData]:
 	return result
 
 func get_task_by_id(id: int) -> TaskData:
-	for task in _tasks:
-		if task.id == id:
-			return task
-	return null
+	return _id_index.get(id, null)
 
 func get_task_count() -> int:
 	return _tasks.size()
@@ -100,6 +99,7 @@ func add_task(title: String, due_timestamp: int = 0) -> TaskData:
 
 	# 未完成任务插入到列表最前面
 	_tasks.insert(0, task)
+	_index_add(task)
 	# 更新所有 order
 	_update_orders()
 
@@ -111,6 +111,8 @@ func add_task(title: String, due_timestamp: int = 0) -> TaskData:
 func remove_task(id: int) -> bool:
 	for i in range(_tasks.size()):
 		if _tasks[i].id == id:
+			var task = _tasks[i]
+			_index_remove(task)
 			_tasks.remove_at(i)
 			# 清理警告记录
 			_warned_15min.erase(id)
@@ -273,7 +275,9 @@ func clear_completed() -> int:
 	var i = _tasks.size() - 1
 	while i >= 0:
 		if _tasks[i].is_completed:
-			var id = _tasks[i].id
+			var task = _tasks[i]
+			var id = task.id
+			_index_remove(task)
 			_tasks.remove_at(i)
 			_warned_15min.erase(id)
 			_warned_deadline.erase(id)
@@ -348,6 +352,7 @@ func load_data() -> void:
 		_tasks.append(task)
 
 	print("[TaskState] Loaded %d tasks, next_id=%d" % [_tasks.size(), _next_id])
+	_rebuild_index()
 	data_loaded.emit()
 
 ## 导出数据（用于云端上传）
@@ -379,6 +384,7 @@ func import_data(data: Dictionary) -> void:
 
 	_save_data()
 	print("[TaskState] Imported %d tasks" % _tasks.size())
+	_rebuild_index()
 	data_loaded.emit()
 
 # ======================== 截止时间检查 ========================
@@ -414,14 +420,35 @@ func _update_orders() -> void:
 	for i in range(_tasks.size()):
 		_tasks[i].order = i
 
+
+## 重建索引（load/import/sync_replace_all 后调用）
+func _rebuild_index() -> void:
+	_id_index.clear()
+	_server_id_index.clear()
+	for task in _tasks:
+		_id_index[task.id] = task
+		if task.server_id > 0:
+			_server_id_index[task.server_id] = task
+
+
+## 索引维护：添加
+func _index_add(task: TaskData) -> void:
+	_id_index[task.id] = task
+	if task.server_id > 0:
+		_server_id_index[task.server_id] = task
+
+
+## 索引维护：移除
+func _index_remove(task: TaskData) -> void:
+	_id_index.erase(task.id)
+	if task.server_id > 0:
+		_server_id_index.erase(task.server_id)
+
 # ======================== 同步辅助 API ========================
 
 ## 按 server_id 查找任务
 func get_task_by_server_id(sid: int) -> TaskData:
-	for task in _tasks:
-		if task.server_id == sid:
-			return task
-	return null
+	return _server_id_index.get(sid, null)
 
 ## 从远程数据创建任务（不自增 _next_id，直接追加）
 func sync_create_task(task: TaskData) -> void:
@@ -430,6 +457,7 @@ func sync_create_task(task: TaskData) -> void:
 		_next_id = task.id + 1
 	var insert_index = clamp(task.order, 0, _tasks.size())
 	_tasks.insert(insert_index, task)
+	_index_add(task)
 	_save_data()
 	task_added.emit(task)
 	print("[TaskState] Sync created task(id: %d, server_id: %d)" % [task.id, task.server_id])
@@ -439,6 +467,8 @@ func sync_update_task(local_id: int, fields: Dictionary) -> bool:
 	var task = get_task_by_id(local_id)
 	if task == null:
 		return false
+	# 若 server_id 变更，先移除旧索引
+	var old_server_id = task.server_id
 	if fields.has("title"):
 		task.title = fields["title"]
 	if fields.has("is_completed"):
@@ -453,6 +483,12 @@ func sync_update_task(local_id: int, fields: Dictionary) -> bool:
 		task.updated_at = fields["updated_at"]
 	if fields.has("server_id"):
 		task.server_id = fields["server_id"]
+	# 更新 server_id 索引
+	if task.server_id != old_server_id:
+		if old_server_id > 0:
+			_server_id_index.erase(old_server_id)
+		if task.server_id > 0:
+			_server_id_index[task.server_id] = task
 	if fields.has("position"):
 		_tasks.sort_custom(func(a: TaskData, b: TaskData): return a.order < b.order)
 		_update_orders()
@@ -465,6 +501,8 @@ func sync_update_task(local_id: int, fields: Dictionary) -> bool:
 func sync_remove_task(local_id: int) -> bool:
 	for i in range(_tasks.size()):
 		if _tasks[i].id == local_id:
+			var task = _tasks[i]
+			_index_remove(task)
 			_tasks.remove_at(i)
 			_warned_15min.erase(local_id)
 			_warned_deadline.erase(local_id)
@@ -510,6 +548,7 @@ func sync_replace_all(tasks: Array[TaskData]) -> void:
 			_next_id = task.id + 1
 	_update_orders()
 	_save_data()
+	_rebuild_index()
 	print("[TaskState] Sync replaced all: %d tasks" % _tasks.size())
 	data_loaded.emit()
 

@@ -40,6 +40,18 @@ func _connect_if_needed(emitter: Object, signal_name: StringName, callback: Call
 	if emitter.has_signal(signal_name) and not emitter.is_connected(signal_name, callback):
 		emitter.connect(signal_name, callback)
 
+func _exit_tree() -> void:
+	if not SettingState:
+		return
+	if SettingState.env_time_changed.is_connected(_on_state_env_time_changed):
+		SettingState.env_time_changed.disconnect(_on_state_env_time_changed)
+	if SettingState.env_weather_changed.is_connected(_on_state_env_weather_changed):
+		SettingState.env_weather_changed.disconnect(_on_state_env_weather_changed)
+	if SettingState.rain_changed.is_connected(_on_state_rain_changed):
+		SettingState.rain_changed.disconnect(_on_state_rain_changed)
+	if SettingState.snow_changed.is_connected(_on_state_snow_changed):
+		SettingState.snow_changed.disconnect(_on_state_snow_changed)
+
 # 启动时从状态单例回填 UI，使用无信号 API 避免回写
 func _sync_all_controls_from_state() -> void:
 	_time_button.set_state_no_signal(SettingState.get_time_mode())

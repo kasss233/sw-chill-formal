@@ -39,6 +39,21 @@ func _init() -> void:
 	_mutex = Mutex.new()
 
 
+# ============ 线程安全访问器 ============
+
+func _set_requesting(value: bool) -> void:
+	_mutex.lock()
+	_is_requesting = value
+	_mutex.unlock()
+
+
+func _get_requesting() -> bool:
+	_mutex.lock()
+	var val = _is_requesting
+	_mutex.unlock()
+	return val
+
+
 ## 配置适配器
 func configure(config: Dictionary) -> void:
 	if config.has("api_url"):
@@ -63,7 +78,7 @@ func send_request(
 	context: Dictionary = {},
 	stream: bool = true
 ) -> void:
-	if _is_requesting:
+	if _get_requesting():
 		call_deferred("_emit_request_failed", "已有请求正在进行中")
 		return
 
@@ -75,7 +90,7 @@ func send_request(
 		call_deferred("_emit_request_failed", "API URL 未设置")
 		return
 
-	_is_requesting = true
+	_set_requesting(true)
 	_should_stop = false
 	_buffer = ""
 	_full_response = ""
@@ -96,10 +111,13 @@ func cancel_request() -> void:
 	if _http_client:
 		_http_client.close()
 
+	if _stream_thread and _stream_thread.is_started():
+		_stream_thread.wait_to_finish()
+
 	if _fr_thread and _fr_thread.is_started():
 		_fr_thread.wait_to_finish()
 
-	_is_requesting = false
+	_set_requesting(false)
 
 
 ## 回传函数执行结果
@@ -180,7 +198,7 @@ func _build_request_body(
 func _execute_request(body: Dictionary, _stream: bool) -> void:
 	if auth_token.is_empty():
 		call_deferred("_emit_request_failed", "未登录，无法发送请求")
-		_is_requesting = false
+		_set_requesting(false)
 		return
 
 	var full_url = api_url + "/chat/messages"
@@ -189,7 +207,7 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 	var url_parts = _parse_url(full_url)
 	if url_parts.is_empty():
 		call_deferred("_emit_request_failed", "API URL 格式无效")
-		_is_requesting = false
+		_set_requesting(false)
 		return
 
 	print("[CustomAPIAdapter][DEBUG] host=%s port=%d tls=%s path=%s" % [url_parts["host"], url_parts["port"], url_parts["tls"], url_parts["path"]])
@@ -200,12 +218,13 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 	print("[CustomAPIAdapter][DEBUG] connect_to_host 返回: %d" % err)
 	if err != OK:
 		call_deferred("_emit_request_failed", "连接失败: %d" % err)
-		_is_requesting = false
+		_http_client.close()
+		_set_requesting(false)
 		return
 
 	# 等待连接
 	if not _wait_for_connection():
-		_is_requesting = false
+		_set_requesting(false)
 		return
 
 	# 构建请求头
@@ -221,7 +240,7 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 	if err != OK:
 		call_deferred("_emit_request_failed", "请求发送失败: %d" % err)
 		_http_client.close()
-		_is_requesting = false
+		_set_requesting(false)
 		return
 
 	# 读取 SSE 响应流
@@ -230,7 +249,7 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 	print("[CustomAPIAdapter][DEBUG] SSE 流读取结束")
 
 	_http_client.close()
-	_is_requesting = false
+	_set_requesting(false)
 
 
 ## 执行函数结果回传请求（在线程中）
@@ -249,6 +268,7 @@ func _execute_function_result_request(body: Dictionary) -> void:
 	var err = client.connect_to_host(url_parts["host"], url_parts["port"], tls_options)
 	if err != OK:
 		call_deferred("_emit_request_failed", "连接失败: %d" % err)
+		client.close()
 		return
 
 	# 等待连接

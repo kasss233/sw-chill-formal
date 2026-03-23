@@ -31,6 +31,8 @@ var _next_habit_id: int = 1
 var _next_slot_template_id: int = 1
 var _next_entry_id: int = 1
 var _next_record_id: int = 1
+var _habit_id_index: Dictionary = {}      # {int id → HabitData}
+var _time_slot_id_index: Dictionary = {}  # {int id → HabitData.TimeSlotTemplate}
 
 const SAVE_PATH = "user://habit_data.json"
 const SAVE_DEBOUNCE_SEC := 0.5
@@ -60,10 +62,7 @@ func get_active_habits() -> Array:
 
 
 func get_habit_by_id(id: int) -> HabitData:
-	for h in _habits:
-		if h.id == id:
-			return h
-	return null
+	return _habit_id_index.get(id, null)
 
 
 # ======================== 查询 API - 时间段 ========================
@@ -73,10 +72,7 @@ func get_time_slot_templates() -> Array:
 
 
 func get_time_slot_by_id(id: int) -> HabitData.TimeSlotTemplate:
-	for s in _time_slot_templates:
-		if s.id == id:
-			return s
-	return null
+	return _time_slot_id_index.get(id, null)
 
 
 # ======================== 查询 API - 排期 ========================
@@ -537,6 +533,7 @@ func add_habit(p_name: String, p_minutes: int = 30, p_period: int = 0, p_frequen
 	var habit = HabitData.new(_next_habit_id, p_name, p_minutes, p_period, p_frequency, p_color)
 	_next_habit_id += 1
 	_habits.append(habit)
+	_habit_id_index[habit.id] = habit
 	_queue_save()
 	habit_added.emit(habit)
 	print("[HabitState] Added habit(id: %d, name: %s)" % [habit.id, habit.name])
@@ -569,6 +566,7 @@ func update_habit(id: int, fields: Dictionary) -> bool:
 func remove_habit(id: int) -> bool:
 	for i in range(_habits.size()):
 		if _habits[i].id == id:
+			_habit_id_index.erase(id)
 			_habits.remove_at(i)
 			# 同时移除关联的排期和执行记录
 			_remove_entries_by_habit(id)
@@ -589,6 +587,7 @@ func add_time_slot_template(p_name: String, p_start: String, p_end: String) -> H
 	var slot = HabitData.TimeSlotTemplate.new(_next_slot_template_id, p_name, p_start, p_end, _time_slot_templates.size())
 	_next_slot_template_id += 1
 	_time_slot_templates.append(slot)
+	_time_slot_id_index[slot.id] = slot
 	_queue_save()
 	time_slot_template_changed.emit()
 	print("[HabitState] Added time slot template(id: %d, name: %s)" % [slot.id, slot.name])
@@ -613,6 +612,7 @@ func update_time_slot_template(id: int, fields: Dictionary) -> bool:
 func remove_time_slot_template(id: int) -> bool:
 	for i in range(_time_slot_templates.size()):
 		if _time_slot_templates[i].id == id:
+			_time_slot_id_index.erase(id)
 			_time_slot_templates.remove_at(i)
 			_update_slot_orders()
 			# 移除使用该时间段的排期
@@ -632,6 +632,10 @@ func reorder_time_slot_templates(ids: Array) -> void:
 			reordered.append(slot)
 	_time_slot_templates = reordered
 	_update_slot_orders()
+	# 重建 time_slot 索引
+	_time_slot_id_index.clear()
+	for s in _time_slot_templates:
+		_time_slot_id_index[s.id] = s
 	_queue_save()
 	time_slot_template_changed.emit()
 
@@ -866,6 +870,7 @@ func load_data() -> void:
 		print("[HabitState] No save file found, initializing defaults")
 		_init_default_templates()
 		_save_data()
+		_rebuild_habit_index()
 		data_loaded.emit()
 		return
 
@@ -873,6 +878,7 @@ func load_data() -> void:
 	if not file:
 		push_error("[HabitState] Failed to open save file")
 		_init_default_templates()
+		_rebuild_habit_index()
 		data_loaded.emit()
 		return
 
@@ -884,6 +890,7 @@ func load_data() -> void:
 	if error != OK:
 		push_error("[HabitState] Failed to parse save file: %s" % json.get_error_message())
 		_init_default_templates()
+		_rebuild_habit_index()
 		data_loaded.emit()
 		return
 
@@ -891,6 +898,7 @@ func load_data() -> void:
 	if not data is Dictionary:
 		push_error("[HabitState] Invalid save data format")
 		_init_default_templates()
+		_rebuild_habit_index()
 		data_loaded.emit()
 		return
 
@@ -919,6 +927,7 @@ func load_data() -> void:
 	if _time_slot_templates.is_empty():
 		_init_default_templates()
 
+	_rebuild_habit_index()
 	data_loaded.emit()
 
 
@@ -945,6 +954,16 @@ func _init_default_templates() -> void:
 func _update_slot_orders() -> void:
 	for i in range(_time_slot_templates.size()):
 		_time_slot_templates[i].order = i
+
+
+## 重建索引（load/import 后调用）
+func _rebuild_habit_index() -> void:
+	_habit_id_index.clear()
+	_time_slot_id_index.clear()
+	for h in _habits:
+		_habit_id_index[h.id] = h
+	for s in _time_slot_templates:
+		_time_slot_id_index[s.id] = s
 
 
 func _get_entry_by_id(id: int) -> HabitData.ScheduleEntry:
@@ -1029,6 +1048,7 @@ func import_data(data: Dictionary) -> void:
 		_execution_records.append(HabitData.ExecutionRecord.from_dict(d))
 	_save_data()
 	print("[HabitState] Imported data")
+	_rebuild_habit_index()
 	data_loaded.emit()
 
 
