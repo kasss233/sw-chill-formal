@@ -32,6 +32,30 @@ const AUTO_DAILY_TASK_DEFS := [
 		"title": "完成两次番茄钟",
 		"description": "今日完成 2 次番茄钟工作阶段",
 		"target": 2
+	},
+	{
+		"auto_key": "chat_complete_3",
+		"title": "完成三次聊天",
+		"description": "今日完成 3 次 AI 对话",
+		"target": 3
+	},
+	{
+		"auto_key": "habit_complete_1",
+		"title": "完成一次习惯",
+		"description": "今日完成 3 次习惯打卡",
+		"target": 3
+	},
+	{
+		"auto_key": "room_decor_use_1",
+		"title": "使用一次装饰",
+		"description": "今日切换 3 次房间装饰",
+		"target": 3
+	},
+	{
+		"auto_key": "note_use_3",
+		"title": "使用三次笔记",
+		"description": "今日使用 3 次笔记",
+		"target": 3
 	}
 ]
 
@@ -47,6 +71,30 @@ const AUTO_ACHIEVEMENT_DEFS := [
 		"title": "累计完成20次番茄钟",
 		"description": "累计完成 20 次番茄钟工作阶段",
 		"target": 20
+	},
+	{
+		"auto_key": "achievement_chat_complete_50",
+		"title": "累计完成50次聊天",
+		"description": "累计完成 50 次 AI 对话",
+		"target": 50
+	},
+	{
+		"auto_key": "achievement_habit_complete_30",
+		"title": "累计完成30次习惯",
+		"description": "累计完成 30 次习惯打卡",
+		"target": 30
+	},
+	{
+		"auto_key": "achievement_room_decor_use_20",
+		"title": "累计切换20次装饰",
+		"description": "累计切换 20 次房间装饰",
+		"target": 20
+	},
+	{
+		"auto_key": "achievement_note_use_50",
+		"title": "累计使用50次笔记",
+		"description": "累计使用 50 次笔记",
+		"target": 50
 	}
 ]
 
@@ -57,6 +105,8 @@ var _next_id: int = 1
 var _daily_claimed_records: Dictionary = {}
 var _last_daily_refresh_key: String = ""
 var _daily_check_timer: Timer = null
+var _habit_execution_last_status_by_id: Dictionary = {}
+var _room_decor_tracking_enabled: bool = false
 
 func _ready() -> void:
 	# 启动时自动加载本地数据
@@ -64,6 +114,7 @@ func _ready() -> void:
 	_connect_external_state_signals()
 	_setup_daily_check_timer()
 	_refresh_daily_tasks()
+	_start_room_decor_tracking_delay()
 
 # ======================== 查询 API ========================
 
@@ -474,6 +525,21 @@ func _connect_external_state_signals() -> void:
 	if PomodoroState and PomodoroState.has_signal("work_phase_completed"):
 		if not PomodoroState.work_phase_completed.is_connected(_on_pomodoro_work_phase_completed):
 			PomodoroState.work_phase_completed.connect(_on_pomodoro_work_phase_completed)
+	if ChatState and ChatState.has_signal("response_completed"):
+		if not ChatState.response_completed.is_connected(_on_chat_response_completed):
+			ChatState.response_completed.connect(_on_chat_response_completed)
+	if HabitState and HabitState.has_signal("execution_updated"):
+		if not HabitState.execution_updated.is_connected(_on_habit_execution_updated):
+			HabitState.execution_updated.connect(_on_habit_execution_updated)
+	if RoomDecorState and RoomDecorState.has_signal("room_decor_selected"):
+		if not RoomDecorState.room_decor_selected.is_connected(_on_room_decor_selected):
+			RoomDecorState.room_decor_selected.connect(_on_room_decor_selected)
+	if NoteState and NoteState.has_signal("note_added"):
+		if not NoteState.note_added.is_connected(_on_note_added):
+			NoteState.note_added.connect(_on_note_added)
+	if NoteState and NoteState.has_signal("note_updated"):
+		if not NoteState.note_updated.is_connected(_on_note_updated):
+			NoteState.note_updated.connect(_on_note_updated)
 
 
 func _on_daily_check_timer_timeout() -> void:
@@ -500,6 +566,42 @@ func _on_pomodoro_work_phase_completed() -> void:
 	_increment_auto_achievement_progress("achievement_pomodoro_complete_20")
 
 
+func _on_chat_response_completed(_full_text: String) -> void:
+	_increment_chat_daily_task_progress()
+	_increment_auto_achievement_progress("achievement_chat_complete_50")
+
+
+func _on_habit_execution_updated(record) -> void:
+	_sync_habit_completed_daily_task()
+	if record == null:
+		return
+	var record_id := int(record.id)
+	var status := int(record.status)
+	var prev_status := int(_habit_execution_last_status_by_id.get(record_id, -1))
+	if prev_status == status:
+		return
+	_habit_execution_last_status_by_id[record_id] = status
+	if status == HabitData.ExecutionRecord.Status.COMPLETED:
+		_increment_auto_achievement_progress("achievement_habit_complete_30")
+
+
+func _on_room_decor_selected(_item_name: String, _category: String) -> void:
+	if not _room_decor_tracking_enabled:
+		return
+	_increment_room_decor_daily_task_progress()
+	_increment_auto_achievement_progress("achievement_room_decor_use_20")
+
+
+func _on_note_added(_note: NoteData) -> void:
+	_increment_note_daily_task_progress()
+	_increment_auto_achievement_progress("achievement_note_use_50")
+
+
+func _on_note_updated(_note: NoteData) -> void:
+	_increment_note_daily_task_progress()
+	_increment_auto_achievement_progress("achievement_note_use_50")
+
+
 func _refresh_daily_tasks() -> void:
 	var today_key := DateUtil.get_today_key()
 
@@ -509,6 +611,7 @@ func _refresh_daily_tasks() -> void:
 	_ensure_builtin_daily_tasks()
 	_ensure_builtin_achievements()
 	_sync_todo_completed_daily_task()
+	_sync_habit_completed_daily_task()
 	_sync_auto_achievement_progress()
 
 	_last_daily_refresh_key = today_key
@@ -557,9 +660,72 @@ func _increment_pomodoro_daily_task_progress() -> void:
 	set_daily_task_progress(item_id, old_current + 1)
 
 
+func _increment_chat_daily_task_progress() -> void:
+	var task := _get_daily_task_ref_by_auto_key("chat_complete_3")
+	if task.is_empty():
+		return
+
+	var item_id := int(task.get("id", -1))
+	if item_id <= 0:
+		return
+
+	var old_current: int = int(task.get("current", 0))
+	set_daily_task_progress(item_id, old_current + 1)
+
+
+func _increment_room_decor_daily_task_progress() -> void:
+	var task := _get_daily_task_ref_by_auto_key("room_decor_use_1")
+	if task.is_empty():
+		return
+
+	var item_id := int(task.get("id", -1))
+	if item_id <= 0:
+		return
+
+	var old_current: int = int(task.get("current", 0))
+	set_daily_task_progress(item_id, old_current + 1)
+
+
+func _increment_note_daily_task_progress() -> void:
+	var task := _get_daily_task_ref_by_auto_key("note_use_3")
+	if task.is_empty():
+		return
+
+	var item_id := int(task.get("id", -1))
+	if item_id <= 0:
+		return
+
+	var old_current: int = int(task.get("current", 0))
+	set_daily_task_progress(item_id, old_current + 1)
+
+
+func _sync_habit_completed_daily_task() -> void:
+	if not HabitState or not HabitState.has_method("get_records_by_date"):
+		return
+	var records := HabitState.get_records_by_date(DateUtil.get_today_key())
+	var completed_today := 0
+	for record in records:
+		if record == null:
+			continue
+		if int(record.status) == HabitData.ExecutionRecord.Status.COMPLETED:
+			completed_today += 1
+
+	var task := _get_daily_task_ref_by_auto_key("habit_complete_1")
+	if task.is_empty():
+		return
+	set_daily_task_progress(int(task.get("id", -1)), completed_today)
+
+
+func _start_room_decor_tracking_delay() -> void:
+	if _room_decor_tracking_enabled:
+		return
+	var timer := get_tree().create_timer(0.2)
+	timer.timeout.connect(func(): _room_decor_tracking_enabled = true, CONNECT_ONE_SHOT)
+
+
 func _sync_auto_achievement_progress() -> void:
 	if TaskState and TaskState.has_method("get_completed_count"):
-		var completed_count :int= max(0, int(TaskState.get_completed_count()))
+		var completed_count: int = max(0, int(TaskState.get_completed_count()))
 		var achievement := _get_achievement_ref_by_auto_key("achievement_todo_complete_50")
 		if not achievement.is_empty():
 			var item_id := int(achievement.get("id", -1))

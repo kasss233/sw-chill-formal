@@ -228,6 +228,19 @@
   - 操作：`add_daily_task*`、`add_achievement*`、`set_*_progress()`、`set_*_completed()`、`claim_*()`
   - 持久化/同步：`load_data()`、`export_data()`、`import_data()`、`import_sync_data()`
   - 自动逻辑：`_setup_daily_check_timer()`、`_refresh_daily_tasks()`、`_ensure_builtin_*()`
+- 内置自动任务：
+  - 待办完成 5 次、番茄钟完成 2 次、聊天完成 3 次
+  - 习惯打卡 3 次、房间装饰切换 3 次、笔记使用 3 次
+- 内置自动成就：
+  - 待办累计 50 次、番茄钟累计 20 次、聊天累计 50 次
+  - 习惯累计 30 次、房间装饰累计 20 次、笔记累计 50 次
+- 外部信号联动：
+  - TaskState：`task_state_changed`、`task_completed`
+  - PomodoroState：`work_phase_completed`
+  - ChatState：`response_completed`
+  - HabitState：`execution_updated`
+  - RoomDecorState：`room_decor_selected`
+  - NoteState：`note_added`、`note_updated`
 
 #### `api_client.gd`
 - 统一 API 请求客户端。
