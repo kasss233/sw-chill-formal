@@ -693,31 +693,31 @@ Character (演出)
 
 **核心类**：[AchievementState](../scenes/main/autoload/data/achievement_state.gd)
 
-```gdscript
-# 长期成就
-var achievements: Dictionary  # key=achievement_id, value=AchievementData
+**数据结构与机制**：
+- 单一条目结构（每日任务/成就共用）：`id/category/title/description/target/current/completed/reward_claimed/auto_key`
+- 自动刷新：`_setup_daily_check_timer()` + `_refresh_daily_tasks()`
+- 自动任务与成就通过 `auto_key` 维护，避免重复创建
 
-class AchievementData:
-    var id: int
-    var name: String
-    var description: String
-    var progress: int  # 当前进度
-    var target: int    # 目标值
-    var reward_exp: int
-    var unlocked: bool
-    var unlocked_at: int
+**内置自动任务**：
+- 待办完成 5 次、番茄钟完成 2 次、聊天完成 3 次
+- 习惯打卡 3 次、房间装饰切换 3 次、笔记使用 3 次
 
-# 每日任务
-var daily_tasks: Array[DailyTaskData]  # 每天 3-5 个任务
-var refresh_time: int  # 上次刷新时间戳
-```
+**内置自动成就**：
+- 待办累计 50 次、番茄钟累计 20 次、聊天累计 50 次
+- 习惯累计 30 次、房间装饰累计 20 次、笔记累计 50 次
+
+**进度来源（信号联动）**：
+- TaskState：`task_state_changed`、`task_completed`
+- PomodoroState：`work_phase_completed`
+- ChatState：`response_completed`
+- HabitState：`execution_updated`
+- RoomDecorState：`room_decor_selected`
+- NoteState：`note_added`、`note_updated`
 
 **已实现 API**：
-- ✅ `check_achievement(id)` - 检查成就条件
-- ✅ `unlock_achievement(id)` - 解锁成就
-- ✅ `claim_reward(id)` - 领取奖励(加经验)
-- ✅ `auto_claim_reward()` - 自动领取
-- ✅ `daily_tasks_refresh()` - 每日自动刷新
+- ✅ `add_daily_task*` / `add_achievement*`
+- ✅ `set_*_progress()` / `set_*_completed()` / `claim_*()`
+- ✅ `export_data()` / `import_data()` / `import_sync_data()`
 
 **UI 实现**：[AchievementModule](../scenes/main/ui/achievement_module/)
 - ✅ 成就 Tab（列表、进度条、锁定状态）
