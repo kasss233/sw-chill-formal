@@ -12,7 +12,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.0,
 		"record_restore": false,
 		"args": {
-			"text": "帮我把我还没完成的待办整理一下，顺便给我一些怎么推进的建议，并记录到一条笔记里。"
+			"text": "开启专注模式。"
 		}
 	},
 	{
@@ -30,7 +30,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.25,
 		"record_restore": false,
 		"args": {
-			"text": "没问题。我先把未完成事项按优先级整理出来，再给你一份今晚/明天都能执行的推进建议，并同步写进笔记。",
+			"text": "没问题，已为你开启专注模式，正在为你设置番茄钟，并调整到适合专注的环境。",
 			"append": false,
 			"stream": false,
 			"chunk_delay": DEMO_RESPONSE_SPEED
@@ -41,8 +41,8 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": false,
 		"args": {
-			"name": "add_category",
-			"call_id": "demo_add_category"
+			"name": "focus_mode",
+			"call_id": "demo_focus_mode"
 		}
 	},
 	{
@@ -50,80 +50,50 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": true,
 		"args": {
-			"module_name": "notebook"
+			"module_name": "pomodoro"
 		}
 	},
 	{
-		"type": "add_category",
+		"type": "start_pomodoro",
 		"delay": 0.2,
 		"record_restore": true,
 		"args": {
-			"category": "工作待办整理"
+			"work_min": 15,
+			"rest_min": 5,
+			"loops": 1
 		}
 	},
+
 	{
-		"type": "create_note",
-		"delay": 0.4,
-		"record_restore": true,
-		"args": {
-			"title": "会议材料整理",
-			"content": "",
-			"save_as": "demo_note"
-		}
-	},
-	{
-		"type": "write_note",
-		"delay": 0.15,
-		"record_restore": true,
-		"args": {
-			"note_ref": "demo_note",
-			"content": "未完成事项】\n1) 项目报告（最优先）\n2) 回复客户邮件\n3) 准备明天的会议材料\n\n【建议与行动清单】\n- 先推进项目报告：先列 3-5 条大纲，再补充关键数据/结论，避免卡在细节。\n- 客户邮件：先用模板写出核心结论 + 下一步（需要对方确认什么/你何时给出更新），控制在 5 分钟内发出首版。\n- 会议材料：先做 1 页大纲 + 关键结论页；细节内容放到明早补齐。\n\n【建议的时间安排（可按需调整）】\n- 现在起 60-90 分钟：项目报告（产出大纲 + 关键段落）\n- 15 分钟：客户邮件（发出首版）\n- 30 分钟：会议材料（大纲 + 关键结论）"
-		}
-	},
-	{
-		"type": "show_function_call_end",
-		"delay": 1.0,
-		"record_restore": false,
-		"args": {
-			"call_id": "demo_add_category",
-			"name": "add_category",
-			"success": true
-		}
-	},
-	{
-		"type": "show_function_call_start",
-		"delay": 0.15,
-		"record_restore": false,
-		"args": {
-			"name": "toggle_note_category",
-			"call_id": "demo_toggle_note_category"
-		}
-	},
-	{
-		"type": "toggle_note_category",
+		"type": "set_time",
 		"delay": 0.2,
 		"record_restore": true,
 		"args": {
-			"note_ref": "demo_note",
-			"category": "工作待办整理"
+			"mode": 2
 		}
 	},
 	{
-		"type": "show_function_call_end",
-		"delay": 0.3,
-		"record_restore": false,
-		"args": {
-			"call_id": "demo_toggle_note_category",
-			"name": "toggle_note_category",
-			"success": true
-		}
-	},
-	{
-		"type": "hide_module",
+		"type": "set_weather",
 		"delay": 0.2,
-		"record_restore": false,
+		"record_restore": true,
 		"args": {
-			"module_name": "notebook"
+			"mode": 1
+		}
+	},
+	{
+		"type": "set_play_mode",
+		"delay": 0.1,
+		"record_restore": true,
+		"args": {
+			"mode": 0
+		}
+	},
+	{
+		"type": "play_track",
+		"delay": 0.2,
+		"record_restore": true,
+		"args": {
+			"track_name": "Little-Wishes"
 		}
 	},
 	{
@@ -131,7 +101,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 		"delay": 0.2,
 		"record_restore": false,
 		"args": {
-			"text": "笔记创建好了，并分类到了：工作待办整理，你可以照这个方式继续整理。",
+			"text": "为你准备了适合专注的音乐和环境，希望能帮助你进入心流状态！",
 			"append": false,
 			"stream": false,
 			"chunk_delay": DEMO_RESPONSE_SPEED
@@ -226,6 +196,7 @@ func _run_restore_async(run_id: int) -> void:
 	_restore_notes()
 	_restore_tasks()
 	_restore_pomodoro()
+	_restore_music()
 	_reset_runtime_state()
 	if run_id == current_demo_run_id:
 		is_restoring = false
@@ -275,6 +246,10 @@ func _execute_step(step: Dictionary, run_id: int) -> bool:
 			return _step_add_category(args, should_record)
 		"toggle_note_category":
 			return _step_toggle_note_category(args, should_record)
+		"play_track":
+			return _step_play_track(args, should_record)
+		"set_play_mode":
+			return _step_set_play_mode(args)
 		"wait":
 			return true
 		_:
@@ -294,6 +269,12 @@ func _describe_step(step: Dictionary) -> String:
 			return "%s(%s)" % [step_type, str(args.get("title", ""))]
 		"create_note":
 			return "%s(%s)" % [step_type, str(args.get("title", ""))]
+		"play_track":
+			return "%s(%s)" % [step_type, str(args.get("track_name", ""))]
+		"set_play_mode":
+			var mode_names = ["顺序播放", "随机播放", "单曲循环"]
+			var mode = int(args.get("mode", 0))
+			return "%s(%s)" % [step_type, mode_names[mode] if mode < mode_names.size() else "未知"]
 		_:
 			return step_type
 
@@ -441,6 +422,24 @@ func _step_set_weather(args: Dictionary) -> bool:
 	return true
 
 
+func _step_play_track(args: Dictionary, should_record: bool) -> bool:
+	var track_name := str(args.get("track_name", "")).strip_edges()
+	if track_name.is_empty():
+		return false
+	var success = MusicState.agent_play_track(track_name)
+	if should_record and success:
+		applied_changes.append({
+			"kind": "track_played",
+			"track_name": track_name
+		})
+	return success
+
+
+func _step_set_play_mode(args: Dictionary) -> bool:
+	var mode := int(args.get("mode", 0))
+	return MusicState.agent_set_play_mode(mode)
+
+
 func _restore_modules() -> void:
 	for i in range(applied_changes.size() - 1, -1, -1):
 		var change := applied_changes[i]
@@ -547,6 +546,25 @@ func _restore_pomodoro() -> void:
 	PomodoroState.agent_restore_snapshot(pomodoro_state)
 
 
+func _restore_music() -> void:
+	var music_state: Dictionary = snapshot.get("music", {})
+	if music_state.is_empty():
+		return
+	# 恢复播放列表
+	var playlist_name := str(music_state.get("current_playlist", ""))
+	if not playlist_name.is_empty():
+		MusicState.agent_set_playlist(playlist_name)
+	# 恢复播放模式
+	var play_mode := int(music_state.get("play_mode", 0))
+	MusicState.agent_set_play_mode(play_mode)
+	# 恢复曲目和播放状态
+	var track_name := str(music_state.get("current_track", ""))
+	var is_playing := bool(music_state.get("is_playing", false))
+	if not track_name.is_empty():
+		MusicState.set_track(track_name)
+	MusicState.agent_set_playing(is_playing)
+
+
 func _force_finish_ui_effects() -> void:
 	for call_id in _active_function_calls.keys():
 		var name := str(_active_function_calls[call_id])
@@ -564,7 +582,13 @@ func _capture_snapshot() -> Dictionary:
 			"time_mode": SettingState.get_time_mode(),
 			"weather_mode": SettingState.get_weather_mode()
 		},
-		"pomodoro": PomodoroState.get_status()
+		"pomodoro": PomodoroState.get_status(),
+		"music": {
+			"current_track": MusicState.current_track,
+			"is_playing": MusicState.is_playing,
+			"play_mode": MusicState.play_mode,
+			"current_playlist": MusicState.current_playlist
+		}
 	}
 
 

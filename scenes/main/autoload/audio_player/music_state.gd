@@ -34,9 +34,9 @@ signal data_loaded
 
 # --- 播放模式枚举 ---
 enum PlayMode {
-	SEQUENTIAL = 0,  # 顺序播放
-	RANDOM = 1,      # 随机播放
-	SINGLE_LOOP = 2  # 单曲循环
+	SEQUENTIAL = 0, # 顺序播放
+	RANDOM = 1, # 随机播放
+	SINGLE_LOOP = 2 # 单曲循环
 }
 
 # --- 持久化常量 ---
@@ -606,6 +606,51 @@ func import_data(data: Dictionary) -> void:
 	_save_data()
 	print("[MusicState] Imported music data")
 	data_loaded.emit()
+
+# ======================== Agent API ========================
+
+## Agent API: 播放指定曲目
+func agent_play_track(track_name: String) -> bool:
+	if track_name.is_empty():
+		push_warning("[MusicState] agent_play_track: track_name 不能为空")
+		return false
+	set_track(track_name)
+	set_playing(true)
+	print("[MusicState] Agent 播放曲目: %s" % track_name)
+	return true
+
+## Agent API: 设置播放状态
+func agent_set_playing(playing: bool) -> bool:
+	set_playing(playing)
+	print("[MusicState] Agent 设置播放状态: %s" % ("播放" if playing else "暂停"))
+	return true
+
+## Agent API: 播放下一首
+func agent_play_next() -> bool:
+	var result = play_next()
+	if result:
+		print("[MusicState] Agent 播放下一首: %s" % current_track)
+	else:
+		print("[MusicState] Agent 播放下一首失败")
+	return result
+
+## Agent API: 播放上一首
+func agent_play_previous() -> bool:
+	var result = play_previous()
+	if result:
+		print("[MusicState] Agent 播放上一首: %s" % current_track)
+	else:
+		print("[MusicState] Agent 播放上一首失败")
+	return result
+
+## Agent API: 设置播放模式（0=顺序, 1=随机, 2=单曲循环）
+func agent_set_play_mode(mode: int) -> bool:
+	if mode < 0 or mode > 2:
+		push_warning("[MusicState] agent_set_play_mode: 无效的播放模式 %d" % mode)
+		return false
+	set_play_mode(mode)
+	print("[MusicState] Agent 设置播放模式: %s" % get_play_mode_name())
+	return true
 
 func _ready() -> void:
 	load_data()

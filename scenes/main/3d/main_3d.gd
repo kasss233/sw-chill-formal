@@ -308,7 +308,6 @@ func _on_dialogue_started(text: String) -> void:
 	tween.tween_callback(character.set_neutral)
 func _on_dialogue_finished() -> void:
 	print("[main3d]Dialogue finished")
-	character.set_idle_pose()
 
 
 func _on_function_executing(func_name: String, call_id: String) -> void:

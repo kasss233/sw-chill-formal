@@ -80,6 +80,7 @@ const FUNC_DISPLAY_NAMES: Dictionary = {
 	"get_week_schedule": "正在获取周计划",
 	"set_habit_execution": "正在记录习惯执行",
 	"get_habit_stats": "正在获取习惯统计",
+	"focus_mode": "正在进入专注模式",
 }
 
 # 信号
