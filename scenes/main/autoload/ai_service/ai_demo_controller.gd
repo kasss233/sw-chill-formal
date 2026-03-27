@@ -8,80 +8,7 @@ const DEMO_RESPONSE_SPEED := 0.05
 const DEMO_DELAY_SCALE := 4
 var DEMO_STEPS: Array[Dictionary] = [
 	{
-		"type": "set_input_text",
-		"delay": 0.0,
-		"record_restore": false,
-		"args": {
-			"text": "开启专注模式。"
-		}
-	},
-	{
-		"type": "clear_input",
-		"delay": 0.5,
-		"record_restore": false
-	},
-	{
-		"type": "enter_dialogue_mode",
-		"delay": 0,
-		"record_restore": false
-	},
-	{
-		"type": "show_response_text",
-		"delay": 0.25,
-		"record_restore": false,
-		"args": {
-			"text": "没问题，已为你开启专注模式，正在为你设置番茄钟，并调整到适合专注的环境。",
-			"append": false,
-			"stream": false,
-			"chunk_delay": DEMO_RESPONSE_SPEED
-		}
-	},
-	{
-		"type": "show_function_call_start",
-		"delay": 0.2,
-		"record_restore": false,
-		"args": {
-			"name": "focus_mode",
-			"call_id": "demo_focus_mode"
-		}
-	},
-	{
-		"type": "show_module",
-		"delay": 0.2,
-		"record_restore": true,
-		"args": {
-			"module_name": "pomodoro"
-		}
-	},
-	{
-		"type": "start_pomodoro",
-		"delay": 0.2,
-		"record_restore": true,
-		"args": {
-			"work_min": 15,
-			"rest_min": 5,
-			"loops": 1
-		}
-	},
-
-	{
 		"type": "set_time",
-		"delay": 0.2,
-		"record_restore": true,
-		"args": {
-			"mode": 2
-		}
-	},
-	{
-		"type": "set_weather",
-		"delay": 0.2,
-		"record_restore": true,
-		"args": {
-			"mode": 1
-		}
-	},
-	{
-		"type": "set_play_mode",
 		"delay": 0.1,
 		"record_restore": true,
 		"args": {
@@ -89,29 +16,37 @@ var DEMO_STEPS: Array[Dictionary] = [
 		}
 	},
 	{
-		"type": "play_track",
-		"delay": 0.2,
+		"type": "set_time",
+		"delay": 1,
 		"record_restore": true,
 		"args": {
-			"track_name": "Little-Wishes"
+			"mode": 1
 		}
 	},
 	{
-		"type": "show_response_text",
-		"delay": 0.2,
-		"record_restore": false,
+		"type": "set_time",
+		"delay": 1,
+		"record_restore": true,
 		"args": {
-			"text": "为你准备了适合专注的音乐和环境，希望能帮助你进入心流状态！",
-			"append": false,
-			"stream": false,
-			"chunk_delay": DEMO_RESPONSE_SPEED
+			"mode": 2
 		}
 	},
 	{
-		"type": "clear_input",
-		"delay": 0.1,
-		"record_restore": false
-	}
+		"type": "set_time",
+		"delay": 1,
+		"record_restore": true,
+		"args": {
+			"mode": 3
+		}
+	},
+	{
+		"type": "set_time",
+		"delay": 1,
+		"record_restore": true,
+		"args": {
+			"mode": 2
+		}
+	},
 ]
 
 var is_demo_running: bool = false

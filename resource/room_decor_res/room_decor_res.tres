@@ -11,70 +11,95 @@
 [ext_resource type="Texture2D" uid="uid://dn4hfg3nddoi2" path="res://assets/ui/3d_item_tex/side_flowers.png" id="8_6deep"]
 [ext_resource type="Texture2D" uid="uid://dp3mep2ox6my4" path="res://assets/ui/3d_item_tex/clock.png" id="9_xqban"]
 [ext_resource type="Texture2D" uid="uid://cgf3e7al2mxr8" path="res://assets/ui/3d_item_tex/night_light.png" id="10_iyl6n"]
+[ext_resource type="Texture2D" uid="uid://cor28g6m3qyc5" path="res://assets/ui/3d_item_tex/sea.png" id="11_fyonx"]
+[ext_resource type="Texture2D" uid="uid://dvs1pm4mm2vr" path="res://assets/ui/3d_item_tex/snow.png" id="12_6deep"]
+[ext_resource type="Texture2D" uid="uid://c4f1g2m2kx3hg" path="res://assets/ui/3d_item_tex/universe.png" id="13_3v2xh"]
 
 [sub_resource type="Resource" id="Resource_rkhps"]
 script = ExtResource("1_2gecy")
-name = "black hole"
-category = "planet"
+name = "黑洞"
+category = "星球"
 icon = ExtResource("2_l68k4")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_2gecy"]
 script = ExtResource("1_2gecy")
-name = "purple planet"
-category = "planet"
+name = "紫色星球"
+category = "星球"
 icon = ExtResource("3_xqban")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_shu76"]
 script = ExtResource("1_2gecy")
-name = "fire planet"
-category = "planet"
+name = "火星"
+category = "星球"
 icon = ExtResource("4_iyl6n")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_lwreo"]
 script = ExtResource("1_2gecy")
-name = "cherry"
-category = "windowside"
+name = "樱花树"
+category = "窗边"
 icon = ExtResource("5_08u7g")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_l2by2"]
 script = ExtResource("1_2gecy")
-name = "whale"
-category = "windowside"
+name = "鲸鱼"
+category = "窗边"
 icon = ExtResource("6_hhdqy")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_qreuf"]
 script = ExtResource("1_2gecy")
-name = "cat"
-category = "sidedesk"
+name = "猫"
+category = "侧柜"
 icon = ExtResource("7_fyonx")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_p2tlr"]
 script = ExtResource("1_2gecy")
-name = "flowers"
-category = "sidedesk"
+name = "花"
+category = "侧柜"
 icon = ExtResource("8_6deep")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_l68k4"]
 script = ExtResource("1_2gecy")
-name = "alarm clock"
-category = "ondesk"
+name = "闹钟"
+category = "桌搭"
 icon = ExtResource("9_xqban")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [sub_resource type="Resource" id="Resource_xqban"]
 script = ExtResource("1_2gecy")
-name = "night light"
-category = "ondesk"
+name = "夜灯"
+category = "桌搭"
 icon = ExtResource("10_iyl6n")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_iyl6n"]
+script = ExtResource("1_2gecy")
+name = "海上"
+category = "天空盒"
+icon = ExtResource("11_fyonx")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_08u7g"]
+script = ExtResource("1_2gecy")
+name = "雪山"
+category = "天空盒"
+icon = ExtResource("12_6deep")
+metadata/_custom_type_script = "uid://rnfs55jsskvs"
+
+[sub_resource type="Resource" id="Resource_hhdqy"]
+script = ExtResource("1_2gecy")
+name = "宇宙"
+category = "天空盒"
+required_level = 10
+icon = ExtResource("13_3v2xh")
 metadata/_custom_type_script = "uid://rnfs55jsskvs"
 
 [resource]
 script = ExtResource("1_8761q")
-decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2"), SubResource("Resource_qreuf"), SubResource("Resource_p2tlr"), SubResource("Resource_l68k4"), SubResource("Resource_xqban")])
+decor_items = Array[ExtResource("1_2gecy")]([SubResource("Resource_rkhps"), SubResource("Resource_2gecy"), SubResource("Resource_shu76"), SubResource("Resource_lwreo"), SubResource("Resource_l2by2"), SubResource("Resource_qreuf"), SubResource("Resource_p2tlr"), SubResource("Resource_l68k4"), SubResource("Resource_xqban"), SubResource("Resource_iyl6n"), SubResource("Resource_08u7g"), SubResource("Resource_hhdqy")])

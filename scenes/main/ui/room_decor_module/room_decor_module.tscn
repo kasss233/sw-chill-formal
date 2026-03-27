@@ -37,7 +37,11 @@ shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(308, 494)
-shader_parameter/shadow_padding = 0.0
+shader_parameter/shadow_padding = 12.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 4.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq8fo"]
 content_margin_left = 12.0

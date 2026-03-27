@@ -17,7 +17,7 @@ extends Node3D
 @export var planet: Node3D
 @export var window_side: Node3D
 @export var side_desk: Node3D
-@export var wall: Node3D
+@export var skybox: Node3D
 @export var on_desk: Node3D
 var _is_saying: bool = false
 
@@ -249,57 +249,67 @@ func _on_fog_button_state_changed(state: int) -> void:
 		sky3d.fog_enabled = false
 func _on_room_decor_selected(item_name: String, item_category: String) -> void:
 	print("Selected decor item: %s (Category: %s)" % [item_name, item_category])
-	if item_category == "planet":
+	if item_category == "星球":
 		match item_name:
-			"black hole":
+			"黑洞":
 				planet.call("show_black_hole")
-			"purple planet":
+			"紫色星球":
 				planet.call("show_purple_planet")
-			"fire planet":
+			"火星":
 				planet.call("show_fire_planet")
-	if item_category == "windowside":
+	if item_category == "窗边":
 		match item_name:
-			"cherry":
+			"樱花树":
 				window_side.call("show_cherry")
-			"whale":
+			"鲸鱼":
 				window_side.call("show_whale")
-	if item_category == "sidedesk":
+	if item_category == "侧柜":
 		match item_name:
-			"cat":
+			"猫":
 				side_desk.call("show_cat")
-			"flowers":
+			"花":
 				side_desk.call("show_flowers")
 	if item_category == "wall":
 		match item_name:
 			pass
-	if item_category == "ondesk":
+	if item_category == "桌搭":
 		match item_name:
-			"alarm clock":
+			"闹钟":
 				on_desk.call("show_alarm_clock")
-			"night light":
+			"夜灯":
 				on_desk.call("show_night_light")
+	if item_category == "天空盒":
+		match item_name:
+			"海上":
+				skybox.call("show_sea")
+			"宇宙":
+				skybox.call("show_universe")
+			"雪山":
+				skybox.call("show_snow")
 func _on_room_decor_category_unselected(category: String) -> void:
 	print("Unselected decor category: %s" % category)
 	match category:
-		"planet":
+		"星球":
 			planet.call("hide_all")
-		"windowside":
+		"窗边":
 			window_side.call("hide_all")
-		"sidedesk":
+		"侧柜":
 			side_desk.call("hide_all")
-		"ondesk":
+		"桌搭":
 			on_desk.call("hide_all")
+		"天空盒":
+			skybox.call("hide_all")
 
 func _on_camera_changed(value: int) -> void:
 	## 输出调试信息
-	print("Camera mode changed to: %d" % value)
+	print("Cameramodechangedto: %d" % value)
 	match value:
 		0:
 			side_camera.current = true
 		1:
 			central_camera.current = true
 func _on_dialogue_started(text: String) -> void:
-	print("[main3d]Dialogue started, text length: %d" % text.length())
+	print("[main3d]Dialoguestarted, textlength: %d" % text.length())
 	character.set_saying()
 	# 根据文本长度调整说话动画持续时间，最长不超过5秒
 	var duration = min(2.0 + text.length() * 0.03, 5.0)
@@ -307,14 +317,14 @@ func _on_dialogue_started(text: String) -> void:
 	tween.tween_interval(duration)
 	tween.tween_callback(character.set_neutral)
 func _on_dialogue_finished() -> void:
-	print("[main3d]Dialogue finished")
+	print("[main3d]Dialoguefinished")
 
 
 func _on_function_executing(func_name: String, call_id: String) -> void:
-	print("[main3d]Function executing: %s (id: %s)" % [func_name, call_id])
+	print("[main3d]Functionexecuting: %s(id: %s)" % [func_name, call_id])
 	character.set_typing_pose()
 
 
 func _on_function_completed(func_name: String, call_id: String, success: bool) -> void:
-	print("[main3d]Function completed: %s (id: %s, success: %s)" % [func_name, call_id, success])
+	print("[main3d]Functioncompleted: %s(id: %s, success: %s)" % [func_name, call_id, success])
 	character.set_idle_pose()
