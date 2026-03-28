@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://b8blywtcq1xws"]
 
 [ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="1_3ljc0"]
-[ext_resource type="Script" uid="uid://dktu8746707t1" path="res://scenes/main/ui/calendar_module/calendar_tab.gd" id="1_mjfma"]
+[ext_resource type="Script" uid="uid://dktu8746707t1" path="res://scenes/main/ui/profile_center_module/profile_center_tab.gd" id="1_mjfma"]
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="2_mjfma"]
 [ext_resource type="Texture2D" uid="uid://dwa63qqbbakjr" path="res://assets/ui/round_icons/calendar-bold.svg" id="3_ilrsm"]
-[ext_resource type="PackedScene" uid="uid://xv83kmr2vgxv" path="res://scenes/main/ui/calendar_module/calendar_module.tscn" id="4_x87v1"]
+[ext_resource type="PackedScene" uid="uid://xv83kmr2vgxv" path="res://scenes/main/ui/profile_center_module/profile_center_module.tscn" id="4_x87v1"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="5_7wwvt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mjfma"]
@@ -74,7 +74,7 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 1)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="CalendarTab" type="MarginContainer" unique_id=1801343001]
+[node name="ProfileCenterTab" type="MarginContainer" unique_id=1801343001]
 offset_right = 32.0
 offset_bottom = 36.0
 script = ExtResource("1_mjfma")
@@ -100,7 +100,7 @@ metadata/_custom_type_script = "uid://cqwct3c1jvph2"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=274763694]
 
-[node name="CalendarModule" parent="CanvasLayer" unique_id=814536265 instance=ExtResource("4_x87v1")]
+[node name="ProfileCenterModule" parent="CanvasLayer" unique_id=814536265 instance=ExtResource("4_x87v1")]
 visible = false
 anchors_preset = 8
 anchor_left = 0.5
@@ -121,8 +121,8 @@ animation_enter = 3
 animation_leave = 3
 duration = 0.39999999999999997
 transition_type = "BACK"
-layout = NodePath("../CanvasLayer/CalendarModule")
-layout_id = "calendar"
+layout = NodePath("../CanvasLayer/ProfileCenterModule")
+layout_id = "profile_center"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
 [connection signal="state_changed" from="MaterialToggleButton" to="." method="_on_material_toggle_button_state_changed"]

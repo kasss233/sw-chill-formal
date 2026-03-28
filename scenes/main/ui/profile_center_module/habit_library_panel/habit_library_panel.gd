@@ -2,7 +2,7 @@ extends VBoxContainer
 
 ## 习惯库面板 - 管理所有习惯
 
-const HabitItemScene = preload("res://scenes/main/ui/calendar_module/habit_library_panel/habit_item.tscn")
+const HabitItemScene = preload("res://scenes/main/ui/profile_center_module/habit_library_panel/habit_item.tscn")
 
 @onready var _list_container: VBoxContainer = $ScrollContainer/ListContainer
 @onready var _edit_dialog = $HabitEditDialog

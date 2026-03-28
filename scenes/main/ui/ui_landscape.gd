@@ -5,7 +5,7 @@ extends UI
 @onready var _pomodoro_module = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/PomodoroTechniqueModule
 @onready var _achievement_module = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/AchievementModule
 @onready var _room_decor_module = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/RoomDecorModule
-@onready var _calendar_tab = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/CalendarTab
+@onready var _profile_center_tab = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/ProfileCenterTab
 @onready var _env_setter = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter
 @onready var _dialogue_box = $VBoxContainer/DialogueBox
 @onready var _music_module = $MusicModule
@@ -17,7 +17,8 @@ const _MODULE_NAME_MAP: Dictionary = {
 	"pomodoro": "_pomodoro_module",
 	"achievement": "_achievement_module",
 	"room_decor": "_room_decor_module",
-	"calendar": "_calendar_tab",
+	"profile_center": "_profile_center_tab",
+	"calendar": "_profile_center_tab",
 	"setting": "_env_setter",
 	"music": "_music_module",
 }
@@ -125,8 +126,8 @@ func _find_module_frosted_panel(module_key: String) -> FrostedPanel:
 			return _find_first_frosted_panel(_achievement_module)
 		"room_decor":
 			return _find_first_frosted_panel(_room_decor_module)
-		"calendar":
-			return _find_first_frosted_panel(_calendar_tab)
+		"profile_center", "calendar":
+			return _find_first_frosted_panel(_profile_center_tab)
 		"setting":
 			return _find_first_frosted_panel(_env_setter)
 		"music":

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://pnh7g5ildbib"]
 
-[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/summary_panel/summary_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://scenes/main/ui/profile_center_module/summary_panel/summary_panel.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_btn"]
 [ext_resource type="Texture2D" uid="uid://1g34yvsn1tq0" path="res://assets/ui/icons/keyboard_arrow_left_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_left"]
 [ext_resource type="Texture2D" uid="uid://cqb73su40nwpo" path="res://assets/ui/icons/keyboard_arrow_right_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="4_right"]
@@ -8,7 +8,7 @@
 [ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="5_r3tkq"]
 [ext_resource type="Script" uid="uid://qac15j88w15i" path="res://scenes/main/ui/components/progress_indicator/MaterialProgressIndicator.gd" id="6_progress"]
 [ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="7_seg"]
-[ext_resource type="Script" uid="uid://k1inoosa1blg" path="res://scenes/main/ui/calendar_module/summary_panel/focus_bar_chart.gd" id="8_chart"]
+[ext_resource type="Script" uid="uid://k1inoosa1blg" path="res://scenes/main/ui/profile_center_module/summary_panel/focus_bar_chart.gd" id="8_chart"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r3tkq"]
 content_margin_left = 0.0

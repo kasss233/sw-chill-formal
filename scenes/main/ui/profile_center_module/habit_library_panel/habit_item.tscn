@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_item.gd" id="1_script"]
+[ext_resource type="Script" path="res://scenes/main/ui/profile_center_module/habit_library_panel/habit_item.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://b2k45kgxcbsaq" path="res://scenes/main/ui/components/switch/MaterialSwitch.gd" id="2_switch"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="3_btn"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/edit_24dp.svg" id="4_edit"]

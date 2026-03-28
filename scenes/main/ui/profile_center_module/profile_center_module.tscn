@@ -2,13 +2,13 @@
 
 [ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="1_f22lk"]
 [ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="2_2abcq"]
-[ext_resource type="Script" uid="uid://crblmymjhjluk" path="res://scenes/main/ui/calendar_module/calendar_module.gd" id="4_module"]
+[ext_resource type="Script" uid="uid://crblmymjhjluk" path="res://scenes/main/ui/profile_center_module/profile_center_module.gd" id="4_module"]
 [ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="5_seg"]
 [ext_resource type="Script" uid="uid://bgqglerkcylxx" path="res://addons/SmoothScroll/smooth_scroll_container.gd" id="5_vl4l1"]
 [ext_resource type="Script" uid="uid://b7h0k2h2qwlqv" path="res://addons/SmoothScroll/scroll_damper/expo_scroll_damper.gd" id="6_54iuj"]
-[ext_resource type="PackedScene" uid="uid://bqdjeom0knkb0" path="res://scenes/main/ui/calendar_module/profile_view/profile_view.tscn" id="7_pv"]
-[ext_resource type="PackedScene" uid="uid://h31riftac41x" path="res://scenes/main/ui/calendar_module/stats_view/stats_view.tscn" id="8_sv"]
-[ext_resource type="PackedScene" uid="uid://8rtsyrvshb4i" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_library_panel.tscn" id="9_hlp"]
+[ext_resource type="PackedScene" uid="uid://bqdjeom0knkb0" path="res://scenes/main/ui/profile_center_module/profile_view/profile_view.tscn" id="7_pv"]
+[ext_resource type="PackedScene" uid="uid://h31riftac41x" path="res://scenes/main/ui/profile_center_module/stats_view/stats_view.tscn" id="8_sv"]
+[ext_resource type="PackedScene" uid="uid://8rtsyrvshb4i" path="res://scenes/main/ui/profile_center_module/habit_library_panel/habit_library_panel.tscn" id="9_hlp"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_jna6j"]
 frequency = 0.1
@@ -59,7 +59,7 @@ script = ExtResource("6_54iuj")
 [sub_resource type="Resource" id="Resource_54iuj"]
 script = ExtResource("6_54iuj")
 
-[node name="CalendarModule" type="MarginContainer" unique_id=814536265]
+[node name="ProfileCenterModule" type="MarginContainer" unique_id=814536265]
 offset_right = 308.0
 offset_bottom = 494.0
 script = ExtResource("4_module")

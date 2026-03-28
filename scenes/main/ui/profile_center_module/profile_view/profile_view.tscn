@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bqdjeom0knkb0"]
 
-[ext_resource type="Script" uid="uid://c5kj2psbsi2fo" path="res://scenes/main/ui/calendar_module/profile_view/profile_view.gd" id="1_pv"]
+[ext_resource type="Script" uid="uid://c5kj2psbsi2fo" path="res://scenes/main/ui/profile_center_module/profile_view/profile_view.gd" id="1_pv"]
 [ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="2_sh"]
 [ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="3_ip"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="4_btn"]

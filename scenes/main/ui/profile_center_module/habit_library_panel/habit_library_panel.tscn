@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://8rtsyrvshb4i"]
 
-[ext_resource type="Script" uid="uid://cmykggw5nw5kb" path="res://scenes/main/ui/calendar_module/habit_library_panel/habit_library_panel.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cmykggw5nw5kb" path="res://scenes/main/ui/profile_center_module/habit_library_panel/habit_library_panel.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="2_btn"]
 [ext_resource type="Texture2D" uid="uid://c7ck2hhjgnsuf" path="res://assets/ui/icons/add_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="3_add"]
-[ext_resource type="PackedScene" uid="uid://bll6akhkj6n3h" path="res://scenes/main/ui/calendar_module/habit_edit_dialog/habit_edit_dialog.tscn" id="4_dialog"]
+[ext_resource type="PackedScene" uid="uid://bll6akhkj6n3h" path="res://scenes/main/ui/profile_center_module/habit_edit_dialog/habit_edit_dialog.tscn" id="4_dialog"]
 
 [node name="HabitLibraryPanel" type="VBoxContainer" unique_id=1092369672]
 size_flags_horizontal = 3

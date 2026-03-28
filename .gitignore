@@ -6,3 +6,6 @@
 .vscode/
 *.tmp
 .claude/
+/.agents/
+/docs
+nul
