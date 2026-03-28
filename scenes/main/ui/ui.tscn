@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://b6i5hsuylq63q" path="res://scenes/main/ui/pomodoro_technique_module/pomodoro_technique_module.tscn" id="11_uypi5"]
 [ext_resource type="PackedScene" uid="uid://bgbv8yre2k242" path="res://scenes/main/ui/room_decor_module/room_decor_module.tscn" id="12_3ru4j"]
 [ext_resource type="PackedScene" uid="uid://c8l76gjafw6xh" path="res://scenes/main/ui/notebook_mobile_module/NoteBookTab.tscn" id="12_w2hwp"]
-[ext_resource type="PackedScene" uid="uid://b8blywtcq1xws" path="res://scenes/main/ui/calendar_module/calendar_tab.tscn" id="13_uumow"]
+[ext_resource type="PackedScene" uid="uid://b8blywtcq1xws" path="res://scenes/main/ui/profile_center_module/profile_center_tab.tscn" id="13_uumow"]
 [ext_resource type="PackedScene" uid="uid://dcf7ss77y1j6m" path="res://scenes/main/ui/dialogue_box/dialogue_box.tscn" id="15_khr3h"]
 [ext_resource type="PackedScene" uid="uid://w7pybkxter3h" path="res://scenes/main/ui/level_bar/level_bar.tscn" id="17_tnos5"]
 [ext_resource type="PackedScene" uid="uid://cecvhnjpe47ei" path="res://scenes/main/ui/achievement_module/achievement_module.tscn" id="18_w2hwp"]
@@ -216,7 +216,7 @@ layout_mode = 2
 [node name="RoomDecorModule" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1442530485 instance=ExtResource("12_3ru4j")]
 layout_mode = 2
 
-[node name="CalendarTab" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1801343001 instance=ExtResource("13_uumow")]
+[node name="ProfileCenterTab" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1801343001 instance=ExtResource("13_uumow")]
 layout_mode = 2
 
 [node name="EnvSetter" parent="TabPanel/FrostedPanel/MarginContainer/VBoxContainer" unique_id=1982143006 instance=ExtResource("4_ex8bf")]

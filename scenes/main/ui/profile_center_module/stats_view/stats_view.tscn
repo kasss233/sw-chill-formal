@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://h31riftac41x"]
 
-[ext_resource type="Script" uid="uid://cjcbact4rqu6k" path="res://scenes/main/ui/calendar_module/stats_view/stats_view.gd" id="1_sv"]
+[ext_resource type="Script" uid="uid://cjcbact4rqu6k" path="res://scenes/main/ui/profile_center_module/stats_view/stats_view.gd" id="1_sv"]
 [ext_resource type="Shader" uid="uid://wst7255lnxde" path="res://scenes/main/ui/components/inner_panel/inner_panel.gdshader" id="2_sh"]
 [ext_resource type="Script" uid="uid://dk1b2ej7qpklo" path="res://scenes/main/ui/components/inner_panel/inner_panel.gd" id="3_ip"]
 [ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="4_btn"]
 [ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="5_seg"]
-[ext_resource type="Script" uid="uid://k1inoosa1blg" path="res://scenes/main/ui/calendar_module/summary_panel/focus_bar_chart.gd" id="6_chart"]
+[ext_resource type="Script" uid="uid://k1inoosa1blg" path="res://scenes/main/ui/profile_center_module/summary_panel/focus_bar_chart.gd" id="6_chart"]
 [ext_resource type="Texture2D" uid="uid://1g34yvsn1tq0" path="res://assets/ui/icons/keyboard_arrow_left_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="7_left"]
 [ext_resource type="Texture2D" uid="uid://cqb73su40nwpo" path="res://assets/ui/icons/keyboard_arrow_right_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="8_right"]
 

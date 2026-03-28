@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bll6akhkj6n3h"]
 
-[ext_resource type="Script" uid="uid://cka3fjar2w003" path="res://scenes/main/ui/calendar_module/habit_edit_dialog/habit_edit_dialog.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cka3fjar2w003" path="res://scenes/main/ui/profile_center_module/habit_edit_dialog/habit_edit_dialog.gd" id="1_script"]
 [ext_resource type="Script" uid="uid://b71ahu6gbysxo" path="res://scenes/main/ui/components/text_field/MaterialTextField.gd" id="2_tf"]
 [ext_resource type="Script" uid="uid://dlsbsc0torxs0" path="res://scenes/main/ui/components/slider/MaterialSlider.gd" id="3_slider"]
 [ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="4_seg"]

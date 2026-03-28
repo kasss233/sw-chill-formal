@@ -20,7 +20,7 @@ extends UI
 @onready var _bottom_bar_panel: FrostedPanel = $MarginContainer/VBoxContainer/BottomBar/ModulePanel/FrostedPanel
 @onready var _achievement_module = $AchievementModule
 @onready var _room_decor_module = $RoomDecorModule
-@onready var _calendar_tab = $CalendarTab
+@onready var _profile_center_tab = $ProfileCenterTab
 @onready var _env_setter = $EnvSetter
 @onready var _music_module_mobile = $MusicModuleMobile
 
@@ -39,7 +39,8 @@ const _MODULE_NAME_MAP: Dictionary = {
 	"pomodoro": "pomodorotechnique",
 	"achievement": "achievement",
 	"room_decor": "room_decor",
-	"calendar": "calendar",
+	"profile_center": "profile_center",
+	"calendar": "profile_center",
 	"setting": "setter",
 	"music": "musiclist",
 }
@@ -105,7 +106,7 @@ func _register_modules() -> void:
 	_register("pomodorotechnique", _pomodoro_module, _pomodoro_module.pomodoro_button)
 	_register("achievement", _achievement_module, _achievement_module.button)
 	_register("room_decor", _room_decor_module, _room_decor_module.button)
-	_register("calendar", _calendar_tab, _calendar_tab.toggle_button)
+	_register("profile_center", _profile_center_tab, _profile_center_tab.toggle_button)
 	_register("setter", _env_setter, null)
 
 
@@ -279,7 +280,7 @@ func _on_more_button_pressed() -> void:
 func _on_more_menu_item_pressed(index: int, _item) -> void:
 	match index:
 		0: _open_module("achievement")
-		1: _open_module("calendar")
+		1: _open_module("profile_center")
 		2: _open_module("room_decor")
 		3: _open_module("setter")
 

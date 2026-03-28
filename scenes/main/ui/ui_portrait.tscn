@@ -19,7 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://c2p0fd4s5qo8l" path="res://assets/ui/icons/close_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg" id="22_close"]
 [ext_resource type="PackedScene" uid="uid://cecvhnjpe47ei" path="res://scenes/main/ui/achievement_module/achievement_module.tscn" id="23_ach"]
 [ext_resource type="PackedScene" uid="uid://bgbv8yre2k242" path="res://scenes/main/ui/room_decor_module/room_decor_module.tscn" id="24_decor"]
-[ext_resource type="PackedScene" uid="uid://b8blywtcq1xws" path="res://scenes/main/ui/calendar_module/calendar_tab.tscn" id="25_cal"]
+[ext_resource type="PackedScene" uid="uid://b8blywtcq1xws" path="res://scenes/main/ui/profile_center_module/profile_center_tab.tscn" id="25_cal"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4g6qf"]
 content_margin_left = 0.0
@@ -491,7 +491,7 @@ layout_mode = 0
 visible = false
 layout_mode = 0
 
-[node name="CalendarTab" parent="." unique_id=436252489 instance=ExtResource("25_cal")]
+[node name="ProfileCenterTab" parent="." unique_id=436252489 instance=ExtResource("25_cal")]
 visible = false
 layout_mode = 0
 

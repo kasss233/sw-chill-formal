@@ -613,8 +613,8 @@
 	  "properties": {
 		"module_name": {
 		  "type": "string",
-		  "enum": ["task", "notebook", "pomodoro", "achievement", "room_decor", "calendar", "setting", "music"],
-		  "description": "模块名称：task=任务, notebook=笔记本, pomodoro=番茄钟, achievement=成就, room_decor=房间装饰, calendar=日历, setting=环境设置, music=音乐"
+		  "enum": ["task", "notebook", "pomodoro", "achievement", "room_decor", "profile_center", "calendar", "setting", "music"],
+		  "description": "模块名称：task=任务, notebook=笔记本, pomodoro=番茄钟, achievement=成就, room_decor=房间装饰, profile_center=个人中心, calendar=个人中心(兼容旧名), setting=环境设置, music=音乐"
 		}
 	  },
 	  "required": ["module_name"]
@@ -628,8 +628,8 @@
 	  "properties": {
 		"module_name": {
 		  "type": "string",
-		  "enum": ["task", "notebook", "pomodoro", "achievement", "room_decor", "calendar", "setting", "music"],
-		  "description": "模块名称：task=任务, notebook=笔记本, pomodoro=番茄钟, achievement=成就, room_decor=房间装饰, calendar=日历, setting=环境设置, music=音乐"
+		  "enum": ["task", "notebook", "pomodoro", "achievement", "room_decor", "profile_center", "calendar", "setting", "music"],
+		  "description": "模块名称：task=任务, notebook=笔记本, pomodoro=番茄钟, achievement=成就, room_decor=房间装饰, profile_center=个人中心, calendar=个人中心(兼容旧名), setting=环境设置, music=音乐"
 		}
 	  },
 	  "required": ["module_name"]

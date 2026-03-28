@@ -85,12 +85,12 @@ const _FUNC_MODULE_MAP: Dictionary = {
 	"set_time": "setting", "set_weather": "setting",
 	# 房间装饰
 	"add_room_decor_item": "room_decor", "select_room_decor_item": "room_decor",
-	# 习惯/日历
-	"add_habit": "calendar", "remove_habit": "calendar",
-	"update_habit": "calendar", "get_habits": "calendar",
-	"get_time_slots": "calendar", "generate_week_schedule": "calendar",
-	"get_week_schedule": "calendar", "set_habit_execution": "calendar",
-	"get_habit_stats": "calendar",
+	# 习惯/个人中心
+	"add_habit": "profile_center", "remove_habit": "profile_center",
+	"update_habit": "profile_center", "get_habits": "profile_center",
+	"get_time_slots": "profile_center", "generate_week_schedule": "profile_center",
+	"get_week_schedule": "profile_center", "set_habit_execution": "profile_center",
+	"get_habit_stats": "profile_center",
 }
 
 # ============ 状态管理 API（供 ChatController 调用）============
