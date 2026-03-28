@@ -21,6 +21,7 @@ signal generation_stopped # 生成被停止时发出
 @onready var line_edit: LineEdit = $FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer/LineEdit
 @onready var text_edit_container: MarginContainer = $FrostedPanel/MarginContainer/VBoxContainer/MarginContainer
 @onready var text_edit: TextEdit = $FrostedPanel/MarginContainer/VBoxContainer/MarginContainer/TextEdit
+@onready var talk_button: Button = $FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer/TalkButton
 @onready var submit_button = $FrostedPanel/MarginContainer/VBoxContainer/ButtonHBoxContainer/SubmitToggleButton
 @onready var material_menu: MaterialMenu = $CanvasLayer/MaterialMenu
 
@@ -559,3 +560,27 @@ func _on_input_text_requested(text: String) -> void:
 func _on_input_clear_requested() -> void:
 	print("[InputBox] _on_input_clear_requested")
 	clear_text()
+
+
+func _on_talk_button_button_down() -> void:
+	var err := ChatState.start_talk_recording()
+	if err != OK:
+		if show_snackbar:
+			snackbar.show_warning("开始录音失败")
+		return
+
+
+func _on_talk_button_button_up() -> void:
+	var result := ChatState.stop_talk_recording()
+	if not result.get("ok", false):
+		if show_snackbar:
+			snackbar.show_warning(str(result.get("error", "录音失败")))
+		return
+
+	var stt_sent := bool(result.get("stt_sent", false))
+	var byte_size := int(result.get("bytes", 0))
+	if show_snackbar:
+		if stt_sent:
+			snackbar.show_message("录音已发送 STT（%d bytes）" % byte_size)
+		else:
+			snackbar.show_message("录音完成（%d bytes），后端 STT 接口待实现" % byte_size)

@@ -11,6 +11,11 @@ extends Control
 @onready var _weather_button: MaterialToggleButton = %WeatherButton
 @onready var _rain_slider: MaterialSlider = %RainMaterialSlider
 @onready var _snow_slider: MaterialSlider = %SnowMaterialSlider
+@onready var _settings_vbox: VBoxContainer = $CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer
+
+var _mic_dropdown: MaterialDropdown
+var _speaker_dropdown: MaterialDropdown
+var _record_preview_toggle: MaterialToggleButton
 
 # ============ 生命周期 ============
 
@@ -19,6 +24,7 @@ func _ready() -> void:
 	# 设置 CanvasLayer 的初始层级
 	canvas_layer.layer = 10
 	_connect_state_signals()
+	_setup_audio_debug_controls()
 	_sync_all_controls_from_state()
 	_init_dropdowns_from_state()
 
@@ -32,6 +38,9 @@ func _connect_state_signals() -> void:
 	_connect_if_needed(SettingState, "env_weather_changed", _on_state_env_weather_changed)
 	_connect_if_needed(SettingState, "rain_changed", _on_state_rain_changed)
 	_connect_if_needed(SettingState, "snow_changed", _on_state_snow_changed)
+	_connect_if_needed(SettingState, "audio_input_device_changed", _on_state_audio_input_device_changed)
+	_connect_if_needed(SettingState, "audio_output_device_changed", _on_state_audio_output_device_changed)
+	_connect_if_needed(SettingState, "talk_record_preview_changed", _on_state_talk_record_preview_changed)
 	# _connect_if_needed(SettingState, "outdoor_1_changed", _on_state_outdoor_1_changed)
 	# _connect_if_needed(SettingState, "outdoor_2_changed", _on_state_outdoor_2_changed)
 
@@ -51,6 +60,12 @@ func _exit_tree() -> void:
 		SettingState.rain_changed.disconnect(_on_state_rain_changed)
 	if SettingState.snow_changed.is_connected(_on_state_snow_changed):
 		SettingState.snow_changed.disconnect(_on_state_snow_changed)
+	if SettingState.audio_input_device_changed.is_connected(_on_state_audio_input_device_changed):
+		SettingState.audio_input_device_changed.disconnect(_on_state_audio_input_device_changed)
+	if SettingState.audio_output_device_changed.is_connected(_on_state_audio_output_device_changed):
+		SettingState.audio_output_device_changed.disconnect(_on_state_audio_output_device_changed)
+	if SettingState.talk_record_preview_changed.is_connected(_on_state_talk_record_preview_changed):
+		SettingState.talk_record_preview_changed.disconnect(_on_state_talk_record_preview_changed)
 
 # 启动时从状态单例回填 UI，使用无信号 API 避免回写
 func _sync_all_controls_from_state() -> void:
@@ -61,6 +76,71 @@ func _sync_all_controls_from_state() -> void:
 	# _outdoor_1_button.set_state_no_signal(SettingState.get_outdoor_1_state())
 	# _outdoor_2_button.set_state_no_signal(SettingState.get_outdoor_2_state())
 	# _outdoor_2_row.visible = true
+	_sync_audio_controls_from_state()
+
+
+func _setup_audio_debug_controls() -> void:
+	if _mic_dropdown != null:
+		return
+
+	# 麦克风选择
+	var mic_row := _create_setting_row("麦克风设备")
+	_mic_dropdown = MaterialDropdown.new()
+	_mic_dropdown.custom_minimum_size = Vector2(170, 36)
+	_mic_dropdown.placeholder = "选择麦克风"
+	mic_row.add_child(_mic_dropdown)
+	_mic_dropdown.selection_changed.connect(_on_mic_dropdown_changed)
+
+	# 扬声器选择
+	var speaker_row := _create_setting_row("扬声器设备")
+	_speaker_dropdown = MaterialDropdown.new()
+	_speaker_dropdown.custom_minimum_size = Vector2(170, 36)
+	_speaker_dropdown.placeholder = "选择扬声器"
+	speaker_row.add_child(_speaker_dropdown)
+	_speaker_dropdown.selection_changed.connect(_on_speaker_dropdown_changed)
+
+	# 录音回放开关
+	var preview_row := _create_setting_row("播放录音回放")
+	_record_preview_toggle = MaterialToggleButton.new()
+	_record_preview_toggle.custom_minimum_size = Vector2(56, 36)
+	_record_preview_toggle.auto_cycle = true
+	_record_preview_toggle.states = [
+		ToggleButtonState.create_text_state("关"),
+		ToggleButtonState.create_text_state("开")
+	]
+	preview_row.add_child(_record_preview_toggle)
+	_record_preview_toggle.state_changed.connect(_on_record_preview_toggle_changed)
+
+	_refresh_audio_device_options()
+
+
+func _create_setting_row(title: String) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.layout_mode = 2
+	_settings_vbox.add_child(row)
+
+	var label := Label.new()
+	label.text = title
+	row.add_child(label)
+
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+
+	return row
+
+
+func _refresh_audio_device_options() -> void:
+	if _mic_dropdown == null or _speaker_dropdown == null:
+		return
+
+	_mic_dropdown.clear_options()
+	for device_name in SettingState.get_audio_input_device_list():
+		_mic_dropdown.add_option(device_name, device_name)
+
+	_speaker_dropdown.clear_options()
+	for device_name in SettingState.get_audio_output_device_list():
+		_speaker_dropdown.add_option(device_name, device_name)
 
 
 # ============ UI 事件 -> State ============
@@ -110,6 +190,17 @@ func _init_dropdowns_from_state() -> void:
 	_msaa_dropdown.set_selected_by_value(str(msaa_val))
 	_ssaa_dropdown.set_selected_by_value(str(ssaa_val))
 	_camera_dropdown.set_selected_by_value(str(camera_val))
+	_sync_audio_controls_from_state()
+
+
+func _sync_audio_controls_from_state() -> void:
+	if _mic_dropdown != null:
+		_mic_dropdown.set_selected_by_value(SettingState.get_audio_input_device())
+	if _speaker_dropdown != null:
+		_speaker_dropdown.set_selected_by_value(SettingState.get_audio_output_device())
+	if _record_preview_toggle != null:
+		var state := 1 if SettingState.get_talk_record_preview_enabled() else 0
+		_record_preview_toggle.set_state_no_signal(state)
 
 
 func _on_rain_material_slider_value_changed(value: float) -> void:
@@ -140,6 +231,39 @@ func _on_state_rain_changed(amount: int) -> void:
 
 func _on_state_snow_changed(amount: int) -> void:
 	_snow_slider.set_value_no_signal(float(amount))
+
+
+func _on_state_audio_input_device_changed(device_name: String) -> void:
+	if _mic_dropdown != null:
+		_mic_dropdown.set_selected_by_value(device_name)
+
+
+func _on_state_audio_output_device_changed(device_name: String) -> void:
+	if _speaker_dropdown != null:
+		_speaker_dropdown.set_selected_by_value(device_name)
+
+
+func _on_state_talk_record_preview_changed(enabled: bool) -> void:
+	if _record_preview_toggle != null:
+		_record_preview_toggle.set_state_no_signal(1 if enabled else 0)
+
+
+func _on_mic_dropdown_changed(_index: int, value: Variant) -> void:
+	var device_name := str(value)
+	if not SettingState.set_audio_input_device(device_name):
+		_refresh_audio_device_options()
+		_sync_audio_controls_from_state()
+
+
+func _on_speaker_dropdown_changed(_index: int, value: Variant) -> void:
+	var device_name := str(value)
+	if not SettingState.set_audio_output_device(device_name):
+		_refresh_audio_device_options()
+		_sync_audio_controls_from_state()
+
+
+func _on_record_preview_toggle_changed(_old_state: int, new_state: int) -> void:
+	SettingState.set_talk_record_preview_enabled(new_state == 1)
 
 # func _on_state_outdoor_1_changed(state: int) -> void:
 # 	_outdoor_1_button.set_state_no_signal(state)

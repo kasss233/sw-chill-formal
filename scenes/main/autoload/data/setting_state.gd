@@ -17,6 +17,12 @@ signal rain_changed(_value: int)
 signal camera_changed(_value: int)
 ## AI 回复流光开关变化
 signal ai_response_glow_changed(enabled: bool)
+## 麦克风设备变化
+signal audio_input_device_changed(device_name: String)
+## 扬声器设备变化
+signal audio_output_device_changed(device_name: String)
+## 录音后回放开关变化
+signal talk_record_preview_changed(enabled: bool)
 ## 户外特效 1 状态变化
 # signal outdoor_1_changed(_state: int)
 ## 户外特效 2 状态变化
@@ -45,6 +51,12 @@ var _fog_state: int = 0
 var _camera_mode: int = 0
 ## AI 回复时对话框流光开关
 var _ai_response_glow: bool = true
+## 当前麦克风设备名称
+var _audio_input_device: String = ""
+## 当前扬声器设备名称
+var _audio_output_device: String = ""
+## 是否播放录音回放（便于调试）
+var _talk_record_preview_enabled: bool = true
 
 
 const SAVE_PATH = "user://settings.cfg"
@@ -146,6 +158,60 @@ func set_ai_response_glow(enabled: bool) -> void:
 	ai_response_glow_changed.emit(enabled)
 	_save_settings()
 
+
+func get_audio_input_device_list() -> PackedStringArray:
+	return AudioServer.get_input_device_list()
+
+
+func get_audio_output_device_list() -> PackedStringArray:
+	return AudioServer.get_output_device_list()
+
+
+func set_audio_input_device(device_name: String) -> bool:
+	var devices := AudioServer.get_input_device_list()
+	if not devices.has(device_name):
+		return false
+	if _audio_input_device == device_name:
+		return true
+	_audio_input_device = device_name
+	AudioServer.set_input_device(device_name)
+	audio_input_device_changed.emit(device_name)
+	_save_settings()
+	return true
+
+
+func set_audio_output_device(device_name: String) -> bool:
+	var devices := AudioServer.get_output_device_list()
+	if not devices.has(device_name):
+		return false
+	if _audio_output_device == device_name:
+		return true
+	_audio_output_device = device_name
+	AudioServer.set_output_device(device_name)
+	audio_output_device_changed.emit(device_name)
+	_save_settings()
+	return true
+
+
+func get_audio_input_device() -> String:
+	return _audio_input_device
+
+
+func get_audio_output_device() -> String:
+	return _audio_output_device
+
+
+func set_talk_record_preview_enabled(enabled: bool) -> void:
+	if _talk_record_preview_enabled == enabled:
+		return
+	_talk_record_preview_enabled = enabled
+	talk_record_preview_changed.emit(enabled)
+	_save_settings()
+
+
+func get_talk_record_preview_enabled() -> bool:
+	return _talk_record_preview_enabled
+
 func get_ai_response_glow() -> bool:
 	return _ai_response_glow
 
@@ -198,6 +264,9 @@ func _save_settings() -> void:
 	config.set_value("rendering", "msaa_3d", _msaa)
 	config.set_value("rendering", "screen_space_aa", _ssaa)
 	config.set_value("ai", "response_glow", _ai_response_glow)
+	config.set_value("audio", "input_device", _audio_input_device)
+	config.set_value("audio", "output_device", _audio_output_device)
+	config.set_value("audio", "talk_record_preview", _talk_record_preview_enabled)
 	config.save(SAVE_PATH)
 
 ## 防抖写盘（滑条等高频操作）
@@ -215,6 +284,8 @@ func _load_settings() -> void:
 		var vp = get_viewport()
 		_msaa = vp.msaa_3d as int
 		_ssaa = vp.screen_space_aa as int
+		_audio_input_device = AudioServer.get_input_device()
+		_audio_output_device = AudioServer.get_output_device()
 		_save_settings()
 		return
 	_time_mode = int(config.get_value("env", "time_mode", 0))
@@ -229,8 +300,22 @@ func _load_settings() -> void:
 	_msaa = int(config.get_value("rendering", "msaa_3d", 0))
 	_ssaa = int(config.get_value("rendering", "screen_space_aa", 0))
 	_ai_response_glow = config.get_value("ai", "response_glow", true) as bool
+	_audio_input_device = str(config.get_value("audio", "input_device", AudioServer.get_input_device()))
+	_audio_output_device = str(config.get_value("audio", "output_device", AudioServer.get_output_device()))
+	_talk_record_preview_enabled = bool(config.get_value("audio", "talk_record_preview", true))
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
 	get_viewport().screen_space_aa = _ssaa as Viewport.ScreenSpaceAA
+
+	# 回放并应用存档中的音频设备；设备不存在时保持当前系统默认
+	if AudioServer.get_input_device_list().has(_audio_input_device):
+		AudioServer.set_input_device(_audio_input_device)
+	else:
+		_audio_input_device = AudioServer.get_input_device()
+
+	if AudioServer.get_output_device_list().has(_audio_output_device):
+		AudioServer.set_output_device(_audio_output_device)
+	else:
+		_audio_output_device = AudioServer.get_output_device()
 
 ## 启动后统一广播当前状态，驱动 UI 首帧同步
 func _emit_loaded_settings() -> void:
@@ -242,3 +327,6 @@ func _emit_loaded_settings() -> void:
 	fog_changed.emit(_fog_state)
 	camera_changed.emit(_camera_mode)
 	ai_response_glow_changed.emit(_ai_response_glow)
+	audio_input_device_changed.emit(_audio_input_device)
+	audio_output_device_changed.emit(_audio_output_device)
+	talk_record_preview_changed.emit(_talk_record_preview_enabled)

@@ -23,6 +23,10 @@ boot_splash/show_image=false
 boot_splash/stretch_mode=0
 config/icon="uid://bpa56ysux4bmi"
 
+[audio]
+
+driver/enable_input=true
+
 [autoload]
 
 GuiTransitions="*res://addons/simple-gui-transitions/singleton.gd"
