@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://b4n1h3076uwh4"]
 
+[ext_resource type="Script" uid="uid://ww8o6qn3eys3" path="res://scenes/main/ui/setting/sound_settings.gd" id="1_ifh7e"]
 [ext_resource type="Script" uid="uid://dlsbsc0torxs0" path="res://scenes/main/ui/components/slider/MaterialSlider.gd" id="3_xh8tb"]
 
-[node name="VBoxContainer" type="VBoxContainer" unique_id=1107748095]
+[node name="SoundSettings" type="VBoxContainer" unique_id=1107748095]
 offset_right = 221.0
 offset_bottom = 128.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
+script = ExtResource("1_ifh7e")
 
 [node name="Label" type="Label" parent="." unique_id=1202614157]
 layout_mode = 2
@@ -20,7 +22,7 @@ layout_mode = 2
 layout_mode = 2
 text = "雨声"
 
-[node name="MaterialSlider" type="Control" parent="HBoxContainer" unique_id=1484038099]
+[node name="RainSlider" type="Control" parent="HBoxContainer" unique_id=1484038099]
 clip_contents = true
 custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
@@ -36,7 +38,7 @@ layout_mode = 2
 layout_mode = 2
 text = "风声"
 
-[node name="MaterialSlider" type="Control" parent="HBoxContainer2" unique_id=379295133]
+[node name="WindSlider" type="Control" parent="HBoxContainer2" unique_id=379295133]
 clip_contents = true
 custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
@@ -52,7 +54,7 @@ layout_mode = 2
 layout_mode = 2
 text = "车声"
 
-[node name="MaterialSlider" type="Control" parent="HBoxContainer3" unique_id=1235191612]
+[node name="CarSlider" type="Control" parent="HBoxContainer3" unique_id=1235191612]
 clip_contents = true
 custom_minimum_size = Vector2(100, 32)
 layout_mode = 2
@@ -60,3 +62,7 @@ size_flags_horizontal = 10
 mouse_default_cursor_shape = 2
 script = ExtResource("3_xh8tb")
 metadata/_custom_type_script = "uid://dlsbsc0torxs0"
+
+[connection signal="value_changed" from="HBoxContainer/RainSlider" to="." method="_on_rain_slider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer2/WindSlider" to="." method="_on_wind_slider_value_changed"]
+[connection signal="value_changed" from="HBoxContainer3/CarSlider" to="." method="_on_car_slider_value_changed"]

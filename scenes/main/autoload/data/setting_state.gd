@@ -23,6 +23,12 @@ signal audio_input_device_changed(device_name: String)
 signal audio_output_device_changed(device_name: String)
 ## 录音后回放开关变化
 signal talk_record_preview_changed(enabled: bool)
+## 环境雨声音量变化（0-100）
+signal rain_sound_volume_changed(value: int)
+## 环境风声音量变化（0-100）
+signal wind_sound_volume_changed(value: int)
+## 环境车声音量变化（0-100）
+signal car_sound_volume_changed(value: int)
 ## 户外特效 1 状态变化
 # signal outdoor_1_changed(_state: int)
 ## 户外特效 2 状态变化
@@ -57,6 +63,12 @@ var _audio_input_device: String = ""
 var _audio_output_device: String = ""
 ## 是否播放录音回放（便于调试）
 var _talk_record_preview_enabled: bool = true
+## 环境雨声音量（0-100）
+var _rain_sound_volume: int = 50
+## 环境风声音量（0-100）
+var _wind_sound_volume: int = 50
+## 环境车声音量（0-100）
+var _car_sound_volume: int = 50
 
 
 const SAVE_PATH = "user://settings.cfg"
@@ -212,6 +224,45 @@ func set_talk_record_preview_enabled(enabled: bool) -> void:
 func get_talk_record_preview_enabled() -> bool:
 	return _talk_record_preview_enabled
 
+
+func set_rain_sound_volume(value: int) -> void:
+	value = clampi(value, 0, 100)
+	if _rain_sound_volume == value:
+		return
+	_rain_sound_volume = value
+	rain_sound_volume_changed.emit(value)
+	_queue_save_settings()
+
+
+func set_wind_sound_volume(value: int) -> void:
+	value = clampi(value, 0, 100)
+	if _wind_sound_volume == value:
+		return
+	_wind_sound_volume = value
+	wind_sound_volume_changed.emit(value)
+	_queue_save_settings()
+
+
+func set_car_sound_volume(value: int) -> void:
+	value = clampi(value, 0, 100)
+	if _car_sound_volume == value:
+		return
+	_car_sound_volume = value
+	car_sound_volume_changed.emit(value)
+	_queue_save_settings()
+
+
+func get_rain_sound_volume() -> int:
+	return _rain_sound_volume
+
+
+func get_wind_sound_volume() -> int:
+	return _wind_sound_volume
+
+
+func get_car_sound_volume() -> int:
+	return _car_sound_volume
+
 func get_ai_response_glow() -> bool:
 	return _ai_response_glow
 
@@ -267,6 +318,9 @@ func _save_settings() -> void:
 	config.set_value("audio", "input_device", _audio_input_device)
 	config.set_value("audio", "output_device", _audio_output_device)
 	config.set_value("audio", "talk_record_preview", _talk_record_preview_enabled)
+	config.set_value("audio", "rain_sound_volume", _rain_sound_volume)
+	config.set_value("audio", "wind_sound_volume", _wind_sound_volume)
+	config.set_value("audio", "car_sound_volume", _car_sound_volume)
 	config.save(SAVE_PATH)
 
 ## 防抖写盘（滑条等高频操作）
@@ -303,6 +357,9 @@ func _load_settings() -> void:
 	_audio_input_device = str(config.get_value("audio", "input_device", AudioServer.get_input_device()))
 	_audio_output_device = str(config.get_value("audio", "output_device", AudioServer.get_output_device()))
 	_talk_record_preview_enabled = bool(config.get_value("audio", "talk_record_preview", true))
+	_rain_sound_volume = clampi(int(config.get_value("audio", "rain_sound_volume", 50)), 0, 100)
+	_wind_sound_volume = clampi(int(config.get_value("audio", "wind_sound_volume", 50)), 0, 100)
+	_car_sound_volume = clampi(int(config.get_value("audio", "car_sound_volume", 50)), 0, 100)
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
 	get_viewport().screen_space_aa = _ssaa as Viewport.ScreenSpaceAA
 
@@ -330,3 +387,6 @@ func _emit_loaded_settings() -> void:
 	audio_input_device_changed.emit(_audio_input_device)
 	audio_output_device_changed.emit(_audio_output_device)
 	talk_record_preview_changed.emit(_talk_record_preview_enabled)
+	rain_sound_volume_changed.emit(_rain_sound_volume)
+	wind_sound_volume_changed.emit(_wind_sound_volume)
+	car_sound_volume_changed.emit(_car_sound_volume)

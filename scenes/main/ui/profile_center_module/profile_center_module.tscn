@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://bqdjeom0knkb0" path="res://scenes/main/ui/profile_center_module/profile_view/profile_view.tscn" id="7_pv"]
 [ext_resource type="PackedScene" uid="uid://h31riftac41x" path="res://scenes/main/ui/profile_center_module/stats_view/stats_view.tscn" id="8_sv"]
 [ext_resource type="PackedScene" uid="uid://8rtsyrvshb4i" path="res://scenes/main/ui/profile_center_module/habit_library_panel/habit_library_panel.tscn" id="9_hlp"]
+[ext_resource type="PackedScene" uid="uid://b0htm67si7qag" path="res://scenes/main/ui/profile_center_module/habit_schedule_panel/habit_schedule_panel.tscn" id="10_hsp"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_jna6j"]
 frequency = 0.1
@@ -18,7 +19,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_jna6j")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_t5ymy"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ohjsb"]
 shader = ExtResource("1_f22lk")
 shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
@@ -34,14 +35,14 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(308, 494)
+shader_parameter/size = Vector2(364, 494)
 shader_parameter/shadow_padding = 12.0
 shader_parameter/glow_intensity = 0.0
 shader_parameter/glow_width = 4.0
 shader_parameter/glow_speed = 0.8
 shader_parameter/glow_softness = 2.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vl4l1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lgc5i"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -65,10 +66,10 @@ offset_bottom = 494.0
 script = ExtResource("4_module")
 
 [node name="FrostedPanel" type="PanelContainer" parent="." unique_id=740828074]
-material = SubResource("ShaderMaterial_t5ymy")
+material = SubResource("ShaderMaterial_ohjsb")
 clip_contents = true
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_vl4l1")
+theme_override_styles/panel = SubResource("StyleBoxFlat_lgc5i")
 script = ExtResource("2_2abcq")
 noise_texture = SubResource("NoiseTexture2D_t7cdk")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -87,12 +88,12 @@ theme_override_font_sizes/font_size = 24
 text = "个人中心"
 
 [node name="TabBar" type="Control" parent="FrostedPanel/MarginContainer/VBoxContainer" unique_id=1721151689]
-custom_minimum_size = Vector2(255, 38)
+custom_minimum_size = Vector2(340, 38)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 1
 script = ExtResource("5_seg")
-editor_segments = Array[String](["我的", "统计", "习惯"])
+editor_segments = Array[String](["我的", "统计", "习惯", "习惯表"])
 selected_index = 0
 button_height = 38
 min_button_width = 85
@@ -122,6 +123,11 @@ visible = false
 layout_mode = 2
 
 [node name="HabitLibraryPanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=273000626 instance=ExtResource("9_hlp")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="HabitSchedulePanel" parent="FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/VBoxContainer" unique_id=1099814730 instance=ExtResource("10_hsp")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

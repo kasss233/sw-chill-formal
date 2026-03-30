@@ -78,6 +78,14 @@ func play_sound_effect(p_name: String) -> void:
 	else:
 		push_error("[AudioPlayer] Sound effect not found: %s" % p_name)
 
+## 设置指定音效音量（0.0 - 1.0）
+func set_sound_effect_volume(p_name: String, volume: float) -> void:
+	var audio = sound_effect_container.get_node_or_null(p_name) as AudioStreamPlayer
+	if audio:
+		audio.volume_db = _linear_to_target_db(clamp(volume, 0.0, 1.0))
+	else:
+		push_error("[AudioPlayer] Sound effect not found: %s" % p_name)
+
 ## 设置 BGM 音量（0.0 - 1.0）
 func set_bgm_volume(volume: float) -> void:
 	bgm_volume = volume

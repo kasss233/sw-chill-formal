@@ -10,29 +10,29 @@ signal habit_updated(habit: HabitData)
 # --- 时间段模板信号 ---
 signal time_slot_template_changed
 # --- 排期信号 ---
-signal schedule_entry_added(entry)  # HabitData.ScheduleEntry
+signal schedule_entry_added(entry) # HabitData.ScheduleEntry
 signal schedule_entry_removed(entry_id: int)
 signal schedule_updated(week_key: String)
 signal schedule_cleared(week_key: String)
 # --- 执行记录信号 ---
-signal execution_updated(record)  # HabitData.ExecutionRecord
+signal execution_updated(record) # HabitData.ExecutionRecord
 # --- Agent 信号 ---
 signal agent_schedule_generated(week_key: String)
 # --- 通用 ---
 signal data_loaded
 
 # --- 内部状态 ---
-var _habits: Array = []  # Array[HabitData]
-var _time_slot_templates: Array = []  # Array[HabitData.TimeSlotTemplate]
-var _schedule_entries: Array = []  # Array[HabitData.ScheduleEntry]
-var _execution_records: Array = []  # Array[HabitData.ExecutionRecord]
+var _habits: Array = [] # Array[HabitData]
+var _time_slot_templates: Array = [] # Array[HabitData.TimeSlotTemplate]
+var _schedule_entries: Array = [] # Array[HabitData.ScheduleEntry]
+var _execution_records: Array = [] # Array[HabitData.ExecutionRecord]
 
 var _next_habit_id: int = 1
 var _next_slot_template_id: int = 1
 var _next_entry_id: int = 1
 var _next_record_id: int = 1
-var _habit_id_index: Dictionary = {}      # {int id → HabitData}
-var _time_slot_id_index: Dictionary = {}  # {int id → HabitData.TimeSlotTemplate}
+var _habit_id_index: Dictionary = {} # {int id → HabitData}
+var _time_slot_id_index: Dictionary = {} # {int id → HabitData.TimeSlotTemplate}
 
 const SAVE_PATH = "user://habit_data.json"
 const SAVE_DEBOUNCE_SEC := 0.5
@@ -83,6 +83,15 @@ func get_week_schedule(week_key: String) -> Array:
 		if e.week_key == week_key:
 			result.append(e)
 	return result
+
+
+func get_scheduled_week_keys() -> Array:
+	var week_map := {}
+	for e in _schedule_entries:
+		week_map[e.week_key] = true
+	var keys: Array = week_map.keys()
+	keys.sort()
+	return keys
 
 
 func get_day_schedule(week_key: String, day: int) -> Array:
@@ -262,7 +271,7 @@ func get_day_dashboard_data(date_key: String) -> Dictionary:
 		if already_added:
 			continue
 		top_cards.append({
-			"entry_id": -1,
+			"entry_id": - 1,
 			"habit_id": habit.id,
 			"title": habit.name,
 			"minutes": habit.estimated_minutes,
@@ -399,13 +408,13 @@ func get_review_summary(period_type: String, period_key: String) -> Dictionary:
 					"planned": 0,
 				}
 			habit_buckets[habit.id]["completed"] += 1
-			match habit.preferred_period:
-				0:
-					period_counter["morning"] += 1
-				1:
-					period_counter["afternoon"] += 1
-				2:
-					period_counter["evening"] += 1
+			var start_hour := _extract_hour(habit.preferred_start_time)
+			if start_hour < 12:
+				period_counter["morning"] += 1
+			elif start_hour < 18:
+				period_counter["afternoon"] += 1
+			else:
+				period_counter["evening"] += 1
 
 	var all_entries: Array = []
 	if period_type == "week" and not week_key.is_empty():
@@ -529,13 +538,31 @@ func get_period_reflection(period_type: String, period_key: String) -> Dictionar
 
 # ======================== 修改 API - 习惯库 ========================
 
-func add_habit(p_name: String, p_minutes: int = 30, p_period: int = 0, p_frequency: int = 0, p_color: String = "#4CAF50") -> HabitData:
+func add_habit(
+	p_name: String,
+	p_minutes: int = 30,
+	p_period: int = 0,
+	p_frequency: int = 0,
+	p_color: String = "#4CAF50",
+	p_selected_week_days: Array = [],
+	p_preferred_time_slot_id: int = -1,
+	p_preferred_start_time: String = "08:00",
+	p_preferred_end_time: String = "09:00"
+) -> HabitData:
 	var habit = HabitData.new(_next_habit_id, p_name, p_minutes, p_period, p_frequency, p_color)
+	habit.set_selected_week_days(p_selected_week_days)
+	habit.preferred_time_slot_id = p_preferred_time_slot_id
+	habit.preferred_start_time = p_preferred_start_time
+	habit.preferred_end_time = p_preferred_end_time
+	habit.estimated_minutes = _duration_minutes_from_time_range(habit.preferred_start_time, habit.preferred_end_time)
 	_next_habit_id += 1
 	_habits.append(habit)
 	_habit_id_index[habit.id] = habit
+	var week_key := get_current_week_key()
+	_auto_sync_habit_schedule_for_week(habit, week_key)
 	_queue_save()
 	habit_added.emit(habit)
+	schedule_updated.emit(week_key)
 	print("[HabitState] Added habit(id: %d, name: %s)" % [habit.id, habit.name])
 	return habit
 
@@ -550,15 +577,28 @@ func update_habit(id: int, fields: Dictionary) -> bool:
 		habit.estimated_minutes = int(fields["estimated_minutes"])
 	if fields.has("preferred_period"):
 		habit.preferred_period = int(fields["preferred_period"])
+	if fields.has("preferred_time_slot_id"):
+		habit.preferred_time_slot_id = int(fields["preferred_time_slot_id"])
+	if fields.has("preferred_start_time"):
+		habit.preferred_start_time = str(fields["preferred_start_time"])
+	if fields.has("preferred_end_time"):
+		habit.preferred_end_time = str(fields["preferred_end_time"])
+	if fields.has("preferred_start_time") or fields.has("preferred_end_time"):
+		habit.estimated_minutes = _duration_minutes_from_time_range(habit.preferred_start_time, habit.preferred_end_time)
 	if fields.has("frequency"):
 		habit.frequency = int(fields["frequency"])
+	if fields.has("selected_week_days"):
+		habit.set_selected_week_days(fields["selected_week_days"])
 	if fields.has("color"):
 		habit.color = fields["color"]
 	if fields.has("is_active"):
 		habit.is_active = fields["is_active"]
+	var week_key := get_current_week_key()
+	_auto_sync_habit_schedule_for_week(habit, week_key)
 	habit.updated_at = int(Time.get_unix_time_from_system())
 	_queue_save()
 	habit_updated.emit(habit)
+	schedule_updated.emit(week_key)
 	print("[HabitState] Updated habit(id: %d)" % id)
 	return true
 
@@ -588,8 +628,11 @@ func add_time_slot_template(p_name: String, p_start: String, p_end: String) -> H
 	_next_slot_template_id += 1
 	_time_slot_templates.append(slot)
 	_time_slot_id_index[slot.id] = slot
+	var week_key := get_current_week_key()
+	_auto_sync_all_habits_for_week(week_key)
 	_queue_save()
 	time_slot_template_changed.emit()
+	schedule_updated.emit(week_key)
 	print("[HabitState] Added time slot template(id: %d, name: %s)" % [slot.id, slot.name])
 	return slot
 
@@ -604,8 +647,11 @@ func update_time_slot_template(id: int, fields: Dictionary) -> bool:
 		slot.start_time = fields["start_time"]
 	if fields.has("end_time"):
 		slot.end_time = fields["end_time"]
+	var week_key := get_current_week_key()
+	_auto_sync_all_habits_for_week(week_key)
 	_queue_save()
 	time_slot_template_changed.emit()
+	schedule_updated.emit(week_key)
 	return true
 
 
@@ -617,8 +663,11 @@ func remove_time_slot_template(id: int) -> bool:
 			_update_slot_orders()
 			# 移除使用该时间段的排期
 			_remove_entries_by_slot(id)
+			var week_key := get_current_week_key()
+			_auto_sync_all_habits_for_week(week_key)
 			_queue_save()
 			time_slot_template_changed.emit()
+			schedule_updated.emit(week_key)
 			print("[HabitState] Removed time slot template(id: %d)" % id)
 			return true
 	return false
@@ -636,14 +685,17 @@ func reorder_time_slot_templates(ids: Array) -> void:
 	_time_slot_id_index.clear()
 	for s in _time_slot_templates:
 		_time_slot_id_index[s.id] = s
+	var week_key := get_current_week_key()
+	_auto_sync_all_habits_for_week(week_key)
 	_queue_save()
 	time_slot_template_changed.emit()
+	schedule_updated.emit(week_key)
 
 
 # ======================== 修改 API - 排期 ========================
 
-func add_schedule_entry(habit_id: int, week_key: String, day: int, time_slot_id: int) -> HabitData.ScheduleEntry:
-	if check_conflict(week_key, day, time_slot_id):
+func add_schedule_entry(habit_id: int, week_key: String, day: int, time_slot_id: int, allow_overlap: bool = false) -> HabitData.ScheduleEntry:
+	if not allow_overlap and check_conflict(week_key, day, time_slot_id):
 		push_warning("[HabitState] Schedule conflict: week=%s day=%d slot=%d" % [week_key, day, time_slot_id])
 		return null
 	var entry = HabitData.ScheduleEntry.new(_next_entry_id, habit_id, week_key, day, time_slot_id)
@@ -666,6 +718,30 @@ func remove_schedule_entry(id: int) -> bool:
 			print("[HabitState] Removed schedule entry(id: %d)" % id)
 			return true
 	return false
+
+
+func add_habit_to_day_schedule(habit_id: int, week_key: String, day: int) -> HabitData.ScheduleEntry:
+	var habit := get_habit_by_id(habit_id)
+	if habit == null:
+		return null
+	var slot_id := _pick_slot_for_time_range(habit.preferred_start_time, habit.preferred_end_time)
+	if slot_id < 0:
+		return null
+	return add_schedule_entry(habit_id, week_key, day, slot_id, true)
+
+
+func remove_habit_from_day_schedule(habit_id: int, week_key: String, day: int) -> void:
+	var i := _schedule_entries.size() - 1
+	while i >= 0:
+		var entry = _schedule_entries[i]
+		if entry.habit_id == habit_id and entry.week_key == week_key and entry.day_of_week == day:
+			var entry_id :int= entry.id
+			_schedule_entries.remove_at(i)
+			_remove_records_by_entry(entry_id)
+			schedule_entry_removed.emit(entry_id)
+		i -= 1
+	_queue_save()
+	schedule_updated.emit(week_key)
 
 
 func clear_week_schedule(week_key: String) -> void:
@@ -928,6 +1004,7 @@ func load_data() -> void:
 		_init_default_templates()
 
 	_rebuild_habit_index()
+	_auto_sync_all_habits_for_week(get_current_week_key())
 	data_loaded.emit()
 
 
@@ -999,6 +1076,106 @@ func _remove_records_by_entry(entry_id: int) -> void:
 		if _execution_records[i].entry_id == entry_id:
 			_execution_records.remove_at(i)
 		i -= 1
+
+
+func _auto_sync_all_habits_for_week(week_key: String) -> void:
+	for habit in _habits:
+		_auto_sync_habit_schedule_for_week(habit, week_key)
+
+
+func _auto_sync_habit_schedule_for_week(habit: HabitData, week_key: String) -> void:
+	if habit == null:
+		return
+	_remove_habit_entries_by_week(habit.id, week_key)
+	if not habit.is_active:
+		return
+
+	var day_list: Array[int] = habit.get_selected_week_days()
+	var slot_id := _pick_slot_for_time_range(habit.preferred_start_time, habit.preferred_end_time)
+	if slot_id < 0:
+		return
+	for day in day_list:
+		if day < 0 or day > 6:
+			continue
+		add_schedule_entry(habit.id, week_key, day, slot_id, true)
+
+
+func _remove_habit_entries_by_week(habit_id: int, week_key: String) -> void:
+	var i := _schedule_entries.size() - 1
+	while i >= 0:
+		var entry = _schedule_entries[i]
+		if entry.habit_id == habit_id and entry.week_key == week_key:
+			var entry_id: int = entry.id
+			_schedule_entries.remove_at(i)
+			_remove_records_by_entry(entry_id)
+			schedule_entry_removed.emit(entry_id)
+		i -= 1
+
+
+func _get_all_slot_ids_ordered() -> Array[int]:
+	var slots := _time_slot_templates.duplicate()
+	slots.sort_custom(func(a, b):
+		return a.order < b.order
+	)
+	var result: Array[int] = []
+	for slot in slots:
+		result.append(slot.id)
+	return result
+
+
+func _get_slot_ids_by_time_range(start_time: String, end_time: String) -> Array[int]:
+	var range_start := _time_to_minutes(start_time)
+	var range_end := _time_to_minutes(end_time)
+	if range_start < 0 or range_end <= range_start:
+		return _get_all_slot_ids_ordered()
+	var slots := _time_slot_templates.duplicate()
+	slots.sort_custom(func(a, b):
+		return a.order < b.order
+	)
+	var result: Array[int] = []
+	for slot in slots:
+		var slot_start := _time_to_minutes(slot.start_time)
+		var slot_end := _time_to_minutes(slot.end_time)
+		if slot_start < 0 or slot_end <= slot_start:
+			continue
+		if slot_start < range_end and range_start < slot_end:
+			result.append(slot.id)
+	if result.is_empty():
+		return _get_all_slot_ids_ordered()
+	return result
+
+
+func _pick_slot_for_time_range(start_time: String, end_time: String) -> int:
+	var slot_ids := _get_slot_ids_by_time_range(start_time, end_time)
+	if slot_ids.is_empty():
+		return -1
+	return int(slot_ids[0])
+
+
+func _extract_hour(time_text: String) -> int:
+	var parts := time_text.split(":")
+	if parts.size() < 2:
+		return 0
+	return clampi(int(parts[0]), 0, 23)
+
+
+func _time_to_minutes(time_text: String) -> int:
+	var parts := time_text.split(":")
+	if parts.size() < 2:
+		return -1
+	var hour := int(parts[0])
+	var minute := int(parts[1])
+	if hour < 0 or hour > 23 or minute < 0 or minute > 59:
+		return -1
+	return hour * 60 + minute
+
+
+func _duration_minutes_from_time_range(start_time: String, end_time: String) -> int:
+	var start_minutes := _time_to_minutes(start_time)
+	var end_minutes := _time_to_minutes(end_time)
+	if start_minutes < 0 or end_minutes <= start_minutes:
+		return 30
+	return maxi(end_minutes - start_minutes, 30)
 
 
 ## 导出数据

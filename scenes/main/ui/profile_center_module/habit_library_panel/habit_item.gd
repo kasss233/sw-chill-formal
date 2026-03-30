@@ -23,7 +23,7 @@ func _ready() -> void:
 	_context_menu.add_item("编辑", preload("res://assets/ui/icons/edit_24dp.svg"))
 	_context_menu.add_item("删除", preload("res://assets/ui/icons/delete_forever_24dp_FFFFFF_FILL0_wght400_GRAD0_opsz24.svg"))
 	_context_menu.item_pressed.connect(_on_context_item)
-	_context_menu.attach_to(self)
+	_context_menu.attach_to(self )
 
 
 func update_display(habit: HabitData) -> void:
@@ -36,13 +36,6 @@ func update_display(habit: HabitData) -> void:
 	for child in _chips_container.get_children():
 		child.queue_free()
 
-	# 时长 chip
-	var time_chip = MaterialChip.new()
-	time_chip.text = "%d分钟" % habit.estimated_minutes
-	time_chip.chip_size = MaterialChip.ChipSize.SMALL
-	time_chip.chip_style = MaterialChip.ChipStyle.OUTLINED
-	_chips_container.add_child(time_chip)
-
 	# 频率 chip
 	var freq_chip = MaterialChip.new()
 	freq_chip.text = habit.get_frequency_name()
@@ -50,12 +43,12 @@ func update_display(habit: HabitData) -> void:
 	freq_chip.chip_style = MaterialChip.ChipStyle.OUTLINED
 	_chips_container.add_child(freq_chip)
 
-	# 时段 chip
-	var period_chip = MaterialChip.new()
-	period_chip.text = habit.get_period_name()
-	period_chip.chip_size = MaterialChip.ChipSize.SMALL
-	period_chip.chip_style = MaterialChip.ChipStyle.OUTLINED
-	_chips_container.add_child(period_chip)
+	# 时间 chip
+	var time_chip = MaterialChip.new()
+	time_chip.text = "%s-%s" % [habit.preferred_start_time, habit.preferred_end_time]
+	time_chip.chip_size = MaterialChip.ChipSize.SMALL
+	time_chip.chip_style = MaterialChip.ChipStyle.OUTLINED
+	_chips_container.add_child(time_chip)
 
 
 func _on_switch_toggled(pressed: bool) -> void:
@@ -66,7 +59,7 @@ func _on_edit_pressed() -> void:
 	edit_requested.emit(_habit_id)
 
 
-func _on_context_item(index: int, _text: String) -> void:
+func _on_context_item(index: int, _item: MaterialMenuItem) -> void:
 	match index:
 		0: edit_requested.emit(_habit_id)
 		1: delete_requested.emit(_habit_id)

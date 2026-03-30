@@ -54,7 +54,7 @@ func _on_habit_removed(habit_id: int) -> void:
 		if child._habit_id == habit_id:
 			child.queue_free()
 			break
-	_empty_label.visible = _list_container.get_child_count() <= 1  # 一个正在 queue_free
+	_empty_label.visible = _list_container.get_child_count() <= 1 # 一个正在 queue_free
 
 
 func _on_habit_updated(habit: HabitData) -> void:
@@ -88,16 +88,21 @@ func _on_habit_confirmed(data: Dictionary) -> void:
 		HabitState.add_habit(
 			data["name"],
 			data["estimated_minutes"],
-			data["preferred_period"],
-			data["frequency"],
+			0,
+			0,
 			data["color"],
+			data["selected_week_days"],
+			-1,
+			str(data.get("preferred_start_time", "08:00")),
+			str(data.get("preferred_end_time", "09:00")),
 		)
 	else:
 		# 编辑
 		HabitState.update_habit(data["id"], {
 			"name": data["name"],
 			"estimated_minutes": data["estimated_minutes"],
-			"preferred_period": data["preferred_period"],
-			"frequency": data["frequency"],
+			"preferred_start_time": str(data.get("preferred_start_time", "08:00")),
+			"preferred_end_time": str(data.get("preferred_end_time", "09:00")),
+			"selected_week_days": data["selected_week_days"],
 			"color": data["color"],
 		})
