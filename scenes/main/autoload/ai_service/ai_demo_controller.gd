@@ -7,46 +7,128 @@ signal demo_response_cleared
 const DEMO_RESPONSE_SPEED := 0.05
 const DEMO_DELAY_SCALE := 4
 var DEMO_STEPS: Array[Dictionary] = [
-	{
-		"type": "set_time",
-		"delay": 0.1,
-		"record_restore": true,
+  {
+	"type": "set_input_text",
+	"delay": 0.0,
+	"record_restore": false,
+	"args": {
+	  "text": "帮我建立一套健康的日常习惯，并生成这周的安排。"
+	}
+  },
+  {
+	"type": "clear_input",
+	"delay": 0.5,
+	"record_restore": false
+  },
+  {
+	"type": "enter_dialogue_mode",
+	"delay": 0,
+	"record_restore": false
+  },
+  {
+	"type": "show_response_text",
+	"delay": 0.25,
+	"record_restore": false,
+	"args": {
+	  "text": "好的，我来为你创建几个健康的日常习惯，然后为这周生成一份均衡的排期安排。",
+	  "append": false,
+	  "stream": false,
+	  "chunk_delay": 0.05
+	}
+  },
+  {
+	"type": "show_function_call_start",
+	"delay": 0.5,
+	"record_restore": false,
+	"args": {
+	  "name": "add_habit",
+	  "call_id": "demo_add_habit_1"
+	}
+  },
+  {
+	"type": "show_module",
+	"delay": 0.3,
+	"record_restore": false,
+	"args": {
+	  "module_name": "habit"
+	}
+  },
+  {
+	"type": "select_profile_tab",
+	"delay": 0.2,
+	"record_restore": false,
+	"args": {
+	  "tab_index": 2
+	}
+  },
+  {
+	"type": "add_habit",
+	"delay": 0.2,
+	"record_restore": true,
+	"args": {
+	  "name": "晨间瑜伽",
+	  "minutes": 60,
+	  "start_time": "10:00",
+	  "end_time": "11:00",
+	  "selected_week_days": [1, 2, 3, 4, 5],
+	  "color": "#FF7043",
+	  "save_as": "yoga_habit"
+	}
+  },
+  {
+	"type": "select_profile_tab",
+	"delay": 0.2,
+	"record_restore": false,
+	"args": {
+	  "tab_index": 3
+	}
+  },
+  {
+	"type": "show_function_call_end",
+	"delay": 0.3,
+	"record_restore": false,
+	"args": {
+	  "name": "add_habit",
+	  "call_id": "demo_add_habit_1",
+	  "success": true
+	}
+  },
+  {
+		"type": "hide_module",
+		"delay": 0.2,
+		"record_restore": false,
 		"args": {
-			"mode": 0
+			"module_name": "habit"
 		}
 	},
-	{
-		"type": "set_time",
-		"delay": 1,
-		"record_restore": true,
-		"args": {
-			"mode": 1
-		}
-	},
-	{
-		"type": "set_time",
-		"delay": 1,
-		"record_restore": true,
-		"args": {
-			"mode": 2
-		}
-	},
-	{
-		"type": "set_time",
-		"delay": 1,
-		"record_restore": true,
-		"args": {
-			"mode": 3
-		}
-	},
-	{
-		"type": "set_time",
-		"delay": 1,
-		"record_restore": true,
-		"args": {
-			"mode": 2
-		}
-	},
+  {
+	"type": "show_response_text",
+	"delay": 0.2,
+	"record_restore": false,
+	"args": {
+	  "text": "✓ 已添加「晨间瑜伽」(20分钟)",
+	  "append": true,
+	  "stream": false,
+	  "chunk_delay": 0.05
+	}
+  },
+  
+  {
+	"type": "show_response_text",
+	"delay": 0.5,
+	"record_restore": false,
+	"args": {
+	  "text": "💡 建议：每天坚持执行课表中的任务，记录完成情况。系统会自动统计你的完成度和习惯养成进度哦～",
+	  "append": true,
+	  "stream": false,
+	  "chunk_delay": 0.05
+	}
+  },
+  {
+	"type": "wait",
+	"delay": 2.0,
+	"record_restore": false
+  }
 ]
 
 var is_demo_running: bool = false
@@ -130,6 +212,7 @@ func _run_restore_async(run_id: int) -> void:
 	_restore_settings()
 	_restore_notes()
 	_restore_tasks()
+	_restore_habits()
 	_restore_pomodoro()
 	_restore_music()
 	_reset_runtime_state()
@@ -169,6 +252,14 @@ func _execute_step(step: Dictionary, run_id: int) -> bool:
 			return _step_create_note(args, should_record)
 		"write_note":
 			return _step_write_note(args, should_record)
+		"add_habit":
+			return _step_add_habit(args, should_record)
+		"select_profile_tab":
+			return _step_select_profile_tab(args)
+		"generate_week_schedule":
+			return _step_generate_week_schedule(args, should_record)
+		"set_execution":
+			return _step_set_execution(args, should_record)
 		"start_pomodoro":
 			return _step_start_pomodoro(args)
 		"stop_pomodoro":
@@ -204,6 +295,12 @@ func _describe_step(step: Dictionary) -> String:
 			return "%s(%s)" % [step_type, str(args.get("title", ""))]
 		"create_note":
 			return "%s(%s)" % [step_type, str(args.get("title", ""))]
+		"add_habit":
+			return "%s(%s)" % [step_type, str(args.get("name", ""))]
+		"generate_week_schedule":
+			var style := str(args.get("style", "relaxed"))
+			var style_name := "轻松版" if style == "relaxed" else "自律版"
+			return "%s(%s, %s)" % [step_type, str(args.get("week_key", "")), style_name]
 		"play_track":
 			return "%s(%s)" % [step_type, str(args.get("track_name", ""))]
 		"set_play_mode":
@@ -375,6 +472,89 @@ func _step_set_play_mode(args: Dictionary) -> bool:
 	return MusicState.agent_set_play_mode(mode)
 
 
+func _step_add_habit(args: Dictionary, should_record: bool) -> bool:
+	var name := str(args.get("name", "")).strip_edges()
+	if name.is_empty():
+		return false
+	var minutes := int(args.get("minutes", 30))
+	var period := int(args.get("period", 0))
+	var frequency := int(args.get("frequency", 0))
+	var color := str(args.get("color", "#4CAF50"))
+	var selected_week_days: Array = args.get("selected_week_days", [])
+	var preferred_time_slot_id := int(args.get("preferred_time_slot_id", -1))
+	var preferred_start_time := str(args.get("start_time", "08:00"))
+	var preferred_end_time := str(args.get("end_time", "09:00"))
+	
+	var habit_dict := HabitState.agent_add_habit(
+		name,
+		minutes,
+		period,
+		frequency,
+		color,
+		selected_week_days,
+		preferred_time_slot_id,
+		preferred_start_time,
+		preferred_end_time
+	)
+	var habit_id := int(habit_dict.get("id", 0))
+	if habit_id <= 0:
+		return false
+	var save_as := str(args.get("save_as", ""))
+	if not save_as.is_empty():
+		_runtime_refs[save_as] = habit_id
+	if should_record:
+		applied_changes.append({
+			"kind": "habit_added",
+			"habit_id": habit_id
+		})
+	return true
+
+
+func _step_select_profile_tab(args: Dictionary) -> bool:
+	var tab_index := int(args.get("tab_index", 2))
+	var auto_show_module := bool(args.get("auto_show_module", false))
+	
+	# 如果设置了自动显示模块，先确保习惯模块打开
+	if auto_show_module:
+		LayerManager.agent_show_module("habit")
+	
+	var profile_center = get_tree().root.find_child("ProfileCenterModule", true, false)
+	if profile_center == null:
+		return false
+	return profile_center.agent_select_tab(tab_index)
+
+
+func _step_generate_week_schedule(args: Dictionary, should_record: bool) -> bool:
+	var week_key := str(args.get("week_key", "")).strip_edges()
+	if week_key.is_empty():
+		week_key = HabitState.get_current_week_key()
+	var style := str(args.get("style", "relaxed"))
+	var ok := HabitState.agent_generate_week_schedule(week_key, style)
+	if should_record and ok:
+		applied_changes.append({
+			"kind": "schedule_generated",
+			"week_key": week_key
+		})
+	return ok
+
+
+func _step_set_execution(args: Dictionary, should_record: bool) -> bool:
+	var entry_id := int(args.get("entry_id", 0))
+	var date_key := str(args.get("date_key", "")).strip_edges()
+	var status := int(args.get("status", 0))
+	if entry_id <= 0 or date_key.is_empty():
+		return false
+	var ok := HabitState.agent_set_execution(entry_id, date_key, status)
+	if should_record and ok:
+		applied_changes.append({
+			"kind": "execution_recorded",
+			"entry_id": entry_id,
+			"date_key": date_key,
+			"status": status
+		})
+	return ok
+
+
 func _restore_modules() -> void:
 	for i in range(applied_changes.size() - 1, -1, -1):
 		var change := applied_changes[i]
@@ -500,6 +680,26 @@ func _restore_music() -> void:
 	MusicState.agent_set_playing(is_playing)
 
 
+func _restore_habits() -> void:
+	for i in range(applied_changes.size() - 1, -1, -1):
+		var change := applied_changes[i]
+		match str(change.get("kind", "")):
+			"habit_added":
+				var habit_id := int(change.get("habit_id", 0))
+				if habit_id > 0 and HabitState.get_habit_by_id(habit_id) != null:
+					HabitState.remove_habit(habit_id)
+			"schedule_generated":
+				var week_key := str(change.get("week_key", ""))
+				if not week_key.is_empty():
+					HabitState.clear_week_schedule(week_key)
+			"execution_recorded":
+				var entry_id := int(change.get("entry_id", 0))
+				var date_key := str(change.get("date_key", ""))
+				if entry_id > 0 and not date_key.is_empty():
+					# 清除执行记录（设为待处理状态）
+					HabitState.agent_set_execution(entry_id, date_key, HabitData.ExecutionRecord.Status.PENDING)
+
+
 func _force_finish_ui_effects() -> void:
 	for call_id in _active_function_calls.keys():
 		var name := str(_active_function_calls[call_id])
@@ -516,6 +716,10 @@ func _capture_snapshot() -> Dictionary:
 		"settings": {
 			"time_mode": SettingState.get_time_mode(),
 			"weather_mode": SettingState.get_weather_mode()
+		},
+		"habits": {
+			"habits_count": HabitState.get_all_habits().size(),
+			"schedules": HabitState.get_scheduled_week_keys(),
 		},
 		"pomodoro": PomodoroState.get_status(),
 		"music": {

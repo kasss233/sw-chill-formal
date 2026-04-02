@@ -735,7 +735,7 @@ func remove_habit_from_day_schedule(habit_id: int, week_key: String, day: int) -
 	while i >= 0:
 		var entry = _schedule_entries[i]
 		if entry.habit_id == habit_id and entry.week_key == week_key and entry.day_of_week == day:
-			var entry_id :int= entry.id
+			var entry_id: int = entry.id
 			_schedule_entries.remove_at(i)
 			_remove_records_by_entry(entry_id)
 			schedule_entry_removed.emit(entry_id)
@@ -829,8 +829,28 @@ func ensure_daily_records(date_key: String) -> void:
 
 # ======================== Agent API ========================
 
-func agent_add_habit(p_name: String, p_minutes: int = 30, p_period: int = 0, p_frequency: int = 0) -> Dictionary:
-	var habit = add_habit(p_name, p_minutes, p_period, p_frequency)
+func agent_add_habit(
+	p_name: String,
+	p_minutes: int = 30,
+	p_period: int = 0,
+	p_frequency: int = 0,
+	p_color: String = "#4CAF50",
+	p_selected_week_days: Array = [],
+	p_preferred_time_slot_id: int = -1,
+	p_preferred_start_time: String = "08:00",
+	p_preferred_end_time: String = "09:00"
+) -> Dictionary:
+	var habit = add_habit(
+		p_name,
+		p_minutes,
+		p_period,
+		p_frequency,
+		p_color,
+		p_selected_week_days,
+		p_preferred_time_slot_id,
+		p_preferred_start_time,
+		p_preferred_end_time
+	)
 	return habit.to_dict()
 
 

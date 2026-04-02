@@ -19,6 +19,7 @@ const _MODULE_NAME_MAP: Dictionary = {
 	"room_decor": "_room_decor_module",
 	"profile_center": "_profile_center_tab",
 	"calendar": "_profile_center_tab",
+	"habit": "_profile_center_tab",
 	"setting": "_env_setter",
 	"music": "_music_module",
 }
