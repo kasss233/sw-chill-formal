@@ -23,3 +23,12 @@ func _on_tab_changed(index: int, _text: String) -> void:
 		view.visible = false
 	if index < _views.size():
 		_views[index].visible = true
+
+
+## Agent API：选择指定 tab
+func agent_select_tab(tab_index: int) -> bool:
+	if tab_index >= 0 and tab_index < _views.size():
+		_tab_bar.selected_index = tab_index
+		_on_tab_changed(tab_index, "") # 手动触发视图切换
+		return true
+	return false

@@ -41,6 +41,7 @@ const _MODULE_NAME_MAP: Dictionary = {
 	"room_decor": "room_decor",
 	"profile_center": "profile_center",
 	"calendar": "profile_center",
+	"habit": "profile_center",
 	"setting": "setter",
 	"music": "musiclist",
 }
@@ -111,7 +112,7 @@ func _register_modules() -> void:
 
 
 func _register(layout_id: String, module_node: Node, toggle_btn) -> void:
-	_module_registry[layout_id] = { "node": module_node, "toggle": toggle_btn }
+	_module_registry[layout_id] = {"node": module_node, "toggle": toggle_btn}
 	if toggle_btn and toggle_btn is MaterialToggleButton:
 		toggle_btn.state_changed.connect(
 			_on_module_toggle_changed.bind(layout_id)
