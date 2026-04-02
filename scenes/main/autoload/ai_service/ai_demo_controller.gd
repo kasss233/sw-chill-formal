@@ -12,7 +12,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 	"delay": 0.0,
 	"record_restore": false,
 	"args": {
-	  "text": "帮我建立一套健康的日常习惯，并生成这周的安排。"
+	  "text": "我工作日要进行4小时考研和1小时读书，周末想运动一下。帮我安排一下日常习惯吧",
 	}
   },
   {
@@ -30,7 +30,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 	"delay": 0.25,
 	"record_restore": false,
 	"args": {
-	  "text": "好的，我来为你创建几个健康的日常习惯，然后为这周生成一份均衡的排期安排。",
+	  "text": "好的，我来为你安排习惯。",
 	  "append": false,
 	  "stream": false,
 	  "chunk_delay": 0.05
@@ -103,23 +103,11 @@ var DEMO_STEPS: Array[Dictionary] = [
 	},
   {
 	"type": "show_response_text",
-	"delay": 0.2,
-	"record_restore": false,
-	"args": {
-	  "text": "✓ 已添加「晨间瑜伽」(20分钟)",
-	  "append": true,
-	  "stream": false,
-	  "chunk_delay": 0.05
-	}
-  },
-  
-  {
-	"type": "show_response_text",
 	"delay": 0.5,
 	"record_restore": false,
 	"args": {
 	  "text": "💡 建议：每天坚持执行课表中的任务，记录完成情况。系统会自动统计你的完成度和习惯养成进度哦～",
-	  "append": true,
+	  "append": false,
 	  "stream": false,
 	  "chunk_delay": 0.05
 	}
