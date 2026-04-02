@@ -640,6 +640,36 @@ label = "FXAA"
 value = "1"
 metadata/_custom_type_script = "uid://cbss0rumljfsx"
 
+[sub_resource type="Resource" id="Resource_rs0"]
+script = ExtResource("16_do")
+label = "100%（原始）"
+value = "1"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
+[sub_resource type="Resource" id="Resource_rs1"]
+script = ExtResource("16_do")
+label = "85%"
+value = "0.85"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
+[sub_resource type="Resource" id="Resource_rs2"]
+script = ExtResource("16_do")
+label = "75%"
+value = "0.75"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
+[sub_resource type="Resource" id="Resource_rs3"]
+script = ExtResource("16_do")
+label = "67%"
+value = "0.67"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
+[sub_resource type="Resource" id="Resource_rs4"]
+script = ExtResource("16_do")
+label = "50%（省电）"
+value = "0.5"
+metadata/_custom_type_script = "uid://cbss0rumljfsx"
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ksap7"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -1184,6 +1214,42 @@ padding_horizontal = 14
 padding_vertical = 7
 metadata/_custom_type_script = "uid://47c8avtwpt0y"
 
+[node name="RenderScaleRow" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=162500303]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/RenderScaleRow" unique_id=171448500]
+layout_mode = 2
+mouse_filter = 1
+text = "渲染分辨率"
+horizontal_alignment = 1
+
+[node name="Control" type="Control" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/RenderScaleRow" unique_id=326409155]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+
+[node name="RenderScaleDropdown" type="Button" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/RenderScaleRow" unique_id=626711530 node_paths=PackedStringArray("menu")]
+unique_name_in_owner = true
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+mouse_filter = 1
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_41d5u")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_prmue")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1v1ii")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_ioa2x")
+theme_override_styles/focus = SubResource("StyleBoxFlat_q6vrp")
+text = "选择分辨率"
+script = ExtResource("15_md")
+placeholder = "选择分辨率"
+editor_options = Array[ExtResource("16_do")]([SubResource("Resource_rs0"), SubResource("Resource_rs1"), SubResource("Resource_rs2"), SubResource("Resource_rs3"), SubResource("Resource_rs4")])
+menu = NodePath("DropdownMenu")
+sync_selected_item = true
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://47c8avtwpt0y"
+
 [node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=1701583484]
 visible = false
 layout_mode = 2
@@ -1268,5 +1334,6 @@ metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 [connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer10/CameraDropDown" to="." method="_on_camera_drop_down_selection_changed"]
 [connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/MsaaRow/MsaaDropdown" to="." method="_on_msaa_changed"]
 [connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/SsaaRow/SsaaDropdown" to="." method="_on_ssaa_changed"]
+[connection signal="selection_changed" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/RenderScaleRow/RenderScaleDropdown" to="." method="_on_render_scale_changed"]
 [connection signal="toggled" from="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer/HBoxContainer3/FullScreenCheckbox" to="." method="_on_full_screen_checkbox_toggled"]
 [connection signal="pressed" from="SettingButton" to="." method="_on_setting_button_pressed"]

@@ -6,6 +6,7 @@ extends Control
 @onready var panel = %FrostedPanel
 @onready var _msaa_dropdown: MaterialDropdown = %MsaaDropdown
 @onready var _ssaa_dropdown: MaterialDropdown = %SsaaDropdown
+@onready var _render_scale_dropdown: MaterialDropdown = %RenderScaleDropdown
 @onready var _camera_dropdown: MaterialDropdown = %CameraDropDown
 @onready var _time_button: MaterialToggleButton = %TimeButton
 @onready var _weather_button: MaterialToggleButton = %WeatherButton
@@ -38,6 +39,7 @@ func _connect_state_signals() -> void:
 	_connect_if_needed(SettingState, "env_weather_changed", _on_state_env_weather_changed)
 	_connect_if_needed(SettingState, "rain_changed", _on_state_rain_changed)
 	_connect_if_needed(SettingState, "snow_changed", _on_state_snow_changed)
+	_connect_if_needed(SettingState, "render_scale_changed", _on_state_render_scale_changed)
 	_connect_if_needed(SettingState, "audio_input_device_changed", _on_state_audio_input_device_changed)
 	_connect_if_needed(SettingState, "audio_output_device_changed", _on_state_audio_output_device_changed)
 	_connect_if_needed(SettingState, "talk_record_preview_changed", _on_state_talk_record_preview_changed)
@@ -60,6 +62,8 @@ func _exit_tree() -> void:
 		SettingState.rain_changed.disconnect(_on_state_rain_changed)
 	if SettingState.snow_changed.is_connected(_on_state_snow_changed):
 		SettingState.snow_changed.disconnect(_on_state_snow_changed)
+	if SettingState.render_scale_changed.is_connected(_on_state_render_scale_changed):
+		SettingState.render_scale_changed.disconnect(_on_state_render_scale_changed)
 	if SettingState.audio_input_device_changed.is_connected(_on_state_audio_input_device_changed):
 		SettingState.audio_input_device_changed.disconnect(_on_state_audio_input_device_changed)
 	if SettingState.audio_output_device_changed.is_connected(_on_state_audio_output_device_changed):
@@ -181,14 +185,20 @@ func _on_msaa_changed(_index: int, value: Variant) -> void:
 func _on_ssaa_changed(_index: int, value: Variant) -> void:
 	SettingState.set_ssaa(int(value))
 
+
+func _on_render_scale_changed(_index: int, value: Variant) -> void:
+	SettingState.set_render_scale(float(str(value)))
+
 # ============ 从 SettingState 初始化下拉框 ============
 
 func _init_dropdowns_from_state() -> void:
 	var msaa_val = SettingState.get_msaa()
 	var ssaa_val = SettingState.get_ssaa()
+	var render_scale_val = SettingState.get_render_scale()
 	var camera_val = SettingState.get_camera_mode()
 	_msaa_dropdown.set_selected_by_value(str(msaa_val))
 	_ssaa_dropdown.set_selected_by_value(str(ssaa_val))
+	_render_scale_dropdown.set_selected_by_value(str(render_scale_val))
 	_camera_dropdown.set_selected_by_value(str(camera_val))
 	_sync_audio_controls_from_state()
 
@@ -231,6 +241,10 @@ func _on_state_rain_changed(amount: int) -> void:
 
 func _on_state_snow_changed(amount: int) -> void:
 	_snow_slider.set_value_no_signal(float(amount))
+
+
+func _on_state_render_scale_changed(scale: float) -> void:
+	_render_scale_dropdown.set_selected_by_value(str(scale))
 
 
 func _on_state_audio_input_device_changed(device_name: String) -> void:
