@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cb2nkwirhlmus"]
+
+[ext_resource type="Script" path="res://scenes/test/memory/prompt_memory_node.gd" id="1_nm1hx"]
+
+[node name="PromptMemoryNode" type="PanelContainer"]
+script = ExtResource("1_nm1hx")
