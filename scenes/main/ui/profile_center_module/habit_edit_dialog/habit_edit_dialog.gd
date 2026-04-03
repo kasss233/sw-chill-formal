@@ -96,15 +96,17 @@ func _setup_weekday_checks() -> void:
 	label.add_theme_font_size_override("font_size", 13)
 	box.add_child(label)
 
-	var row := HBoxContainer.new()
+	var row := GridContainer.new()
 	row.name = "WeekdayRow"
-	row.add_theme_constant_override("separation", 8)
+	row.columns = 4
+	row.add_theme_constant_override("h_separation", 8)
+	row.add_theme_constant_override("v_separation", 8)
 	box.add_child(row)
 
 	for i in range(WEEKDAY_LABELS.size()):
 		var cb := CheckBox.new()
 		cb.text = WEEKDAY_LABELS[i]
-		cb.custom_minimum_size = Vector2(64, 28)
+		cb.custom_minimum_size = Vector2(74, 28)
 		row.add_child(cb)
 		_weekday_checks.append(cb)
 
