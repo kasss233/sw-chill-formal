@@ -489,7 +489,7 @@ func _fn_get_pomodoro_remaining_time(_args: Dictionary) -> Dictionary:
 
 
 # ============================================================
-# 函数实现 — 环境设置（2 个）
+# 函数实现 — 环境设置（13 个）
 # ============================================================
 
 func _fn_set_time(args: Dictionary) -> Dictionary:
@@ -500,6 +500,204 @@ func _fn_set_time(args: Dictionary) -> Dictionary:
 func _fn_set_weather(args: Dictionary) -> Dictionary:
 	SettingState.set_weather(int(args.get("mode", 0)))
 	return {"success": true}
+
+
+func _fn_get_environment_settings(_args: Dictionary) -> Dictionary:
+	return {
+		"success": true,
+		"data": {
+			"time_mode": SettingState.get_time_mode(),
+			"weather_mode": SettingState.get_weather_mode(),
+			"rain_amount": SettingState.get_rain_amount(),
+			"snow_amount": SettingState.get_snow_amount(),
+			"fog_state": SettingState.get_fog_state(),
+			"camera_mode": SettingState.get_camera_mode(),
+			"msaa": SettingState.get_msaa(),
+			"ssaa": SettingState.get_ssaa(),
+			"render_scale": SettingState.get_render_scale(),
+			"ai_response_glow": SettingState.get_ai_response_glow(),
+			"rain_sound_volume": SettingState.get_rain_sound_volume(),
+			"wind_sound_volume": SettingState.get_wind_sound_volume(),
+			"car_sound_volume": SettingState.get_car_sound_volume(),
+		}
+	}
+
+
+func _fn_set_rain_amount(args: Dictionary) -> Dictionary:
+	SettingState.set_rain_amount(int(args.get("amount", 300)))
+	return {"success": true, "data": {"rain_amount": SettingState.get_rain_amount()}}
+
+
+func _fn_set_snow_amount(args: Dictionary) -> Dictionary:
+	SettingState.set_snow_amount(int(args.get("amount", 500)))
+	return {"success": true, "data": {"snow_amount": SettingState.get_snow_amount()}}
+
+
+func _fn_set_fog(args: Dictionary) -> Dictionary:
+	SettingState.set_fog(int(args.get("state", 0)))
+	return {"success": true, "data": {"fog_state": SettingState.get_fog_state()}}
+
+
+func _fn_set_camera_mode(args: Dictionary) -> Dictionary:
+	SettingState.set_camera(int(args.get("mode", 0)))
+	return {"success": true, "data": {"camera_mode": SettingState.get_camera_mode()}}
+
+
+func _fn_set_render_scale(args: Dictionary) -> Dictionary:
+	SettingState.set_render_scale(float(args.get("scale", 1.0)))
+	return {"success": true, "data": {"render_scale": SettingState.get_render_scale()}}
+
+
+func _fn_set_msaa(args: Dictionary) -> Dictionary:
+	SettingState.set_msaa(int(args.get("mode", 0)))
+	return {"success": true, "data": {"msaa": SettingState.get_msaa()}}
+
+
+func _fn_set_ssaa(args: Dictionary) -> Dictionary:
+	SettingState.set_ssaa(int(args.get("mode", 0)))
+	return {"success": true, "data": {"ssaa": SettingState.get_ssaa()}}
+
+
+func _fn_set_ai_response_glow(args: Dictionary) -> Dictionary:
+	SettingState.set_ai_response_glow(bool(args.get("enabled", true)))
+	return {"success": true, "data": {"ai_response_glow": SettingState.get_ai_response_glow()}}
+
+
+func _fn_set_rain_sound_volume(args: Dictionary) -> Dictionary:
+	SettingState.set_rain_sound_volume(int(args.get("value", 50)))
+	return {"success": true, "data": {"rain_sound_volume": SettingState.get_rain_sound_volume()}}
+
+
+func _fn_set_wind_sound_volume(args: Dictionary) -> Dictionary:
+	SettingState.set_wind_sound_volume(int(args.get("value", 50)))
+	return {"success": true, "data": {"wind_sound_volume": SettingState.get_wind_sound_volume()}}
+
+
+func _fn_set_car_sound_volume(args: Dictionary) -> Dictionary:
+	SettingState.set_car_sound_volume(int(args.get("value", 50)))
+	return {"success": true, "data": {"car_sound_volume": SettingState.get_car_sound_volume()}}
+
+
+func _fn_activate_focus_mode(args: Dictionary) -> Dictionary:
+	var profile := str(args.get("profile", "deep")).strip_edges().to_lower()
+	if profile not in ["deep", "calm", "light"]:
+		profile = "deep"
+
+	var work_minutes := maxi(1, int(args.get("work_minutes", 25)))
+	var rest_minutes := maxi(1, int(args.get("rest_minutes", 5)))
+	var loop_times := maxi(1, int(args.get("loop_times", 1)))
+	PomodoroState.agent_start_pomodoro(work_minutes, rest_minutes, loop_times)
+
+	var playlist_name := str(args.get("playlist_name", "")).strip_edges()
+	if not playlist_name.is_empty():
+		MusicState.set_playlist(playlist_name)
+
+	var track_name := str(args.get("track_name", "")).strip_edges()
+	if not track_name.is_empty():
+		MusicState.set_track(track_name)
+
+	var default_play_mode := _focus_default_play_mode(profile)
+	var play_mode := clampi(int(args.get("play_mode", default_play_mode)), 0, 2)
+	MusicState.set_play_mode(play_mode)
+
+	var bgm_volume := float(args.get("bgm_volume", _focus_default_bgm_volume(profile)))
+	AudioPlayer.set_bgm_volume(bgm_volume)
+	MusicState.set_playing(true)
+
+	var env := _focus_environment_preset(profile)
+	SettingState.set_time(int(args.get("time_mode", env.get("time_mode", 2))))
+	SettingState.set_weather(int(args.get("weather_mode", env.get("weather_mode", 1))))
+	SettingState.set_rain_amount(int(args.get("rain_amount", env.get("rain_amount", 420))))
+	SettingState.set_snow_amount(int(args.get("snow_amount", env.get("snow_amount", 500))))
+	SettingState.set_fog(int(args.get("fog_state", env.get("fog_state", 1))))
+	SettingState.set_render_scale(float(args.get("render_scale", env.get("render_scale", 0.9))))
+	SettingState.set_ai_response_glow(bool(args.get("ai_response_glow", false)))
+	SettingState.set_rain_sound_volume(int(args.get("rain_sound_volume", env.get("rain_sound_volume", 45))))
+	SettingState.set_wind_sound_volume(int(args.get("wind_sound_volume", env.get("wind_sound_volume", 35))))
+	SettingState.set_car_sound_volume(int(args.get("car_sound_volume", env.get("car_sound_volume", 10))))
+
+	return {
+		"success": true,
+		"data": {
+			"profile": profile,
+			"pomodoro": {
+				"work_minutes": work_minutes,
+				"rest_minutes": rest_minutes,
+				"loop_times": loop_times,
+			},
+			"music": {
+				"playlist_name": MusicState.current_playlist,
+				"track_name": MusicState.current_track,
+				"play_mode": MusicState.play_mode,
+				"is_playing": MusicState.is_playing,
+				"bgm_volume": bgm_volume,
+			},
+			"environment": {
+				"time_mode": SettingState.get_time_mode(),
+				"weather_mode": SettingState.get_weather_mode(),
+				"rain_amount": SettingState.get_rain_amount(),
+				"snow_amount": SettingState.get_snow_amount(),
+				"fog_state": SettingState.get_fog_state(),
+				"render_scale": SettingState.get_render_scale(),
+				"ai_response_glow": SettingState.get_ai_response_glow(),
+				"rain_sound_volume": SettingState.get_rain_sound_volume(),
+				"wind_sound_volume": SettingState.get_wind_sound_volume(),
+				"car_sound_volume": SettingState.get_car_sound_volume(),
+			}
+		}
+	}
+
+
+func _fn_deactivate_focus_mode(args: Dictionary) -> Dictionary:
+	var stop_pomodoro := bool(args.get("stop_pomodoro", true))
+	var pause_music := bool(args.get("pause_music", true))
+	var reset_environment := bool(args.get("reset_environment", true))
+
+	if stop_pomodoro and PomodoroState.is_active():
+		PomodoroState.agent_stop()
+
+	if pause_music:
+		MusicState.set_playing(false)
+
+	if reset_environment:
+		var env := _focus_exit_environment_preset()
+		SettingState.set_time(int(args.get("time_mode", env.get("time_mode", 3))))
+		SettingState.set_weather(int(args.get("weather_mode", env.get("weather_mode", 3))))
+		SettingState.set_rain_amount(int(args.get("rain_amount", env.get("rain_amount", 300))))
+		SettingState.set_snow_amount(int(args.get("snow_amount", env.get("snow_amount", 500))))
+		SettingState.set_fog(int(args.get("fog_state", env.get("fog_state", 0))))
+		SettingState.set_render_scale(float(args.get("render_scale", env.get("render_scale", 1.0))))
+		SettingState.set_ai_response_glow(bool(args.get("ai_response_glow", env.get("ai_response_glow", true))))
+		SettingState.set_rain_sound_volume(int(args.get("rain_sound_volume", env.get("rain_sound_volume", 20))))
+		SettingState.set_wind_sound_volume(int(args.get("wind_sound_volume", env.get("wind_sound_volume", 20))))
+		SettingState.set_car_sound_volume(int(args.get("car_sound_volume", env.get("car_sound_volume", 25))))
+
+	return {
+		"success": true,
+		"data": {
+			"pomodoro": {
+				"is_running": PomodoroState.agent_is_running(),
+				"is_paused": PomodoroState.agent_is_paused(),
+			},
+			"music": {
+				"is_playing": MusicState.is_playing,
+				"current_playlist": MusicState.current_playlist,
+				"current_track": MusicState.current_track,
+			},
+			"environment": {
+				"time_mode": SettingState.get_time_mode(),
+				"weather_mode": SettingState.get_weather_mode(),
+				"rain_amount": SettingState.get_rain_amount(),
+				"snow_amount": SettingState.get_snow_amount(),
+				"fog_state": SettingState.get_fog_state(),
+				"render_scale": SettingState.get_render_scale(),
+				"ai_response_glow": SettingState.get_ai_response_glow(),
+				"rain_sound_volume": SettingState.get_rain_sound_volume(),
+				"wind_sound_volume": SettingState.get_wind_sound_volume(),
+				"car_sound_volume": SettingState.get_car_sound_volume(),
+			}
+		}
+	}
 
 
 # ============================================================
@@ -521,7 +719,7 @@ func _fn_clear_input(_args: Dictionary) -> Dictionary:
 
 
 # ============================================================
-# 函数实现 — 房间装饰（2 个）
+# 函数实现 — 房间装饰（8 个）
 # ============================================================
 
 func _fn_add_room_decor_item(args: Dictionary) -> Dictionary:
@@ -548,6 +746,22 @@ func _fn_select_room_decor_item(args: Dictionary) -> Dictionary:
 	return {"success": true, "data": {"item_id": item_id}}
 
 
+func _fn_deselect_room_decor_item(args: Dictionary) -> Dictionary:
+	var item_id := int(args.get("item_id", 0))
+	var ok := RoomDecorState.agent_deselect_room_decor_item(item_id)
+	if not ok:
+		return {"success": false, "error": "取消选择失败（物品不存在或当前未被选中）"}
+	return {"success": true, "data": {"item_id": item_id}}
+
+
+func _fn_remove_room_decor_item(args: Dictionary) -> Dictionary:
+	var item_id := int(args.get("item_id", 0))
+	var ok := RoomDecorState.agent_remove_room_decor_item(item_id)
+	if not ok:
+		return {"success": false, "error": "删除失败（物品不存在）"}
+	return {"success": true, "data": {"item_id": item_id}}
+
+
 func _fn_get_all_room_decor(_args: Dictionary) -> Dictionary:
 	var data := RoomDecorState.agent_get_all_room_decor()
 	return {"success": true, "data": data}
@@ -555,6 +769,28 @@ func _fn_get_all_room_decor(_args: Dictionary) -> Dictionary:
 
 func _fn_get_available_room_decor(_args: Dictionary) -> Dictionary:
 	var data := RoomDecorState.agent_get_available_room_decor()
+	return {"success": true, "data": data}
+
+
+func _fn_get_selected_room_decor(_args: Dictionary) -> Dictionary:
+	var data := RoomDecorState.agent_get_selected_room_decor()
+	return {"success": true, "data": data}
+
+
+func _fn_clear_all_room_decor(_args: Dictionary) -> Dictionary:
+	var removed_count := RoomDecorState.agent_clear_all_room_decor()
+	return {"success": true, "data": {"removed_count": removed_count}}
+
+
+func _fn_clear_all_room_decor_categories(_args: Dictionary) -> Dictionary:
+	var data := RoomDecorState.agent_clear_all_room_decor_categories()
+	return {"success": true, "data": data}
+
+
+func _fn_load_room_decor_from_resource(_args: Dictionary) -> Dictionary:
+	var data := RoomDecorState.agent_load_room_decor_from_resource()
+	if not bool(data.get("success", false)):
+		return {"success": false, "error": "从资源加载失败或无新增物品", "data": data}
 	return {"success": true, "data": data}
 
 
@@ -591,11 +827,17 @@ func _fn_add_habit(args: Dictionary) -> Dictionary:
 	var habit_name = args.get("name", "")
 	if habit_name.is_empty():
 		return {"success": false, "error": "习惯名称不能为空"}
+	var selected_week_days := _to_int_array(args.get("selected_week_days", []))
 	var data = HabitState.agent_add_habit(
 		habit_name,
 		int(args.get("estimated_minutes", 30)),
 		int(args.get("preferred_period", 0)),
 		int(args.get("frequency", 0)),
+		str(args.get("color", "#4CAF50")),
+		selected_week_days,
+		int(args.get("preferred_time_slot_id", -1)),
+		str(args.get("preferred_start_time", "08:00")),
+		str(args.get("preferred_end_time", "09:00")),
 	)
 	return {"success": true, "data": data}
 
@@ -616,8 +858,18 @@ func _fn_update_habit(args: Dictionary) -> Dictionary:
 		fields["estimated_minutes"] = int(args["estimated_minutes"])
 	if args.has("preferred_period"):
 		fields["preferred_period"] = int(args["preferred_period"])
+	if args.has("preferred_time_slot_id"):
+		fields["preferred_time_slot_id"] = int(args["preferred_time_slot_id"])
+	if args.has("preferred_start_time"):
+		fields["preferred_start_time"] = str(args["preferred_start_time"])
+	if args.has("preferred_end_time"):
+		fields["preferred_end_time"] = str(args["preferred_end_time"])
 	if args.has("frequency"):
 		fields["frequency"] = int(args["frequency"])
+	if args.has("selected_week_days"):
+		fields["selected_week_days"] = _to_int_array(args["selected_week_days"])
+	if args.has("color"):
+		fields["color"] = str(args["color"])
 	if args.has("is_active"):
 		fields["is_active"] = args["is_active"]
 	var ok = HabitState.update_habit(habit_id, fields)
@@ -672,6 +924,32 @@ func _fn_get_habit_stats(args: Dictionary) -> Dictionary:
 		return {"success": false, "error": "week_key 不能为空"}
 	var data = HabitState.agent_get_habit_stats(week_key)
 	return {"success": true, "data": data}
+
+
+func _fn_generate_habit_week_schedule(args: Dictionary) -> Dictionary:
+	var week_key := str(args.get("week_key", "")).strip_edges()
+	if week_key.is_empty():
+		week_key = HabitState.get_current_week_key()
+	var style := str(args.get("style", "relaxed")).strip_edges().to_lower()
+	if style not in ["relaxed", "disciplined"]:
+		style = "relaxed"
+	var ok := HabitState.agent_generate_week_schedule(week_key, style)
+	if not ok:
+		return {"success": false, "error": "生成周计划提示失败"}
+	return {"success": true, "data": {"week_key": week_key, "style": style}}
+
+
+func _fn_generate_habit_reflection(args: Dictionary) -> Dictionary:
+	var period_type := str(args.get("period_type", "week")).strip_edges().to_lower()
+	if period_type not in ["week", "month", "year"]:
+		period_type = "week"
+	var period_key := str(args.get("period_key", "")).strip_edges()
+	if period_key.is_empty():
+		period_key = HabitState.get_current_week_key() if period_type == "week" else Time.get_date_string_from_system()
+	var ok := HabitState.agent_generate_period_reflection(period_type, period_key)
+	if not ok:
+		return {"success": false, "error": "生成复盘提示失败"}
+	return {"success": true, "data": {"period_type": period_type, "period_key": period_key}}
 
 
 # ============================================================
@@ -744,3 +1022,82 @@ func _resolve_due_timestamp(args: Dictionary) -> int:
 	# 兼容：旧格式 due_timestamp 整数
 	var due_raw = args.get("due_timestamp", 0)
 	return int(due_raw)
+
+
+func _to_int_array(value: Variant) -> Array:
+	var result: Array = []
+	if value is Array:
+		for item in value:
+			result.append(int(item))
+	return result
+
+
+func _focus_default_bgm_volume(profile: String) -> float:
+	match profile:
+		"calm":
+			return 0.3
+		"light":
+			return 0.4
+		_:
+			return 0.35
+
+
+func _focus_default_play_mode(profile: String) -> int:
+	if profile == "light":
+		return MusicState.PlayMode.SEQUENTIAL
+	return MusicState.PlayMode.SINGLE_LOOP
+
+
+func _focus_environment_preset(profile: String) -> Dictionary:
+	match profile:
+		"calm":
+			return {
+				"time_mode": 1,
+				"weather_mode": 0,
+				"rain_amount": 300,
+				"snow_amount": 500,
+				"fog_state": 0,
+				"render_scale": 1.0,
+				"rain_sound_volume": 10,
+				"wind_sound_volume": 20,
+				"car_sound_volume": 10,
+			}
+		"light":
+			return {
+				"time_mode": 0,
+				"weather_mode": 0,
+				"rain_amount": 300,
+				"snow_amount": 500,
+				"fog_state": 0,
+				"render_scale": 1.0,
+				"rain_sound_volume": 0,
+				"wind_sound_volume": 10,
+				"car_sound_volume": 15,
+			}
+		_:
+			return {
+				"time_mode": 2,
+				"weather_mode": 1,
+				"rain_amount": 420,
+				"snow_amount": 500,
+				"fog_state": 1,
+				"render_scale": 0.9,
+				"rain_sound_volume": 45,
+				"wind_sound_volume": 35,
+				"car_sound_volume": 10,
+			}
+
+
+func _focus_exit_environment_preset() -> Dictionary:
+	return {
+		"time_mode": 3,
+		"weather_mode": 3,
+		"rain_amount": 300,
+		"snow_amount": 500,
+		"fog_state": 0,
+		"render_scale": 1.0,
+		"ai_response_glow": true,
+		"rain_sound_volume": 20,
+		"wind_sound_volume": 20,
+		"car_sound_volume": 25,
+	}

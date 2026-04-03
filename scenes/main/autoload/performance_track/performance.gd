@@ -5,8 +5,8 @@ var log_interval := 0.5 # 记录间隔（秒）
 var file_name := "user://performance.csv"
 
 # ===== 内部变量 =====
-	var _file: FileAccess
-	var _time_passed := 0.0
+var _file: FileAccess
+var _time_passed := 0.0
 var _timer := 0.0
 
 func _ready():

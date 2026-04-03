@@ -25,7 +25,7 @@ var _is_requesting: bool = false
 var _should_stop: bool = false
 var _buffer: String = ""
 var _stream_thread: Thread = null
-var _fr_thread: Thread = null   # function-result 独立线程
+var _fr_thread: Thread = null # function-result 独立线程
 var _mutex: Mutex = null
 var _full_response: String = ""
 var _event_type: String = ""
@@ -490,12 +490,13 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 			pass
 
 		"function_call":
-			var raw_args = data.get("arguments", {})
+			var raw_args = data.get("arguments", data.get("args", data.get("parameters", {})))
+			var normalized_args := _normalize_function_arguments(raw_args)
 			print("[CustomAPIAdapter][DEBUG] function_call name=%s args_type=%s args=%s" % [data.get("name", ""), typeof(raw_args), raw_args])
 			var response = AIResponse.function_call(
 				data.get("id", ""),
 				data.get("name", ""),
-				raw_args if raw_args is Dictionary else {}
+				normalized_args
 			)
 			call_deferred("_emit_stream_chunk", response)
 
@@ -571,3 +572,29 @@ func _decode_base64(base64_string: String) -> PackedByteArray:
 	if base64_string.is_empty():
 		return []
 	return Marshalls.base64_to_raw(base64_string)
+
+
+## 兼容后端 function_call.arguments 为 Dictionary / JSON 字符串
+func _normalize_function_arguments(raw_args: Variant) -> Dictionary:
+	if raw_args is Dictionary:
+		return raw_args
+
+	if raw_args is String:
+		var args_text := String(raw_args).strip_edges()
+		if args_text.is_empty():
+			return {}
+		var json := JSON.new()
+		if json.parse(args_text) != OK:
+			push_warning("[CustomAPIAdapter] function_call arguments JSON 解析失败: %s" % json.get_error_message())
+			return {}
+		var parsed = json.get_data()
+		if parsed is Dictionary:
+			return parsed
+		push_warning("[CustomAPIAdapter] function_call arguments 解析后不是 Dictionary")
+		return {}
+
+	if raw_args == null:
+		return {}
+
+	push_warning("[CustomAPIAdapter] function_call arguments 类型不支持: %s" % typeof(raw_args))
+	return {}

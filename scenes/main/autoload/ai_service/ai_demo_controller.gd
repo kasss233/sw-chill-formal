@@ -12,7 +12,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 	"delay": 0.0,
 	"record_restore": false,
 	"args": {
-	  "text": "我工作日要进行4小时考研和1小时读书，周末想运动一下。帮我安排一下日常习惯吧",
+	  "text": "我工作日每天要进行2小时考研和1小时读书，周末想运动一下。帮我安排一下日常习惯吧。",
 	}
   },
   {
@@ -66,12 +66,54 @@ var DEMO_STEPS: Array[Dictionary] = [
 	"delay": 0.2,
 	"record_restore": true,
 	"args": {
-	  "name": "晨间瑜伽",
+	  "name": "考研-上午",
 	  "minutes": 60,
 	  "start_time": "10:00",
 	  "end_time": "11:00",
-	  "selected_week_days": [1, 2, 3, 4, 5],
+	  "selected_week_days": [0, 1, 2, 3, 4],
 	  "color": "#FF7043",
+	  "save_as": "yoga_habit"
+	}
+  },
+  {
+	"type": "add_habit",
+	"delay": 0.2,
+	"record_restore": true,
+	"args": {
+	  "name": "考研-下午",
+	  "minutes": 60,
+	  "start_time": "14:00",
+	  "end_time": "15:00",
+	  "selected_week_days": [0, 1, 2, 3, 4],
+	  "color": "#FF7043",
+	  "save_as": "yoga_habit"
+	}
+  },
+  {
+	"type": "add_habit",
+	"delay": 0.2,
+	"record_restore": true,
+	"args": {
+	  "name": "读书",
+	  "minutes": 60,
+	  "start_time": "19:00",
+	  "end_time": "20:00",
+	  "selected_week_days": [0, 1, 2, 3, 4],
+	  "color": "#88ff43",
+	  "save_as": "yoga_habit"
+	}
+  },
+  {
+	"type": "add_habit",
+	"delay": 0.2,
+	"record_restore": true,
+	"args": {
+	  "name": "运动",
+	  "minutes": 60,
+	  "start_time": "16:00",
+	  "end_time": "17:00",
+	  "selected_week_days": [5, 6],
+	  "color": "#4375ff",
 	  "save_as": "yoga_habit"
 	}
   },
@@ -106,7 +148,7 @@ var DEMO_STEPS: Array[Dictionary] = [
 	"delay": 0.5,
 	"record_restore": false,
 	"args": {
-	  "text": "💡 建议：每天坚持执行课表中的任务，记录完成情况。系统会自动统计你的完成度和习惯养成进度哦～",
+	  "text": "我已帮你安排好习惯，记得按时执行哦",
 	  "append": false,
 	  "stream": false,
 	  "chunk_delay": 0.05
