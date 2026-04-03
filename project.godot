@@ -60,7 +60,7 @@ GlobalPerformance="*uid://c8p6p3dopghec"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/handheld/orientation=1
+window/handheld/orientation=6
 window/vsync/vsync_mode=0
 
 [editor_plugins]
