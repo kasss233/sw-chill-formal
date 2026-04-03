@@ -9,6 +9,8 @@ extends Node
 signal env_time_changed(mode: int)
 ## 环境天气切换信号
 signal env_weather_changed(mode: int)
+## 屏幕方向模式变化（0=横屏, 1=竖屏）
+signal screen_orientation_mode_changed(mode: int)
 ## 雪量强度变化
 signal snow_changed(_value: int)
 ## 雨量强度变化
@@ -41,6 +43,8 @@ signal fog_changed(_state: int)
 var _time_mode: int = 0
 ## 天气模式: 0=晴天, 1=雨天, 2=雪天, 3=同步
 var _weather_mode: int = 0
+## 屏幕方向模式: 0=横屏, 1=竖屏
+var _screen_orientation_mode: int = 0
 ## MSAA 3D 抗锯齿等级
 var _msaa: int = 0
 ## Screen Space AA 等级
@@ -104,6 +108,15 @@ func set_weather(mode: int) -> void:
 	env_weather_changed.emit(mode)
 	_save_settings()
 
+
+func set_screen_orientation_mode(mode: int) -> void:
+	mode = clampi(mode, 0, 1)
+	if _screen_orientation_mode == mode:
+		return
+	_screen_orientation_mode = mode
+	screen_orientation_mode_changed.emit(mode)
+	_save_settings()
+
 ## 设置雨量（下限 300），高频调整走防抖保存
 func set_rain_amount(amount: int) -> void:
 	amount = maxi(amount, RAIN_MIN_AMOUNT)
@@ -127,6 +140,10 @@ func get_time_mode() -> int:
 
 func get_weather_mode() -> int:
 	return _weather_mode
+
+
+func get_screen_orientation_mode() -> int:
+	return _screen_orientation_mode
 
 func get_rain_amount() -> int:
 	return _rain_amount
@@ -326,6 +343,7 @@ func _save_settings() -> void:
 	var config = ConfigFile.new()
 	config.set_value("env", "time_mode", _time_mode)
 	config.set_value("env", "weather_mode", _weather_mode)
+	config.set_value("env", "screen_orientation_mode", _screen_orientation_mode)
 	config.set_value("env", "rain_amount", _rain_amount)
 	config.set_value("env", "snow_amount", _snow_amount)
 	# outdoor_1/outdoor_2 功能暂时停用，不写入存档
@@ -367,6 +385,8 @@ func _load_settings() -> void:
 		return
 	_time_mode = int(config.get_value("env", "time_mode", 0))
 	_weather_mode = int(config.get_value("env", "weather_mode", 0))
+	var default_orientation := 1 if OS.has_feature("mobile") else 0
+	_screen_orientation_mode = clampi(int(config.get_value("env", "screen_orientation_mode", default_orientation)), 0, 1)
 	_rain_amount = maxi(int(config.get_value("env", "rain_amount", RAIN_MIN_AMOUNT)), RAIN_MIN_AMOUNT)
 	_snow_amount = maxi(int(config.get_value("env", "snow_amount", SNOW_MIN_AMOUNT)), SNOW_MIN_AMOUNT)
 	# outdoor_1/outdoor_2 功能已停用
@@ -403,6 +423,7 @@ func _load_settings() -> void:
 func _emit_loaded_settings() -> void:
 	env_time_changed.emit(_time_mode)
 	env_weather_changed.emit(_weather_mode)
+	screen_orientation_mode_changed.emit(_screen_orientation_mode)
 	rain_changed.emit(_rain_amount)
 	snow_changed.emit(_snow_amount)
 	# outdoor_1/outdoor_2 功能已停用（信号已注释）

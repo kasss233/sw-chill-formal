@@ -58,7 +58,6 @@ GlobalPerformance="*uid://c8p6p3dopghec"
 
 [display]
 
-window/size/mode=3
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1

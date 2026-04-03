@@ -10,8 +10,10 @@ extends Control
 @onready var _camera_dropdown: MaterialDropdown = %CameraDropDown
 @onready var _time_button: MaterialToggleButton = %TimeButton
 @onready var _weather_button: MaterialToggleButton = %WeatherButton
+@onready var _orientation_toggle: MaterialToggleButton = %OrientationToggle
 @onready var _rain_slider: MaterialSlider = %RainMaterialSlider
 @onready var _snow_slider: MaterialSlider = %SnowMaterialSlider
+@onready var _full_screen_checkbox: CheckBox = %FullScreenCheckbox
 @onready var _settings_vbox: VBoxContainer = $CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer
 
 var _mic_dropdown: MaterialDropdown
@@ -37,6 +39,7 @@ func _connect_state_signals() -> void:
 		return
 	_connect_if_needed(SettingState, "env_time_changed", _on_state_env_time_changed)
 	_connect_if_needed(SettingState, "env_weather_changed", _on_state_env_weather_changed)
+	_connect_if_needed(SettingState, "screen_orientation_mode_changed", _on_state_screen_orientation_mode_changed)
 	_connect_if_needed(SettingState, "rain_changed", _on_state_rain_changed)
 	_connect_if_needed(SettingState, "snow_changed", _on_state_snow_changed)
 	_connect_if_needed(SettingState, "render_scale_changed", _on_state_render_scale_changed)
@@ -58,6 +61,8 @@ func _exit_tree() -> void:
 		SettingState.env_time_changed.disconnect(_on_state_env_time_changed)
 	if SettingState.env_weather_changed.is_connected(_on_state_env_weather_changed):
 		SettingState.env_weather_changed.disconnect(_on_state_env_weather_changed)
+	if SettingState.screen_orientation_mode_changed.is_connected(_on_state_screen_orientation_mode_changed):
+		SettingState.screen_orientation_mode_changed.disconnect(_on_state_screen_orientation_mode_changed)
 	if SettingState.rain_changed.is_connected(_on_state_rain_changed):
 		SettingState.rain_changed.disconnect(_on_state_rain_changed)
 	if SettingState.snow_changed.is_connected(_on_state_snow_changed):
@@ -77,12 +82,14 @@ func _sync_all_controls_from_state() -> void:
 	_weather_button.set_state_no_signal(SettingState.get_weather_mode())
 	_rain_slider.set_value_no_signal(float(SettingState.get_rain_amount()))
 	_snow_slider.set_value_no_signal(float(SettingState.get_snow_amount()))
+	if _orientation_toggle != null:
+		_orientation_toggle.set_state_no_signal(SettingState.get_screen_orientation_mode())
+	if _full_screen_checkbox != null:
+		_full_screen_checkbox.set_pressed_no_signal(_is_full_screen_enabled())
 	# _outdoor_1_button.set_state_no_signal(SettingState.get_outdoor_1_state())
 	# _outdoor_2_button.set_state_no_signal(SettingState.get_outdoor_2_state())
 	# _outdoor_2_row.visible = true
 	_sync_audio_controls_from_state()
-
-
 func _setup_audio_debug_controls() -> void:
 	if _mic_dropdown != null:
 		return
@@ -175,7 +182,15 @@ func hide_module() -> void:
 
 
 func _on_full_screen_checkbox_toggled(toggled_on: bool) -> void:
-	pass # Replace with function body.
+	if toggled_on:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+
+func _is_full_screen_enabled() -> bool:
+	var mode := DisplayServer.window_get_mode()
+	return mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
 
 # ============ 抗锯齿设置 ============
 
@@ -236,6 +251,11 @@ func _on_state_env_time_changed(mode: int) -> void:
 func _on_state_env_weather_changed(mode: int) -> void:
 	_weather_button.set_state_no_signal(mode)
 
+
+func _on_state_screen_orientation_mode_changed(mode: int) -> void:
+	if _orientation_toggle != null:
+		_orientation_toggle.set_state_no_signal(mode)
+
 func _on_state_rain_changed(amount: int) -> void:
 	_rain_slider.set_value_no_signal(float(amount))
 
@@ -278,6 +298,10 @@ func _on_speaker_dropdown_changed(_index: int, value: Variant) -> void:
 
 func _on_record_preview_toggle_changed(_old_state: int, new_state: int) -> void:
 	SettingState.set_talk_record_preview_enabled(new_state == 1)
+
+
+func _on_orientation_toggle_changed(_old_state: int, new_state: int) -> void:
+	SettingState.set_screen_orientation_mode(new_state)
 
 # func _on_state_outdoor_1_changed(state: int) -> void:
 # 	_outdoor_1_button.set_state_no_signal(state)
