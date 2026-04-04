@@ -11,6 +11,7 @@ class_name AIResponse extends RefCounted
 ##   - TEXT: 普通文本响应，用于 DialogueBox 显示
 ##   - TTS: 语音合成响应，包含音频 URL 或二进制数据
 ##   - FUNCTION_CALL: 函数调用请求，AI 要求执行某个操作
+##   - ENVIRONMENT / ACTION: SSE 扩展，环境设置与演出动作
 ##   - FUNCTION_RESULT: 函数执行结果，用于回传给 AI
 ##   - ERROR: 错误响应
 ##   - DONE: 流式传输完成标记
@@ -20,6 +21,8 @@ enum ResponseType {
 	TEXT,            ## 文本内容
 	TTS,             ## 语音合成
 	FUNCTION_CALL,   ## 函数调用请求
+	ENVIRONMENT,     ## 环境/场景设置（SSE environment）
+	ACTION,          ## 演出动作（SSE action）
 	FUNCTION_RESULT, ## 函数调用结果
 	ERROR,           ## 错误
 	DONE             ## 完成标记
@@ -49,6 +52,9 @@ var function_call_id: String = ""
 var function_name: String = ""
 ## 函数参数（JSON 解析后的字典）
 var function_args: Dictionary = {}
+## environment / action 载荷（SSE 扩展）
+var environment_data: Dictionary = {}
+var action_data: Dictionary = {}
 ## 函数执行结果（用于 FUNCTION_RESULT 类型）
 var function_result: Variant = null
 
@@ -93,6 +99,24 @@ static func function_call(id: String, name: String, args: Dictionary) -> AIRespo
 	r.function_call_id = id
 	r.function_name = name
 	r.function_args = args
+	r.timestamp = Time.get_unix_time_from_system()
+	return r
+
+
+## 创建 environment 响应
+static func environment_payload(data: Dictionary) -> AIResponse:
+	var r = AIResponse.new()
+	r.type = ResponseType.ENVIRONMENT
+	r.environment_data = data.duplicate(true)
+	r.timestamp = Time.get_unix_time_from_system()
+	return r
+
+
+## 创建 action（演出）响应
+static func action_payload(data: Dictionary) -> AIResponse:
+	var r = AIResponse.new()
+	r.type = ResponseType.ACTION
+	r.action_data = data.duplicate(true)
 	r.timestamp = Time.get_unix_time_from_system()
 	return r
 

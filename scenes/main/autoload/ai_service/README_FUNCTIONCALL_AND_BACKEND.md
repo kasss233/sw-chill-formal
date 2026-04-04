@@ -280,3 +280,24 @@ data: {"stream_id":"s1"}
 3. 语音：播放器实现与稳定性修复
 
 这样便于回滚和定位问题。
+
+---
+
+## 9. 独立 Python Agent（仓库内 `agent/`）输出协议
+
+仓库内 HTTP Agent（`python -m http_server.server`）与 Godot 后端对齐时使用相同 SSE 事件名：
+
+- `text_delta` / `text_done`：对用户可见正文。
+- `function_call`：`data` 含 `id`、`name`、`arguments`，与本文第 2 节一致。
+- `environment`：`data` 为扁平对象，建议字段：`time_mode`、`weather_mode`、`camera_mode`、`rain_amount`、`snow_amount`（与 `SettingState` 约定一致，null/省略表示不改）。
+- `action`：演出用，建议字段：`pose`（如 `greet`、`idle`、`typing`…）、`emotion`（如 `happy`、`neutral`…）；客户端由 `ChatState.agent_action_received` 转发至 3D。
+
+模型须在回复中输出 **自然语言段落** + 围栏包住的 JSON：
+
+- 起始行：`<agent_json>`
+- 结束行：`</agent_json>`
+- 围栏内为单一 JSON 对象，键名至少包含：`text`、`function_calls`（数组）、`environment`（对象或 null）、`action`（对象或 null）。
+
+**工具定义唯一来源**：`scenes/main/autoload/ai_service/function_definitions.json`（旧版 `docs/function_definitions.json` 已移除以避免双份漂移）。Python 侧通过 `agent/config/chat_agent.yaml` 的 `function_definitions_path` 覆盖路径；留空则用上述默认文件。
+
+Godot `CustomAPIAdapter` 已识别 SSE 事件 `environment` 与 `action`；`ChatController` 对 environment 调用 `SettingState` API，对 action 调用 `ChatState.notify_agent_action`（`main_3d.gd` 监听并驱动角色）。

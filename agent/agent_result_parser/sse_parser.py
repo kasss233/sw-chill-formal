@@ -4,7 +4,7 @@ SSE事件解析器
 """
 import json
 import uuid
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from enum import Enum
 
 from response import AgentResponse, Operation
@@ -16,6 +16,8 @@ class SSEEventType(str, Enum):
     TEXT_DELTA = "text_delta"
     TEXT_DONE = "text_done"
     FUNCTION_CALL = "function_call"
+    ENVIRONMENT = "environment"
+    ACTION = "action"
     TTS = "tts"
     ERROR = "error"
     DONE = "done"
@@ -87,20 +89,35 @@ class SSEParser:
                 event_type=SSEEventType.TEXT_DONE,
                 data={"content": agent_response.text}
             ))
-        
-        # 2. 函数调用：将operations转换为function_call事件
-        for operation in agent_response.operations:
-            function_call_event = self._operation_to_function_call(operation)
-            if function_call_event:
-                events.append(function_call_event)
-        
-        # 3. 演出脚本：转换为TTS事件（如果有）
+
+        # 2. 函数调用：优先原生 function_calls，否则 legacy operations
+        if agent_response.function_calls:
+            events.extend(self._native_function_call_events(agent_response.function_calls))
+        else:
+            for operation in agent_response.operations:
+                function_call_event = self._operation_to_function_call(operation)
+                if function_call_event:
+                    events.append(function_call_event)
+
+        # 3. 环境与演出（与 Python agent / 后端扩展事件对齐）
+        if agent_response.environment:
+            events.append(SSEEvent(
+                event_type=SSEEventType.ENVIRONMENT,
+                data=dict(agent_response.environment),
+            ))
+        if agent_response.action:
+            events.append(SSEEvent(
+                event_type=SSEEventType.ACTION,
+                data=dict(agent_response.action),
+            ))
+
+        # 4. 演出脚本：转换为TTS事件（如果有）
         if agent_response.performance_sequence:
             tts_event = self._performance_to_tts(agent_response.performance_sequence)
             if tts_event:
                 events.append(tts_event)
-        
-        # 4. 最后发送done事件
+
+        # 5. 最后发送done事件
         events.append(SSEEvent(
             event_type=SSEEventType.DONE,
             data={
@@ -110,7 +127,32 @@ class SSEParser:
         ))
         
         return events
-    
+
+    def _native_function_call_events(self, calls: List[Dict[str, Any]]) -> List[SSEEvent]:
+        evs: List[SSEEvent] = []
+        for fc in calls:
+            if not isinstance(fc, dict):
+                continue
+            name = fc.get("name")
+            if not name:
+                continue
+            self.function_call_counter += 1
+            fid = fc.get("id") or fc.get("call_id") or f"fc_{self.function_call_counter:03d}"
+            args = fc.get("arguments", fc.get("args", {}))
+            if args is None:
+                args = {}
+            if not isinstance(args, dict):
+                args = {}
+            evs.append(SSEEvent(
+                event_type=SSEEventType.FUNCTION_CALL,
+                data={
+                    "id": str(fid),
+                    "name": str(name),
+                    "arguments": args,
+                },
+            ))
+        return evs
+
     def _operation_to_function_call(self, operation: Operation) -> Optional[SSEEvent]:
         """
         将Operation转换为function_call事件

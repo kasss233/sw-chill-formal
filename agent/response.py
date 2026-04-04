@@ -2,7 +2,7 @@
 响应结构定义
 将响应拆解为更细粒度的操作类型
 """
-from typing import List, Literal, Optional, Dict, Any
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import Field, BaseModel
 
@@ -122,5 +122,21 @@ Operation = (
 
 
 class AgentResponse(Response):
-    """Agent完整响应（包含文本、演出和操作）"""
-    operations: List[Operation] = Field(default_factory=list, description="需要执行的操作列表")
+    """Agent完整响应（包含文本、演出、原生 function_calls 与可选 environment/action）"""
+
+    operations: List[Operation] = Field(
+        default_factory=list,
+        description="旧版结构化操作（已弃用主路径，仅兼容反序列化/测试）",
+    )
+    function_calls: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="与后端/Godot 一致的函数调用列表：id, name, arguments",
+    )
+    environment: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="环境/场景设置载荷（SSE environment 事件）",
+    )
+    action: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="演出动作载荷（SSE action 事件）",
+    )

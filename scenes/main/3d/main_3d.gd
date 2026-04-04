@@ -122,6 +122,9 @@ func _connect_signals() -> void:
 	if DialogueState and DialogueState.has_signal("function_completed"):
 		if not DialogueState.function_completed.is_connected(_on_function_completed):
 			DialogueState.function_completed.connect(_on_function_completed)
+	if ChatState and ChatState.has_signal("agent_action_received"):
+		if not ChatState.agent_action_received.is_connected(_on_agent_action_received):
+			ChatState.agent_action_received.connect(_on_agent_action_received)
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
@@ -328,3 +331,52 @@ func _on_function_executing(func_name: String, call_id: String) -> void:
 func _on_function_completed(func_name: String, call_id: String, success: bool) -> void:
 	print("[main3d]Functioncompleted: %s(id: %s, success: %s)" % [func_name, call_id, success])
 	character.set_idle_pose()
+
+
+func _on_agent_action_received(payload: Dictionary) -> void:
+	if not character:
+		return
+	if payload.has("pose") and payload["pose"] != null:
+		var pose := str(payload["pose"]).strip_edges()
+		match pose:
+			"idle":
+				character.set_idle_pose()
+			"typing":
+				character.set_typing_pose()
+			"clap":
+				character.set_clap_pose()
+			"think":
+				character.set_think_pose()
+			"cheer":
+				character.set_cheer_pose()
+			"watch":
+				character.set_watch_pose()
+			"greet":
+				character.set_greet_pose()
+			"surprised":
+				character.set_surprised_pose()
+			"disbelief":
+				character.set_disbelief_pose()
+			"stretch":
+				character.set_stretch_pose()
+			"stretch2":
+				character.set_stretch2_pose()
+			"talk":
+				character.set_talk_pose()
+	if payload.has("emotion") and payload["emotion"] != null:
+		var em := str(payload["emotion"]).strip_edges()
+		match em:
+			"neutral":
+				character.set_neutral()
+			"happy":
+				character.set_happy()
+			"sad":
+				character.set_sad()
+			"surprised":
+				character.set_surprised()
+			"angry":
+				character.set_angry()
+			"saying":
+				character.set_saying()
+			"blinking":
+				character.set_blinking()

@@ -46,6 +46,14 @@ def agent_response_to_sse_text_list(agent_response_json: str, quiet: bool = Fals
     for fc in function_calls:
         function_call_data = fc.to_sse_data()
         sse_text_list.append(f"event: function_call\ndata: {function_call_data}\n")
+
+    # 3.25 environment / action（原生 AgentResponse 字段）
+    if agent_response.environment:
+        env_data = json.dumps(agent_response.environment, ensure_ascii=False)
+        sse_text_list.append(f"event: environment\ndata: {env_data}\n")
+    if agent_response.action:
+        act_data = json.dumps(agent_response.action, ensure_ascii=False)
+        sse_text_list.append(f"event: action\ndata: {act_data}\n")
     
     # 3.3 TTS事件（如果有演出脚本）
     if agent_response.performance_sequence:

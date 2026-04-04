@@ -23,6 +23,16 @@ system_prompt_template: |
 temperature: 0.7
 max_tokens: 1000
 
+# 与 Godot 共用的工具定义 JSON；留空则用仓库内 scenes/main/autoload/ai_service/function_definitions.json
+function_definitions_path: ""
+legacy_task_pipeline: false
+strict_function_names: false
+
+# 工具自回归：>0 时 chat/chat_stream 会多轮执行 function_calls 并将结果注入后再调 LLM（详见 agent/docs/AGENT_IO_AND_BACKEND_INTEGRATION.md）
+max_tool_rounds: 0
+# none | heuristic：首轮前是否注入轻量规划提示（不额外调 LLM）
+planner_mode: none
+
 memory_top_k: 5
 memory_max_tokens: 2000
 

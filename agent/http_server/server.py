@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import time
+import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
@@ -225,6 +226,12 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             return
 
         user_id = self._get_user_id(body)
+        session_id = body.get("session_id")
+        trace = (
+            body.get("request_trace_id")
+            or body.get("trace_id")
+            or uuid.uuid4().hex[:16]
+        )
 
         # 流式：Accept: text/event-stream 或 query ?stream=true
         want_stream = (
@@ -232,11 +239,21 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             or (urlparse(self.path).query or "").lower().find("stream=true") >= 0
         )
         if want_stream:
-            self._handle_chat_stream(message, body.get("session_id"), user_id=user_id)
+            self._handle_chat_stream(
+                message,
+                session_id=session_id,
+                user_id=user_id,
+                request_trace_id=str(trace),
+            )
             return
 
         try:
-            response = CHAT_AGENT.chat(message)
+            response = CHAT_AGENT.chat(
+                message,
+                user_id=user_id,
+                session_id=session_id,
+                request_trace_id=str(trace),
+            )
             # Pydantic v2 不再支持 .json(ensure_ascii=...)，用 model_dump 再 json.dumps
             out = response.model_dump(mode="json")
             if user_id is not None:
@@ -252,6 +269,7 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
         message: str,
         session_id: Optional[str] = None,
         user_id: Optional[str] = None,
+        request_trace_id: Optional[str] = None,
     ) -> None:
         """以 SSE 流式返回 /chat 结果。done 事件中带回 user_id。"""
         t0 = time.perf_counter()
@@ -270,7 +288,12 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             ev_total = 0
             delta_total = 0
             first_ev_t: Optional[float] = None
-            for event_type, data in CHAT_AGENT.chat_stream(message, session_id=session_id):
+            for event_type, data in CHAT_AGENT.chat_stream(
+                message,
+                session_id=session_id,
+                user_id=user_id,
+                request_trace_id=request_trace_id,
+            ):
                 if first_ev_t is None:
                     first_ev_t = time.perf_counter()
                     logger.info(

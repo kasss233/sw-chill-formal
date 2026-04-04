@@ -61,6 +61,72 @@ func _find_ui_node_recursive(node: Node) -> UI:
 	
 	return null
 
+
+func _extract_agent_response_dict(cleaned_text: String) -> Variant:
+	const BEGIN := "<agent_json>"
+	const END := "</agent_json>"
+	var bi := cleaned_text.find(BEGIN)
+	var ei := cleaned_text.rfind(END)
+	if bi != -1 and ei != -1 and ei > bi:
+		var preamble := cleaned_text.substr(0, bi).strip_edges()
+		var inner_start := bi + BEGIN.length()
+		var inner := cleaned_text.substr(inner_start, ei - inner_start).strip_edges()
+		var obj = JSON.parse_string(inner)
+		if obj is Dictionary:
+			var t := str(obj.get("text", "")).strip_edges()
+			if t.is_empty():
+				obj["text"] = preamble
+			return obj
+		return {"text": preamble, "function_calls": [], "operations": []}
+	return JSON.parse_string(cleaned_text)
+
+
+func _apply_environment_payload(env: Variant) -> void:
+	if env == null or not env is Dictionary:
+		return
+	var d: Dictionary = env
+	if d.is_empty():
+		return
+	if SettingState:
+		if d.has("time_mode") and d["time_mode"] != null:
+			SettingState.set_time(int(d["time_mode"]))
+		if d.has("weather_mode") and d["weather_mode"] != null:
+			SettingState.set_weather(int(d["weather_mode"]))
+		if d.has("camera_mode") and d["camera_mode"] != null:
+			SettingState.set_camera(int(d["camera_mode"]))
+		if d.has("rain_amount") and d["rain_amount"] != null:
+			SettingState.set_rain_amount(int(d["rain_amount"]))
+		if d.has("snow_amount") and d["snow_amount"] != null:
+			SettingState.set_snow_amount(int(d["snow_amount"]))
+	if ChatState:
+		ChatState.notify_agent_environment(d.duplicate(true))
+
+
+func _execute_function_call_entry(fc: Dictionary) -> Dictionary:
+	var out = {"success": false, "error": ""}
+	var fname := str(fc.get("name", ""))
+	if fname.is_empty():
+		out["error"] = "function_call 缺少 name"
+		return out
+	var args: Dictionary = {}
+	var raw_args = fc.get("arguments", fc.get("args", {}))
+	if raw_args is Dictionary:
+		args = raw_args
+	elif raw_args is String:
+		var j = JSON.new()
+		if j.parse(raw_args) == OK and j.get_data() is Dictionary:
+			args = j.get_data()
+	var call_id := str(fc.get("id", fc.get("call_id", "")))
+	var executor: AgentExecutor = null
+	if ChatController:
+		executor = ChatController.get_node_or_null("AgentExecutor") as AgentExecutor
+	if executor == null:
+		out["error"] = "AgentExecutor 不可用"
+		print("[Parser] ", out["error"])
+		return out
+	var res: Dictionary = executor.execute(call_id, fname, args)
+	return {"success": res.get("success", false), "error": str(res.get("error", ""))}
+
 # ====== 主要解析接口 ======
 """
 解析Agent传递来的JSON文本并执行相应操作
@@ -84,11 +150,9 @@ func parse_and_execute(json_text: String) -> Dictionary:
 	var cleaned_text = json_text.strip_edges()
 	if cleaned_text.begins_with("Agent response: "):
 		cleaned_text = cleaned_text.substr("Agent response: ".length()).strip_edges()
-	
-	# 解析JSON
-	var json_parse_result = JSON.parse_string(cleaned_text)
-	if json_parse_result == null:
-		# 尝试使用 JSON.parse() 获取详细错误信息
+
+	var response_data = _extract_agent_response_dict(cleaned_text)
+	if response_data == null:
 		var json_parser = JSON.new()
 		var parse_error = json_parser.parse(cleaned_text)
 		if parse_error != OK:
@@ -97,37 +161,41 @@ func parse_and_execute(json_text: String) -> Dictionary:
 			result["error"] = "JSON解析失败: 未知错误"
 		print("[Parser] 错误: ", result["error"])
 		return result
-	
-	var response_data = json_parse_result
-	
-	# 验证响应结构
+
 	if not response_data.has("text"):
-		result["error"] = "响应缺少 'text' 字段"
-		print("[Parser] 错误: ", result["error"])
-		return result
-	
+		response_data["text"] = ""
+
 	result["parsed_response"] = response_data
-	result["text"] = response_data.get("text", "")
-	
-	# 提取文本响应
-	var text = response_data.get("text", "")
-	print("[Parser] Agent文本响应: ", text)
-	
-	# 处理演出脚本序列（如果有）
+	result["text"] = str(response_data.get("text", ""))
+
+	print("[Parser] Agent文本响应: ", result["text"])
+
+	var env = response_data.get("environment")
+	_apply_environment_payload(env)
+
+	var act = response_data.get("action")
+	if act is Dictionary:
+		ChatState.notify_agent_action(act.duplicate(true))
+
 	if response_data.has("performance_sequence") and response_data["performance_sequence"] != null:
 		_handle_performance_sequence(response_data["performance_sequence"])
-	
-	# 处理操作列表
+
+	var fcalls = response_data.get("function_calls", [])
+	if fcalls is Array:
+		for fc in fcalls:
+			if fc is Dictionary and fc.has("name"):
+				var op_result = _execute_function_call_entry(fc)
+				if op_result.get("success", false):
+					result["executed_operations"] += 1
+
 	var operations = response_data.get("operations", [])
 	if operations is Array:
 		for operation in operations:
 			if operation is Dictionary:
-				var op_result = await _execute_operation(operation)
-				if op_result.get("success", false):
+				var op_result2 = await _execute_operation(operation)
+				if op_result2.get("success", false):
 					result["executed_operations"] += 1
-				else:
-					print("[Parser] 操作执行失败: ", op_result.get("error", "未知错误"))
-	else:
+	elif not (operations is Array) and not operations == null:
 		print("[Parser] 警告: operations 不是数组类型")
 	
 	result["success"] = true

@@ -21,7 +21,7 @@ class AgentConfig(BaseModel):
 1. 你必须使用中文与用户对话
 2. 回复要符合你的角色设定，语气要{character_personality}
 3. 回复要简洁、温暖、自然，就像朋友间的对话
-4. 当用户请求创建任务或学习计划时，除了文字回复，系统会自动为你创建相应的任务"""
+4. 当用户需要操作 App 内能力时，在 agent_json 的 function_calls 中填写对应工具，不要仅停留在文字描述"""
 
     temperature: float = 0.7
     max_tokens: Optional[int] = None
@@ -29,3 +29,13 @@ class AgentConfig(BaseModel):
     memory_max_tokens: int = 2000
     task_generation_prompt_template: Optional[str] = None
     task_generation_system_prompt: Optional[str] = None
+    ## 与 Godot 共用的函数定义 JSON；空字符串表示使用默认路径（scenes/main/autoload/ai_service/function_definitions.json）
+    function_definitions_path: str = ""
+    ## 为 True 时保留旧版「意图检测 + 二次 LLM 生成 TaskCreateOperation」路径（默认关闭，由模型在 agent_json 中输出 function_calls）
+    legacy_task_pipeline: bool = False
+    ## 为 True 时丢弃不在 function_definitions.json 中出现的 function name（并写入解析警告日志）
+    strict_function_names: bool = False
+    ## 工具自回归最大轮数（每轮：LLM → function_calls → 执行 → 再 LLM）。0 表示关闭，单轮行为与旧版一致。
+    max_tool_rounds: int = 0
+    ## none | heuristic：首轮前是否注入轻量规划提示（不额外调用 LLM）
+    planner_mode: str = "none"

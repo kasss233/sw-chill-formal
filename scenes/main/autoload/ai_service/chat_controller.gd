@@ -131,10 +131,18 @@ func _on_adapter_stream_chunk(ai_response: AIResponse) -> void:
 			_handle_text_response(ai_response)
 		AIResponse.ResponseType.FUNCTION_CALL:
 			_handle_function_call(ai_response)
+		AIResponse.ResponseType.ENVIRONMENT:
+			_handle_environment_response(ai_response)
+		AIResponse.ResponseType.ACTION:
+			_handle_action_response(ai_response)
 		AIResponse.ResponseType.TTS:
 			_handle_tts_response(ai_response)
 		AIResponse.ResponseType.ERROR:
 			_handle_error_response(ai_response)
+		AIResponse.ResponseType.DONE, AIResponse.ResponseType.FUNCTION_RESULT:
+			pass
+		_:
+			push_warning("[ChatController] 未处理的 AIResponse 类型: %s" % ai_response.type)
 
 
 func _on_adapter_stream_completed(full_response: String) -> void:
@@ -156,6 +164,28 @@ func _handle_text_response(ai_response: AIResponse) -> void:
 	else:
 		ChatState.set_response_text(ai_response.text_content)
 	response_chunk.emit(ai_response.text_content)
+
+
+func _handle_environment_response(ai_response: AIResponse) -> void:
+	var d := ai_response.environment_data
+	if d.is_empty():
+		return
+	if SettingState:
+		if d.has("time_mode") and d["time_mode"] != null:
+			SettingState.set_time(int(d["time_mode"]))
+		if d.has("weather_mode") and d["weather_mode"] != null:
+			SettingState.set_weather(int(d["weather_mode"]))
+		if d.has("camera_mode") and d["camera_mode"] != null:
+			SettingState.set_camera(int(d["camera_mode"]))
+		if d.has("rain_amount") and d["rain_amount"] != null:
+			SettingState.set_rain_amount(int(d["rain_amount"]))
+		if d.has("snow_amount") and d["snow_amount"] != null:
+			SettingState.set_snow_amount(int(d["snow_amount"]))
+	ChatState.notify_agent_environment(d.duplicate(true))
+
+
+func _handle_action_response(ai_response: AIResponse) -> void:
+	ChatState.notify_agent_action(ai_response.action_data.duplicate(true))
 
 
 func _handle_function_call(ai_response: AIResponse) -> void:

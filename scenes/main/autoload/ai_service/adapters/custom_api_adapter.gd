@@ -6,9 +6,13 @@ class_name CustomAPIAdapter extends AIAdapter
 ##   event: text_delta / text_done / function_call / tts / error / done
 ##   data: {json}
 ##
-## 请求端点:
-##   POST /chat/messages — 发送消息（SSE 流）
-##   POST /chat/function-results — 回传函数执行结果（JSON）
+## 请求端点（相对 AuthState.get_base_url()，通常为 .../api/v1）:
+##   POST /agent/chat/messages — 发送消息（SSE 流，chill-backend agent_api）
+##   POST /agent/chat/function-results — 回传函数执行结果（JSON）
+## 若需直连旧版 LLM 路由，可在 configure 中传入 chat_path_prefix: "/chat"。
+
+## 相对 base_url 的对话前缀，默认与后端 router 前缀一致
+var chat_path_prefix: String = "/agent/chat"
 
 ## API 配置
 var api_url: String = ""
@@ -62,6 +66,10 @@ func configure(config: Dictionary) -> void:
 		auth_token = config["auth_token"]
 	if config.has("request_timeout"):
 		request_timeout = config["request_timeout"]
+	if config.has("chat_path_prefix"):
+		chat_path_prefix = str(config["chat_path_prefix"]).strip_edges()
+		if chat_path_prefix.is_empty():
+			chat_path_prefix = "/agent/chat"
 
 
 ## 获取/设置会话 ID
@@ -201,7 +209,7 @@ func _execute_request(body: Dictionary, _stream: bool) -> void:
 		_set_requesting(false)
 		return
 
-	var full_url = api_url + "/chat/messages"
+	var full_url = api_url + chat_path_prefix + "/messages"
 	print("[CustomAPIAdapter][DEBUG] api_url = %s" % api_url)
 	print("[CustomAPIAdapter][DEBUG] full_url = %s" % full_url)
 	var url_parts = _parse_url(full_url)
@@ -258,7 +266,7 @@ func _execute_function_result_request(body: Dictionary) -> void:
 		call_deferred("_emit_request_failed", "未登录，无法回传函数结果")
 		return
 
-	var url_parts = _parse_url(api_url + "/chat/function-results")
+	var url_parts = _parse_url(api_url + chat_path_prefix + "/function-results")
 	if url_parts.is_empty():
 		call_deferred("_emit_request_failed", "API URL 格式无效")
 		return
@@ -499,6 +507,16 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 				normalized_args
 			)
 			call_deferred("_emit_stream_chunk", response)
+
+		"environment":
+			if data is Dictionary:
+				var env_resp = AIResponse.environment_payload(data)
+				call_deferred("_emit_stream_chunk", env_resp)
+
+		"action":
+			if data is Dictionary:
+				var act_resp = AIResponse.action_payload(data)
+				call_deferred("_emit_stream_chunk", act_resp)
 
 		"tts":
 			var response: AIResponse

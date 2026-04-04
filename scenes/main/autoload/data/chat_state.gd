@@ -30,6 +30,10 @@ signal function_call_started(call_id: String, name: String)
 ## 函数调用完成
 signal function_call_completed(call_id: String, name: String, success: bool)
 
+## Agent SSE：环境/演出载荷（供 3D 或其它模块监听）
+signal agent_environment_received(payload: Dictionary)
+signal agent_action_received(payload: Dictionary)
+
 ## AI 流光开始（模块级）
 signal ai_glow_started(module_key: String)
 ## AI 流光结束（模块级）
@@ -611,6 +615,20 @@ func notify_function_call_started(call_id: String, fname: String) -> void:
 	var module_key: String = _FUNC_MODULE_MAP.get(fname, "")
 	if not module_key.is_empty():
 		ai_glow_started.emit(module_key)
+
+
+func notify_agent_environment(payload: Dictionary) -> void:
+	if payload.is_empty():
+		return
+	print("[ChatState] agent_environment: %s" % payload)
+	agent_environment_received.emit(payload)
+
+
+func notify_agent_action(payload: Dictionary) -> void:
+	if payload.is_empty():
+		return
+	print("[ChatState] agent_action: %s" % payload)
+	agent_action_received.emit(payload)
 
 
 func notify_function_call_completed(call_id: String, fname: String, success: bool) -> void:

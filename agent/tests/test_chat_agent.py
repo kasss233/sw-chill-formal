@@ -60,6 +60,25 @@ def test_chat_agent_import_and_config():
     assert config.temperature == 0.5
 
 
+def test_llm_output_parser():
+    """结构化围栏与 function_calls 解析"""
+    from agent.chat_agent.llm_output_parser import AGENT_JSON_BEGIN, AGENT_JSON_END, parse_full
+    allowed = {"add_task"}
+    raw = (
+        "你好\n"
+        f"{AGENT_JSON_BEGIN}\n"
+        '{"text":"你好","function_calls":[{"id":"fc_001","name":"add_task","arguments":{"title":"x","deadline":""}}],'
+        '"environment":{"time_mode":0},"action":{"pose":"greet"}}\n'
+        f"{AGENT_JSON_END}"
+    )
+    turn = parse_full(raw, allowed_function_names=allowed, strict_function_names=True)
+    assert turn.text == "你好"
+    assert len(turn.function_calls) == 1
+    assert turn.function_calls[0]["name"] == "add_task"
+    assert turn.environment and turn.environment.get("time_mode") == 0
+    assert turn.action and turn.action.get("pose") == "greet"
+
+
 def test_chat_stream_events():
     """测试 chat_stream 产出的事件类型与顺序（mock LLM，不依赖 Ollama）"""
     from agent.chat_agent.agent import Agent
