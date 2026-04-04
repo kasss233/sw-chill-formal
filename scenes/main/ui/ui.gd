@@ -17,7 +17,7 @@ func _input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed):
 		return
 
-	if event.keycode == KEY_1:
+	if event.keycode == KEY_KP_1:
 		AIDemoController.start_demo()
 		get_viewport().set_input_as_handled()
 		return
