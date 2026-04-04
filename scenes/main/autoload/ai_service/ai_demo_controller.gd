@@ -158,6 +158,48 @@ var DEMO_STEPS: Array[Dictionary] = [
 	"type": "wait",
 	"delay": 2.0,
 	"record_restore": false
+  },
+  {
+	"type": "generate_profile_demo_data",
+	"delay": 0.5,
+	"record_restore": true,
+	"args": {
+	  "days_back": 7
+	}
+  },
+  {
+	"type": "show_module",
+	"delay": 0.3,
+	"record_restore": false,
+	"args": {
+	  "module_name": "habit"
+	}
+  },
+  {
+	"type": "select_profile_tab",
+	"delay": 0.2,
+	"record_restore": false,
+	"args": {
+	  "tab_index": 0
+	}
+  },
+  {
+	"type": "wait",
+	"delay": 2.0,
+	"record_restore": false
+  },
+  {
+	"type": "select_profile_tab",
+	"delay": 0.5,
+	"record_restore": false,
+	"args": {
+	  "tab_index": 1
+	}
+  },
+  {
+	"type": "wait",
+	"delay": 3.0,
+	"record_restore": false
   }
 ]
 
@@ -306,6 +348,18 @@ func _execute_step(step: Dictionary, run_id: int) -> bool:
 			return _step_play_track(args, should_record)
 		"set_play_mode":
 			return _step_set_play_mode(args)
+		"add_focus_record":
+			return _step_add_focus_record(args, should_record)
+		"add_task_record":
+			return _step_add_task_record(args, should_record)
+		"add_overdue_task":
+			return _step_add_overdue_task(args, should_record)
+		"set_level_xp":
+			return _step_set_level_xp(args, should_record)
+		"set_daily_task_progress":
+			return _step_set_daily_task_progress(args, should_record)
+		"generate_profile_demo_data":
+			return _step_generate_profile_demo_data(args, should_record)
 		"wait":
 			return true
 		_:
@@ -682,6 +736,23 @@ func _restore_tasks() -> void:
 				if TaskState.get_task_by_id(task_id) != null:
 					TaskState.set_task_completed(task_id, bool(change.get("old_completed", false)))
 					TaskState.set_task_due_time(task_id, int(change.get("old_due_timestamp", 0)))
+			"focus_record_added", "task_record_added":
+				# 统计记录通过 demo_clear_all_records 统一清除
+				pass
+			"level_changed":
+				var old_level := int(change.get("old_level", 1))
+				var old_xp := int(change.get("old_xp", 0))
+				LevelState.demo_set_level_and_xp(old_level, old_xp)
+			"daily_task_progress_set":
+				AchievementState.demo_set_daily_task_progress(str(change.get("auto_key", "")), 0)
+			"profile_demo_data_generated":
+				# 清除所有统计记录
+				StatsState.demo_clear_all_records()
+				# 恢复等级
+				LevelState.demo_set_level_and_xp(1, 0)
+				# 清除每日任务进度
+				for task_def in AchievementState.AUTO_DAILY_TASK_DEFS:
+					AchievementState.demo_set_daily_task_progress(str(task_def.get("auto_key", "")), 0)
 
 
 func _restore_pomodoro() -> void:
@@ -788,3 +859,132 @@ func _reset_runtime_state() -> void:
 	_active_function_calls.clear()
 	_recorded_note_updates.clear()
 	_opened_modules.clear()
+
+
+func _step_add_focus_record(args: Dictionary, should_record: bool) -> bool:
+	var date_key := str(args.get("date_key", ""))
+	var duration_seconds := int(args.get("duration_seconds", 1500))
+	var start_time := str(args.get("start_time", ""))
+	var completed := bool(args.get("completed", true))
+	var interruptions := int(args.get("interruptions_count", 0))
+
+	var record = StatsState.demo_add_focus_record(
+		date_key, duration_seconds, start_time, completed, interruptions
+	)
+
+	if record and should_record:
+		applied_changes.append({
+			"kind": "focus_record_added",
+			"record_id": record.id
+		})
+	return record != null
+
+
+func _step_add_task_record(args: Dictionary, should_record: bool) -> bool:
+	var date_key := str(args.get("date_key", ""))
+	var task_id := int(args.get("task_id", 0))
+
+	var record = StatsState.demo_add_task_record(date_key, task_id)
+
+	if record and should_record:
+		applied_changes.append({
+			"kind": "task_record_added",
+			"record_id": record.id
+		})
+	return record != null
+
+
+func _step_add_overdue_task(args: Dictionary, should_record: bool) -> bool:
+	var title := str(args.get("title", "")).strip_edges()
+	var due_timestamp := int(args.get("due_timestamp", 0))
+
+	if title.is_empty():
+		return false
+
+	var task = TaskState.demo_add_overdue_task(title, due_timestamp)
+
+	if task and should_record:
+		applied_changes.append({
+			"kind": "task_added",
+			"task_id": task.id
+		})
+	return task != null
+
+
+func _step_set_level_xp(args: Dictionary, should_record: bool) -> bool:
+	var level := int(args.get("level", 1))
+	var xp := int(args.get("xp", 0))
+
+	if should_record:
+		applied_changes.append({
+			"kind": "level_changed",
+			"old_level": LevelState.level,
+			"old_xp": LevelState.xp
+		})
+
+	LevelState.demo_set_level_and_xp(level, xp)
+	return true
+
+
+func _step_set_daily_task_progress(args: Dictionary, should_record: bool) -> bool:
+	var auto_key := str(args.get("auto_key", ""))
+	var progress := int(args.get("progress", 0))
+
+	if auto_key.is_empty():
+		return false
+
+	var ok = AchievementState.demo_set_daily_task_progress(auto_key, progress)
+
+	if ok and should_record:
+		applied_changes.append({
+			"kind": "daily_task_progress_set",
+			"auto_key": auto_key
+		})
+	return ok
+
+
+func _step_generate_profile_demo_data(args: Dictionary, should_record: bool) -> bool:
+	var days_back := int(args.get("days_back", 7))
+
+	# 生成过去 N 天的数据
+	for i in range(days_back):
+		var offset := -(days_back - 1 - i)
+		var date_key := DateUtil.offset_date(DateUtil.get_today_key(), offset)
+
+		# 每天 2-4 条专注记录
+		var focus_count := randi() % 3 + 2
+		for j in range(focus_count):
+			var hour := 9 + j * 3
+			var minute := randi() % 60
+			var start_time := "%02d:%02d" % [hour, minute]
+			var duration := (randi() % 46 + 15) * 60  # 15-60 分钟
+			var completed := randf() > 0.2  # 80% 完成率
+
+			StatsState.demo_add_focus_record(date_key, duration, start_time, completed, 0)
+
+		# 每天 3-5 条任务完成记录
+		var task_count := randi() % 3 + 3
+		for j in range(task_count):
+			StatsState.demo_add_task_record(date_key, 0)
+
+	# 设置等级和经验
+	LevelState.demo_set_level_and_xp(5, 150)
+
+	# 设置每日任务进度
+	AchievementState.demo_set_daily_task_progress("todo_complete_5", 5)
+	AchievementState.demo_set_daily_task_progress("pomodoro_complete_2", 2)
+	AchievementState.demo_set_daily_task_progress("chat_complete_3", 1)
+
+	# 添加逾期任务
+	var now := int(Time.get_unix_time_from_system())
+	TaskState.demo_add_overdue_task("完成项目文档", now - 86400 * 2)
+	TaskState.demo_add_overdue_task("回复客户邮件", now - 86400)
+
+	if should_record:
+		applied_changes.append({
+			"kind": "profile_demo_data_generated",
+			"days_back": days_back
+		})
+
+	print("[AIDemoController] 已生成个人中心演示数据（过去 %d 天）" % days_back)
+	return true

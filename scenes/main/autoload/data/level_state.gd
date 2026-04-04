@@ -148,6 +148,18 @@ func agent_get_level_info() -> Dictionary:
 	}
 
 
+# ===== Demo API =====
+
+## 设置等级和经验（用于演示）
+func demo_set_level_and_xp(new_level: int, new_xp: int) -> void:
+	level = max(1, new_level)
+	xp = max(0, new_xp)
+	_clear_pending_gain_context()
+	save_data()
+	_emit_state_changed()
+	print("[LevelState] Demo 设置等级: Lv.%d, XP: %d" % [level, xp])
+
+
 # ===== 同步 API =====
 func export_data() -> Dictionary:
 	return {"version": 1, "level": level, "xp": xp}

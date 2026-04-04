@@ -1014,3 +1014,19 @@ func _find_item_index(category: String, item_id: int) -> int:
 		if str(item.get("category", "")) == category and int(item.get("id", -1)) == item_id:
 			return index
 	return -1
+
+
+# ======================== Demo API ========================
+
+## 设置每日任务进度（用于演示）
+func demo_set_daily_task_progress(auto_key: String, progress: int) -> bool:
+	for item in _items:
+		if str(item.get("category", "")) == "daily_task" and str(item.get("auto_key", "")) == auto_key:
+			item["progress"] = max(0, progress)
+			item["is_completed"] = progress >= int(item.get("target", 1))
+			_save_data()
+			daily_task_state_updated.emit(item)
+			if item["is_completed"]:
+				daily_task_completed.emit(item)
+			return true
+	return false

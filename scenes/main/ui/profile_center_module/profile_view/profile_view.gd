@@ -129,8 +129,11 @@ func _refresh_overview() -> void:
 	else:
 		_focus_value.text = "0 分钟"
 
-	# 完成任务
-	_task_done_value.text = str(TaskState.get_completed_count())
+	# 今日完成任务
+	if StatsState:
+		_task_done_value.text = str(StatsState.get_today_task_completed_count())
+	else:
+		_task_done_value.text = "0"
 
 	# 逾期任务
 	_task_overdue_value.text = str(TaskState.get_overdue_tasks().size())
