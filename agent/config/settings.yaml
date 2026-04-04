@@ -4,9 +4,20 @@ server:
   host: "127.0.0.1"
   port: 8000
 
+# LLM：按 providers 顺序尝试，前者失败则换下一个；全部失败才报错。
+# 密钥勿提交公开仓库，可用 api_key_env: "DEEPSEEK_API_KEY" 从环境变量读取（优先于 api_key）。
 llm:
-  base_url: "http://localhost:11434"
-  model: "qwen2:1.5b"
+  providers:
+    - name: deepseek
+      type: openai_compatible
+      base_url: "https://api.deepseek.com"
+      chat_path: "/chat/completions"
+      model: "deepseek-chat"
+      api_key: "sk-316f0a471cb44c11997f9cb7b0d71a01"
+    - name: local-ollama
+      type: ollama
+      base_url: "http://localhost:11434"
+      model: "qwen2:1.5b"
 
 # 后端 API（ReflectionAgent / 统计 等可选用真实后端）
 backend:
@@ -15,4 +26,5 @@ backend:
   use_real_api: false  # true 时使用 RealServerAPI，否则使用 SimpleServerAPI
 
 logging:
+  # SSE 排障：info 可看阶段；debug 可看 HTTP 每 60 条 text_delta、Agent 每 40 片 LLM 分片
   level: "info"  # trace | debug | info | warning | error

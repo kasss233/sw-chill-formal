@@ -58,6 +58,32 @@ var _character: Node = null
 
 func _ready() -> void:
 	_setup_audio_player()
+	_apply_tts_state()
+	if TTSState:
+		TTSState.volume_changed.connect(_on_tts_state_volume)
+		TTSState.audio_bus_changed.connect(_on_tts_state_bus)
+		TTSState.queue_enabled_changed.connect(_on_tts_state_queue)
+
+
+func _apply_tts_state() -> void:
+	if not TTSState or not _audio_player:
+		return
+	volume = TTSState.get_volume()
+	_audio_player.bus = TTSState.get_audio_bus()
+	queue_enabled = TTSState.is_queue_enabled()
+
+
+func _on_tts_state_volume(v: float) -> void:
+	volume = v
+
+
+func _on_tts_state_bus(bus_name: String) -> void:
+	if _audio_player:
+		_audio_player.bus = bus_name
+
+
+func _on_tts_state_queue(enabled: bool) -> void:
+	queue_enabled = enabled
 
 
 func _setup_audio_player() -> void:

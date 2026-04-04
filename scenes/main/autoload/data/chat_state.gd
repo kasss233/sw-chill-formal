@@ -56,18 +56,44 @@ signal talk_recording_ready(byte_size: int)
 signal talk_recording_failed(message: String)
 ## 请求上传语音到 STT 后端（后端接入方监听）
 signal talk_stt_upload_requested(payload: Dictionary)
+## 语音对话 HTTP 完成（与 /api/v1/sound-to-text/messages 对应，body 为完整 SSE 文本）
+signal talk_voice_chat_http_completed(result: int, response_code: int, body: PackedByteArray)
+## 语音对话 HTTP 发起失败（配置缺失或 request() 返回错误）
+signal talk_voice_chat_http_failed(message: String)
+## 后端 speech_transcript 事件（识别出的用户话术，便于 UI 展示）
+signal speech_transcript_received(text: String)
 
 # ============ 状态 ============
 var status: Status = Status.IDLE
 var current_response_text: String = ""
 
 const _TALK_RECORD_BUS := "TalkRecord"
+const _VOICE_CHAT_PATH := "/api/v1/sound-to-text/messages"
+
+## 后端根 URL（不含尾斜杠），例如 https://api.example.com
+var voice_chat_api_base_url: String = ""
+## Bearer Token，与文本聊天一致
+var voice_chat_access_token: String = ""
+## 当前会话 ID，与 POST chat 一致；空则由后端新建会话
+var voice_chat_session_id: String = ""
+## 转写后转发目标："" 使用服务端默认配置；"openai" | "agent" 覆盖
+var voice_chat_target: String = ""
+## 与 SendMessageRequest.context 一致的可 JSON 序列化字典，可为空
+var voice_chat_context: Dictionary = {}
 
 var _talk_record_effect: AudioEffectRecord
 var _talk_mic_player: AudioStreamPlayer
 var _talk_preview_player: AudioStreamPlayer
 var _is_talk_recording := false
 var _last_talk_audio_payload: Dictionary = {}
+
+var _voice_chat_http: HTTPRequest
+var _voice_chat_in_flight: bool = false
+
+## 语音合成播放（后端 tts_audio）；与录音预览共用 Master 总线
+var _tts_output_player: AudioStreamPlayer
+var _tts_pending_queue: Array[Dictionary] = []
+var _tts_collect: Array[Dictionary] = []
 
 # 函数名 → 模块 key 映射（用于流光定位）
 const _FUNC_MODULE_MAP: Dictionary = {
@@ -115,6 +141,7 @@ const _FUNC_MODULE_MAP: Dictionary = {
 
 func _ready() -> void:
 	_setup_talk_recording()
+	_setup_voice_chat_http()
 
 
 func _setup_talk_recording() -> void:
@@ -148,6 +175,194 @@ func _setup_talk_recording() -> void:
 	_talk_preview_player = AudioStreamPlayer.new()
 	_talk_preview_player.bus = "Master"
 	add_child(_talk_preview_player)
+
+
+func _setup_voice_chat_http() -> void:
+	_voice_chat_http = HTTPRequest.new()
+	_voice_chat_http.request_completed.connect(_on_voice_chat_http_completed)
+	add_child(_voice_chat_http)
+
+	_tts_output_player = AudioStreamPlayer.new()
+	_tts_output_player.bus = "Master"
+	_tts_output_player.finished.connect(_on_tts_output_player_finished)
+	add_child(_tts_output_player)
+
+
+func _on_voice_chat_http_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	_voice_chat_in_flight = false
+
+	if result != HTTPRequest.RESULT_SUCCESS:
+		fail_response("语音对话网络错误: %d" % result)
+	elif response_code < 200 or response_code >= 300:
+		var hint := body.get_string_from_utf8()
+		fail_response("语音对话 HTTP %d: %s" % [response_code, hint.left(400)])
+	else:
+		_parse_and_apply_voice_chat_sse(body.get_string_from_utf8())
+
+	talk_voice_chat_http_completed.emit(result, response_code, body)
+
+
+## 解析 ChillBackend SSE（含 speech_transcript、tts_audio，与 /api/v1/agent/chat 一致）
+func _parse_and_apply_voice_chat_sse(raw: String) -> void:
+	_tts_collect.clear()
+	_tts_pending_queue.clear()
+	if _tts_output_player != null and _tts_output_player.playing:
+		_tts_output_player.stop()
+
+	var had_error := false
+	var saw_done := false
+	var saw_response_start := false
+
+	for block in raw.split("\n\n"):
+		var b := block.strip_edges()
+		if b.is_empty() or b.begins_with(":"):
+			continue
+		var ev := ""
+		var data_str := ""
+		for line in b.split("\n"):
+			if line.begins_with("event:"):
+				ev = line.substr(6).strip_edges()
+			elif line.begins_with("data:"):
+				# 只取首行 data（与当前后端一致）
+				if data_str.is_empty():
+					data_str = line.substr(5).strip_edges()
+		if ev.is_empty() or data_str.is_empty():
+			continue
+
+		var j: Variant = JSON.parse_string(data_str)
+		if typeof(j) != TYPE_DICTIONARY:
+			continue
+		var d: Dictionary = j
+
+		match ev:
+			"speech_transcript":
+				var st: String = str(d.get("text", ""))
+				if not st.is_empty():
+					speech_transcript_received.emit(st)
+					input_text_requested.emit(st)
+			"session_start":
+				var sid: String = str(d.get("session_id", ""))
+				if not sid.is_empty():
+					voice_chat_session_id = sid
+				if not saw_response_start:
+					saw_response_start = true
+					start_response()
+			"text_delta":
+				if not saw_response_start:
+					saw_response_start = true
+					start_response()
+				var part: String = str(d.get("content", ""))
+				if not part.is_empty():
+					append_response_text(part)
+			"text_done":
+				var full_td: String = str(d.get("content", ""))
+				if not full_td.is_empty():
+					set_response_text(full_td)
+			"function_call":
+				var fc_id: String = str(d.get("id", ""))
+				if fc_id.is_empty():
+					fc_id = "fc_%d" % Time.get_ticks_msec()
+				var fname: String = str(d.get("name", ""))
+				notify_function_call_started(fc_id, fname)
+			"tts_audio":
+				var b64: String = str(d.get("audio_base64", ""))
+				var mime: String = str(d.get("mime_type", "audio/wav"))
+				var seg_idx: int = int(d.get("segment_index", 0))
+				if b64.is_empty():
+					continue
+				var audio_bytes: PackedByteArray = Marshalls.base64_decode(b64)
+				if audio_bytes.is_empty():
+					continue
+				_tts_collect.append({"segment_index": seg_idx, "bytes": audio_bytes, "mime": mime})
+			"error":
+				had_error = true
+				_stop_and_clear_tts_voice()
+				var code: int = int(d.get("code", 0))
+				var msg: String = str(d.get("message", "未知错误"))
+				fail_response("[%d] %s" % [code, msg])
+			"done":
+				saw_done = true
+				var dsid: String = str(d.get("session_id", ""))
+				if not dsid.is_empty():
+					voice_chat_session_id = dsid
+				if not had_error:
+					complete_response(current_response_text)
+					_queue_tts_from_collect()
+				else:
+					_stop_and_clear_tts_voice()
+
+	if had_error:
+		return
+	if saw_response_start and not saw_done:
+		complete_response(current_response_text)
+		_queue_tts_from_collect()
+	elif not saw_response_start and not _tts_collect.is_empty():
+		_queue_tts_from_collect()
+
+
+func _stop_and_clear_tts_voice() -> void:
+	_tts_collect.clear()
+	_tts_pending_queue.clear()
+	if _tts_output_player != null and _tts_output_player.playing:
+		_tts_output_player.stop()
+
+
+func _queue_tts_from_collect() -> void:
+	if _tts_collect.is_empty():
+		return
+	_tts_collect.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a.get("segment_index", 0)) < int(b.get("segment_index", 0))
+	)
+	_tts_pending_queue.clear()
+	for item in _tts_collect:
+		_tts_pending_queue.append(item)
+	_tts_collect.clear()
+	if _tts_output_player != null and not _tts_output_player.playing:
+		_play_next_tts_chunk()
+
+
+func _play_next_tts_chunk() -> void:
+	if _tts_output_player == null:
+		return
+	if _tts_pending_queue.is_empty():
+		return
+	var item: Dictionary = _tts_pending_queue.pop_front()
+	var raw: PackedByteArray = item.get("bytes", PackedByteArray())
+	var mime: String = str(item.get("mime", "audio/wav"))
+	if raw.is_empty():
+		call_deferred("_play_next_tts_chunk")
+		return
+	var err: int = _load_stream_and_play_tts(raw, mime)
+	if err != OK:
+		push_warning("[ChatState] TTS 片段解码失败: %d" % err)
+		call_deferred("_play_next_tts_chunk")
+
+
+func _load_stream_and_play_tts(raw: PackedByteArray, mime: String) -> int:
+	var mlow := mime.to_lower()
+	if mlow.contains("mpeg") or mlow.contains("mp3"):
+		var mp3 := AudioStreamMP3.new()
+		mp3.data = raw
+		_tts_output_player.stream = mp3
+		_tts_output_player.play()
+		return OK
+	var path := "user://_chatstate_tts_%d.wav" % Time.get_ticks_msec()
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		return ERR_CANT_CREATE
+	f.store_buffer(raw)
+	f.close()
+	var loaded: Variant = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE)
+	if loaded == null or not (loaded is AudioStream):
+		return ERR_INVALID_DATA
+	_tts_output_player.stream = loaded as AudioStream
+	_tts_output_player.play()
+	return OK
+
+
+func _on_tts_output_player_finished() -> void:
+	_play_next_tts_chunk()
+
 
 func set_status(new_status: Status) -> void:
 	if status != new_status:
@@ -211,7 +426,6 @@ func stop_talk_recording() -> Dictionary:
 		_talk_preview_player.stream = wav_stream
 		_talk_preview_player.play()
 
-	# 预留后端接口：当前仅返回未实现状态。
 	var stt_result := request_talk_stt(payload)
 	return {
 		"ok": true,
@@ -221,11 +435,57 @@ func stop_talk_recording() -> Dictionary:
 	}
 
 
-func request_talk_stt(_payload: Dictionary) -> Dictionary:
-	return {
-		"ok": false,
-		"error": "STT 后端接口未实现"
+func request_talk_stt(payload: Dictionary) -> Dictionary:
+	# POST JSON 至 ChillBackend /api/v1/sound-to-text/messages，响应为 text/event-stream（整包缓冲完成后回调）。
+	if voice_chat_api_base_url.is_empty() or voice_chat_access_token.is_empty():
+		var skip := "语音对话未配置（voice_chat_api_base_url / voice_chat_access_token）"
+		print("[ChatState] " + skip)
+		talk_voice_chat_http_failed.emit(skip)
+		return {"ok": false, "error": skip}
+
+	var url := voice_chat_api_base_url.rstrip("/") + _VOICE_CHAT_PATH
+	var b64 := Marshalls.raw_to_base64(payload.get("audio_bytes", PackedByteArray()))
+	var body: Dictionary = {
+		"audio_base64": b64,
+		"mime_type": payload.get("mime_type", "audio/wav"),
+		"stream": true,
 	}
+	var fn: Variant = payload.get("file_name", "")
+	if typeof(fn) == TYPE_STRING and str(fn) != "":
+		body["file_name"] = str(fn)
+	if voice_chat_session_id != "":
+		body["session_id"] = voice_chat_session_id
+	if voice_chat_target != "":
+		body["chat_target"] = voice_chat_target
+	if not voice_chat_context.is_empty():
+		body["context"] = voice_chat_context
+
+	var json_str := JSON.stringify(body)
+	if json_str.is_empty():
+		var err_build := "构建语音对话 JSON 失败"
+		talk_voice_chat_http_failed.emit(err_build)
+		return {"ok": false, "error": err_build}
+
+	var headers: PackedStringArray = [
+		"Authorization: Bearer " + voice_chat_access_token,
+		"Content-Type: application/json",
+		"Accept: text/event-stream",
+	]
+	if _voice_chat_in_flight:
+		var busy := "语音对话请求进行中，请稍后再试"
+		talk_voice_chat_http_failed.emit(busy)
+		return {"ok": false, "error": busy}
+
+	var err: int = _voice_chat_http.request(url, headers, HTTPClient.METHOD_POST, json_str)
+	if err != OK:
+		var msg := "语音对话 HTTP 发起失败: %d" % err
+		print("[ChatState] " + msg)
+		talk_voice_chat_http_failed.emit(msg)
+		return {"ok": false, "error": msg}
+
+	_voice_chat_in_flight = true
+	print("[ChatState] 已请求语音对话: %s" % url)
+	return {"ok": true, "error": ""}
 
 
 func get_last_talk_audio_payload() -> Dictionary:

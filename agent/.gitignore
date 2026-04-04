@@ -1,4 +1,5 @@
 .idea
+test_api_sse_last_capture.txt
 *.example
 *cache*
 *.md

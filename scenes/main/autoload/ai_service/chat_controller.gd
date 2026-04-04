@@ -182,9 +182,15 @@ func _handle_function_call(ai_response: AIResponse) -> void:
 
 
 func _handle_tts_response(ai_response: AIResponse) -> void:
-	if tts_player:
-		tts_player.play(ai_response.tts_url, ai_response.tts_data, ai_response.tts_format)
-		tts_started.emit()
+	if not TTSState.is_tts_enabled():
+		return
+	if not tts_player:
+		return
+	tts_player.queue_enabled = TTSState.is_queue_enabled()
+	if TTSState.get_interrupt_on_new_reply():
+		tts_player.stop()
+	tts_player.play(ai_response.tts_url, ai_response.tts_data, ai_response.tts_format)
+	tts_started.emit()
 
 
 func _handle_error_response(ai_response: AIResponse) -> void:

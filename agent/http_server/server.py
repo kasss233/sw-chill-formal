@@ -14,12 +14,14 @@
     python -m agent.http_server.server
 
 依赖：
-- 需要本地已启动 Ollama 服务（默认 http://localhost:11434），并有可用模型（例如 qwen2:1.5b）。
+- LLM 由 `agent/config/settings.yaml` 的 `llm` 段配置：可为 `providers` 列表（OpenAI 兼容 + Ollama 等按顺序回退），
+  或旧版单字段 `base_url` + `model`（仅 Ollama）。
 """
 
 from __future__ import annotations
 
 import json
+import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
@@ -28,13 +30,25 @@ from typing import Optional, Dict, Any
 
 from agent import Agent, AgentConfig
 from agent.reflection_agent import ReflectionAgent, ReflectionAgentConfig
-from agent.core.config_loader import (
-    load_settings,
-    load_chat_agent_config,
-    load_reflection_agent_config,
-)
-from agent.core.logger import get_logger, setup_logging
-from interfaces.llm_implementations.ollama_llm import OllamaLLM
+
+# run_server.py 把本仓库的 agent/ 目录加入 path 时，core 是顶层包，内层 agent 包里没有 core；
+# 从游戏仓库根目录 python -m agent.http_server.server 时则为 agent.core。
+try:
+    from agent.core.config_loader import (
+        load_settings,
+        load_chat_agent_config,
+        load_reflection_agent_config,
+    )
+    from agent.core.logger import get_logger, setup_logging
+    from agent.core.llm_factory import build_llm_from_settings
+except ModuleNotFoundError:  # pragma: no cover - 与 run_server / start_server.bat 一致
+    from core.config_loader import (
+        load_settings,
+        load_chat_agent_config,
+        load_reflection_agent_config,
+    )
+    from core.logger import get_logger, setup_logging
+    from core.llm_factory import build_llm_from_settings
 from interfaces.memory import MemoryInterface
 from interfaces.simple_server_api import SimpleServerAPI
 from interfaces.real_server_api import RealServerAPI
@@ -78,11 +92,9 @@ def _load_config(config_dir: Optional[Path] = None) -> None:
     setup_logging(level=log_level)
     logger.info("配置已加载: settings=%s", bool(settings))
 
-    # LLM：优先配置文件
+    # LLM：settings.yaml 中 llm.providers 顺序回退，或 legacy base_url+model（Ollama）
     llm_opts = settings.get("llm") or {}
-    base_url = llm_opts.get("base_url", "http://localhost:11434")
-    model = llm_opts.get("model", "qwen2:1.5b")
-    LLM_INSTANCE = OllamaLLM(base_url=base_url, model=model)
+    LLM_INSTANCE = build_llm_from_settings(llm_opts)
     MEMORY_INSTANCE = DummyMemory()
     backend = settings.get("backend") or {}
     if backend.get("use_real_api"):
@@ -143,11 +155,15 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _set_sse_headers(self) -> None:
-        """设置 SSE 流式响应头"""
+        """设置 SSE 流式响应头。
+
+        必须使用 Connection: close：本响应无 Content-Length / chunked，
+        若 keep-alive，curl 等客户端无法判定 body 结束，会与单线程服务端互相等待而卡死。
+        """
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-cache")
-        self.send_header("Connection", "keep-alive")
+        self.send_header("Connection", "close")
         self.send_header("X-Accel-Buffering", "no")
         self.end_headers()
 
@@ -221,7 +237,8 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
 
         try:
             response = CHAT_AGENT.chat(message)
-            out = json.loads(response.json(ensure_ascii=False))
+            # Pydantic v2 不再支持 .json(ensure_ascii=...)，用 model_dump 再 json.dumps
+            out = response.model_dump(mode="json")
             if user_id is not None:
                 out["user_id"] = user_id
             self._set_headers(200)
@@ -237,14 +254,55 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
         user_id: Optional[str] = None,
     ) -> None:
         """以 SSE 流式返回 /chat 结果。done 事件中带回 user_id。"""
+        t0 = time.perf_counter()
+        logger.info(
+            "HTTP SSE /chat 开始 session_id=%s user_id=%s message_len=%d",
+            session_id,
+            user_id,
+            len(message or ""),
+        )
         try:
             self._set_sse_headers()
+            logger.info(
+                "HTTP SSE 响应头已发送 (+%.2fs)，开始消费 chat_stream 生成器",
+                time.perf_counter() - t0,
+            )
+            ev_total = 0
+            delta_total = 0
+            first_ev_t: Optional[float] = None
             for event_type, data in CHAT_AGENT.chat_stream(message, session_id=session_id):
+                if first_ev_t is None:
+                    first_ev_t = time.perf_counter()
+                    logger.info(
+                        "HTTP SSE 首个事件 type=%s (距请求开始 %.2fs)",
+                        event_type,
+                        first_ev_t - t0,
+                    )
+                ev_total += 1
+                if event_type == "text_delta":
+                    delta_total += 1
+                    if delta_total == 1:
+                        logger.debug("HTTP SSE 开始推送 text_delta")
+                    elif delta_total % 60 == 0:
+                        logger.debug("HTTP SSE 已写 text_delta x%s", delta_total)
+                else:
+                    logger.info(
+                        "HTTP SSE 事件 type=%s ev#%s data_keys=%s",
+                        event_type,
+                        ev_total,
+                        list(data.keys()) if isinstance(data, dict) else type(data).__name__,
+                    )
                 if event_type == "done" and user_id is not None:
                     data = {**data, "user_id": user_id}
                 line = f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
                 self.wfile.write(line.encode("utf-8"))
                 self.wfile.flush()
+            logger.info(
+                "HTTP SSE /chat 正常结束 events=%s text_deltas=%s 总耗时=%.2fs",
+                ev_total,
+                delta_total,
+                time.perf_counter() - t0,
+            )
         except Exception as e:
             logger.exception("流式 chat 失败: %s", e)
             # 已发送 SSE 头时无法再改状态码，只能发 error 事件
@@ -304,7 +362,7 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 precomputed_stats=precomputed_stats,
                 extra_context=extra_context,
             )
-            out = json.loads(response.json(ensure_ascii=False))
+            out = response.model_dump(mode="json")
             user_id = self._get_user_id(body)
             if user_id is not None:
                 out["user_id"] = user_id
