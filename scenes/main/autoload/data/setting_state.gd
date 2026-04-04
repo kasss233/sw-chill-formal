@@ -9,12 +9,16 @@ extends Node
 signal env_time_changed(mode: int)
 ## 环境天气切换信号
 signal env_weather_changed(mode: int)
+## 屏幕方向模式变化（0=横屏, 1=竖屏）
+signal screen_orientation_mode_changed(mode: int)
 ## 雪量强度变化
 signal snow_changed(_value: int)
 ## 雨量强度变化
 signal rain_changed(_value: int)
 ## 摄像头切换
 signal camera_changed(_value: int)
+## 3D 渲染分辨率缩放变化
+signal render_scale_changed(scale: float)
 ## AI 回复流光开关变化
 signal ai_response_glow_changed(enabled: bool)
 ## 麦克风设备变化
@@ -39,10 +43,14 @@ signal fog_changed(_state: int)
 var _time_mode: int = 0
 ## 天气模式: 0=晴天, 1=雨天, 2=雪天, 3=同步
 var _weather_mode: int = 0
+## 屏幕方向模式: 0=横屏, 1=竖屏
+var _screen_orientation_mode: int = 0
 ## MSAA 3D 抗锯齿等级
 var _msaa: int = 0
 ## Screen Space AA 等级
 var _ssaa: int = 0
+## 3D 渲染分辨率缩放（0.5-1.0）
+var _render_scale: float = 1.0
 ## 雨量强度
 var _rain_amount: int = 300
 ## 雪量强度
@@ -75,6 +83,8 @@ const SAVE_PATH = "user://settings.cfg"
 const SAVE_DEBOUNCE_SEC := 0.25
 const RAIN_MIN_AMOUNT := 300
 const SNOW_MIN_AMOUNT := 500
+const RENDER_SCALE_MIN := 0.5
+const RENDER_SCALE_MAX := 1.0
 
 var _save_timer: SceneTreeTimer
 
@@ -96,6 +106,15 @@ func set_weather(mode: int) -> void:
 		return
 	_weather_mode = mode
 	env_weather_changed.emit(mode)
+	_save_settings()
+
+
+func set_screen_orientation_mode(mode: int) -> void:
+	mode = clampi(mode, 0, 1)
+	if _screen_orientation_mode == mode:
+		return
+	_screen_orientation_mode = mode
+	screen_orientation_mode_changed.emit(mode)
 	_save_settings()
 
 ## 设置雨量（下限 300），高频调整走防抖保存
@@ -121,6 +140,10 @@ func get_time_mode() -> int:
 
 func get_weather_mode() -> int:
 	return _weather_mode
+
+
+func get_screen_orientation_mode() -> int:
+	return _screen_orientation_mode
 
 func get_rain_amount() -> int:
 	return _rain_amount
@@ -151,6 +174,17 @@ func set_ssaa(mode: int) -> void:
 		return
 	_ssaa = mode
 	get_viewport().screen_space_aa = mode as Viewport.ScreenSpaceAA
+	_save_settings()
+
+
+## 设置 3D 渲染分辨率缩放并立即应用到视口
+func set_render_scale(scale: float) -> void:
+	scale = clampf(scale, RENDER_SCALE_MIN, RENDER_SCALE_MAX)
+	if is_equal_approx(_render_scale, scale):
+		return
+	_render_scale = scale
+	get_viewport().scaling_3d_scale = _render_scale
+	render_scale_changed.emit(_render_scale)
 	_save_settings()
 
 func set_camera(mode: int) -> void:
@@ -272,6 +306,10 @@ func get_msaa() -> int:
 func get_ssaa() -> int:
 	return _ssaa
 
+
+func get_render_scale() -> float:
+	return _render_scale
+
 ## 设置户外特效 1 开关状态
 func set_outdoor_1(_state: int) -> void:
 	# outdoor_1 功能暂时停用
@@ -305,6 +343,7 @@ func _save_settings() -> void:
 	var config = ConfigFile.new()
 	config.set_value("env", "time_mode", _time_mode)
 	config.set_value("env", "weather_mode", _weather_mode)
+	config.set_value("env", "screen_orientation_mode", _screen_orientation_mode)
 	config.set_value("env", "rain_amount", _rain_amount)
 	config.set_value("env", "snow_amount", _snow_amount)
 	# outdoor_1/outdoor_2 功能暂时停用，不写入存档
@@ -314,6 +353,7 @@ func _save_settings() -> void:
 	config.set_value("env", "camera_mode", _camera_mode)
 	config.set_value("rendering", "msaa_3d", _msaa)
 	config.set_value("rendering", "screen_space_aa", _ssaa)
+	config.set_value("rendering", "scale_3d", _render_scale)
 	config.set_value("ai", "response_glow", _ai_response_glow)
 	config.set_value("audio", "input_device", _audio_input_device)
 	config.set_value("audio", "output_device", _audio_output_device)
@@ -338,12 +378,15 @@ func _load_settings() -> void:
 		var vp = get_viewport()
 		_msaa = vp.msaa_3d as int
 		_ssaa = vp.screen_space_aa as int
+		_render_scale = clampf(vp.scaling_3d_scale, RENDER_SCALE_MIN, RENDER_SCALE_MAX)
 		_audio_input_device = AudioServer.get_input_device()
 		_audio_output_device = AudioServer.get_output_device()
 		_save_settings()
 		return
 	_time_mode = int(config.get_value("env", "time_mode", 0))
 	_weather_mode = int(config.get_value("env", "weather_mode", 0))
+	var default_orientation := 1 if OS.has_feature("mobile") else 0
+	_screen_orientation_mode = clampi(int(config.get_value("env", "screen_orientation_mode", default_orientation)), 0, 1)
 	_rain_amount = maxi(int(config.get_value("env", "rain_amount", RAIN_MIN_AMOUNT)), RAIN_MIN_AMOUNT)
 	_snow_amount = maxi(int(config.get_value("env", "snow_amount", SNOW_MIN_AMOUNT)), SNOW_MIN_AMOUNT)
 	# outdoor_1/outdoor_2 功能已停用
@@ -353,6 +396,7 @@ func _load_settings() -> void:
 	_camera_mode = int(config.get_value("env", "camera_mode", 0))
 	_msaa = int(config.get_value("rendering", "msaa_3d", 0))
 	_ssaa = int(config.get_value("rendering", "screen_space_aa", 0))
+	_render_scale = clampf(float(config.get_value("rendering", "scale_3d", get_viewport().scaling_3d_scale)), RENDER_SCALE_MIN, RENDER_SCALE_MAX)
 	_ai_response_glow = config.get_value("ai", "response_glow", true) as bool
 	_audio_input_device = str(config.get_value("audio", "input_device", AudioServer.get_input_device()))
 	_audio_output_device = str(config.get_value("audio", "output_device", AudioServer.get_output_device()))
@@ -362,6 +406,7 @@ func _load_settings() -> void:
 	_car_sound_volume = clampi(int(config.get_value("audio", "car_sound_volume", 50)), 0, 100)
 	get_viewport().msaa_3d = _msaa as Viewport.MSAA
 	get_viewport().screen_space_aa = _ssaa as Viewport.ScreenSpaceAA
+	get_viewport().scaling_3d_scale = _render_scale
 
 	# 回放并应用存档中的音频设备；设备不存在时保持当前系统默认
 	if AudioServer.get_input_device_list().has(_audio_input_device):
@@ -378,11 +423,13 @@ func _load_settings() -> void:
 func _emit_loaded_settings() -> void:
 	env_time_changed.emit(_time_mode)
 	env_weather_changed.emit(_weather_mode)
+	screen_orientation_mode_changed.emit(_screen_orientation_mode)
 	rain_changed.emit(_rain_amount)
 	snow_changed.emit(_snow_amount)
 	# outdoor_1/outdoor_2 功能已停用（信号已注释）
 	fog_changed.emit(_fog_state)
 	camera_changed.emit(_camera_mode)
+	render_scale_changed.emit(_render_scale)
 	ai_response_glow_changed.emit(_ai_response_glow)
 	audio_input_device_changed.emit(_audio_input_device)
 	audio_output_device_changed.emit(_audio_output_device)

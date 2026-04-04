@@ -183,6 +183,26 @@ func agent_select_room_decor_item(item_id: int) -> bool:
 	return select_item(item_id)
 
 
+func agent_deselect_room_decor_item(item_id: int) -> bool:
+	return deselect_item(item_id)
+
+
+func agent_remove_room_decor_item(item_id: int) -> bool:
+	return remove_item(item_id)
+
+
+func agent_clear_all_room_decor() -> int:
+	return clear_all_items()
+
+
+func agent_clear_all_room_decor_categories() -> Dictionary:
+	return clear_all_categories()
+
+
+func agent_get_selected_room_decor() -> Dictionary:
+	return get_selected_item_ids_by_category()
+
+
 func agent_load_room_decor_from_resource() -> Dictionary:
 	"""AI API: 从 room_decor_res 资源文件加载初始房间装饰物品"""
 	var initial_count := _items.size()

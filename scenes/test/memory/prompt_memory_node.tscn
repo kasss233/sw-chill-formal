@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://cb2nkwirhlmus"]
+
+[ext_resource type="Script" uid="uid://dvt04vt0v4ic2" path="res://scenes/test/memory/prompt_memory_node.gd" id="1_nm1hx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_62xj4"]
+bg_color = Color(0.105882, 0.145098, 0.211765, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.345098, 0.380392, 0.466667, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.2)
+shadow_size = 8
+
+[node name="PromptMemoryNode" type="PanelContainer" unique_id=1056475359]
+custom_minimum_size = Vector2(200, 86)
+offset_right = 200.0
+offset_bottom = 86.0
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_62xj4")
+script = ExtResource("1_nm1hx")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1058614672]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="Layout" type="VBoxContainer" parent="Margin" unique_id=226770599]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TitleLabel" type="Label" parent="Margin/Layout" unique_id=1360282170]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
+[node name="StateLabel" type="Label" parent="Margin/Layout" unique_id=1535032721]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
