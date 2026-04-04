@@ -880,11 +880,8 @@ func agent_generate_week_schedule(week_key: String, style: String = "relaxed") -
 func agent_generate_period_reflection(period_type: String, period_key: String) -> bool:
 	if not ChatState:
 		return false
-	var summary := get_review_summary(period_type, period_key)
-	var prompt := "请根据我的%s数据，生成一段温和、鼓励式的回顾总结。请包含亮点、节奏观察和下一步一小步建议。数据摘要：%s" % [
-		_period_title(period_type, period_key),
-		JSON.stringify(summary),
-	]
+	var period_title := _period_title(period_type, period_key)
+	var prompt := "请为我的%s生成一段温和、鼓励式的回顾总结。包含亮点、节奏观察和下一步建议。" % period_title
 	return ChatState.agent_set_input_text(prompt)
 
 

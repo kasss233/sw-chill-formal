@@ -12,7 +12,7 @@ class_name CustomAPIAdapter extends AIAdapter
 ## 若需直连旧版 LLM 路由，可在 configure 中传入 chat_path_prefix: "/chat"。
 
 ## 相对 base_url 的对话前缀，默认与后端 router 前缀一致
-var chat_path_prefix: String = "/agent/chat"
+var chat_path_prefix: String = "/chat"
 
 ## API 配置
 var api_url: String = ""

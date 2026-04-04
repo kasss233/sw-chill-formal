@@ -350,7 +350,19 @@ func _refresh_insights(insights: Array) -> void:
 func _on_generate_reflection() -> void:
 	var period_type := _get_review_period_type()
 	var period_key := _get_review_period_key()
-	HabitState.agent_generate_period_reflection(period_type, period_key)
+	# 通过 AI 的 generate_reflection 函数调用生成反思
+	var prompt := "请为我的%s生成一段温和、鼓励式的回顾总结。包含亮点、节奏观察和下一步建议。" % _period_title_for_display(period_type, period_key)
+	ChatState.agent_set_input_text(prompt)
+
+
+func _period_title_for_display(period_type: String, period_key: String) -> String:
+	match period_type:
+		"month":
+			return "%s 月度回顾" % period_key
+		"recent30":
+			return "最近30天回顾"
+		_:
+			return "周回顾"
 
 
 # ======================== 工具方法 ========================
