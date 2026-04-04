@@ -72,9 +72,8 @@ var status: Status = Status.IDLE
 var current_response_text: String = ""
 
 const _TALK_RECORD_BUS := "TalkRecord"
-const _VOICE_CHAT_PATH := "/api/v1/sound-to-text/messages"
 
-## 后端根 URL（不含尾斜杠），例如 https://api.example.com
+## 后端根 URL（与 [AuthState] 中「服务器地址」一致，可为 `https://host` 或已含 `/api/v1`）
 var voice_chat_api_base_url: String = ""
 ## Bearer Token，与文本聊天一致
 var voice_chat_access_token: String = ""
@@ -146,6 +145,25 @@ const _FUNC_MODULE_MAP: Dictionary = {
 func _ready() -> void:
 	_setup_talk_recording()
 	_setup_voice_chat_http()
+	call_deferred("sync_voice_credentials_from_auth")
+
+
+## 与 AuthState 对齐：语音 STT 与文本聊天共用同一服务地址与 Token
+func sync_voice_credentials_from_auth() -> void:
+	if not is_instance_valid(AuthState):
+		return
+	voice_chat_api_base_url = AuthState.get_base_url().rstrip("/")
+	voice_chat_access_token = AuthState.get_access_token()
+
+
+## POST `/api/v1/sound-to-text/messages` 的完整 URL（若 base 已以 `/api/v1` 结尾则不再重复前缀）
+func get_voice_chat_post_url() -> String:
+	var base := voice_chat_api_base_url.rstrip("/")
+	if base.is_empty():
+		return ""
+	if base.ends_with("/api/v1"):
+		return base + "/sound-to-text/messages"
+	return base + "/api/v1/sound-to-text/messages"
 
 
 func _setup_talk_recording() -> void:
@@ -274,7 +292,7 @@ func _parse_and_apply_voice_chat_sse(raw: String) -> void:
 				var seg_idx: int = int(d.get("segment_index", 0))
 				if b64.is_empty():
 					continue
-				var audio_bytes: PackedByteArray = Marshalls.base64_decode(b64)
+				var audio_bytes: PackedByteArray = Marshalls.base64_to_raw(b64)
 				if audio_bytes.is_empty():
 					continue
 				_tts_collect.append({"segment_index": seg_idx, "bytes": audio_bytes, "mime": mime})
@@ -440,14 +458,14 @@ func stop_talk_recording() -> Dictionary:
 
 
 func request_talk_stt(payload: Dictionary) -> Dictionary:
-	# POST JSON 至 ChillBackend /api/v1/sound-to-text/messages，响应为 text/event-stream（整包缓冲完成后回调）。
-	if voice_chat_api_base_url.is_empty() or voice_chat_access_token.is_empty():
-		var skip := "语音对话未配置（voice_chat_api_base_url / voice_chat_access_token）"
+	# POST …/api/v1/sound-to-text/messages，响应为 text/event-stream（整包缓冲完成后回调）。
+	sync_voice_credentials_from_auth()
+	var url := get_voice_chat_post_url()
+	if url.is_empty() or voice_chat_access_token.is_empty():
+		var skip := "语音对话未配置：请在设置中填写后端地址并登录（与文本聊天相同）"
 		print("[ChatState] " + skip)
 		talk_voice_chat_http_failed.emit(skip)
 		return {"ok": false, "error": skip}
-
-	var url := voice_chat_api_base_url.rstrip("/") + _VOICE_CHAT_PATH
 	var b64 := Marshalls.raw_to_base64(payload.get("audio_bytes", PackedByteArray()))
 	var body: Dictionary = {
 		"audio_base64": b64,
@@ -518,7 +536,7 @@ func _build_talk_stt_payload(wav_stream: AudioStreamWAV) -> Dictionary:
 
 func _build_wav_bytes(pcm_data: PackedByteArray, sample_rate: int, channels: int, bits_per_sample: int) -> PackedByteArray:
 	var data_size := pcm_data.size()
-	var block_align := channels * bits_per_sample / 8
+	var block_align: int = int(round(float(channels * bits_per_sample) / 8.0))
 	var byte_rate := sample_rate * block_align
 	var riff_size := 36 + data_size
 

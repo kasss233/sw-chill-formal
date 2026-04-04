@@ -37,6 +37,11 @@ var _session_id: String = ""
 func _ready() -> void:
 	_init_adapter()
 	_connect_signals()
+	call_deferred("_sync_chatstate_voice_from_auth")
+
+
+func _sync_chatstate_voice_from_auth() -> void:
+	ChatState.sync_voice_credentials_from_auth()
 
 
 func _init_adapter() -> void:
@@ -55,6 +60,12 @@ func _connect_signals() -> void:
 	ChatState.text_submitted.connect(_on_text_submitted)
 	ChatState.generation_stop_requested.connect(_on_generation_stopped)
 
+	if is_instance_valid(AuthState):
+		if not AuthState.token_refreshed.is_connected(_on_auth_token_refreshed_for_voice):
+			AuthState.token_refreshed.connect(_on_auth_token_refreshed_for_voice)
+		if not AuthState.auth_state_changed.is_connected(_on_auth_state_changed_for_voice):
+			AuthState.auth_state_changed.connect(_on_auth_state_changed_for_voice)
+
 	if tts_player:
 		tts_player.playback_finished.connect(_on_tts_finished)
 
@@ -70,6 +81,14 @@ func _on_text_submitted(text: String, attachments: Array) -> void:
 func _on_generation_stopped() -> void:
 	_adapter.cancel_request()
 	ChatState.set_status(ChatState.Status.IDLE)
+
+
+func _on_auth_token_refreshed_for_voice() -> void:
+	ChatState.sync_voice_credentials_from_auth()
+
+
+func _on_auth_state_changed_for_voice(_is_logged_in: bool) -> void:
+	ChatState.sync_voice_credentials_from_auth()
 
 
 # ============ 适配器请求 ============
