@@ -557,3 +557,21 @@ func allocate_id() -> int:
 	var id = _next_id
 	_next_id += 1
 	return id
+
+
+# ======================== Demo API ========================
+
+## 添加逾期任务（用于演示）
+func demo_add_overdue_task(title: String, due_timestamp: int) -> TaskData:
+	var task = TaskData.new(_next_id, title, due_timestamp, false)
+	task.order = 0
+	_next_id += 1
+
+	_tasks.insert(0, task)
+	_index_add(task)
+	_update_orders()
+
+	_queue_save()
+	task_added.emit(task)
+	print("[TaskState] Demo 添加逾期任务(id: %d, title: %s)" % [task.id, task.title])
+	return task

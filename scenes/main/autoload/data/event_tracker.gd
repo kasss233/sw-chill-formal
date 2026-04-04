@@ -33,6 +33,7 @@ func track_task_pause(task_id: int) -> void:
 
 
 func track_ai_suggestion_rejected(name: String) -> void:
+	# 当前对话链路没有明确的“用户拒绝建议”事件源，先保留接口供后续真实入口接入。
 	StatsState.record_ai_function_rejected(name)
 
 
@@ -46,6 +47,7 @@ func _connect_signals() -> void:
 
 	if TaskState:
 		TaskState.task_state_changed.connect(_on_task_state_changed)
+		# 当前任务模块没有独立的“开始/暂停任务”业务动作，暂不伪造接入 track_task_start/track_task_pause。
 
 	if HabitState:
 		HabitState.execution_updated.connect(_on_execution_updated)
