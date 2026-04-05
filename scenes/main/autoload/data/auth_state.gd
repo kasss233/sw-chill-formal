@@ -1,7 +1,7 @@
 extends Node
 
 # --- 信号 ---
-signal login_succeeded(user_data: Dictionary)       # {user_id, username}
+signal login_succeeded(user_data: Dictionary) # {user_id, username}
 signal login_failed(error_code: int, message: String)
 signal register_succeeded(user_data: Dictionary)
 signal register_failed(error_code: int, message: String)
@@ -15,18 +15,18 @@ var _access_token: String = ""
 var _refresh_token: String = ""
 var _user_id: String = ""
 var _username: String = ""
-var _expires_at: int = 0  # Unix 秒级时间戳
+var _expires_at: int = 0 # Unix 秒级时间戳
 
 var _refresh_timer: Timer = null
 var _is_refreshing: bool = false
 var _http_request: HTTPRequest = null
-var _pending_action: String = ""  # "login" / "register" / "refresh" / "logout"
+var _pending_action: String = "" # "login" / "register" / "refresh" / "logout"
 
-var _base_url: String = ""
+var _base_url: String = "http://106.54.18.206:8000/api/v1"
 
 const AUTH_SAVE_PATH = "user://auth.json"
 const SERVER_CONFIG_PATH = "user://server_config.cfg"
-const REFRESH_ADVANCE_SECONDS = 300  # 提前 5 分钟刷新
+const REFRESH_ADVANCE_SECONDS = 300 # 提前 5 分钟刷新
 
 func _ready() -> void:
 	_http_request = HTTPRequest.new()
