@@ -264,6 +264,11 @@ func _switch_to_multiline_mode() -> void:
 	# 显示 TextEdit 容器
 	text_edit_container.visible = true
 
+	# 立即转移焦点到 TextEdit，避免键盘弹跳
+	# 使用 call_deferred 确保在布局更新后执行
+	text_edit.call_deferred("grab_focus")
+	text_edit.call_deferred("set_caret_column", caret_column)
+
 	# 并行动画：LineEdit 淡出，TextEdit 淡入
 	_current_tween.parallel().tween_property(line_edit, "modulate:a", 0.0, transition_duration)
 	_current_tween.parallel().tween_property(text_edit_container, "modulate:a", 1.0, transition_duration)
@@ -274,10 +279,6 @@ func _switch_to_multiline_mode() -> void:
 		line_edit.focus_mode = Control.FOCUS_NONE
 		# 清空 LineEdit 文本防止残留
 		line_edit.text = ""
-
-		# 设置 TextEdit 焦点和光标
-		text_edit.grab_focus()
-		text_edit.set_caret_column(caret_column)
 
 		_is_transitioning = false
 	)
@@ -301,6 +302,10 @@ func _switch_to_singleline_mode() -> void:
 
 	# 将文本转移到 LineEdit
 	line_edit.text = current_text
+
+	# 立即转移焦点到 LineEdit，避免键盘弹跳
+	line_edit.call_deferred("grab_focus")
+	line_edit.call_deferred("set_caret_column", mini(caret_column, current_text.length()))
 
 	# 停止之前的动画
 	if _current_tween and _current_tween.is_valid():
@@ -331,10 +336,6 @@ func _switch_to_singleline_mode() -> void:
 		text_edit_container.visible = false
 		# 清空 TextEdit 文本防止残留
 		text_edit.text = ""
-
-		# 设置 LineEdit 焦点和光标
-		line_edit.grab_focus()
-		line_edit.caret_column = mini(caret_column, line_edit.text.length())
 
 		_is_transitioning = false
 	)

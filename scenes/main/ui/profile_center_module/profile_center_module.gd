@@ -3,6 +3,7 @@ extends MarginContainer
 ## 个人中心模块，管理"我的" / "统计" / "习惯"三个 Tab 视图
 
 @onready var _tab_bar: MaterialSegmentedButton = $FrostedPanel/MarginContainer/VBoxContainer/TabBar
+@onready var _scroll_container: ScrollContainer = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer
 @onready var _profile_view: Node = %ProfileView
 @onready var _stats_view: Node = %StatsView
 @onready var _habit_panel: Node = %HabitLibraryPanel
@@ -23,6 +24,8 @@ func _on_tab_changed(index: int, _text: String) -> void:
 		view.visible = false
 	if index < _views.size():
 		_views[index].visible = true
+	# 重置滚动位置到顶部，避免切换 Tab 时出现空白区域
+	_scroll_container.scroll_vertical = 0
 
 
 ## Agent API：选择指定 tab

@@ -312,13 +312,8 @@ func _process(_delta: float) -> void:
 	var scale := viewport_height / window_height if window_height > 0.0 else 1.0
 	var scaled_height := keyboard_height * scale
 
-	# 根据当前模式选择底部占用高度
-	var bottom_h: float
-	if _dialogue_mode:
-		bottom_h = _input_box.size.y
-	else:
-		bottom_h = _bottom_bar.size.y
-	_keyboard_spacer.custom_minimum_size.y = maxf(0.0, scaled_height - bottom_h)
+	# KeyboardSpacer 直接设置为键盘高度，让上方的 InputBox/BottomBar 整体上移
+	_keyboard_spacer.custom_minimum_size.y = scaled_height
 
 
 # === Agent 模块控制（监听 LayerManager 信号） ===

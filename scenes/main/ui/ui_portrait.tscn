@@ -90,7 +90,7 @@ shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 5.0
+shader_parameter/blur_amount = 6.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -103,9 +103,9 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(220, 64)
 shader_parameter/shadow_padding = 0.0
 shader_parameter/glow_intensity = 0.0
-shader_parameter/glow_width = 3.0
+shader_parameter/glow_width = 4.0
 shader_parameter/glow_speed = 0.8
-shader_parameter/glow_softness = 1.5
+shader_parameter/glow_softness = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mdnhd"]
 content_margin_left = 0.0
@@ -176,11 +176,11 @@ corner_radius_bottom_left = 24
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rugay"]
 shader = ExtResource("2_0d2yd")
-shader_parameter/corner_radius = 24.0
+shader_parameter/corner_radius = 32.0
 shader_parameter/show_border = true
 shader_parameter/border_width = 1.0
 shader_parameter/border_color = Color(1, 1, 1, 0.2)
-shader_parameter/blur_amount = 5.0
+shader_parameter/blur_amount = 6.0
 shader_parameter/saturation = 1.6
 shader_parameter/brightness = 1.1
 shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
@@ -193,9 +193,9 @@ shader_parameter/shadow_offset = Vector2(0, 4)
 shader_parameter/size = Vector2(64, 64)
 shader_parameter/shadow_padding = 0.0
 shader_parameter/glow_intensity = 0.0
-shader_parameter/glow_width = 3.0
+shader_parameter/glow_width = 4.0
 shader_parameter/glow_speed = 0.8
-shader_parameter/glow_softness = 1.5
+shader_parameter/glow_softness = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w75tq"]
 content_margin_left = 0.0
@@ -427,7 +427,7 @@ material = SubResource("ShaderMaterial_rugay")
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_w75tq")
 script = ExtResource("3_fb1sj")
-corner_radius = 24.0
+corner_radius = 32.0
 noise_texture = SubResource("NoiseTexture2D_7aqxg")
 show_shadow = false
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
