@@ -19,6 +19,7 @@ extends Control
 var _mic_dropdown: MaterialDropdown
 var _speaker_dropdown: MaterialDropdown
 var _record_preview_toggle: MaterialToggleButton
+var _chat_backend_dropdown: MaterialDropdown
 
 # ============ 生命周期 ============
 
@@ -28,8 +29,10 @@ func _ready() -> void:
 	canvas_layer.layer = 10
 	_connect_state_signals()
 	_setup_audio_debug_controls()
+	_setup_chat_backend_dropdown()
 	_sync_all_controls_from_state()
 	_init_dropdowns_from_state()
+	_sync_chat_backend_dropdown_from_state()
 
 # ============ 状态监听与 UI 同步 ============
 
@@ -37,6 +40,8 @@ func _ready() -> void:
 func _connect_state_signals() -> void:
 	if not SettingState:
 		return
+	if is_instance_valid(ChatState) and not ChatState.chat_backend_mode_changed.is_connected(_on_chat_state_chat_backend_mode_changed):
+		ChatState.chat_backend_mode_changed.connect(_on_chat_state_chat_backend_mode_changed)
 	_connect_if_needed(SettingState, "env_time_changed", _on_state_env_time_changed)
 	_connect_if_needed(SettingState, "env_weather_changed", _on_state_env_weather_changed)
 	_connect_if_needed(SettingState, "screen_orientation_mode_changed", _on_state_screen_orientation_mode_changed)
@@ -55,6 +60,8 @@ func _connect_if_needed(emitter: Object, signal_name: StringName, callback: Call
 		emitter.connect(signal_name, callback)
 
 func _exit_tree() -> void:
+	if is_instance_valid(ChatState) and ChatState.chat_backend_mode_changed.is_connected(_on_chat_state_chat_backend_mode_changed):
+		ChatState.chat_backend_mode_changed.disconnect(_on_chat_state_chat_backend_mode_changed)
 	if not SettingState:
 		return
 	if SettingState.env_time_changed.is_connected(_on_state_env_time_changed):
@@ -123,6 +130,36 @@ func _setup_audio_debug_controls() -> void:
 	_record_preview_toggle.state_changed.connect(_on_record_preview_toggle_changed)
 
 	_refresh_audio_device_options()
+
+
+func _setup_chat_backend_dropdown() -> void:
+	if _chat_backend_dropdown != null:
+		return
+	var row := _create_setting_row("AI 对话模式")
+	_chat_backend_dropdown = MaterialDropdown.new()
+	_chat_backend_dropdown.custom_minimum_size = Vector2(200, 36)
+	_chat_backend_dropdown.placeholder = "选择模式"
+	_chat_backend_dropdown.add_option("性能（更快）", ChatState.CHAT_PATH_PERFORMANCE)
+	_chat_backend_dropdown.add_option("质量（Agent）", ChatState.CHAT_PATH_QUALITY)
+	row.add_child(_chat_backend_dropdown)
+	_chat_backend_dropdown.selection_changed.connect(_on_chat_backend_dropdown_changed)
+
+
+func _sync_chat_backend_dropdown_from_state() -> void:
+	if _chat_backend_dropdown == null:
+		return
+	_chat_backend_dropdown.set_selected_by_value(ChatState.get_chat_path_prefix())
+
+
+func _on_chat_backend_dropdown_changed(_index: int, value: Variant) -> void:
+	var path := str(value)
+	if path == ChatState.get_chat_path_prefix():
+		return
+	ChatState.set_chat_backend_mode_from_path(path)
+
+
+func _on_chat_state_chat_backend_mode_changed(_mode: int) -> void:
+	_sync_chat_backend_dropdown_from_state()
 
 
 func _create_setting_row(title: String) -> HBoxContainer:

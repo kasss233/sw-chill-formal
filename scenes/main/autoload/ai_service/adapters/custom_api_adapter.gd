@@ -11,7 +11,7 @@ class_name CustomAPIAdapter extends AIAdapter
 ##   POST /agent/chat/function-results — 回传函数执行结果（JSON）
 ## 若需直连旧版 LLM 路由，可在 configure 中传入 chat_path_prefix: "/chat"。
 
-## 相对 base_url 的对话前缀，默认与后端 router 前缀一致
+## 相对 base_url 的对话前缀；默认质量模式，运行时由 ChatState / ChatController 覆盖
 var chat_path_prefix: String = "/agent/chat"
 
 ## 最近一次请求使用的 API 根地址（由 AuthState.get_base_url() 在主线程写入，供 worker 线程读取）

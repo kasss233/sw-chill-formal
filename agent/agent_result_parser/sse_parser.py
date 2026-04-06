@@ -77,6 +77,9 @@ class SSEParser:
         事件顺序（与流式 text_delta 衔接）：
         function_call → environment → action → tts → text_done（完整正文）→ done。
         便于客户端先处理结构化事件，再以 text_done 收束正文，最后 done 结束（含 usage 可选）。
+
+        协议补充（可选）：若希望 Godot 角色在回合末必回 idle，可在最后一帧 action 中显式带
+        pose=idle 与 emotion=neutral，或由客户端在 response_completed 统一复位（见 main_3d）。
         """
         events = []
         used_session_id = session_id or self.session_id

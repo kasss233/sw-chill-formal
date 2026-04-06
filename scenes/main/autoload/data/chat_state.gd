@@ -1,10 +1,25 @@
 extends Node
 
 ## 聊天状态单例
-## 纯内存状态（不持久化），管理聊天会话的运行时状态
+## 管理聊天会话的运行时状态；「AI 对话后端模式」持久化至 user://chat_backend_prefs.cfg
+
+## 后端对话路径（与 chill-backend 路由一致）
+const CHAT_PATH_PERFORMANCE := "/chat"
+const CHAT_PATH_QUALITY := "/agent/chat"
+
+## 性能 = 直连 LLM（/chat）；质量 = Agent 编排（/agent/chat）
+enum ChatBackendMode {
+	PERFORMANCE = 0,
+	QUALITY = 1,
+}
+
+const _CHAT_BACKEND_PREFS_PATH := "user://chat_backend_prefs.cfg"
 
 ## 聊天状态枚举
 enum Status {IDLE, GENERATING, EXECUTING_FUNCTION, ERROR}
+
+## AI 对话后端模式变更（性能=0，质量=1，与 ChatBackendMode 枚举值一致）
+signal chat_backend_mode_changed(mode: int)
 
 # ============ 状态变化信号 ============
 ## 聊天状态变化（IDLE/GENERATING/EXECUTING_FUNCTION/ERROR）
@@ -70,6 +85,9 @@ signal speech_transcript_received(text: String)
 # ============ 状态 ============
 var status: Status = Status.IDLE
 var current_response_text: String = ""
+
+## 当前对话后端模式（默认质量 / Agent）
+var _chat_backend_mode: ChatBackendMode = ChatBackendMode.QUALITY
 
 const _TALK_RECORD_BUS := "TalkRecord"
 
@@ -142,10 +160,59 @@ const _FUNC_MODULE_MAP: Dictionary = {
 
 # ============ 状态管理 API（供 ChatController 调用）============
 
+func _init() -> void:
+	_load_chat_backend_prefs_from_disk()
+
+
 func _ready() -> void:
 	_setup_talk_recording()
 	_setup_voice_chat_http()
 	call_deferred("sync_voice_credentials_from_auth")
+
+
+func _load_chat_backend_prefs_from_disk() -> void:
+	var config := ConfigFile.new()
+	if config.load(_CHAT_BACKEND_PREFS_PATH) != OK:
+		return
+	var v = config.get_value("chat", "backend_mode", ChatBackendMode.QUALITY)
+	if v is int:
+		if v == ChatBackendMode.PERFORMANCE:
+			_chat_backend_mode = ChatBackendMode.PERFORMANCE
+		elif v == ChatBackendMode.QUALITY:
+			_chat_backend_mode = ChatBackendMode.QUALITY
+
+
+func _save_chat_backend_prefs_to_disk() -> void:
+	var config := ConfigFile.new()
+	config.set_value("chat", "backend_mode", _chat_backend_mode as int)
+	config.save(_CHAT_BACKEND_PREFS_PATH)
+
+
+func get_chat_backend_mode() -> ChatBackendMode:
+	return _chat_backend_mode
+
+
+## 供 CustomAPIAdapter：性能为 /chat，质量为 /agent/chat
+func get_chat_path_prefix() -> String:
+	return CHAT_PATH_QUALITY if _chat_backend_mode == ChatBackendMode.QUALITY else CHAT_PATH_PERFORMANCE
+
+
+func set_chat_backend_mode(mode: ChatBackendMode) -> void:
+	if mode == _chat_backend_mode:
+		return
+	_chat_backend_mode = mode
+	_save_chat_backend_prefs_to_disk()
+	chat_backend_mode_changed.emit(mode as int)
+
+
+func set_chat_backend_mode_from_path(path: String) -> void:
+	match path:
+		CHAT_PATH_PERFORMANCE:
+			set_chat_backend_mode(ChatBackendMode.PERFORMANCE)
+		CHAT_PATH_QUALITY:
+			set_chat_backend_mode(ChatBackendMode.QUALITY)
+		_:
+			pass
 
 
 ## 与 AuthState 对齐：语音 STT 与文本聊天共用同一服务地址与 Token

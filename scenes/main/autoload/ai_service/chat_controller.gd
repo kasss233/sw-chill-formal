@@ -47,12 +47,21 @@ func _sync_chatstate_voice_from_auth() -> void:
 func _init_adapter() -> void:
 	_adapter = CustomAPIAdapter.new()
 	_adapter.configure({
-		"auth_token": AuthState.get_access_token()
+		"auth_token": AuthState.get_access_token(),
+		"chat_path_prefix": ChatState.get_chat_path_prefix(),
 	})
 	_adapter.stream_chunk.connect(_on_adapter_stream_chunk)
 	_adapter.stream_completed.connect(_on_adapter_stream_completed)
 	_adapter.request_failed.connect(_on_adapter_request_failed)
-	print("[ChatController] 后端模式: %s" % AuthState.get_base_url())
+	if not ChatState.chat_backend_mode_changed.is_connected(_on_chat_backend_mode_changed):
+		ChatState.chat_backend_mode_changed.connect(_on_chat_backend_mode_changed)
+	print("[ChatController] 后端模式: %s 对话路径: %s" % [AuthState.get_base_url(), ChatState.get_chat_path_prefix()])
+
+
+func _on_chat_backend_mode_changed(_mode: int) -> void:
+	if _adapter == null:
+		return
+	_adapter.configure({"chat_path_prefix": ChatState.get_chat_path_prefix()})
 
 
 func _connect_signals() -> void:

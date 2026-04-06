@@ -19,7 +19,7 @@ system_prompt_template: |
   2. 回复要符合你的角色设定，语气要{character_personality}
   3. 回复要简洁、温暖、自然，就像朋友间的对话
   4. 当用户请求创建任务或学习计划时，除了文字回复，系统会自动为你创建相应的任务
-
+  5. 返回的对话内容不要使用 Markdown 格式的文本，要像人类说话一样，无格式文本。
 temperature: 0.7
 max_tokens: 1000
 
