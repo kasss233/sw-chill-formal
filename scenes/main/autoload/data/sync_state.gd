@@ -13,15 +13,15 @@ signal device_registered(device_id: String)
 # --- 配置常量 ---
 const SYNC_DATA_PATH = "user://sync_data.json"
 const SYNC_CHANGES_PATH = "user://sync_changes.json"
-const AUTO_SYNC_INTERVAL = 120.0  # 2 分钟自动同步
-const DEBOUNCE_DELAY = 5.0        # 5 秒防抖
+const AUTO_SYNC_INTERVAL = 120.0 # 2 分钟自动同步
+const DEBOUNCE_DELAY = 5.0 # 5 秒防抖
 const MAX_CONSECUTIVE_FAILURES = 5
 const MAX_PULL_PAGES = 10
 
 # --- 内部状态 ---
 var _device_id: String = ""
-var _last_sync_time: int = 0      # 上次成功同步的 server_time（毫秒）
-var _change_queue: Array = []     # Array[SyncChange]
+var _last_sync_time: int = 0 # 上次成功同步的 server_time（毫秒）
+var _change_queue: Array = [] # Array[SyncChange]
 var _is_syncing: bool = false
 var _is_applying_remote: bool = false
 var _is_registered: bool = false
@@ -145,6 +145,9 @@ func _on_bundle_dirty(_arg1 = null, bundle_type: String = "") -> void:
 		return
 	if bundle_type != "":
 		_bundle_dirty[bundle_type] = true
+	if _is_registered and AuthState.is_logged_in():
+		_debounce_timer.stop()
+		_debounce_timer.start()
 
 
 func _has_dirty_bundles() -> bool:
@@ -435,19 +438,19 @@ func _merge_change(new_change: SyncChange) -> void:
 			for key in new_change.data:
 				existing.data[key] = new_change.data[key]
 			existing.timestamp = new_change.timestamp
-			return  # 不添加新变更
+			return # 不添加新变更
 
 		# create 后续 delete → 两者都从队列移除
 		if existing.action == "create" and new_change.action == "delete":
 			_change_queue.remove_at(i)
-			return  # 不添加新变更
+			return # 不添加新变更
 
 		# update 后续 update → 合并 fields
 		if existing.action == "update" and new_change.action == "update":
 			for key in new_change.data:
 				existing.data[key] = new_change.data[key]
 			existing.timestamp = new_change.timestamp
-			return  # 不添加新变更
+			return # 不添加新变更
 
 		# update 后续 delete → 移除 update，保留 delete
 		if existing.action == "update" and new_change.action == "delete":
@@ -492,6 +495,14 @@ func _do_push() -> bool:
 		_change_queue = pending_queue
 		_save_change_queue()
 		return true
+
+	var push_stats: Dictionary = {}
+	for item in changes_to_push:
+		if not item is Dictionary:
+			continue
+		var stat_key := "%s/%s" % [str(item.get("resource", "")), str(item.get("action", ""))]
+		push_stats[stat_key] = int(push_stats.get(stat_key, 0)) + 1
+	print("[SyncState][PushTrace] device_id=%s 变更统计=%s" % [_device_id, JSON.stringify(push_stats)])
 
 	var body = {
 		"device_id": _device_id,
@@ -596,7 +607,7 @@ func _convert_to_push_format(change: SyncChange) -> Dictionary:
 		"delete":
 			var server_id: int = _resolve_server_id_for_change(change)
 			if server_id == 0:
-				return {}  # 没有映射说明服务器没有此数据
+				return {} # 没有映射说明服务器没有此数据
 			item["data"] = {"id": server_id}
 		"reorder":
 			item["data"] = change.data.duplicate(true)
@@ -642,7 +653,7 @@ func _process_push_results(queued_changes: Array, results: Array) -> Dictionary:
 					var local_key = ""
 					var local_id = 0
 					if client_id.begins_with("local-cat-"):
-						local_key = client_id.substr(10)  # "local-cat-" 长度 10
+						local_key = client_id.substr(10) # "local-cat-" 长度 10
 					elif client_id.begins_with("local-"):
 						local_key = client_id.substr(6)
 						local_id = int(local_key)
@@ -695,10 +706,15 @@ func _do_pull() -> bool:
 	var has_more = true
 
 	while has_more and pull_count < MAX_PULL_PAGES:
+		var pull_resources: Array = ["task", "note", "category"]
+		for bundle_type in _full_sync_bundles:
+			if not pull_resources.has(bundle_type):
+				pull_resources.append(bundle_type)
+		print("[SyncState][PullTrace] device_id=%s 请求增量资源=%s last_sync_time=%d" % [_device_id, JSON.stringify(pull_resources), _last_sync_time])
 		var body = {
 			"device_id": _device_id,
 			"last_sync_time": _last_sync_time,
-			"resources": ["task", "note", "category"]
+			"resources": pull_resources
 		}
 
 		var result = await ApiClient.api_post("/sync/pull", body)
@@ -712,6 +728,14 @@ func _do_pull() -> bool:
 
 		var changes = data.get("changes", [])
 		if changes.size() > 0:
+			var change_stats: Dictionary = {}
+			for change in changes:
+				if not change is Dictionary:
+					continue
+				var key := "%s/%s" % [str(change.get("resource", "")), str(change.get("action", ""))]
+				change_stats[key] = int(change_stats.get(key, 0)) + 1
+			print("[SyncState][PullTrace] 变更统计=%s" % JSON.stringify(change_stats))
+		if changes.size() > 0:
 			var delete_changes: Array = []
 			for change in changes:
 				if change is Dictionary and change.get("action", "") == "delete":
@@ -723,11 +747,14 @@ func _do_pull() -> bool:
 			var page_summary = _apply_remote_changes(changes)
 			_last_pull_summary = _merge_remote_apply_summary(_last_pull_summary, page_summary)
 
+		var prev_sync_time := _last_sync_time
 		_last_sync_time = data.get("server_time", _last_sync_time)
 		has_more = data.get("has_more", false)
 		pull_count += 1
 
-		print("[SyncState] Pull 第 %d 页: %d 条变更" % [pull_count, changes.size()])
+		print("[SyncState] Pull 第 %d 页: %d 条变更 (server_time %d -> %d, has_more=%s)" % [
+			pull_count, changes.size(), prev_sync_time, _last_sync_time, str(has_more)
+		])
 
 	_save_sync_data()
 	_id_mapping.save_to_file()
@@ -763,6 +790,14 @@ func _apply_remote_changes(changes: Array) -> Dictionary:
 			"category":
 				var category_result = _apply_remote_category_change_v2(action, data)
 				summary = _merge_remote_apply_summary(summary, category_result)
+			_:
+				if _full_sync_bundles.has(resource) and action == "full_replace":
+					var bundle_info = _full_sync_bundles[resource]
+					bundle_info["merge"].call(data)
+					summary["applied_count"] += 1
+					print("[SyncState] 增量应用 bundle: %s" % resource)
+				else:
+					print("[SyncState] 跳过未支持的远端变更: resource=%s action=%s" % [resource, action])
 
 	_is_applying_remote = false
 	_rebuild_sync_hints()
@@ -1026,7 +1061,7 @@ func do_full_sync() -> void:
 ## 全量同步 - 合并 bundles
 func _merge_full_sync_bundles(server_data: Dictionary) -> void:
 	for bundle_type in _full_sync_bundles:
-		var bundle_key = bundle_type  # 响应中 key 与 bundle_type 相同
+		var bundle_key = bundle_type # 响应中 key 与 bundle_type 相同
 		if not server_data.has(bundle_key):
 			continue
 		var server_bundle = server_data[bundle_key]
@@ -1041,7 +1076,7 @@ func _merge_full_sync_bundles(server_data: Dictionary) -> void:
 func _push_local_only_bundles(server_data: Dictionary) -> void:
 	for bundle_type in _full_sync_bundles:
 		if server_data.has(bundle_type):
-			continue  # 服务器已有，跳过
+			continue # 服务器已有，跳过
 		var bundle_info = _full_sync_bundles[bundle_type]
 		var export_data: Dictionary = bundle_info["export"].call()
 		if export_data.is_empty():
@@ -1265,7 +1300,7 @@ func _merge_full_sync_categories(server_categories: Array) -> void:
 			server_ids[int(server_id)] = true
 
 		if _id_mapping.has_server_id("category", server_id):
-			continue  # 已映射，跳过
+			continue # 已映射，跳过
 
 		# 按名称匹配
 		if name in local_categories:
@@ -1555,8 +1590,8 @@ func _on_auto_sync_timeout() -> void:
 func _on_debounce_timeout() -> void:
 	if _is_syncing:
 		return
-	if _change_queue.size() > 0:
-		await _do_push()
+	if _change_queue.size() > 0 or _has_dirty_bundles():
+		await _do_sync_cycle()
 
 
 ## 执行一次完整的同步周期（push + pull + bundle push）

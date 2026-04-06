@@ -513,10 +513,56 @@ func export_data() -> Dictionary:
 
 
 func import_sync_data(data: Dictionary) -> void:
-	if not data.has("selected_item_ids_by_category"):
+	if not data.has("items") and not data.has("selected_item_ids_by_category") and not data.has("selected_item_id"):
 		return
-	var remote_selected = data.get("selected_item_ids_by_category", {})
-	# 合并策略：以服务器端选中状态为准（装饰变更不频繁）
-	_selected_item_ids_by_category = remote_selected.duplicate()
+
+	# 全量导入：房间装饰按 bundle 做 full_replace，同步时以服务端快照为准。
+	var incoming_items: Array[RoomDecorData] = []
+	for raw in data.get("items", []):
+		if raw is Dictionary:
+			incoming_items.append(RoomDecorData.from_dict(raw))
+
+	_items = incoming_items
+
+	var remote_next_id := int(data.get("next_id", 1))
+	var max_id := 0
+	for item in _items:
+		max_id = max(max_id, item.id)
+	_next_id = max(remote_next_id, max_id + 1)
+
+	_selected_item_ids_by_category.clear()
+	var has_selection_payload := false
+	if data.has("selected_item_ids_by_category"):
+		has_selection_payload = true
+		var remote_selected: Dictionary = data.get("selected_item_ids_by_category", {})
+		for category in remote_selected.keys():
+			var normalized := _normalize_category(str(category))
+			_selected_item_ids_by_category[normalized] = int(remote_selected.get(category, 0))
+	elif data.has("selected_item_id"):
+		has_selection_payload = true
+		# 兼容旧版单选字段
+		var legacy_selected_id := int(data.get("selected_item_id", 0))
+		if legacy_selected_id > 0:
+			var legacy_item := _get_item_by_id(legacy_selected_id)
+			if legacy_item:
+				_selected_item_ids_by_category[_normalize_category(legacy_item.category)] = legacy_selected_id
+
+	for category in _selected_item_ids_by_category.keys():
+		var selected_id := int(_selected_item_ids_by_category[category])
+		var selected_item := _get_item_by_id(selected_id)
+		if selected_item == null:
+			_selected_item_ids_by_category.erase(category)
+			continue
+		if _normalize_category(selected_item.category) != _normalize_category(str(category)):
+			_selected_item_ids_by_category.erase(category)
+			continue
+		if not _is_unlocked(selected_item):
+			_selected_item_ids_by_category.erase(category)
+
+	# 仅在旧版数据缺少任何选中字段时，才进行兜底自动选中。
+	if not has_selection_payload:
+		for item in _items:
+			_assign_first_unlocked_for_category(_normalize_category(item.category))
+
 	_save_data()
 	_emit_startup_sync_signals()
