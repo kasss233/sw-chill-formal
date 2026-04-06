@@ -135,13 +135,16 @@ func _setup_audio_debug_controls() -> void:
 func _setup_chat_backend_dropdown() -> void:
 	if _chat_backend_dropdown != null:
 		return
-	var row := _create_setting_row("AI 对话模式")
+	# 插在「切换摄像头」行上方（与 HBoxContainer10 同级）
+	var camera_row: Node = _camera_dropdown.get_parent()
+	var row := _create_setting_row("AI 对话模式", camera_row)
 	_chat_backend_dropdown = MaterialDropdown.new()
 	_chat_backend_dropdown.custom_minimum_size = Vector2(200, 36)
 	_chat_backend_dropdown.placeholder = "选择模式"
+	# 必须先加入场景树再 add_option，否则 create_menu() 不会把菜单挂到树上，点击无弹出
+	row.add_child(_chat_backend_dropdown)
 	_chat_backend_dropdown.add_option("性能（更快）", ChatState.CHAT_PATH_PERFORMANCE)
 	_chat_backend_dropdown.add_option("质量（Agent）", ChatState.CHAT_PATH_QUALITY)
-	row.add_child(_chat_backend_dropdown)
 	_chat_backend_dropdown.selection_changed.connect(_on_chat_backend_dropdown_changed)
 
 
@@ -162,10 +165,13 @@ func _on_chat_state_chat_backend_mode_changed(_mode: int) -> void:
 	_sync_chat_backend_dropdown_from_state()
 
 
-func _create_setting_row(title: String) -> HBoxContainer:
+func _create_setting_row(title: String, insert_before: Node = null) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.layout_mode = 2
 	_settings_vbox.add_child(row)
+
+	if insert_before != null and is_instance_valid(insert_before) and insert_before.get_parent() == _settings_vbox:
+		_settings_vbox.move_child(row, insert_before.get_index())
 
 	var label := Label.new()
 	label.text = title
