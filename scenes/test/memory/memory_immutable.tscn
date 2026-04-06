@@ -1,6 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://dnlhnkx8rysx6"]
+[gd_scene format=3 uid="uid://g4fnc740yi0a"]
 
-[ext_resource type="Script" uid="uid://gr28tcv8j1c4" path="res://scenes/test/memory/memory.gd" id="1_bqlyq"]
+[ext_resource type="Script" path="res://scenes/test/memory/memory_immutable.gd" id="1_immut"]
 [ext_resource type="Script" path="res://scenes/test/memory/memory_agent_hub.gd" id="2_hub"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxTopBar"]
@@ -68,14 +68,14 @@ corner_radius_top_right = 36
 corner_radius_bottom_right = 36
 corner_radius_bottom_left = 36
 
-[node name="Memory" type="Control"]
+[node name="MemoryImmutable" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_bqlyq")
+script = ExtResource("1_immut")
 
 [node name="GraphLayer" type="Control" parent="."]
 layout_mode = 1
@@ -190,7 +190,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(0.862745, 0.909804, 1, 1)
-text = "Agent 短期记忆图"
+text = "Agent 记忆（只读）"
 
 [node name="AddButton" type="Button" parent="TopBar/MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(120, 40)

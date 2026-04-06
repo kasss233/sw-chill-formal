@@ -5,29 +5,60 @@ signal selected(node: PromptMemoryNode)
 signal moved(node: PromptMemoryNode)
 signal connect_toggled(node: PromptMemoryNode)
 
+## 是否允许用户通过控制台等途径修改内容、权重、连接与删除（展示用记忆可关）。
+@export var is_mutable: bool = true
+
+## 只读布局：正文常显、不显示「展开」行；仍可拖拽与悬停。数据是否可改由 [member is_mutable] 决定。
+var _display_only: bool = false
+
+@export_group("演出")
+## 已点亮：边缘 RGB 流光（与 FrostedPanel / aiglow 同源逻辑）；未点亮：关闭流光。运行时请优先用 [method set_lit] 以控制是否播放过渡。
+@export var is_lit: bool = false
+
 var prompt_id: int = -1
-var prompt_text: String = ""
+## 卡片顶部标题（短句，用于列表识别）。
+var prompt_title: String = ""
+## 状态行下方的正文，注入 Agent 时的主要描述内容。
+var prompt_body: String = ""
 var weight: float = 0.5
 var connected: bool = false
 
+var _body_expanded: bool = false
+
 var _title_label: Label
 var _state_label: Label
+var _body_label: Label
+var _body_toggle_row: HBoxContainer
+var _body_toggle_button: Button
 var _dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
 var _hover_tween: Tween
 
-@onready var _margin: MarginContainer = $Margin
-@onready var _layout: VBoxContainer = $Margin/Layout
-@onready var _title_label_node: Label = $Margin/Layout/TitleLabel
-@onready var _state_label_node: Label = $Margin/Layout/StateLabel
+@onready var _title_label_node: Label = $Center/Margin/Layout/TitleLabel
+@onready var _state_label_node: Label = $Center/Margin/Layout/StateLabel
+@onready var _body_toggle_row_node: HBoxContainer = $Center/Margin/Layout/BodyToggleRow
+@onready var _body_toggle_button_node: Button = $Center/Margin/Layout/BodyToggleRow/BodyToggleButton
+@onready var _body_label_node: Label = $Center/Margin/Layout/BodyLabel
+@onready var _glow_overlay: ColorRect = $GlowOverlay
+
+var _glow_material: ShaderMaterial
+var _glow_intensity: float = 0.0
+var _glow_tween: Tween
 
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(200, 86)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	pivot_offset = custom_minimum_size * 0.5
+	_init_glow_overlay()
 	_title_label = _title_label_node
 	_state_label = _state_label_node
+	_body_label = _body_label_node
+	_body_toggle_row = _body_toggle_row_node
+	_body_toggle_button = _body_toggle_button_node
+	_body_toggle_button.pressed.connect(_on_body_toggle_pressed)
+	_body_toggle_button.add_theme_color_override("font_color", Color("8eb6e8"))
+	_body_toggle_button.add_theme_color_override("font_hover_color", Color("b5d4ff"))
+	_body_toggle_button.add_theme_color_override("font_pressed_color", Color("6a9fd4"))
+	_update_pivot()
 
 	_refresh_visuals()
 	scale = Vector2(0.88, 0.88)
@@ -35,6 +66,139 @@ func _ready() -> void:
 	var intro := create_tween().set_parallel(true)
 	intro.tween_property(self , "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	intro.tween_property(self , "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_update_pivot()
+		_update_glow_size()
+
+
+func _init_glow_overlay() -> void:
+	if not is_instance_valid(_glow_overlay):
+		return
+	var base_mat := _glow_overlay.material as ShaderMaterial
+	if base_mat:
+		_glow_material = base_mat.duplicate() as ShaderMaterial
+		_glow_overlay.material = _glow_material
+	else:
+		_glow_material = null
+	_update_glow_size()
+	_apply_lit_visual(false)
+
+
+func _update_glow_size() -> void:
+	if _glow_material:
+		_glow_material.set_shader_parameter("size", size)
+
+
+## 演出用：切换点亮状态；[param animated] 为 false 时立即到位。
+func set_lit(value: bool, animated: bool = true) -> void:
+	var v := value
+	if is_lit == v:
+		return
+	is_lit = v
+	_apply_lit_visual(animated)
+
+
+func _apply_lit_visual(animated: bool) -> void:
+	if not _glow_material:
+		return
+	if _glow_tween:
+		_glow_tween.kill()
+		_glow_tween = null
+	var target := 1.0 if is_lit else 0.0
+	if not animated:
+		_set_glow_intensity(target)
+		return
+	if not is_inside_tree():
+		_set_glow_intensity(target)
+		return
+	_glow_tween = create_tween()
+	if is_lit:
+		_glow_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+		_glow_tween.tween_method(_set_glow_intensity, _glow_intensity, 1.0, 0.4)
+	else:
+		_glow_tween.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+		_glow_tween.tween_method(_set_glow_intensity, _glow_intensity, 0.0, 0.6)
+
+
+func _set_glow_intensity(v: float) -> void:
+	_glow_intensity = v
+	if _glow_material:
+		_glow_material.set_shader_parameter("glow_intensity", v)
+
+
+func _update_pivot() -> void:
+	if size.x > 0.0 and size.y > 0.0:
+		pivot_offset = size * 0.5
+
+
+static func create_from_content(
+	title: String,
+	body: String = "",
+	weight_value: float = 0.5,
+	connected_value: bool = false,
+	mutable: bool = true,
+	display_only: bool = false
+) -> PromptMemoryNode:
+	var packed := load("res://scenes/test/memory/prompt_memory_node.tscn") as PackedScene
+	var node := packed.instantiate() as PromptMemoryNode
+	node._configure_content(title.strip_edges(), body.strip_edges(), weight_value, connected_value)
+	node.is_mutable = mutable
+	node._display_only = display_only
+	return node
+
+
+## 合并标题与正文，供提示词拼接（标题非空时顶格一行，正文另起段落）。
+func get_prompt_for_injection() -> String:
+	var t := prompt_title.strip_edges()
+	var b := prompt_body.strip_edges()
+	if t.is_empty() and b.is_empty():
+		return ""
+	if t.is_empty():
+		return b
+	if b.is_empty():
+		return t
+	return "%s\n%s" % [t, b]
+
+
+## 导出为可嵌入提示词或存档的纯文本块（含元数据与标题/正文）。
+func export_to_text() -> String:
+	var lines: PackedStringArray = PackedStringArray([
+		"--- PromptMemory ---",
+		"id=%d" % prompt_id,
+		"mutable=%s" % ("true" if is_mutable else "false"),
+		"weight=%.2f" % weight,
+		"connected=%s" % ("true" if connected else "false"),
+		"---title---",
+		prompt_title,
+		"---body---",
+		prompt_body
+	])
+	return "\n".join(lines)
+
+
+func _configure_content(title: String, body: String, weight_value: float, connected_value: bool) -> void:
+	var ti := title.strip_edges()
+	prompt_title = ti if not ti.is_empty() else "未命名标题"
+	prompt_body = body.strip_edges()
+	weight = clampf(weight_value, 0.0, 1.0)
+	connected = connected_value
+
+
+func _on_body_toggle_pressed() -> void:
+	_body_expanded = not _body_expanded
+	_refresh_visuals()
+
+
+func _shrink_wrap_to_content() -> void:
+	## 在正文折叠后让 Panel 收回高度；Godot 的 Label 曾参与布局后易残留最小尺寸，需 reset + 清空文案配合。
+	if not is_instance_valid(self) or not is_inside_tree():
+		return
+	reset_size()
+	_update_pivot()
+	emit_signal("moved", self )
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -49,7 +213,8 @@ func _gui_input(event: InputEvent) -> void:
 				emit_signal("moved", self )
 				accept_event()
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			toggle_connected()
+			if is_mutable:
+				toggle_connected()
 			accept_event()
 	elif event is InputEventMouseMotion and _dragging:
 		position += event.position - _drag_offset
@@ -76,24 +241,45 @@ func _enter_tree() -> void:
 	mouse_exited.connect(_on_mouse_exited)
 
 
-func set_prompt_text(value: String) -> void:
-	prompt_text = value.strip_edges()
-	if prompt_text.is_empty():
-		prompt_text = "未命名提示词"
+func set_prompt_title(value: String) -> void:
+	if not is_mutable:
+		return
+	var v := value.strip_edges()
+	prompt_title = v if not v.is_empty() else "未命名标题"
 	_refresh_visuals()
 
 
+func set_prompt_body(value: String) -> void:
+	if not is_mutable:
+		return
+	prompt_body = value.strip_edges()
+	if prompt_body.is_empty():
+		_body_expanded = false
+	_refresh_visuals()
+
+
+## 兼容旧调用：整段写入时视为仅更新标题（正文不变）。
+func set_prompt_text(value: String) -> void:
+	set_prompt_title(value)
+
+
 func set_weight(value: float) -> void:
+	if not is_mutable:
+		return
 	weight = clampf(value, 0.0, 1.0)
 	_refresh_visuals()
 
 
 func set_connected(value: bool) -> void:
+	if not is_mutable:
+		return
 	connected = value
 	_refresh_visuals()
 
 
 func toggle_connected() -> void:
+	if not is_mutable:
+		return
 	connected = not connected
 	_refresh_visuals()
 	emit_signal("connect_toggled", self )
@@ -103,10 +289,42 @@ func _refresh_visuals() -> void:
 	if not is_inside_tree():
 		return
 
-	_title_label.text = prompt_text
+	var readonly_prefix := "" if is_mutable else "只读 · "
+	_title_label.text = prompt_title
 	if connected:
-		_state_label.text = "已连接  |  权重 %.2f" % weight
-		_state_label.modulate = Color("8dd9ff")
+		_state_label.text = "%s已连接  |  权重 %.2f" % [readonly_prefix, weight]
+		_state_label.modulate = Color("8dd9ff") if is_mutable else Color("a8b8cc")
 	else:
-		_state_label.text = "未连接（不生效）  |  权重 %.2f" % weight
+		_state_label.text = "%s未连接（不生效）  |  权重 %.2f" % [readonly_prefix, weight]
 		_state_label.modulate = Color("8e97aa")
+
+	var body := prompt_body.strip_edges()
+	var has_body := not body.is_empty()
+
+	if _display_only and has_body:
+		_body_expanded = true
+		_body_toggle_row.visible = false
+		_body_label.visible = true
+		_body_label.text = body
+		_body_label.modulate = Color(0.75, 0.82, 0.92, 1.0)
+		call_deferred("_shrink_wrap_to_content")
+		return
+
+	if not has_body:
+		_body_expanded = false
+
+	_body_toggle_row.visible = has_body
+
+	var show_body := has_body and _body_expanded
+	_body_label.visible = show_body
+	## 收起时必须清空文本，否则 Wrapped Label 的最小高度不会收回。
+	if show_body:
+		_body_label.text = body
+	else:
+		_body_label.text = ""
+
+	if has_body:
+		_body_toggle_button.text = "收起正文 ▲" if _body_expanded else "展开正文 ▼"
+		_body_label.modulate = Color(0.75, 0.82, 0.92, 1.0)
+
+	call_deferred("_shrink_wrap_to_content")
