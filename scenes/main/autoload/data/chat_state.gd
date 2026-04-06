@@ -36,6 +36,8 @@ signal response_text_set(text: String)
 signal response_completed(full_text: String)
 ## 响应内容清空
 signal response_cleared()
+## 工具结果已回传，即将开始同一用户消息下的「下一轮」模型输出（网关多轮）；UI 应清空当前流式气泡正文，避免与上一轮拼接
+signal assistant_followup_segment_started()
 ## 响应错误
 signal response_error(message: String)
 
@@ -709,6 +711,13 @@ func clear_response() -> void:
 	print("[ChatState] clear_response()")
 	current_response_text = ""
 	response_cleared.emit()
+
+
+## 网关多轮：function-results 成功后、下一轮模型 SSE 到达前调用，避免续轮 text_delta 拼在上一轮正文后
+func begin_followup_assistant_segment() -> void:
+	print("[ChatState] begin_followup_assistant_segment()")
+	current_response_text = ""
+	assistant_followup_segment_started.emit()
 
 
 func notify_function_call_started(call_id: String, fname: String) -> void:

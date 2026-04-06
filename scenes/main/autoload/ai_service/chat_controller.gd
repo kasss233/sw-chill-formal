@@ -53,6 +53,7 @@ func _init_adapter() -> void:
 	_adapter.stream_chunk.connect(_on_adapter_stream_chunk)
 	_adapter.stream_completed.connect(_on_adapter_stream_completed)
 	_adapter.request_failed.connect(_on_adapter_request_failed)
+	_adapter.followup_assistant_segment_started.connect(_on_adapter_followup_segment)
 	if not ChatState.chat_backend_mode_changed.is_connected(_on_chat_backend_mode_changed):
 		ChatState.chat_backend_mode_changed.connect(_on_chat_backend_mode_changed)
 	print("[ChatController] 后端模式: %s 对话路径: %s" % [AuthState.get_base_url(), ChatState.get_chat_path_prefix()])
@@ -187,6 +188,10 @@ func _on_adapter_stream_completed(full_response: String) -> void:
 func _on_adapter_request_failed(error: String) -> void:
 	ChatState.fail_response(error)
 	response_failed.emit(error)
+
+
+func _on_adapter_followup_segment() -> void:
+	ChatState.begin_followup_assistant_segment()
 
 
 # ============ AIResponse 处理 ============

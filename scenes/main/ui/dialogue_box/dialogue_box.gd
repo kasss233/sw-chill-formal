@@ -221,6 +221,7 @@ func _ready() -> void:
 	ChatState.response_completed.connect(_on_response_completed)
 	ChatState.response_error.connect(_on_response_error)
 	ChatState.response_cleared.connect(_on_response_cleared)
+	ChatState.assistant_followup_segment_started.connect(_on_assistant_followup_segment_started)
 	ChatState.function_call_started.connect(_on_function_call_started)
 	ChatState.function_call_completed.connect(_on_function_call_completed)
 
@@ -238,6 +239,8 @@ func _exit_tree() -> void:
 		ChatState.response_error.disconnect(_on_response_error)
 	if ChatState.response_cleared.is_connected(_on_response_cleared):
 		ChatState.response_cleared.disconnect(_on_response_cleared)
+	if ChatState.assistant_followup_segment_started.is_connected(_on_assistant_followup_segment_started):
+		ChatState.assistant_followup_segment_started.disconnect(_on_assistant_followup_segment_started)
 	if ChatState.function_call_started.is_connected(_on_function_call_started):
 		ChatState.function_call_started.disconnect(_on_function_call_started)
 	if ChatState.function_call_completed.is_connected(_on_function_call_completed):
@@ -670,6 +673,13 @@ func _on_response_error(message: String) -> void:
 func _on_response_cleared() -> void:
 	print("[DialogueBox] _on_response_cleared")
 	clear_dialogue()
+
+
+func _on_assistant_followup_segment_started() -> void:
+	# 网关多轮：新一轮模型流式开始前清空当前气泡正文，避免拼在上一轮后面；首字 delta 再走 dialogue_started
+	_has_received_text = false
+	set_text("")
+	_set_display_state(DisplayState.LOADING)
 
 
 func _on_function_call_started(_call_id: String, func_name: String) -> void:

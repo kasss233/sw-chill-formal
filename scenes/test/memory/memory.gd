@@ -26,8 +26,6 @@ var _selected_node: PromptMemoryNode
 var _next_prompt_id: int = 1
 var _anim_time: float = 0.0
 var _syncing_inspector: bool = false
-## 批量导入时强制卡片为「只读布局」（正文常显）；只读场景会临时置 true。拖拽/悬停仍可用，数据改不改由 [member PromptMemoryNode.is_mutable] 决定。
-var _batch_node_display_only: bool = false
 ## 卡片之间的展示用有向边，`from` / `to` 为 [member PromptMemoryNode.prompt_id]。仅绘制，不参与编辑。
 var _inter_node_edges: Array[Dictionary] = []
 
@@ -176,11 +174,10 @@ func _create_prompt_node(
 	body: String = "",
 	lit: bool = false,
 	lit_delay_sec: float = -1.0,
-	display_only: bool = false,
 	place_index: int = -1,
 	place_total: int = -1
 ) -> void:
-	var node := PromptMemoryNode.create_from_content(title, body, weight, connected, mutable, display_only)
+	var node := PromptMemoryNode.create_from_content(title, body, weight, connected, mutable)
 	if lit_delay_sec >= 0.0:
 		node.is_lit = false
 	else:
@@ -267,7 +264,7 @@ func _find_node_by_prompt_id(p_id: int) -> PromptMemoryNode:
 ## 与 [method _update_api_output] / [method agent_get_short_term_memory] 导出结构互逆：[br]
 ## 根对象可为：`prompts`（推荐，可逐项含 `connected` / `mutable`）、`connected_prompts`（默认已连接、可变）。[br]
 ## 根为数组时视为整表条目列表（等价于仅含 connected_prompts）。[br]
-## 条目字段：`id`、`title`、`body`、`prompt`、`weight`；可选 `connected`（默认 true）、`mutable`（默认 true）、`display_only`。[br]
+## 条目字段：`id`、`title`、`body`、`prompt`、`weight`；可选 `connected`（默认 true）、`mutable`（默认 true）。[br]
 ## 可选 `edges`：`[{"from": id, "to": id}, ...]` 或 `[[from, to], ...]`，表示记忆节点之间的展示关联（与 Agent 中心连线独立）。
 func apply_memory_graph_from_export_json(json_text: String) -> Dictionary:
 	var stripped := json_text.strip_edges()
@@ -315,10 +312,7 @@ func apply_memory_graph_from_parsed(parsed: Variant) -> Dictionary:
 		var mutable := true
 		if item.has("mutable"):
 			mutable = bool(item["mutable"])
-		var display_only_item := _batch_node_display_only
-		if item.has("display_only"):
-			display_only_item = bool(item["display_only"])
-		_create_prompt_node(title, weight, connected, mutable, body, false, -1.0, display_only_item, i, n)
+		_create_prompt_node(title, weight, connected, mutable, body, false, -1.0, i, n)
 	for i in n:
 		var item: Dictionary = items[i]
 		if item.has("id"):

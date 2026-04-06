@@ -36,10 +36,14 @@ OUTPUT_PROTOCOL = """
 
 def get_system_prompt(config: AgentConfig) -> str:
     """角色与基础能力说明（不含工具目录与输出协议）。"""
-    return config.system_prompt_template.format(
+    base = config.system_prompt_template.format(
         character_name=config.character_name,
         character_personality=config.character_personality,
-    )
+    ).strip()
+    bg = (config.character_background or "").strip()
+    if bg:
+        base += "\n\n【背景与经历】\n" + bg
+    return base
 
 
 def build_full_system_prompt(config: AgentConfig, tools_markdown: str) -> str:

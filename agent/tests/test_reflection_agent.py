@@ -26,6 +26,20 @@ def test_build_system_prompt():
     assert "简洁" in out
 
 
+def test_build_system_prompt_character_background():
+    """character_background 拼接到系统提示末尾"""
+    from agent.reflection_agent.config import ReflectionAgentConfig
+    from agent.reflection_agent.prompt_builder import build_system_prompt
+    config = ReflectionAgentConfig(
+        character_name="小镜",
+        character_background="她曾长期在 Chill 陪伴用户复盘。",
+        style_hint="简洁",
+    )
+    out = build_system_prompt(config)
+    assert "【背景与经历】" in out
+    assert "Chill" in out
+
+
 def test_build_user_prompt():
     """测试 prompt_builder.build_user_prompt 结构"""
     from agent.reflection_agent.prompt_builder import build_user_prompt

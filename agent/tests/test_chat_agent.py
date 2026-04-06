@@ -19,6 +19,20 @@ def test_prompt_layer():
     assert "女孩" not in out
 
 
+def test_get_system_prompt_appends_character_background():
+    """character_background 在 format 之后拼接，且含标题"""
+    from agent.chat_agent.config import AgentConfig
+    from agent.chat_agent.prompt import get_system_prompt
+    config = AgentConfig(
+        character_name="测试",
+        character_personality="温和",
+        character_background="她曾在期末周连续熬夜。",
+    )
+    out = get_system_prompt(config)
+    assert "【背景与经历】" in out
+    assert "期末周" in out
+
+
 def test_task_intent_layer():
     """测试任务意图检测层"""
     from agent.chat_agent.task_intent import detect_task_creation_intent

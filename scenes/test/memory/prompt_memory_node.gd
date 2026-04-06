@@ -8,9 +8,6 @@ signal connect_toggled(node: PromptMemoryNode)
 ## 是否允许用户通过控制台等途径修改内容、权重、连接与删除（展示用记忆可关）。
 @export var is_mutable: bool = true
 
-## 只读布局：正文常显、不显示「展开」行；仍可拖拽与悬停。数据是否可改由 [member is_mutable] 决定。
-var _display_only: bool = false
-
 @export_group("演出")
 ## 已点亮：边缘 RGB 流光（与 FrostedPanel / aiglow 同源逻辑）；未点亮：关闭流光。运行时请优先用 [method set_lit] 以控制是否播放过渡。
 @export var is_lit: bool = false
@@ -139,14 +136,12 @@ static func create_from_content(
 	body: String = "",
 	weight_value: float = 0.5,
 	connected_value: bool = false,
-	mutable: bool = true,
-	display_only: bool = false
+	mutable: bool = true
 ) -> PromptMemoryNode:
 	var packed := load("res://scenes/test/memory/prompt_memory_node.tscn") as PackedScene
 	var node := packed.instantiate() as PromptMemoryNode
 	node._configure_content(title.strip_edges(), body.strip_edges(), weight_value, connected_value)
 	node.is_mutable = mutable
-	node._display_only = display_only
 	return node
 
 
@@ -300,15 +295,6 @@ func _refresh_visuals() -> void:
 
 	var body := prompt_body.strip_edges()
 	var has_body := not body.is_empty()
-
-	if _display_only and has_body:
-		_body_expanded = true
-		_body_toggle_row.visible = false
-		_body_label.visible = true
-		_body_label.text = body
-		_body_label.modulate = Color(0.75, 0.82, 0.92, 1.0)
-		call_deferred("_shrink_wrap_to_content")
-		return
 
 	if not has_body:
 		_body_expanded = false

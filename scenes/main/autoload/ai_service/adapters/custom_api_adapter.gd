@@ -33,6 +33,8 @@ var _fr_thread: Thread = null # function-result 独立线程
 var _mutex: Mutex = null
 var _full_response: String = ""
 var _event_type: String = ""
+## function-results 成功回传后发出；ChatController 用于清空续轮前的流式正文，避免多轮拼在同一段里
+signal followup_assistant_segment_started
 
 
 func _init() -> void:
@@ -334,17 +336,29 @@ func _execute_function_result_request(body: Dictionary) -> void:
 
 	client.close()
 
-	# 解析 JSON
-	if not response_body.is_empty():
-		var json = JSON.new()
-		if json.parse(response_body) == OK:
-			var result = json.get_data()
-			if result is Dictionary and result.get("code", -1) != 0:
-				call_deferred("_emit_request_failed",
-					"函数结果回传失败: %s" % result.get("message", ""))
-		else:
+	# 解析 JSON（成功后再通知 UI 进入「续轮」段落，避免与上一轮流式正文拼接）
+	if response_body.is_empty():
+		call_deferred("_emit_followup_segment_started")
+		return
+
+	var json = JSON.new()
+	if json.parse(response_body) != OK:
+		call_deferred("_emit_request_failed", "函数结果响应解析失败")
+		return
+	var result = json.get_data()
+	if result is Dictionary:
+		# 与 ApiResponse 一致：code==0 成功；缺省视为成功（避免误把缺省当失败）
+		var c = int(result.get("code", 0))
+		if c != 0:
 			call_deferred("_emit_request_failed",
-				"函数结果响应解析失败")
+				"函数结果回传失败: %s" % str(result.get("message", "")))
+			return
+	call_deferred("_emit_followup_segment_started")
+
+
+func _emit_followup_segment_started() -> void:
+	_full_response = ""
+	followup_assistant_segment_started.emit()
 
 
 ## 等待连接建立

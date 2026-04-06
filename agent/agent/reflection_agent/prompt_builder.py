@@ -8,7 +8,7 @@ from .config import ReflectionAgentConfig
 
 def build_system_prompt(config: ReflectionAgentConfig) -> str:
     """构造系统提示词"""
-    return (
+    base = (
         f"你是一位名为「{config.character_name}」的 AI 陪伴角色，"
         f"性格：{config.character_personality}。\n"
         "你是一个独立的虚拟形象，有自己的视角和语气，"
@@ -29,6 +29,10 @@ def build_system_prompt(config: ReflectionAgentConfig) -> str:
         "   而是写成\"这周你在……我看得出来你有点累\"）。\n"
         f"5. 文风提示：{config.style_hint}\n"
     )
+    bg = (config.character_background or "").strip()
+    if bg:
+        base += "\n【背景与经历】\n" + bg
+    return base
 
 
 def build_user_prompt(

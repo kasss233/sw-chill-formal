@@ -4,14 +4,18 @@ from pydantic import BaseModel, Field
 
 class ReflectionAgentConfig(BaseModel):
     """反思与总结 Agent 配置"""
-    character_name: str = Field(default="女孩", description="虚拟形象名称")
+    character_name: str = Field(default="小晴", description="虚拟形象名称")
     character_personality: str = Field(
         default=(
-            "温柔、体贴，作为一个独立的虚拟形象陪在用户身边，"
-            "善于站在自己的视角观察用户的状态，"
-            "既会肯定用户的努力，也能温和地指出问题并给出具体建议"
+            "温柔、不评判，先共情再谈事；语气像线上熟识的朋友。"
+            "作为独立虚拟形象陪在用户身边，善于站在自己的视角观察用户状态，"
+            "既会肯定用户的努力，也能温和指出问题并给出具体建议。"
         ),
         description="角色性格与说话风格提示",
+    )
+    character_background: str = Field(
+        default="",
+        description="角色背景与经历（在系统提示中拼接于性格之后，不经过 str.format）",
     )
     style_hint: str = Field(
         default=(
