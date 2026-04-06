@@ -246,7 +246,8 @@ class Agent:
         from agent_result_parser.sse_parser import SSEParser
 
         trace = request_trace_id or uuid.uuid4().hex[:12]
-        if self.config.max_tool_rounds > 0:
+        # 网关编排时必须在首轮就下发 function_call SSE，不能在进程内跑完 run_tool_loop 再一次性 parse
+        if self.config.max_tool_rounds > 0 and not gateway_orchestrator:
             resp = self._chat_orchestrated(
                 user_message,
                 user_id=user_id,
@@ -271,6 +272,12 @@ class Agent:
             return
 
         self._last_llm_usage_rounds = None
+        if gateway_orchestrator and self.config.max_tool_rounds > 0:
+            _log.info(
+                "[chat_stream] gateway_orchestrator=True：跳过进程内 max_tool_rounds=%s 编排，"
+                "工具由网关等待 function-results 后续轮",
+                self.config.max_tool_rounds,
+            )
         tools_md = self._tools_markdown()
         hist = (
             conversation_history_override

@@ -109,7 +109,7 @@ Planner（可选） → Orchestrator（工具循环） → LLMInterface → pars
 
 | 字段 | 说明 |
 |------|------|
-| `gateway_orchestrator` | `true` 时：若本轮有 `function_calls`，**不**在 SSE 末尾发 `done`，并在进程内暂存消息链供续轮 |
+| `gateway_orchestrator` | `true` 时：若本轮有 `function_calls`，**不**在 SSE 末尾发 `done`，并在进程内暂存消息链供续轮；且 **忽略** `chat_agent.yaml` 的 `max_tool_rounds>0`，**不**走进程内 `_chat_orchestrated`（否则工具在服务端跑完才发 SSE，前端收不到首轮 `function_call`） |
 | `history` | `[{ "role", "content" }]`（可选），与 `message` 一起参与 `get_context_messages`，**替代**该 HTTP 单例上一次的 `conversation_history`（用于网关从 DB 注入历史） |
 | `tool_results` | 续轮请求体（**无** `message`）：`[{ "function_call_id", "name", "result" }]`，与 orchestrator 的 `format_tool_results_user_message` 对齐 |
 
