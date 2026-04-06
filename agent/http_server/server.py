@@ -7,7 +7,7 @@
 
 端口与路由（默认）：
 - GET  /health                    → 健康检查
-- POST /chat                      → 主聊天 Agent，对应 Agent.chat(...)
+- POST /chat                      → 主聊天 Agent（流式见 `gateway_orchestrator` / `history` / `tool_results` 续轮，见 agent/docs/AGENT_IO_AND_BACKEND_INTEGRATION.md 3.2.1）
 - POST /reflection/summary        → 反思 Agent，对应 ReflectionAgent.generate_period_summary(...)
 
 启动方式（在仓库根目录）：
@@ -28,7 +28,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
+
+from interfaces.llm import LLMMessage
 
 from agent import Agent, AgentConfig
 from agent.reflection_agent import ReflectionAgent, ReflectionAgentConfig
@@ -225,12 +227,6 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"error": "请求体不是合法的 JSON"}).encode("utf-8"))
             return
 
-        message = (body.get("message") or "").strip()
-        if not message:
-            self._set_headers(400)
-            self.wfile.write(json.dumps({"error": "缺少 message 字段或为空"}).encode("utf-8"))
-            return
-
         user_id = self._get_user_id(body)
         session_id = body.get("session_id")
         trace = (
@@ -244,12 +240,61 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             "text/event-stream" in (self.headers.get("Accept") or "")
             or (urlparse(self.path).query or "").lower().find("stream=true") >= 0
         )
+
+        tool_results = body.get("tool_results")
+        if isinstance(tool_results, list) and len(tool_results) > 0:
+            if not session_id:
+                self._set_headers(400)
+                self.wfile.write(
+                    json.dumps({"error": "tool_results 需要非空 session_id"}).encode("utf-8")
+                )
+                return
+            if not want_stream:
+                self._set_headers(400)
+                self.wfile.write(
+                    json.dumps({"error": "tool_results 续轮仅支持流式（Accept: text/event-stream）"}).encode(
+                        "utf-8"
+                    )
+                )
+                return
+            self._handle_chat_stream_followup(
+                session_id,
+                tool_results,
+                user_id=user_id,
+                request_trace_id=str(trace),
+            )
+            return
+
+        message = (body.get("message") or "").strip()
+        if not message:
+            self._set_headers(400)
+            self.wfile.write(
+                json.dumps({"error": "缺少 message 字段或为空（tool_results 续轮除外）"}).encode(
+                    "utf-8"
+                )
+            )
+            return
+
+        gateway_orchestrator = bool(body.get("gateway_orchestrator"))
+        history_override: Optional[List[LLMMessage]] = None
+        raw_hist = body.get("history")
+        if isinstance(raw_hist, list):
+            history_override = []
+            for h in raw_hist:
+                if not isinstance(h, dict):
+                    continue
+                role = str(h.get("role") or "user")
+                content = str(h.get("content") or "")
+                history_override.append(LLMMessage(role=role, content=content))
+
         if want_stream:
             self._handle_chat_stream(
                 message,
                 session_id=session_id,
                 user_id=user_id,
                 request_trace_id=str(trace),
+                conversation_history_override=history_override,
+                gateway_orchestrator=gateway_orchestrator,
             )
             return
 
@@ -270,20 +315,79 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
             self._set_headers(500)
             self.wfile.write(json.dumps({"error": f"Agent 处理失败: {e}"}).encode("utf-8"))
 
+    def _handle_chat_stream_followup(
+        self,
+        session_id: str,
+        tool_results: List[Dict[str, Any]],
+        *,
+        user_id: Optional[str] = None,
+        request_trace_id: Optional[str] = None,
+    ) -> None:
+        """网关编排：收到 function-results 后的续轮 SSE。"""
+        t0 = time.perf_counter()
+        logger.info(
+            "HTTP SSE /chat 续轮 session_id=%s tool_results=%d",
+            session_id,
+            len(tool_results),
+        )
+        try:
+            self._set_sse_headers()
+            ev_total = 0
+            delta_total = 0
+            first_ev_t: Optional[float] = None
+            for event_type, data in CHAT_AGENT.chat_stream_after_tool_results(
+                session_id,
+                tool_results,
+                user_id=user_id,
+                request_trace_id=request_trace_id,
+            ):
+                if first_ev_t is None:
+                    first_ev_t = time.perf_counter()
+                    logger.info(
+                        "HTTP SSE 续轮首个事件 type=%s (+%.2fs)",
+                        event_type,
+                        first_ev_t - t0,
+                    )
+                ev_total += 1
+                if event_type == "text_delta":
+                    delta_total += 1
+                if event_type == "done" and user_id is not None:
+                    data = {**data, "user_id": user_id}
+                line = f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+                self.wfile.write(line.encode("utf-8"))
+                self.wfile.flush()
+            logger.info(
+                "HTTP SSE /chat 续轮结束 events=%s text_deltas=%s 总耗时=%.2fs",
+                ev_total,
+                delta_total,
+                time.perf_counter() - t0,
+            )
+        except Exception as e:
+            logger.exception("流式 chat 续轮失败: %s", e)
+            err_line = f"event: error\ndata: {json.dumps({'code': 500, 'message': str(e)}, ensure_ascii=False)}\n\n"
+            try:
+                self.wfile.write(err_line.encode("utf-8"))
+                self.wfile.flush()
+            except Exception:
+                pass
+
     def _handle_chat_stream(
         self,
         message: str,
         session_id: Optional[str] = None,
         user_id: Optional[str] = None,
         request_trace_id: Optional[str] = None,
+        conversation_history_override: Optional[List[LLMMessage]] = None,
+        gateway_orchestrator: bool = False,
     ) -> None:
         """以 SSE 流式返回 /chat 结果。done 事件中带回 user_id。"""
         t0 = time.perf_counter()
         logger.info(
-            "HTTP SSE /chat 开始 session_id=%s user_id=%s message_len=%d",
+            "HTTP SSE /chat 开始 session_id=%s user_id=%s message_len=%d gateway=%s",
             session_id,
             user_id,
             len(message or ""),
+            gateway_orchestrator,
         )
         try:
             self._set_sse_headers()
@@ -299,6 +403,8 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 session_id=session_id,
                 user_id=user_id,
                 request_trace_id=request_trace_id,
+                conversation_history_override=conversation_history_override,
+                gateway_orchestrator=gateway_orchestrator,
             ):
                 if first_ev_t is None:
                     first_ev_t = time.perf_counter()

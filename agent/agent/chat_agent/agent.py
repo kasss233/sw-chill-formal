@@ -20,7 +20,8 @@ from .config import AgentConfig
 from .context import get_context_messages
 from .invoke_log import emit_llm_invoke_single_turn, emit_llm_round_usage, emit_llm_stream_done
 from .llm_output_parser import StreamingStructuredParser, StructuredTurn, parse_full
-from .orchestrator import apply_plan_to_system_message, run_tool_loop
+from .gateway_session import clear_pending, get_pending, set_pending
+from .orchestrator import apply_plan_to_system_message, format_tool_results_user_message, run_tool_loop
 from .planner import get_planner
 from .task_intent import detect_task_creation_intent
 from .task_generation import generate_tasks_from_conversation
@@ -239,6 +240,8 @@ class Agent:
         *,
         user_id: Optional[str] = None,
         request_trace_id: Optional[str] = None,
+        conversation_history_override: Optional[List[LLMMessage]] = None,
+        gateway_orchestrator: bool = False,
     ) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
         from agent_result_parser.sse_parser import SSEParser
 
@@ -269,9 +272,16 @@ class Agent:
 
         self._last_llm_usage_rounds = None
         tools_md = self._tools_markdown()
+        hist = (
+            conversation_history_override
+            if conversation_history_override is not None
+            else self.conversation_history
+        )
+        if gateway_orchestrator and session_id:
+            clear_pending(session_id)
         messages = get_context_messages(
             memory=self.memory,
-            conversation_history=self.conversation_history,
+            conversation_history=hist,
             user_message=user_message,
             config=self.config,
             tools_markdown=tools_md,
@@ -332,8 +342,9 @@ class Agent:
         for w in final_turn.parse_warnings:
             _log.warning("[chat_stream] %s", w)
 
-        self.conversation_history.append(LLMMessage(role="user", content=user_message))
-        self.conversation_history.append(LLMMessage(role="assistant", content=raw))
+        if not gateway_orchestrator:
+            self.conversation_history.append(LLMMessage(role="user", content=user_message))
+            self.conversation_history.append(LLMMessage(role="assistant", content=raw))
 
         if os.environ.get("AGENT_DEBUG_CHAT", "").strip().lower() in ("1", "true", "yes"):
             _log.info(
@@ -364,7 +375,151 @@ class Agent:
         for ev in parser_sse.parse_agent_response(
             resp, session_id=session_id, usage=self._last_llm_usage
         ):
+            if (
+                gateway_orchestrator
+                and session_id
+                and resp.function_calls
+                and ev.event_type.value == "done"
+            ):
+                continue
             yield (ev.event_type.value, ev.data)
+
+        if gateway_orchestrator and session_id and resp.function_calls:
+            msgs_after = list(messages) + [LLMMessage(role="assistant", content=raw)]
+            set_pending(session_id, msgs_after)
+        elif gateway_orchestrator and session_id and not resp.function_calls:
+            clear_pending(session_id)
+
+    def chat_stream_after_tool_results(
+        self,
+        session_id: str,
+        tool_results: List[Dict[str, Any]],
+        *,
+        user_id: Optional[str] = None,
+        request_trace_id: Optional[str] = None,
+    ) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
+        """网关编排：在收到 function-results 后继续一轮 LLM（不执行进程内 tool_executor）。"""
+        from agent_result_parser.sse_parser import SSEParser
+
+        trace = request_trace_id or uuid.uuid4().hex[:12]
+        if self.config.max_tool_rounds > 0:
+            raise ValueError("chat_stream_after_tool_results 与 max_tool_rounds>0 编排不兼容，请将 max_tool_rounds 置 0")
+
+        pending = get_pending(session_id)
+        if not pending:
+            raise ValueError(f"无待续网关会话: session_id={session_id}")
+
+        batch: List[Dict[str, Any]] = []
+        for tr in tool_results:
+            if not isinstance(tr, dict):
+                continue
+            fc_id = str(
+                tr.get("function_call_id")
+                or tr.get("id")
+                or ""
+            )
+            name = str(tr.get("name") or tr.get("function_name") or "")
+            result = tr.get("result")
+            if not isinstance(result, dict):
+                result = {"success": False, "error": "invalid_result"}
+            batch.append(
+                {"function_call_id": fc_id, "name": name, "result": result}
+            )
+
+        messages = list(pending) + [
+            LLMMessage(
+                role="user",
+                content=format_tool_results_user_message(batch),
+            )
+        ]
+        max_tokens = self.config.max_tokens or 1000
+
+        stream_parser = StreamingStructuredParser()
+        final_turn: Optional[StructuredTurn] = None
+        raw_parts: List[str] = []
+
+        t_stream0 = time.perf_counter()
+        if hasattr(self.llm, "stream_chat"):
+            for chunk in self.llm.stream_chat(
+                messages=messages,
+                temperature=self.config.temperature,
+                max_tokens=max_tokens,
+            ):
+                if not chunk:
+                    continue
+                raw_parts.append(chunk)
+                delta, closed = stream_parser.feed(chunk)
+                if delta:
+                    yield ("text_delta", {"content": delta})
+                if closed:
+                    final_turn = closed
+        else:
+            llm_response = self.llm.chat(
+                messages=messages,
+                temperature=self.config.temperature,
+                max_tokens=max_tokens,
+            )
+            c = llm_response.content or ""
+            raw_parts.append(c)
+            delta, closed = stream_parser.feed(c)
+            if delta:
+                yield ("text_delta", {"content": delta})
+            if closed:
+                final_turn = closed
+
+        emit_llm_stream_done(
+            trace=trace,
+            user_id=user_id,
+            session_id=session_id,
+            latency_ms=(time.perf_counter() - t_stream0) * 1000.0,
+        )
+        raw = "".join(raw_parts)
+
+        if final_turn is None:
+            final_turn = stream_parser.close()
+            if final_turn is None:
+                allowed = self._allowed_function_names()
+                final_turn = parse_full(
+                    raw,
+                    allowed_function_names=allowed,
+                    strict_function_names=self.config.strict_function_names,
+                )
+
+        for w in final_turn.parse_warnings:
+            _log.warning("[chat_stream_after_tool_results] %s", w)
+
+        self._last_assistant_text = (final_turn.text or "").strip()
+        resp = self._turn_to_response(final_turn, "", raw)
+        prompt_est = self.llm.count_tokens(
+            "".join(m.content for m in messages if m.content)
+        )
+        completion_est = self.llm.count_tokens(raw)
+        self._last_llm_usage = {
+            "estimated": True,
+            "prompt_tokens_est": prompt_est,
+            "completion_tokens_est": completion_est,
+            "total_tokens_est": prompt_est + completion_est,
+        }
+        emit_llm_round_usage(
+            trace=trace,
+            user_id=user_id,
+            session_id=session_id,
+            round_idx=0,
+            usage=self._last_llm_usage,
+        )
+        parser_sse = SSEParser(session_id=session_id or "")
+        for ev in parser_sse.parse_agent_response(
+            resp, session_id=session_id, usage=self._last_llm_usage
+        ):
+            if resp.function_calls and ev.event_type.value == "done":
+                continue
+            yield (ev.event_type.value, ev.data)
+
+        if resp.function_calls:
+            msgs_after = list(messages) + [LLMMessage(role="assistant", content=raw)]
+            set_pending(session_id, msgs_after)
+        else:
+            clear_pending(session_id)
 
     def generate_tasks_from_conversation(self, conversation_text: str) -> List[Task]:
         """对外暴露：从对话生成任务列表（委托给 task_generation 层）"""

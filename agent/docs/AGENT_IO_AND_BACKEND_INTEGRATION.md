@@ -101,6 +101,22 @@ Planner（可选） → Orchestrator（工具循环） → LLMInterface → pars
 - SSE 中每条 `function_call` 的 **`id`** 与 `POST /chat/function-results` 中的 **`function_call_id`** **一一对应**。
 - 客户端（Godot）执行 `AgentExecutor.execute` 后，将结果 JSON 回传；后端应 **合并进对话** 并 **再次调用模型**，直到不再产生新工具调用。
 
+### 3.2.1 生产推荐：chill-backend 编排 + Agent HTTP 单轮（`gateway_orchestrator`）
+
+与 Godot 状态对齐的工具体应在 **网关**侧完成「下发 FC → 等待 `function-results` → 再调 Agent」；Python Agent 进程内 **勿** 再用 `max_tool_rounds>0` + `default_mock_tool_executor` 代替客户端。
+
+**`POST /chat`（流式）扩展字段**（与 `agent/http_server/server.py` 一致）：
+
+| 字段 | 说明 |
+|------|------|
+| `gateway_orchestrator` | `true` 时：若本轮有 `function_calls`，**不**在 SSE 末尾发 `done`，并在进程内暂存消息链供续轮 |
+| `history` | `[{ "role", "content" }]`（可选），与 `message` 一起参与 `get_context_messages`，**替代**该 HTTP 单例上一次的 `conversation_history`（用于网关从 DB 注入历史） |
+| `tool_results` | 续轮请求体（**无** `message`）：`[{ "function_call_id", "name", "result" }]`，与 orchestrator 的 `format_tool_results_user_message` 对齐 |
+
+**续轮**：首轮 `gateway_orchestrator` + `message` + `history` → 若有 FC 则网关挂起并 `POST .../function-results` → 再 `POST /chat` 仅带 `session_id` + `tool_results` + `gateway_orchestrator`，直至某轮 SSE 出现 `done`（无未决 FC）。
+
+**独立运行 `http_server` 且未传 `gateway_orchestrator`** 时，行为与旧版一致（单轮 SSE + `done`）。
+
 ### 3.3 流式
 
 - **`text_delta`**：用户可见文本流；纯工具轮可无 delta。
