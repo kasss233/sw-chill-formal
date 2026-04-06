@@ -129,7 +129,7 @@ func _refresh_overview_cards() -> void:
 
 	match _focus_view:
 		0:  # 周
-			var week_key := DateUtil.date_to_week_key(_selected_date_key)
+			var week_key := DateUtil.offset_week(DateUtil.date_to_week_key(_selected_date_key), _focus_offset)
 			var monday := DateUtil.get_monday_for_week(week_key)
 			var totals := StatsState.get_week_daily_totals("focus", monday, "duration_seconds")
 			for item in totals:
@@ -178,7 +178,7 @@ func _refresh_focus_chart() -> void:
 
 	match _focus_view:
 		0:  # 周
-			var week_key := DateUtil.date_to_week_key(_selected_date_key)
+			var week_key := DateUtil.offset_week(DateUtil.date_to_week_key(_selected_date_key), _focus_offset)
 			var monday := DateUtil.get_monday_for_week(week_key)
 			var totals := StatsState.get_week_focus_totals(monday)
 			for i in range(totals.size()):
@@ -231,16 +231,24 @@ func _refresh_timeline() -> void:
 		_add_timeline_empty()
 		return
 
-	var records := StatsState.get_records("focus", _selected_date_key)
+	var target_date_key := _selected_date_key
+	if _focus_offset != 0:
+		target_date_key = DateUtil.offset_date(_selected_date_key, _focus_offset * 7)
+
+	var records := StatsState.get_records("focus", target_date_key)
 	if records.is_empty():
 		_add_timeline_empty()
 		return
 
+	records.sort_custom(func(a, b) -> bool:
+		return int(a.data.get("start_timestamp", 0)) < int(b.data.get("start_timestamp", 0))
+	)
+
 	for record in records:
-		var data: Dictionary = record.get("data", {}) if record is Dictionary else record.data if "data" in record else {}
+		var data: Dictionary = record.data if record != null else {}
 		var completed: bool = data.get("completed", false)
 		var duration_seconds: int = int(data.get("duration_seconds", 0))
-		var start_time: String = data.get("start_time", "")
+		var start_time := _resolve_record_start_time(data)
 
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
@@ -259,6 +267,8 @@ func _refresh_timeline() -> void:
 
 		var time_label := Label.new()
 		var time_text := start_time.left(5) if start_time.length() >= 5 else start_time
+		if time_text.is_empty():
+			time_text = "--:--"
 		var duration_min := duration_seconds / 60
 		time_label.text = "%s  ·  %d 分钟" % [time_text, duration_min]
 		time_label.add_theme_color_override("font_color", Color(1, 1, 1))
@@ -340,7 +350,19 @@ func _refresh_insights(insights: Array) -> void:
 func _on_generate_reflection() -> void:
 	var period_type := _get_review_period_type()
 	var period_key := _get_review_period_key()
-	HabitState.agent_generate_period_reflection(period_type, period_key)
+	# 通过 AI 的 generate_reflection 函数调用生成反思
+	var prompt := "请为我的%s生成一段温和、鼓励式的回顾总结。包含亮点、节奏观察和下一步建议。" % _period_title_for_display(period_type, period_key)
+	ChatState.agent_set_input_text(prompt)
+
+
+func _period_title_for_display(period_type: String, period_key: String) -> String:
+	match period_type:
+		"month":
+			return "%s 月度回顾" % period_key
+		"recent30":
+			return "最近30天回顾"
+		_:
+			return "周回顾"
 
 
 # ======================== 工具方法 ========================
@@ -360,7 +382,8 @@ func _get_stats_reference() -> Dictionary:
 			var now := Time.get_datetime_dict_from_system()
 			return {"year": int(now["year"]) + _focus_offset}
 		_:
-			return {}
+			var week_key := DateUtil.offset_week(DateUtil.date_to_week_key(_selected_date_key), _focus_offset)
+			return {"monday_date": DateUtil.get_monday_for_week(week_key)}
 
 
 func _get_review_period_type() -> String:
@@ -378,7 +401,7 @@ func _get_review_period_key() -> String:
 		2:
 			return _selected_date_key
 		_:
-			return DateUtil.date_to_week_key(_selected_date_key)
+			return DateUtil.offset_week(DateUtil.date_to_week_key(_selected_date_key), _focus_offset)
 
 
 func _add_timeline_empty() -> void:
@@ -401,3 +424,16 @@ func _heatmap_label_for_index(index: int, date_key: String, total_items: int) ->
 			return "·"
 		return date_key.right(2)
 	return str(index + 1)
+
+
+func _resolve_record_start_time(data: Dictionary) -> String:
+	var start_time := str(data.get("start_time", ""))
+	if not start_time.is_empty():
+		return start_time
+
+	var start_timestamp := int(data.get("start_timestamp", 0))
+	if start_timestamp <= 0:
+		return ""
+
+	var dt := DateUtil.utc_unix_to_datetime_dict_cn(start_timestamp)
+	return "%02d:%02d" % [int(dt.get("hour", 0)), int(dt.get("minute", 0))]

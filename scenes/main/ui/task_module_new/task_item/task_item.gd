@@ -85,7 +85,9 @@ func update_display(task: TaskData) -> void:
 		return
 
 	_is_updating_display = true
-	line_edit.text = task_data.title
+	# 如果 LineEdit 正在被用户编辑（有焦点），跳过文本更新以避免光标重置
+	if not line_edit.has_focus():
+		line_edit.text = task_data.title
 	complete_check_box.button_pressed = task_data.is_completed
 	line_edit.is_completed = task_data.is_completed
 	_is_updating_display = false

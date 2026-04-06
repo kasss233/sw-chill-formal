@@ -137,6 +137,7 @@ func record_focus_finished(session_id: String, completed: bool, meta: Dictionary
 	var record_data := {
 		"session_id": session_id,
 		"start_timestamp": int(started_at_ms / 1000),
+		"start_time": _format_time_from_unix(int(started_at_ms / 1000)),
 		"duration_seconds": duration_seconds,
 		"completed": completed,
 		"interruptions_count": interruptions_count,
@@ -331,6 +332,10 @@ func get_today_focus_seconds() -> int:
 	return int(get_day_total("focus", DateUtil.get_today_key(), "duration_seconds"))
 
 
+func get_today_task_completed_count() -> int:
+	return int(get_day_total("task", DateUtil.get_today_key(), "value"))
+
+
 func get_week_focus_totals(monday_date: String) -> Array[Dictionary]:
 	var raw = get_week_daily_totals("focus", monday_date, "duration_seconds")
 	var result: Array[Dictionary] = []
@@ -390,6 +395,74 @@ func get_ai_call_stats(period: String, reference: Dictionary = {}) -> Dictionary
 		"success_count": int(success_count),
 		"failure_count": failure_count,
 	}
+
+
+# ======================== Demo API ========================
+
+## 为演示生成历史专注记录（绕过 60 秒限制和当前时间限制）
+func demo_add_focus_record(
+	date_key: String,
+	duration_seconds: int,
+	start_time: String = "",
+	completed: bool = true,
+	interruptions_count: int = 0,
+	meta: Dictionary = {}
+) -> StatsRecord:
+	if date_key.is_empty():
+		date_key = DateUtil.get_today_key()
+
+	# 计算 start_timestamp
+	var start_timestamp := 0
+	if not start_time.is_empty():
+		var date_unix := DateUtil.date_str_to_unix(date_key)
+		var time_parts := start_time.split(":")
+		if time_parts.size() >= 2:
+			var hour := int(time_parts[0])
+			var minute := int(time_parts[1])
+			start_timestamp = date_unix + hour * 3600 + minute * 60
+	else:
+		start_timestamp = DateUtil.date_str_to_unix(date_key) + 12 * 3600
+
+	var record_data := {
+		"session_id": generate_session_id(),
+		"start_timestamp": start_timestamp,
+		"start_time": start_time if not start_time.is_empty() else "12:00",
+		"duration_seconds": duration_seconds,
+		"completed": completed,
+		"interruptions_count": interruptions_count,
+		"work_duration": duration_seconds,
+		"rest_duration": 0,
+	}
+
+	for key in meta:
+		if not record_data.has(key):
+			record_data[key] = meta[key]
+
+	return add_record("focus", date_key, record_data, float(duration_seconds))
+
+
+## 为演示生成历史任务完成记录
+func demo_add_task_record(
+	date_key: String,
+	task_id: int = 0,
+	meta: Dictionary = {}
+) -> StatsRecord:
+	if date_key.is_empty():
+		date_key = DateUtil.get_today_key()
+
+	var record_data := meta.duplicate(true)
+	record_data["task_id"] = task_id
+	record_data["count"] = 1
+
+	return add_record("task", date_key, record_data, 1.0)
+
+
+## 清除所有统计记录（用于演示恢复）
+func demo_clear_all_records() -> void:
+	var count := _records.size()
+	_records.clear()
+	_queue_save()
+	print("[StatsState] 已清除所有统计记录: %d 条" % count)
 
 
 # ======================== Agent API ========================
@@ -616,6 +689,12 @@ func import_sync_data(data: Dictionary) -> void:
 
 
 # ======================== 内部实现 ========================
+
+func _format_time_from_unix(unix_time: int) -> String:
+	if unix_time <= 0:
+		return ""
+	var dt := DateUtil.utc_unix_to_datetime_dict_cn(unix_time)
+	return "%02d:%02d" % [int(dt.get("hour", 0)), int(dt.get("minute", 0))]
 
 func _append_event(event_type: String, session_id: String, source: String, payload: Dictionary) -> StatsEvent:
 	var event = StatsEvent.new()

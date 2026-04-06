@@ -31,12 +31,14 @@ var _next_habit_id: int = 1
 var _next_slot_template_id: int = 1
 var _next_entry_id: int = 1
 var _next_record_id: int = 1
+var _bundle_updated_at: int = 0
 var _habit_id_index: Dictionary = {} # {int id → HabitData}
 var _time_slot_id_index: Dictionary = {} # {int id → HabitData.TimeSlotTemplate}
 
 const SAVE_PATH = "user://habit_data.json"
 const SAVE_DEBOUNCE_SEC := 0.5
 var _save_timer: SceneTreeTimer
+var _suppress_bundle_timestamp_update: bool = false
 
 
 func _ready() -> void:
@@ -880,11 +882,8 @@ func agent_generate_week_schedule(week_key: String, style: String = "relaxed") -
 func agent_generate_period_reflection(period_type: String, period_key: String) -> bool:
 	if not ChatState:
 		return false
-	var summary := get_review_summary(period_type, period_key)
-	var prompt := "请根据我的%s数据，生成一段温和、鼓励式的回顾总结。请包含亮点、节奏观察和下一步一小步建议。数据摘要：%s" % [
-		_period_title(period_type, period_key),
-		JSON.stringify(summary),
-	]
+	var period_title := _period_title(period_type, period_key)
+	var prompt := "请为我的%s生成一段温和、鼓励式的回顾总结。包含亮点、节奏观察和下一步建议。" % period_title
 	return ChatState.agent_set_input_text(prompt)
 
 
@@ -926,14 +925,21 @@ func agent_get_time_slots() -> Array:
 # ======================== 持久化 ========================
 
 func _queue_save() -> void:
+	if not _suppress_bundle_timestamp_update:
+		_touch_bundle_updated_at()
 	if _save_timer and _save_timer.time_left > 0.0:
 		return
 	_save_timer = get_tree().create_timer(SAVE_DEBOUNCE_SEC)
 	_save_timer.timeout.connect(_save_data, CONNECT_ONE_SHOT)
 
+
+func _touch_bundle_updated_at() -> void:
+	_bundle_updated_at = int(Time.get_unix_time_from_system())
+
 func _save_data() -> void:
 	var data = {
 		"version": 1,
+		"bundle_updated_at": _bundle_updated_at,
 		"next_habit_id": _next_habit_id,
 		"next_slot_template_id": _next_slot_template_id,
 		"next_entry_id": _next_entry_id,
@@ -1002,6 +1008,7 @@ func load_data() -> void:
 	_next_slot_template_id = data.get("next_slot_template_id", 1)
 	_next_entry_id = data.get("next_entry_id", 1)
 	_next_record_id = data.get("next_record_id", 1)
+	_bundle_updated_at = int(data.get("bundle_updated_at", 0))
 
 	_habits.clear()
 	for d in data.get("habits", []):
@@ -1024,7 +1031,11 @@ func load_data() -> void:
 		_init_default_templates()
 
 	_rebuild_habit_index()
+	_suppress_bundle_timestamp_update = true
 	_auto_sync_all_habits_for_week(get_current_week_key())
+	_suppress_bundle_timestamp_update = false
+	if _bundle_updated_at <= 0:
+		_bundle_updated_at = _estimate_bundle_updated_at_from_data(data)
 	data_loaded.emit()
 
 
@@ -1202,6 +1213,7 @@ func _duration_minutes_from_time_range(start_time: String, end_time: String) -> 
 func export_data() -> Dictionary:
 	var data = {
 		"version": 1,
+		"bundle_updated_at": _bundle_updated_at,
 		"next_habit_id": _next_habit_id,
 		"next_slot_template_id": _next_slot_template_id,
 		"next_entry_id": _next_entry_id,
@@ -1227,6 +1239,7 @@ func import_data(data: Dictionary) -> void:
 	if not data.has("habits"):
 		push_error("[HabitState] Invalid import data")
 		return
+	var remote_bundle_updated_at := int(data.get("bundle_updated_at", 0))
 	_next_habit_id = data.get("next_habit_id", 1)
 	_next_slot_template_id = data.get("next_slot_template_id", 1)
 	_next_entry_id = data.get("next_entry_id", 1)
@@ -1243,6 +1256,10 @@ func import_data(data: Dictionary) -> void:
 		_schedule_entries.append(HabitData.ScheduleEntry.from_dict(d))
 	for d in data.get("execution_records", []):
 		_execution_records.append(HabitData.ExecutionRecord.from_dict(d))
+	if remote_bundle_updated_at > 0:
+		_bundle_updated_at = remote_bundle_updated_at
+	else:
+		_bundle_updated_at = _estimate_bundle_updated_at_from_data(data)
 	_save_data()
 	print("[HabitState] Imported data")
 	_rebuild_habit_index()
@@ -1253,12 +1270,34 @@ func import_data(data: Dictionary) -> void:
 func import_sync_data(data: Dictionary) -> void:
 	if not data.has("habits"):
 		return
-	# 比较 bundle 级 updated_at（取 habits 中最大值）
-	var remote_max_updated: int = _get_max_updated_at_from_data(data)
-	var local_max_updated: int = get_max_updated_at()
-	if remote_max_updated > local_max_updated:
+	var remote_bundle_updated := int(data.get("bundle_updated_at", 0))
+	var local_bundle_updated := _bundle_updated_at
+
+	# 兼容旧快照：缺少 bundle_updated_at 时回退到历史逻辑，并在签名不一致时以远端为准。
+	if remote_bundle_updated <= 0:
+		var remote_max_updated: int = _get_max_updated_at_from_data(data)
+		var local_max_updated: int = get_max_updated_at()
+		if remote_max_updated > local_max_updated:
+			import_data(data)
+			print("[HabitState] 同步覆盖本地数据(旧版规则): remote=%d > local=%d" % [remote_max_updated, local_max_updated])
+			return
+		if _build_bundle_signature_from_data(data) != _build_local_bundle_signature():
+			import_data(data)
+			print("[HabitState] 同步覆盖本地数据(旧版签名差异)")
+		return
+
+	if local_bundle_updated <= 0:
+		local_bundle_updated = _estimate_bundle_updated_at_from_data(export_data())
+
+	if remote_bundle_updated > local_bundle_updated:
 		import_data(data)
-		print("[HabitState] 同步覆盖本地数据 (remote=%d > local=%d)" % [remote_max_updated, local_max_updated])
+		print("[HabitState] 同步覆盖本地数据 (remote_bundle=%d > local_bundle=%d)" % [remote_bundle_updated, local_bundle_updated])
+		return
+
+	# 时钟偏差兜底：当时间戳不占优但内容已不同，仍应用远端快照，避免登录全量同步偶发失效。
+	if _build_bundle_signature_from_data(data) != _build_local_bundle_signature():
+		import_data(data)
+		print("[HabitState] 同步覆盖本地数据(签名差异兜底): remote_bundle=%d local_bundle=%d" % [remote_bundle_updated, local_bundle_updated])
 
 
 ## 获取本地数据最大 updated_at
@@ -1279,6 +1318,35 @@ func _get_max_updated_at_from_data(data: Dictionary) -> int:
 			if val > max_val:
 				max_val = val
 	return max_val
+
+
+func _estimate_bundle_updated_at_from_data(data: Dictionary) -> int:
+	var max_val: int = 0
+	for h in data.get("habits", []):
+		if h is Dictionary:
+			max_val = max(max_val, int(h.get("updated_at", 0)))
+			max_val = max(max_val, int(h.get("created_at", 0)))
+	for e in data.get("schedule_entries", []):
+		if e is Dictionary:
+			max_val = max(max_val, int(e.get("created_at", 0)))
+	for r in data.get("execution_records", []):
+		if r is Dictionary:
+			max_val = max(max_val, int(r.get("completed_at", 0)))
+	return max_val
+
+
+func _build_bundle_signature_from_data(data: Dictionary) -> String:
+	var snapshot := {
+		"habits": data.get("habits", []),
+		"time_slot_templates": data.get("time_slot_templates", []),
+		"schedule_entries": data.get("schedule_entries", []),
+		"execution_records": data.get("execution_records", []),
+	}
+	return JSON.stringify(snapshot)
+
+
+func _build_local_bundle_signature() -> String:
+	return _build_bundle_signature_from_data(export_data())
 
 
 func _build_time_slot_label(slot: HabitData.TimeSlotTemplate) -> String:

@@ -952,6 +952,37 @@ func _fn_generate_habit_reflection(args: Dictionary) -> Dictionary:
 	return {"success": true, "data": {"period_type": period_type, "period_key": period_key}}
 
 
+func _fn_generate_reflection(args: Dictionary) -> Dictionary:
+	var period_type := str(args.get("period_type", "week")).strip_edges().to_lower()
+	if period_type not in ["week", "month", "recent30"]:
+		period_type = "week"
+	var period_key := str(args.get("period_key", "")).strip_edges()
+	if period_key.is_empty():
+		match period_type:
+			"week":
+				period_key = HabitState.get_current_week_key()
+			"month":
+				var now = Time.get_datetime_dict_from_system()
+				period_key = "%04d-%02d" % [now["year"], now["month"]]
+			"recent30":
+				period_key = Time.get_date_string_from_system()
+
+	# 生成回顾摘要
+	var summary := HabitState.get_review_summary(period_type, period_key)
+	if summary.is_empty():
+		return {"success": false, "error": "无法生成回顾数据"}
+
+	# 返回完整的回顾数据供 AI 分析
+	return {
+		"success": true,
+		"data": {
+			"period_type": period_type,
+			"period_key": period_key,
+			"summary": summary
+		}
+	}
+
+
 # ============================================================
 # 函数实现 — UI 模块控制（2 个）
 # ============================================================
