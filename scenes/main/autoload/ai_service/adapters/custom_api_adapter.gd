@@ -418,8 +418,10 @@ func _read_sse_stream() -> void:
 		return
 
 	# 读取 SSE 数据流
+	# 网关模式下首轮可能无 done，服务端会挂起等待 function-results，仅周期性发 :keepalive。
+	# 若空闲阈值与「整次请求超时」相同，易在工具执行/回传前误触发「SSE 流读取超时」并断开。
 	var idle_elapsed = 0
-	var idle_timeout_ms = int(request_timeout * 1000)
+	var idle_timeout_ms = int(max(request_timeout * 3.0, 300.0) * 1000.0)
 	while _http_client.get_status() == HTTPClient.STATUS_BODY:
 		_mutex.lock()
 		var stopped = _should_stop

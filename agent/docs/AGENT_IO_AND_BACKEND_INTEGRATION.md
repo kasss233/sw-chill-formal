@@ -117,6 +117,8 @@ Planner（可选） → Orchestrator（工具循环） → LLMInterface → pars
 
 **独立运行 `http_server` 且未传 `gateway_orchestrator`** 时，行为与旧版一致（单轮 SSE + `done`）。
 
+**chill-backend** 在转发 `function_call` 时会 **重写 `id` 为全局唯一**（如 `fc_<uuid>`），避免模型固定输出 `fc_001` 等与 `function_calls` 表主键冲突；客户端回传 `function-results` 时须使用 SSE 里下发的 **`id`**。
+
 ### 3.3 流式
 
 - **`text_delta`**：用户可见文本流；纯工具轮可无 delta。
