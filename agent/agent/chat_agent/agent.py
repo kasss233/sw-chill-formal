@@ -409,8 +409,7 @@ class Agent:
         from agent_result_parser.sse_parser import SSEParser
 
         trace = request_trace_id or uuid.uuid4().hex[:12]
-        if self.config.max_tool_rounds > 0:
-            raise ValueError("chat_stream_after_tool_results 与 max_tool_rounds>0 编排不兼容，请将 max_tool_rounds 置 0")
+        # 续轮恒为单次 LLM+parse，不跑 run_tool_loop；与 max_tool_rounds 无关（该字段只影响首路 chat_stream 是否走 _chat_orchestrated）。
 
         pending = get_pending(session_id)
         if not pending:
