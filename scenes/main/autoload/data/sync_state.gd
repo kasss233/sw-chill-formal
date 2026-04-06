@@ -1076,7 +1076,21 @@ func _merge_full_sync_bundles(server_data: Dictionary) -> void:
 func _push_local_only_bundles(server_data: Dictionary) -> void:
 	for bundle_type in _full_sync_bundles:
 		if server_data.has(bundle_type):
-			continue # 服务器已有，跳过
+			# level 使用“更高等级/同级更高经验”为准；若本地更高则回推到服务器。
+			if bundle_type == "level":
+				var server_level_bundle = server_data.get(bundle_type, {})
+				if server_level_bundle is Dictionary:
+					var local_level_data: Dictionary = LevelState.export_data()
+					var local_level := int(local_level_data.get("level", 1))
+					var local_xp := int(local_level_data.get("xp", 0))
+					var remote_level := int(server_level_bundle.get("level", 1))
+					var remote_xp := int(server_level_bundle.get("xp", 0))
+					if local_level > remote_level or (local_level == remote_level and local_xp > remote_xp):
+						_change_queue.append(SyncChange.new(bundle_type, "full_replace", 0, bundle_type, local_level_data))
+						print("[SyncState] 回推本地 level 到服务器: local=(Lv.%d,XP:%d) remote=(Lv.%d,XP:%d)" % [
+							local_level, local_xp, remote_level, remote_xp
+						])
+			continue # 服务器已有，默认跳过
 		var bundle_info = _full_sync_bundles[bundle_type]
 		var export_data: Dictionary = bundle_info["export"].call()
 		if export_data.is_empty():

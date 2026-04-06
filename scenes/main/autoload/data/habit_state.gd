@@ -1292,6 +1292,12 @@ func import_sync_data(data: Dictionary) -> void:
 	if remote_bundle_updated > local_bundle_updated:
 		import_data(data)
 		print("[HabitState] 同步覆盖本地数据 (remote_bundle=%d > local_bundle=%d)" % [remote_bundle_updated, local_bundle_updated])
+		return
+
+	# 时钟偏差兜底：当时间戳不占优但内容已不同，仍应用远端快照，避免登录全量同步偶发失效。
+	if _build_bundle_signature_from_data(data) != _build_local_bundle_signature():
+		import_data(data)
+		print("[HabitState] 同步覆盖本地数据(签名差异兜底): remote_bundle=%d local_bundle=%d" % [remote_bundle_updated, local_bundle_updated])
 
 
 ## 获取本地数据最大 updated_at
