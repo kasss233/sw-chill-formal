@@ -334,8 +334,32 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 total_s,
             )
             lat_ms = total_s * 1000.0
+            usage_rounds = getattr(CHAT_AGENT, "_last_llm_usage_rounds", None)
             usage = getattr(CHAT_AGENT, "_last_llm_usage", None)
+            if isinstance(usage_rounds, list) and len(usage_rounds) > 0:
+                logger.info(
+                    "HTTP SSE token usage_rounds（单次 LLM 响应，非累加）trace=%s session_id=%s %s",
+                    request_trace_id,
+                    session_id,
+                    json.dumps(usage_rounds, ensure_ascii=False),
+                )
+            elif isinstance(usage, dict) and usage:
+                logger.info(
+                    "HTTP SSE token usage trace=%s session_id=%s %s",
+                    request_trace_id,
+                    session_id,
+                    json.dumps(usage, ensure_ascii=False),
+                )
+            else:
+                logger.info(
+                    "HTTP SSE token usage trace=%s session_id=%s (无或为空，部分后端不返回 OpenAI 风格 usage)",
+                    request_trace_id,
+                    session_id,
+                )
             preview = str(getattr(CHAT_AGENT, "_last_assistant_text", "") or "")
+            audit_extra: Dict[str, Any] = {"sse_events": ev_total, "text_deltas": delta_total}
+            if isinstance(usage_rounds, list) and len(usage_rounds) > 0:
+                audit_extra["usage_rounds"] = usage_rounds
             append_audit_line(
                 user_id=user_id,
                 session_id=session_id,
@@ -343,7 +367,7 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 latency_ms=lat_ms,
                 usage=usage if isinstance(usage, dict) else None,
                 text_preview=preview,
-                extra={"sse_events": ev_total, "text_deltas": delta_total},
+                extra=audit_extra,
             )
             if os.environ.get("AGENT_DEBUG_CHAT", "").strip().lower() in (
                 "1",

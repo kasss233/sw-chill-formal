@@ -233,6 +233,15 @@ func get_voice_chat_post_url() -> String:
 	return base + "/api/v1/sound-to-text/messages"
 
 
+## 与「性能/质量」对话模式对齐：质量→agent（TTS/编排），性能→openai
+func _default_voice_chat_target_for_backend_mode() -> String:
+	if _chat_backend_mode == ChatBackendMode.QUALITY:
+		return "agent"
+	if _chat_backend_mode == ChatBackendMode.PERFORMANCE:
+		return "openai"
+	return ""
+
+
 func _setup_talk_recording() -> void:
 	if not ProjectSettings.get_setting("audio/driver/enable_input", false):
 		var msg := "未开启音频输入，请在项目设置中启用后重启"
@@ -268,6 +277,7 @@ func _setup_talk_recording() -> void:
 
 func _setup_voice_chat_http() -> void:
 	_voice_chat_http = HTTPRequest.new()
+	_voice_chat_http.timeout = 120.0
 	_voice_chat_http.request_completed.connect(_on_voice_chat_http_completed)
 	add_child(_voice_chat_http)
 
@@ -459,7 +469,9 @@ func set_status(new_status: Status) -> void:
 		var new_name = Status.keys()[new_status]
 		print("[ChatState] 状态变更: %s -> %s" % [old_name, new_name])
 		status = new_status
-		chat_status_changed.emit(new_status)
+	# 始终广播，便于 InputBox 等与状态同步：Agent 多轮/重复 start_response 时可能仍为 GENERATING，
+	# 若此处不 emit，提交钮不会切到「停止」态。
+	chat_status_changed.emit(status)
 
 
 func start_talk_recording() -> int:
@@ -544,8 +556,11 @@ func request_talk_stt(payload: Dictionary) -> Dictionary:
 		body["file_name"] = str(fn)
 	if voice_chat_session_id != "":
 		body["session_id"] = voice_chat_session_id
-	if voice_chat_target != "":
-		body["chat_target"] = voice_chat_target
+	var ct := voice_chat_target.strip_edges()
+	if ct.is_empty():
+		ct = _default_voice_chat_target_for_backend_mode()
+	if not ct.is_empty():
+		body["chat_target"] = ct
 	if not voice_chat_context.is_empty():
 		body["context"] = voice_chat_context
 
@@ -573,7 +588,10 @@ func request_talk_stt(payload: Dictionary) -> Dictionary:
 		return {"ok": false, "error": msg}
 
 	_voice_chat_in_flight = true
-	print("[ChatState] 已请求语音对话: %s" % url)
+	var audio_len := int(payload.get("audio_bytes", PackedByteArray()).size())
+	print("[ChatState] 已请求语音对话: %s (audio ~%d bytes, chat_target=%s)" % [
+		url, audio_len, str(body.get("chat_target", ""))
+	])
 	return {"ok": true, "error": ""}
 
 

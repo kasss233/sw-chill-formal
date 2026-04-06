@@ -81,6 +81,10 @@ func _connect_signals() -> void:
 # ============ ChatState 用户输入回调 ============
 
 func _on_text_submitted(text: String, attachments: Array) -> void:
+	var t := text.strip_edges()
+	if t.is_empty() and attachments.is_empty():
+		push_warning("[ChatController] 忽略空白提交（无文本且无附件）")
+		return
 	text_submitted.emit(text, attachments)
 	ChatState.start_response()
 	_send_via_adapter(text, attachments)
@@ -147,6 +151,8 @@ func _encode_image(path: String) -> String:
 			mime = "image/webp"
 		"gif":
 			mime = "image/gif"
+		"bmp":
+			mime = "image/bmp"
 	return "data:%s;base64,%s" % [mime, base64]
 
 

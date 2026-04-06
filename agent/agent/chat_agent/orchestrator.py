@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from interfaces.llm import LLMInterface, LLMMessage, LLMResponse
 
-from .invoke_log import emit_llm_invoke, emit_tool_invoke
+from .invoke_log import emit_llm_invoke, emit_llm_round_usage, emit_tool_invoke
 from .llm_output_parser import StructuredTurn, parse_full
 from .planner import PlanResult
 
@@ -22,7 +22,7 @@ except ModuleNotFoundError:
     _log = logging.getLogger(__name__)
 
 
-def _merge_openai_usage(acc: Dict[str, int], usage: Any) -> None:
+def _merge_openai_usage(acc: Dict[str, Any], usage: Any) -> None:
     """累加 OpenAI 风格 usage 字典。"""
     if not isinstance(usage, dict):
         return
@@ -30,6 +30,17 @@ def _merge_openai_usage(acc: Dict[str, int], usage: Any) -> None:
         v = usage.get(k)
         if isinstance(v, int):
             acc[k] = acc.get(k, 0) + v
+
+
+def _merge_round_usage(acc: Dict[str, Any], metadata: Any) -> None:
+    """合并单轮 LLM 返回的用量：OpenAI usage + Ollama 等 eval_count / prompt_eval_count。"""
+    if not isinstance(metadata, dict):
+        return
+    _merge_openai_usage(acc, metadata.get("usage"))
+    for key in ("eval_count", "prompt_eval_count"):
+        v = metadata.get(key)
+        if isinstance(v, int):
+            acc[key] = int(acc.get(key, 0)) + v
 
 
 def format_tool_results_user_message(results: List[Dict[str, Any]]) -> str:
@@ -54,7 +65,7 @@ def run_tool_loop(
     user_id: Optional[str] = None,
     session_id: Optional[str] = None,
     request_trace_id: Optional[str] = None,
-) -> Tuple[str, StructuredTurn, List[str], Dict[str, int]]:
+) -> Tuple[str, StructuredTurn, List[str], List[Dict[str, Any]]]:
     """
     在同一会话消息列表上做多轮：LLM → 解析 function_calls → 执行 → 注入 user(tool results) → 再 LLM。
 
@@ -62,13 +73,14 @@ def run_tool_loop(
         last_raw: 最后一轮 assistant 完整原文
         last_turn: 最后一轮解析结果
         all_raws: 每轮 assistant 原文（调试）
+        usage_per_round: 每轮 LLM.chat 单次响应的用量列表（不跨轮累加）
     """
     trace = request_trace_id or uuid.uuid4().hex[:12]
     messages: List[LLMMessage] = list(initial_messages)
     all_raws: List[str] = []
     last_turn: Optional[StructuredTurn] = None
     last_raw = ""
-    usage_total: Dict[str, int] = {}
+    usage_per_round: List[Dict[str, Any]] = []
 
     for round_idx in range(max_tool_rounds + 1):
         t_llm0 = time.perf_counter()
@@ -86,7 +98,16 @@ def run_tool_loop(
             latency_ms=llm_ms,
         )
         raw = resp.content or ""
-        _merge_openai_usage(usage_total, (resp.metadata or {}).get("usage"))
+        round_usage: Dict[str, Any] = {}
+        _merge_round_usage(round_usage, resp.metadata or {})
+        usage_per_round.append(round_usage)
+        emit_llm_round_usage(
+            trace=trace,
+            user_id=user_id,
+            session_id=session_id,
+            round_idx=round_idx,
+            usage=round_usage,
+        )
         all_raws.append(raw)
         last_raw = raw
         turn = parse_full(
@@ -150,7 +171,7 @@ def run_tool_loop(
 
     if last_turn is None:
         raise RuntimeError("orchestrator: 无有效解析结果")
-    return last_raw, last_turn, all_raws, usage_total
+    return last_raw, last_turn, all_raws, usage_per_round
 
 
 def apply_plan_to_system_message(

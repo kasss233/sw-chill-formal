@@ -18,7 +18,7 @@ from response import AgentResponse
 
 from .config import AgentConfig
 from .context import get_context_messages
-from .invoke_log import emit_llm_invoke_single_turn, emit_llm_stream_done
+from .invoke_log import emit_llm_invoke_single_turn, emit_llm_round_usage, emit_llm_stream_done
 from .llm_output_parser import StreamingStructuredParser, StructuredTurn, parse_full
 from .orchestrator import apply_plan_to_system_message, run_tool_loop
 from .planner import get_planner
@@ -70,6 +70,8 @@ class Agent:
         ## 同步工具执行器 (call_id, name, args) -> result；生产环境由 Godot 异步执行，本地联调可传 Mock
         self._tool_executor: Optional[ToolExecutorCallable] = tool_executor
         self._last_llm_usage: Optional[Dict[str, Any]] = None
+        ## 编排多轮时：每轮 LLM 单次响应用量（列表顺序即 round 0,1,…）；与 _last_llm_usage 互斥
+        self._last_llm_usage_rounds: Optional[List[Dict[str, Any]]] = None
         self._last_assistant_text: str = ""
 
     def _definitions_path(self):
@@ -146,7 +148,7 @@ class Agent:
             ) or ""
         messages = apply_plan_to_system_message(base_messages, plan, memory_extra)
         trace = request_trace_id or uuid.uuid4().hex[:12]
-        last_raw, final_turn, _, usage = run_tool_loop(
+        last_raw, final_turn, _, usage_per_round = run_tool_loop(
             self.llm,
             initial_messages=messages,
             allowed_function_names=allowed,
@@ -159,7 +161,8 @@ class Agent:
             session_id=session_id,
             request_trace_id=trace,
         )
-        self._last_llm_usage = usage
+        self._last_llm_usage = None
+        self._last_llm_usage_rounds = usage_per_round
         self._last_assistant_text = (final_turn.text or "").strip()
         self.conversation_history.append(LLMMessage(role="user", content=user_message))
         self.conversation_history.append(LLMMessage(role="assistant", content=last_raw))
@@ -181,6 +184,7 @@ class Agent:
                 session_id=session_id,
                 request_trace_id=trace,
             )
+        self._last_llm_usage_rounds = None
         tools_md = self._tools_markdown()
         messages = get_context_messages(
             memory=self.memory,
@@ -219,6 +223,13 @@ class Agent:
         self.conversation_history.append(LLMMessage(role="user", content=user_message))
         self.conversation_history.append(LLMMessage(role="assistant", content=raw))
 
+        emit_llm_round_usage(
+            trace=trace,
+            user_id=user_id,
+            session_id=session_id,
+            round_idx=0,
+            usage=self._last_llm_usage if isinstance(self._last_llm_usage, dict) else None,
+        )
         return self._turn_to_response(turn, user_message, raw)
 
     def chat_stream(
@@ -244,16 +255,19 @@ class Agent:
                     "[chat_stream 编排] text 预览: %s",
                     (resp.text or "")[:800],
                 )
-            if resp.text:
-                yield ("text_delta", {"content": resp.text})
+            # 不在此处单独 yield text_delta：parse_agent_response 已按约定发出 function_call → … → text_done。
+            # 若抢先发整段 text_delta，Godot 会先进入「正文展示」再收到工具调用，DialogueBox 状态会错乱。
             parser_sse = SSEParser(session_id=session_id or "")
-            usage = self._last_llm_usage if isinstance(self._last_llm_usage, dict) else {}
+            urounds = self._last_llm_usage_rounds
             for ev in parser_sse.parse_agent_response(
-                resp, session_id=session_id, usage=usage
+                resp,
+                session_id=session_id,
+                usage_rounds=urounds if isinstance(urounds, list) and len(urounds) > 0 else None,
             ):
                 yield (ev.event_type.value, ev.data)
             return
 
+        self._last_llm_usage_rounds = None
         tools_md = self._tools_markdown()
         messages = get_context_messages(
             memory=self.memory,
@@ -339,6 +353,13 @@ class Agent:
             "completion_tokens_est": completion_est,
             "total_tokens_est": prompt_est + completion_est,
         }
+        emit_llm_round_usage(
+            trace=trace,
+            user_id=user_id,
+            session_id=session_id,
+            round_idx=0,
+            usage=self._last_llm_usage,
+        )
         parser_sse = SSEParser(session_id=session_id or "")
         for ev in parser_sse.parse_agent_response(
             resp, session_id=session_id, usage=self._last_llm_usage

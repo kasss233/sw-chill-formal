@@ -88,6 +88,7 @@ class OllamaLLM(LLMInterface):
                     "model": result.get("model", self.model),
                     "total_duration": result.get("total_duration", 0),
                     "eval_count": result.get("eval_count", 0),
+                    "prompt_eval_count": result.get("prompt_eval_count", 0),
                 }
             )
         except requests.exceptions.Timeout as e:

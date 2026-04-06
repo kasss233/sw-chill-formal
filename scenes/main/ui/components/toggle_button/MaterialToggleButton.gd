@@ -34,12 +34,15 @@ enum CycleMode {
 		states = value
 		_update_state_display()
 
+## 为 true 时仅更新视觉状态，不发出 state_changed（供 InputBox 等与 ChatState 同步时避免误触发「提交」）
+var _suppress_state_signal: bool = false
+
 ## 当前状态索引
 @export var current_state: int = 0:
 	set(value):
 		var old_state = current_state
 		current_state = clampi(value, 0, maxi(0, states.size() - 1))
-		if old_state != current_state:
+		if not _suppress_state_signal and old_state != current_state:
 			state_changed.emit(old_state, current_state)
 		_update_state_display()
 
@@ -521,11 +524,12 @@ func remove_state(index: int) -> void:
 			current_state = maxi(0, states.size() - 1)
 		_update_state_display()
 
-## 设置状态 (不触发信号)
+## 设置状态 (不触发 state_changed)
 func set_state_no_signal(index: int) -> void:
 	if index >= 0 and index < states.size():
+		_suppress_state_signal = true
 		current_state = index
-		_update_state_display()
+		_suppress_state_signal = false
 
 ## 获取状态数量
 func get_state_count() -> int:

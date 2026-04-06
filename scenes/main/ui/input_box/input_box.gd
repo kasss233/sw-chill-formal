@@ -83,6 +83,7 @@ func _ready() -> void:
 	ChatState.chat_status_changed.connect(_on_chat_status_changed)
 	ChatState.input_text_requested.connect(_on_input_text_requested)
 	ChatState.input_clear_requested.connect(_on_input_clear_requested)
+	call_deferred("_sync_submit_button_from_chat_state")
 
 
 func _on_line_edit_text_changed(new_text: String) -> void:
@@ -155,11 +156,10 @@ func _on_submit_button_state_changed(old_state: int, new_state: int) -> void:
 func _handle_submit() -> void:
 	var current_text := get_text().strip_edges()
 
-	# 检查文本是否为空
-	if current_text.is_empty():
+	# 允许纯图片（无文字）：后端与 ChatController 会编码 base64 并随 attachments 发送
+	if current_text.is_empty() and _attachments.is_empty():
 		if show_snackbar:
-			snackbar.show_warning("消息文本不能为空")
-		# 切换回状态 0
+			snackbar.show_warning("请输入文字或添加图片")
 		submit_button.current_state = 0
 		return
 
@@ -525,14 +525,29 @@ func get_attachments() -> Array:
 
 ## ============ ChatState 响应式回调 ============
 
+## 与 ChatState 当前 status 对齐提交/停止钮（晚于 Autoload 就绪或漏掉 chat_status_changed 时兜底）
+func _sync_submit_button_from_chat_state() -> void:
+	if not is_instance_valid(ChatState):
+		return
+	_on_chat_status_changed(ChatState.status)
+
+
 ## 聊天状态变化 -> 更新按钮状态
 func _on_chat_status_changed(new_status: ChatState.Status) -> void:
 	print("[InputBox] _on_chat_status_changed: %s" % ChatState.Status.keys()[new_status])
-	match new_status:
-		ChatState.Status.GENERATING, ChatState.Status.EXECUTING_FUNCTION:
-			submit_button.current_state = 1 # 停止状态
-		ChatState.Status.IDLE, ChatState.Status.ERROR:
-			submit_button.current_state = 0 # 发送状态
+	# 必须用 set_state_no_signal：改 current_state 会触发 state_changed → 误走 _handle_submit 发空白消息
+	if submit_button is MaterialToggleButton:
+		match new_status:
+			ChatState.Status.GENERATING, ChatState.Status.EXECUTING_FUNCTION:
+				(submit_button as MaterialToggleButton).set_state_no_signal(1)
+			ChatState.Status.IDLE, ChatState.Status.ERROR:
+				(submit_button as MaterialToggleButton).set_state_no_signal(0)
+	else:
+		match new_status:
+			ChatState.Status.GENERATING, ChatState.Status.EXECUTING_FUNCTION:
+				submit_button.current_state = 1
+			ChatState.Status.IDLE, ChatState.Status.ERROR:
+				submit_button.current_state = 0
 
 
 ## Agent 请求设置文本
@@ -564,8 +579,11 @@ func _on_talk_button_button_up() -> void:
 
 	var stt_sent := bool(result.get("stt_sent", false))
 	var byte_size := int(result.get("bytes", 0))
+	var err_msg := str(result.get("error", ""))
 	if show_snackbar:
 		if stt_sent:
 			snackbar.show_message("录音已发送 STT（%d bytes）" % byte_size)
+		elif err_msg != "":
+			snackbar.show_warning("语音未发送：%s" % err_msg)
 		else:
-			snackbar.show_message("录音完成（%d bytes），后端 STT 接口待实现" % byte_size)
+			snackbar.show_warning("语音未发送，请检查登录与服务器地址")

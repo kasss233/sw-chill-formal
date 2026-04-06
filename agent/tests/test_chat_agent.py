@@ -73,6 +73,16 @@ def test_llm_output_parser():
     )
     turn = parse_full(raw, allowed_function_names=allowed, strict_function_names=True)
     assert turn.text == "你好"
+    # 标签前有正文时优先展示 preamble，忽略 JSON 内易被误写的「内部说明」式 text
+    raw_meta = (
+        "已经帮你调好番茄钟啦，休息一会儿吧～\n"
+        f"{AGENT_JSON_BEGIN}\n"
+        '{"text":"告知用户：已设置工作时长与休息时长。","function_calls":[]}\n'
+        f"{AGENT_JSON_END}"
+    )
+    turn2 = parse_full(raw_meta, allowed_function_names=allowed, strict_function_names=True)
+    assert "告知用户" not in turn2.text
+    assert "番茄钟" in turn2.text
     assert len(turn.function_calls) == 1
     assert turn.function_calls[0]["name"] == "add_task"
     assert turn.environment and turn.environment.get("time_mode") == 0

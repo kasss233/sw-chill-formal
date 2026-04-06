@@ -70,13 +70,15 @@ class SSEParser:
         agent_response: AgentResponse,
         session_id: Optional[str] = None,
         usage: Optional[Dict[str, Any]] = None,
+        usage_rounds: Optional[List[Dict[str, Any]]] = None,
     ) -> List[SSEEvent]:
         """
         解析AgentResponse为SSE事件列表
 
         事件顺序（与流式 text_delta 衔接）：
         function_call → environment → action → tts → text_done（完整正文）→ done。
-        便于客户端先处理结构化事件，再以 text_done 收束正文，最后 done 结束（含 usage 可选）。
+        便于客户端先处理结构化事件，再以 text_done 收束正文，最后 done 结束。
+        done 可带 usage（单轮或估算）或 usage_rounds（编排多轮，每项为单次 LLM 响应用量，不累加）。
 
         协议补充（可选）：若希望 Godot 角色在回合末必回 idle，可在最后一帧 action 中显式带
         pose=idle 与 emotion=neutral，或由客户端在 response_completed 统一复位（见 main_3d）。
@@ -118,12 +120,14 @@ class SSEParser:
                 data={"content": agent_response.text}
             ))
 
-        # 5. 结束事件（可附带 token 用量）
+        # 5. 结束事件（可附带 token：单次用 usage；多轮编排用 usage_rounds，勿与跨轮累加混淆）
         done_data: Dict[str, Any] = {
             "message_id": self.message_id,
             "session_id": used_session_id or ""
         }
-        if usage:
+        if usage_rounds:
+            done_data["usage_rounds"] = usage_rounds
+        elif usage:
             done_data["usage"] = usage
         events.append(SSEEvent(
             event_type=SSEEventType.DONE,

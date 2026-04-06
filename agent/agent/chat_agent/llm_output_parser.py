@@ -62,8 +62,9 @@ def parse_full(
 ) -> StructuredTurn:
     """
     从整段 LLM 输出解析结构化回合。
-    - 若存在 <agent_json>...</agent_json>：前置为 preamble（给用户看的正文）；
-      JSON 内 text 若非空则优先作为归档 text，否则用 preamble。
+    - 若存在 <agent_json>...</agent_json>：标签前为 preamble（自然语言给用户看的正文）；
+      JSON 内 `text` 常被模型写成内部说明（如「告知用户…」），故 **非空 preamble 优先** 作为对外 text，
+      仅当标签前无正文时才使用 JSON 内 `text`（兼容纯结构化输出）。
     - 若无结构化块：全文视为 preamble，text 与 preamble 相同，无 function_calls。
     """
     raw = raw or ""
@@ -110,7 +111,11 @@ def parse_full(
         warnings.append("agent_json 根节点不是对象")
         obj = {}
 
-    text = str(obj.get("text") or "").strip() or preamble
+    json_inner_text = str(obj.get("text") or "").strip()
+    if preamble.strip():
+        text = preamble
+    else:
+        text = json_inner_text
 
     raw_calls = obj.get("function_calls", [])
     if raw_calls is None:

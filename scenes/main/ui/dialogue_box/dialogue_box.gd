@@ -636,11 +636,15 @@ func _on_response_text_delta(delta: String) -> void:
 
 func _on_response_text_set(text: String) -> void:
 	print("[DialogueBox] _on_response_text_set len=%d" % text.length())
-	if !_has_received_text and text.length() > 0:
-		_has_received_text = true
-		_set_display_state(DisplayState.SHOWING_TEXT)
-		# 第一次收到文本时，发送 dialogue_started 信号（包含文本内容）
-		DialogueState.emit_dialogue_started(text)
+	if text.length() > 0:
+		if !_has_received_text:
+			_has_received_text = true
+			_set_display_state(DisplayState.SHOWING_TEXT)
+			# 第一次收到文本时，发送 dialogue_started 信号（包含文本内容）
+			DialogueState.emit_dialogue_started(text)
+		elif _display_state == DisplayState.LOADING or _display_state == DisplayState.EXECUTING_FUNC:
+			# 编排模式若仍先发 text_delta 再工具：text_done 收束时应回到正文并收起加载区
+			_set_display_state(DisplayState.SHOWING_TEXT)
 	set_text(text)
 
 
