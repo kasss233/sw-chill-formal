@@ -1,4 +1,9 @@
-"""客户端工具执行抽象：与 Godot AgentExecutor 返回结构对齐的同步桩 / 自定义实现。"""
+"""客户端工具执行抽象：与 Godot AgentExecutor 返回结构对齐的同步桩 / 自定义实现。
+
+默认 default_mock_tool_executor 在 Agent HTTP 进程内同步返回占位数据（含 _mock=True），
+invoke_log 中 tool_call 的「延迟_ms」仅度量本进程调用，不包含 Godot 往返。
+若需真实任务/笔记等，应在创建 Agent 时注入自定义 tool_executor，或由网关把 function_call 交给客户端。
+"""
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, Optional
