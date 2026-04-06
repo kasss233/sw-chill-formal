@@ -187,7 +187,7 @@ text = "服务器地址"
 [node name="ServerUrlInput" type="LineEdit" parent="ServerRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "http://localhost:8000/api/v1"
+placeholder_text = "http://106.54.18.206:8000/api/v1"
 
 [node name="LoggedOutRow" type="HBoxContainer" parent="."]
 layout_mode = 2

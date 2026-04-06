@@ -4,6 +4,9 @@ class_name InputBox
 ## 仿 ChatGPT 官网的 AI 对话输入框
 ## 一开始使用 LineEdit 输入，当文本超出边界时自动切换到 TextEdit 多行输入
 
+# 预加载缩略图场景
+const AttachmentThumbnail = preload("res://scenes/main/ui/components/attachment_thumbnail/attachment_thumbnail.tscn")
+
 # 信号
 signal text_submitted(text: String, attachments: Array) # 用户提交文本时发出（包含附件）
 signal text_changed(text: String) # 文本变化时发出
@@ -27,8 +30,6 @@ signal generation_stopped # 生成被停止时发出
 
 @onready var smooth_scroll_container = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer
 @onready var attach_hbox_container = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer
-@onready var material_chip1 = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer/MaterialChip
-@onready var material_chip2 = $FrostedPanel/MarginContainer/VBoxContainer/SmoothScrollContainer/AttachHBoxContainer/MaterialChip2
 @onready var file_dialog: FileDialog = $FileDialog
 @onready var snackbar: MaterialSnackbar = $MaterialSnackbar
 
@@ -67,10 +68,6 @@ func _ready() -> void:
 	# 连接FileDialog信号
 	file_dialog.file_selected.connect(_on_file_selected)
 
-	# 连接MaterialChip删除信号
-	material_chip1.deleted.connect(_on_chip1_deleted)
-	material_chip2.deleted.connect(_on_chip2_deleted)
-
 	# 连接SubmitToggleButton状态变化信号
 	submit_button.state_changed.connect(_on_submit_button_state_changed)
 
@@ -81,8 +78,6 @@ func _ready() -> void:
 
 	# 初始化附件UI
 	smooth_scroll_container.visible = false
-	material_chip1.visible = false
-	material_chip2.visible = false
 
 	# 监听 ChatState
 	ChatState.chat_status_changed.connect(_on_chat_status_changed)
@@ -478,7 +473,7 @@ func _show_max_attachments_warning() -> void:
 func _on_file_selected(path: String) -> void:
 	# 检查是否是图片文件
 	var ext = path.get_extension().to_lower()
-	if not ext in ["png", "jpg", "jpeg", "gif", "bmp", "webp"]:
+	if not ext in ["png", "jpg", "jpeg", "bmp", "webp"]:
 		_show_invalid_file_warning()
 		return
 
@@ -495,36 +490,25 @@ func _show_invalid_file_warning() -> void:
 
 ## 更新附件UI
 func _update_attachment_ui() -> void:
-	var attachment_count = _attachments.size()
+	# 清空现有缩略图节点
+	for child in attach_hbox_container.get_children():
+		child.queue_free()
 
-	# 显示/隐藏SmoothScrollContainer
-	smooth_scroll_container.visible = attachment_count > 0
+	# 动态创建缩略图
+	for i in range(_attachments.size()):
+		var thumbnail = AttachmentThumbnail.instantiate()
+		thumbnail.image_path = _attachments[i]
+		thumbnail.deleted.connect(_on_thumbnail_deleted.bind(i))
+		attach_hbox_container.add_child(thumbnail)
 
-	# 更新Chip显示
-	if attachment_count >= 1:
-		material_chip1.visible = true
-		material_chip1.text = "图片" + str(1)
-	else:
-		material_chip1.visible = false
-
-	if attachment_count >= 2:
-		material_chip2.visible = true
-		material_chip2.text = "图片" + str(2)
-	else:
-		material_chip2.visible = false
+	# 显示/隐藏容器
+	smooth_scroll_container.visible = _attachments.size() > 0
 
 
-## 处理Chip1删除
-func _on_chip1_deleted() -> void:
-	if _attachments.size() >= 1:
-		_attachments.remove_at(0)
-		_update_attachment_ui()
-
-
-## 处理Chip2删除
-func _on_chip2_deleted() -> void:
-	if _attachments.size() >= 2:
-		_attachments.remove_at(1)
+## 处理缩略图删除
+func _on_thumbnail_deleted(index: int) -> void:
+	if index >= 0 and index < _attachments.size():
+		_attachments.remove_at(index)
 		_update_attachment_ui()
 
 
