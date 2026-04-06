@@ -68,29 +68,20 @@ class SSEParser:
     def parse_agent_response(
         self,
         agent_response: AgentResponse,
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
+        usage: Optional[Dict[str, Any]] = None,
     ) -> List[SSEEvent]:
         """
         解析AgentResponse为SSE事件列表
-        
-        Args:
-            agent_response: Agent响应对象
-            session_id: 会话ID（可选，覆盖初始化时的session_id）
-            
-        Returns:
-            SSE事件列表
+
+        事件顺序（与流式 text_delta 衔接）：
+        function_call → environment → action → tts → text_done（完整正文）→ done。
+        便于客户端先处理结构化事件，再以 text_done 收束正文，最后 done 结束（含 usage 可选）。
         """
         events = []
         used_session_id = session_id or self.session_id
-        
-        # 1. 文本回复：先发送text_done（完整文本）
-        if agent_response.text:
-            events.append(SSEEvent(
-                event_type=SSEEventType.TEXT_DONE,
-                data={"content": agent_response.text}
-            ))
 
-        # 2. 函数调用：优先原生 function_calls，否则 legacy operations
+        # 1. 函数调用：优先原生 function_calls，否则 legacy operations
         if agent_response.function_calls:
             events.extend(self._native_function_call_events(agent_response.function_calls))
         else:
@@ -99,7 +90,7 @@ class SSEParser:
                 if function_call_event:
                     events.append(function_call_event)
 
-        # 3. 环境与演出（与 Python agent / 后端扩展事件对齐）
+        # 2. 环境与演出
         if agent_response.environment:
             events.append(SSEEvent(
                 event_type=SSEEventType.ENVIRONMENT,
@@ -111,21 +102,31 @@ class SSEParser:
                 data=dict(agent_response.action),
             ))
 
-        # 4. 演出脚本：转换为TTS事件（如果有）
+        # 3. 演出脚本 → TTS
         if agent_response.performance_sequence:
             tts_event = self._performance_to_tts(agent_response.performance_sequence)
             if tts_event:
                 events.append(tts_event)
 
-        # 5. 最后发送done事件
+        # 4. 完整正文（在结构化事件之后，done 之前）
+        if agent_response.text:
+            events.append(SSEEvent(
+                event_type=SSEEventType.TEXT_DONE,
+                data={"content": agent_response.text}
+            ))
+
+        # 5. 结束事件（可附带 token 用量）
+        done_data: Dict[str, Any] = {
+            "message_id": self.message_id,
+            "session_id": used_session_id or ""
+        }
+        if usage:
+            done_data["usage"] = usage
         events.append(SSEEvent(
             event_type=SSEEventType.DONE,
-            data={
-                "message_id": self.message_id,
-                "session_id": used_session_id or ""
-            }
+            data=done_data
         ))
-        
+
         return events
 
     def _native_function_call_events(self, calls: List[Dict[str, Any]]) -> List[SSEEvent]:

@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -31,6 +32,11 @@ from typing import Optional, Dict, Any
 
 from agent import Agent, AgentConfig
 from agent.reflection_agent import ReflectionAgent, ReflectionAgentConfig
+
+try:
+    from agent.chat_agent.request_audit_log import append_audit_line
+except ModuleNotFoundError:
+    from chat_agent.request_audit_log import append_audit_line
 
 # run_server.py 把本仓库的 agent/ 目录加入 path 时，core 是顶层包，内层 agent 包里没有 core；
 # 从游戏仓库根目录 python -m agent.http_server.server 时则为 agent.core。
@@ -320,12 +326,34 @@ class AgentHTTPRequestHandler(BaseHTTPRequestHandler):
                 line = f"event: {event_type}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
                 self.wfile.write(line.encode("utf-8"))
                 self.wfile.flush()
+            total_s = time.perf_counter() - t0
             logger.info(
                 "HTTP SSE /chat 正常结束 events=%s text_deltas=%s 总耗时=%.2fs",
                 ev_total,
                 delta_total,
-                time.perf_counter() - t0,
+                total_s,
             )
+            lat_ms = total_s * 1000.0
+            usage = getattr(CHAT_AGENT, "_last_llm_usage", None)
+            preview = str(getattr(CHAT_AGENT, "_last_assistant_text", "") or "")
+            append_audit_line(
+                user_id=user_id,
+                session_id=session_id,
+                trace=request_trace_id,
+                latency_ms=lat_ms,
+                usage=usage if isinstance(usage, dict) else None,
+                text_preview=preview,
+                extra={"sse_events": ev_total, "text_deltas": delta_total},
+            )
+            if os.environ.get("AGENT_DEBUG_CHAT", "").strip().lower() in (
+                "1",
+                "true",
+                "yes",
+            ):
+                logger.info(
+                    "[HTTP SSE] 助手回复预览（前 1200 字）: %s",
+                    preview[:1200],
+                )
         except Exception as e:
             logger.exception("流式 chat 失败: %s", e)
             # 已发送 SSE 头时无法再改状态码，只能发 error 事件

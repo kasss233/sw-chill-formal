@@ -47,7 +47,6 @@ func _sync_chatstate_voice_from_auth() -> void:
 func _init_adapter() -> void:
 	_adapter = CustomAPIAdapter.new()
 	_adapter.configure({
-		"api_url": AuthState.get_base_url(),
 		"auth_token": AuthState.get_access_token()
 	})
 	_adapter.stream_chunk.connect(_on_adapter_stream_chunk)
@@ -208,11 +207,19 @@ func _handle_action_response(ai_response: AIResponse) -> void:
 
 
 func _handle_function_call(ai_response: AIResponse) -> void:
-	if not agent_executor:
-		print("[ChatController] AgentExecutor 不可用，跳过函数调用: %s" % ai_response.function_name)
-		return
-
+	# 先通知 UI「正在执行某工具」（与 AgentExecutor 是否可用无关；否则用户看不到 DialogueBox 的 EXECUTING_FUNC）
 	ChatState.notify_function_call_started(ai_response.function_call_id, ai_response.function_name)
+
+	if not agent_executor:
+		push_warning("[ChatController] AgentExecutor 不可用，无法执行函数: %s" % ai_response.function_name)
+		var fail := {"success": false, "error": "AgentExecutor 未就绪"}
+		ChatState.notify_function_call_completed(
+			ai_response.function_call_id,
+			ai_response.function_name,
+			false
+		)
+		function_call_executed.emit(ai_response.function_name, fail)
+		return
 
 	var result = agent_executor.execute(
 		ai_response.function_call_id,

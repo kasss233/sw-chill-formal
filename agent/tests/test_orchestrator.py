@@ -53,7 +53,7 @@ def test_tool_loop_two_llm_rounds():
         LLMMessage(role="system", content="你是助手，须输出 agent_json"),
         LLMMessage(role="user", content="我有哪些任务？"),
     ]
-    last_raw, last_turn, raws = run_tool_loop(
+    last_raw, last_turn, raws, _usage = run_tool_loop(
         llm,
         initial_messages=base,
         allowed_function_names={"get_all_tasks"},

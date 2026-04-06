@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import time
 import uuid
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from interfaces.llm import LLMInterface, LLMMessage, LLMResponse
 
@@ -20,6 +20,16 @@ except ModuleNotFoundError:
     import logging
 
     _log = logging.getLogger(__name__)
+
+
+def _merge_openai_usage(acc: Dict[str, int], usage: Any) -> None:
+    """累加 OpenAI 风格 usage 字典。"""
+    if not isinstance(usage, dict):
+        return
+    for k in ("prompt_tokens", "completion_tokens", "total_tokens"):
+        v = usage.get(k)
+        if isinstance(v, int):
+            acc[k] = acc.get(k, 0) + v
 
 
 def format_tool_results_user_message(results: List[Dict[str, Any]]) -> str:
@@ -44,7 +54,7 @@ def run_tool_loop(
     user_id: Optional[str] = None,
     session_id: Optional[str] = None,
     request_trace_id: Optional[str] = None,
-) -> Tuple[str, StructuredTurn, List[str]]:
+) -> Tuple[str, StructuredTurn, List[str], Dict[str, int]]:
     """
     在同一会话消息列表上做多轮：LLM → 解析 function_calls → 执行 → 注入 user(tool results) → 再 LLM。
 
@@ -58,6 +68,7 @@ def run_tool_loop(
     all_raws: List[str] = []
     last_turn: Optional[StructuredTurn] = None
     last_raw = ""
+    usage_total: Dict[str, int] = {}
 
     for round_idx in range(max_tool_rounds + 1):
         t_llm0 = time.perf_counter()
@@ -75,6 +86,7 @@ def run_tool_loop(
             latency_ms=llm_ms,
         )
         raw = resp.content or ""
+        _merge_openai_usage(usage_total, (resp.metadata or {}).get("usage"))
         all_raws.append(raw)
         last_raw = raw
         turn = parse_full(
@@ -138,7 +150,7 @@ def run_tool_loop(
 
     if last_turn is None:
         raise RuntimeError("orchestrator: 无有效解析结果")
-    return last_raw, last_turn, all_raws
+    return last_raw, last_turn, all_raws, usage_total
 
 
 def apply_plan_to_system_message(

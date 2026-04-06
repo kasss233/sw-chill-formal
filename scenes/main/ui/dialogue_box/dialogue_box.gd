@@ -81,6 +81,24 @@ const FUNC_DISPLAY_NAMES: Dictionary = {
 	"set_habit_execution": "正在记录习惯执行",
 	"get_habit_stats": "正在获取习惯统计",
 	"focus_mode": "正在进入专注模式",
+	# 与 function_definitions / 后端对齐（避免仅有「正在执行 xxx」时看起来像空）
+	"activate_focus_mode": "正在进入专注模式",
+	"deactivate_focus_mode": "正在退出专注模式",
+	"show_module": "正在打开界面",
+	"hide_module": "正在关闭界面",
+	"get_level_info": "正在获取等级信息",
+	"get_task_stats": "正在获取任务统计",
+	"get_focus_stats": "正在获取专注统计",
+	"generate_habit_week_schedule": "正在生成习惯周计划",
+	"generate_habit_reflection": "正在生成习惯复盘",
+	"deselect_room_decor_item": "正在取消选择装饰",
+	"remove_room_decor_item": "正在移除装饰",
+	"get_selected_room_decor": "正在读取已选装饰",
+	"clear_all_room_decor": "正在清空房间装饰",
+	"clear_all_room_decor_categories": "正在清空装饰分类",
+	"load_room_decor_from_resource": "正在加载装饰资源",
+	"get_all_room_decor": "正在获取装饰列表",
+	"get_available_room_decor": "正在获取可用装饰",
 }
 
 # 信号

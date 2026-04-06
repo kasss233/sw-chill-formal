@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import os
 import time
 import uuid
 from datetime import datetime
@@ -68,6 +69,8 @@ class Agent:
         self.conversation_history: List[LLMMessage] = []
         ## 同步工具执行器 (call_id, name, args) -> result；生产环境由 Godot 异步执行，本地联调可传 Mock
         self._tool_executor: Optional[ToolExecutorCallable] = tool_executor
+        self._last_llm_usage: Optional[Dict[str, Any]] = None
+        self._last_assistant_text: str = ""
 
     def _definitions_path(self):
         return resolve_definitions_path(self.config.function_definitions_path or None)
@@ -143,7 +146,7 @@ class Agent:
             ) or ""
         messages = apply_plan_to_system_message(base_messages, plan, memory_extra)
         trace = request_trace_id or uuid.uuid4().hex[:12]
-        last_raw, final_turn, _ = run_tool_loop(
+        last_raw, final_turn, _, usage = run_tool_loop(
             self.llm,
             initial_messages=messages,
             allowed_function_names=allowed,
@@ -156,6 +159,8 @@ class Agent:
             session_id=session_id,
             request_trace_id=trace,
         )
+        self._last_llm_usage = usage
+        self._last_assistant_text = (final_turn.text or "").strip()
         self.conversation_history.append(LLMMessage(role="user", content=user_message))
         self.conversation_history.append(LLMMessage(role="assistant", content=last_raw))
         return self._turn_to_response(final_turn, user_message, last_raw)
@@ -199,12 +204,15 @@ class Agent:
             source="chat",
         )
         raw = llm_response.content or ""
+        u = (llm_response.metadata or {}).get("usage") if llm_response.metadata else None
+        self._last_llm_usage = u if isinstance(u, dict) else None
         allowed = self._allowed_function_names()
         turn = parse_full(
             raw,
             allowed_function_names=allowed,
             strict_function_names=self.config.strict_function_names,
         )
+        self._last_assistant_text = (turn.text or "").strip()
         for w in turn.parse_warnings:
             _log.warning("[chat] %s", w)
 
@@ -221,7 +229,7 @@ class Agent:
         user_id: Optional[str] = None,
         request_trace_id: Optional[str] = None,
     ) -> Generator[Tuple[str, Dict[str, Any]], None, None]:
-        from agent_result_parser.sse_parser import SSEEventType, SSEParser
+        from agent_result_parser.sse_parser import SSEParser
 
         trace = request_trace_id or uuid.uuid4().hex[:12]
         if self.config.max_tool_rounds > 0:
@@ -231,13 +239,18 @@ class Agent:
                 session_id=session_id,
                 request_trace_id=trace,
             )
+            if os.environ.get("AGENT_DEBUG_CHAT", "").strip().lower() in ("1", "true", "yes"):
+                _log.info(
+                    "[chat_stream 编排] text 预览: %s",
+                    (resp.text or "")[:800],
+                )
             if resp.text:
                 yield ("text_delta", {"content": resp.text})
-            yield ("text_done", {"content": resp.text})
             parser_sse = SSEParser(session_id=session_id or "")
-            for ev in parser_sse.parse_agent_response(resp, session_id=session_id):
-                if ev.event_type == SSEEventType.TEXT_DONE:
-                    continue
+            usage = self._last_llm_usage if isinstance(self._last_llm_usage, dict) else {}
+            for ev in parser_sse.parse_agent_response(
+                resp, session_id=session_id, usage=usage
+            ):
                 yield (ev.event_type.value, ev.data)
             return
 
@@ -308,14 +321,28 @@ class Agent:
         self.conversation_history.append(LLMMessage(role="user", content=user_message))
         self.conversation_history.append(LLMMessage(role="assistant", content=raw))
 
-        yield ("text_done", {"content": final_turn.text})
+        if os.environ.get("AGENT_DEBUG_CHAT", "").strip().lower() in ("1", "true", "yes"):
+            _log.info(
+                "[chat_stream 单轮] text 预览: %s",
+                (final_turn.text or "")[:800],
+            )
 
+        self._last_assistant_text = (final_turn.text or "").strip()
         resp = self._turn_to_response(final_turn, user_message, raw)
+        prompt_est = self.llm.count_tokens(
+            "".join(m.content for m in messages if m.content)
+        )
+        completion_est = self.llm.count_tokens(raw)
+        self._last_llm_usage = {
+            "estimated": True,
+            "prompt_tokens_est": prompt_est,
+            "completion_tokens_est": completion_est,
+            "total_tokens_est": prompt_est + completion_est,
+        }
         parser_sse = SSEParser(session_id=session_id or "")
-        events = parser_sse.parse_agent_response(resp, session_id=session_id)
-        for ev in events:
-            if ev.event_type == SSEEventType.TEXT_DONE:
-                continue
+        for ev in parser_sse.parse_agent_response(
+            resp, session_id=session_id, usage=self._last_llm_usage
+        ):
             yield (ev.event_type.value, ev.data)
 
     def generate_tasks_from_conversation(self, conversation_text: str) -> List[Task]:

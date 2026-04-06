@@ -12,9 +12,9 @@ class_name CustomAPIAdapter extends AIAdapter
 ## 若需直连旧版 LLM 路由，可在 configure 中传入 chat_path_prefix: "/chat"。
 
 ## 相对 base_url 的对话前缀，默认与后端 router 前缀一致
-var chat_path_prefix: String = "/chat"
+var chat_path_prefix: String = "/agent/chat"
 
-## API 配置
+## 最近一次请求使用的 API 根地址（由 AuthState.get_base_url() 在主线程写入，供 worker 线程读取）
 var api_url: String = ""
 var auth_token: String = ""
 var request_timeout: float = 120.0
@@ -58,10 +58,8 @@ func _get_requesting() -> bool:
 	return val
 
 
-## 配置适配器
+## 配置适配器（对话根地址始终用 AuthState.get_base_url()，不在此缓存，避免早于 AuthState._load_base_url 初始化）
 func configure(config: Dictionary) -> void:
-	if config.has("api_url"):
-		api_url = config["api_url"]
 	if config.has("auth_token"):
 		auth_token = config["auth_token"]
 	if config.has("request_timeout"):
@@ -488,24 +486,36 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 			_session_id = data.get("session_id", _session_id)
 
 		"text_delta":
-			var content = data.get("content", "")
+			var content = str(data.get("content", ""))
 			_full_response += content
 			var response = AIResponse.text(content, true)
 			call_deferred("_emit_stream_chunk", response)
 
 		"text_done":
-			# text_done 不需要特殊处理，text_delta 已逐步输出
-			pass
+			# 与直连 OpenAI/Gemini 流式不同：后端可能只发 text_done、不发 text_delta（例如整段生成后一次下发）。
+			# 若不处理，ChatState 永远收不到正文，对话框只有框没有字。
+			var full: String = str(data.get("content", data.get("text", "")))
+			if not full.is_empty():
+				_full_response = full
+				var response = AIResponse.text(full, false)
+				call_deferred("_emit_stream_chunk", response)
 
 		"function_call":
 			var raw_args = data.get("arguments", data.get("args", data.get("parameters", {})))
 			var normalized_args := _normalize_function_arguments(raw_args)
-			print("[CustomAPIAdapter][DEBUG] function_call name=%s args_type=%s args=%s" % [data.get("name", ""), typeof(raw_args), raw_args])
-			var response = AIResponse.function_call(
+			var fc_id: String = _coalesce_str_first([
 				data.get("id", ""),
+				data.get("call_id", ""),
+				data.get("function_call_id", "")
+			])
+			var fc_name: String = _coalesce_str_first([
 				data.get("name", ""),
-				normalized_args
-			)
+				data.get("function", ""),
+				data.get("function_name", ""),
+				data.get("tool_name", "")
+			])
+			print("[CustomAPIAdapter][DEBUG] function_call name=%s id=%s args_type=%s" % [fc_name, fc_id, typeof(raw_args)])
+			var response = AIResponse.function_call(fc_id, fc_name, normalized_args)
 			call_deferred("_emit_stream_chunk", response)
 
 		"environment":
@@ -590,6 +600,15 @@ func _decode_base64(base64_string: String) -> PackedByteArray:
 	if base64_string.is_empty():
 		return []
 	return Marshalls.base64_to_raw(base64_string)
+
+
+## 取第一个非空字符串（兼容 OpenAI/Gemini/后端不同字段名）
+func _coalesce_str_first(parts: Array) -> String:
+	for v in parts:
+		var s := str(v).strip_edges()
+		if not s.is_empty():
+			return s
+	return ""
 
 
 ## 兼容后端 function_call.arguments 为 Dictionary / JSON 字符串
