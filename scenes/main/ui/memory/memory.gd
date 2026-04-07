@@ -220,6 +220,86 @@ func _find_node_by_prompt_id(p_id: int) -> PromptMemoryNode:
 	return null
 
 
+## 按 [member PromptMemoryNode.prompt_title] 精确匹配（去首尾空白）查找节点。
+func find_prompt_nodes_by_titles(titles: PackedStringArray) -> Array[PromptMemoryNode]:
+	var want: Dictionary = {}
+	for t in titles:
+		var s := str(t).strip_edges()
+		if not s.is_empty():
+			want[s] = true
+	var out: Array[PromptMemoryNode] = []
+	for node in _prompt_nodes:
+		if want.has(node.prompt_title.strip_edges()):
+			out.append(node)
+	return out
+
+
+func has_prompt_title(title: String) -> bool:
+	var want := title.strip_edges()
+	if want.is_empty():
+		return false
+	for node in _prompt_nodes:
+		if node.prompt_title.strip_edges() == want:
+			return true
+	return false
+
+
+## 演示/外部调用：在 [param initial_position] 放置新卡片；[param play_intro] 为 false 时跳过卡片默认入场 tween。
+func add_prompt_node_for_demo(
+	title: String,
+	body: String,
+	weight: float,
+	connected: bool,
+	mutable: bool,
+	initial_position: Vector2,
+	play_intro: bool = true
+) -> PromptMemoryNode:
+	var node := PromptMemoryNode.create_from_content(title, body, weight, connected, mutable)
+	node.play_spawn_intro = play_intro
+	node.prompt_id = _next_prompt_id
+	_next_prompt_id += 1
+	node.selected.connect(_on_prompt_selected)
+	node.moved.connect(_on_prompt_moved)
+	node.connect_toggled.connect(_on_prompt_connect_toggled)
+	node.content_changed.connect(_on_prompt_content_changed)
+	node.delete_requested.connect(_on_prompt_delete_requested)
+	_graph_layer.add_child(node)
+	node.position = initial_position
+	_clamp_node_to_graph(node)
+	_prompt_nodes.append(node)
+	_select_node(node)
+	call_deferred("_persist_memory_graph_snapshot_deferred")
+	return node
+
+
+## 为新节点 [param new_prompt_id] 追加指向标题匹配节点的展示边（无向绘制，与存档 edges 一致）。
+func add_inter_edges_from_new_node_by_titles(new_prompt_id: int, target_titles: PackedStringArray) -> void:
+	for raw in target_titles:
+		var want := str(raw).strip_edges()
+		if want.is_empty():
+			continue
+		for node in _prompt_nodes:
+			if node.prompt_title.strip_edges() == want:
+				_inter_node_edges.append({"from": new_prompt_id, "to": node.prompt_id})
+				break
+	queue_redraw()
+	call_deferred("_persist_memory_graph_snapshot_deferred")
+
+
+func remove_prompt_node_by_id(prompt_id: int) -> bool:
+	var node := _find_node_by_prompt_id(prompt_id)
+	if node == null:
+		return false
+	_remove_prompt_node(node)
+	_inter_node_edges = _inter_node_edges.filter(
+		func(e: Dictionary) -> bool:
+			return int(e.get("from", -1)) != prompt_id and int(e.get("to", -1)) != prompt_id
+	)
+	queue_redraw()
+	call_deferred("_persist_memory_graph_snapshot_deferred")
+	return true
+
+
 ## 与 [method agent_get_short_term_memory] 导出结构互逆：[br]
 ## 根对象可为：`prompts`（推荐，可逐项含 `connected` / `mutable`）、`connected_prompts`（默认已连接、可变）。[br]
 ## 根为数组时视为整表条目列表（等价于仅含 connected_prompts）。[br]
@@ -360,6 +440,15 @@ func _update_inspector() -> void:
 	pass
 
 
+## 供外部演示等计算节点落点（与内部 [method _get_graph_rect] 一致）。
+func get_move_bounds_rect() -> Rect2:
+	return _get_graph_rect()
+
+
+func get_all_prompt_nodes() -> Array[PromptMemoryNode]:
+	return _prompt_nodes.duplicate()
+
+
 func _get_graph_rect() -> Rect2:
 	if is_instance_valid(_move_bounds):
 		return Rect2(_move_bounds.position, _move_bounds.size)
@@ -439,6 +528,10 @@ func _clamp_node_to_graph(node: PromptMemoryNode) -> void:
 	var max_y := graph_rect.end.y - node.size.y
 	node.position.x = clampf(node.position.x, graph_rect.position.x, max_x)
 	node.position.y = clampf(node.position.y, graph_rect.position.y, max_y)
+
+
+func clamp_prompt_node_to_bounds(node: PromptMemoryNode) -> void:
+	_clamp_node_to_graph(node)
 
 
 func _remove_prompt_node(node: PromptMemoryNode) -> void:

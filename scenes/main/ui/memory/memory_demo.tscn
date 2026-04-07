@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bvoy4cutgimss"]
+
+[ext_resource type="Script" uid="uid://4ejnm44kmhk1" path="res://scenes/main/ui/memory/memory_demo.gd" id="1_demo"]
+
+[node name="MemoryDemo" type="Node" unique_id=1352131361]
+script = ExtResource("1_demo")

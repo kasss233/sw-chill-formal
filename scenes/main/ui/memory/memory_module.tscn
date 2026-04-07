@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="8_nne8r"]
 [ext_resource type="Texture2D" uid="uid://doqkweyl3uxcv" path="res://assets/ui/icons/memory_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="9_fgjfq"]
 [ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="10_nne8r"]
+[ext_resource type="PackedScene" uid="uid://bvoy4cutgimss" path="res://scenes/main/ui/memory/memory_demo.tscn" id="11_mdemo"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_ollwg"]
 frequency = 0.1
@@ -122,7 +123,7 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="MemoryModule" type="MarginContainer" unique_id=1769940406 node_paths=PackedStringArray("memory", "memory_immutable", "canvas_layer")]
+[node name="MemoryModule" type="MarginContainer" unique_id=1769940406 node_paths=PackedStringArray("memory", "memory_immutable", "canvas_layer", "segmented_button", "memory_button")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -134,15 +135,24 @@ script = ExtResource("1_qft7o")
 memory = NodePath("CanvasLayer/FrostedPanel/Memory")
 memory_immutable = NodePath("CanvasLayer/FrostedPanel/MemoryImmutable")
 canvas_layer = NodePath("CanvasLayer")
+segmented_button = NodePath("CanvasLayer/FrostedPanel/MaterialSegmentedButton")
+memory_button = NodePath("MemoryButton")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=508245683]
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=834414769]
 material = SubResource("ShaderMaterial_cxltj")
-offset_left = 319.0
-offset_top = 49.0
-offset_right = 843.0
-offset_bottom = 587.0
+anchors_preset = 15
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_vuy7x")
 script = ExtResource("3_qft7o")
 noise_texture = SubResource("NoiseTexture2D_s1ofn")
@@ -196,6 +206,9 @@ transition_type = "BACK"
 layout = NodePath("../CanvasLayer/FrostedPanel")
 layout_id = "memory"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[node name="MemoryDemo" parent="." instance=ExtResource("11_mdemo")]
+记忆模块节点路径 = NodePath("..")
 
 [connection signal="segment_selected" from="CanvasLayer/FrostedPanel/MaterialSegmentedButton" to="." method="_on_material_segmented_button_segment_selected"]
 [connection signal="state_changed" from="MemoryButton" to="." method="_on_memory_button_state_changed"]

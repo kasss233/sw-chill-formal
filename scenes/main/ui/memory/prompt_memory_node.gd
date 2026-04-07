@@ -13,6 +13,12 @@ signal delete_requested(node: PromptMemoryNode)
 @export_group("演出")
 ## 已点亮：边缘 RGB 流光（与 FrostedPanel / aiglow 同源逻辑）；未点亮：关闭流光。运行时请优先用 [method set_lit] 以控制是否播放过渡。
 @export var is_lit: bool = false
+## 为 false 时跳过 [method _ready] 内默认入场缩放/淡入，便于外部用 Tween + Curve 自定义出现动画。
+@export var play_spawn_intro: bool = true
+
+## 演示用：为 true 时 [method _refresh_visuals] 中流光由 [member demo_lit_override_lit] 决定，而非 [member connected]（只读卡片演示必用）。
+var demo_lit_override_active: bool = false
+var demo_lit_override_lit: bool = false
 
 var prompt_id: int = -1
 ## 卡片顶部标题（短句，用于列表识别）。
@@ -75,11 +81,15 @@ func _ready() -> void:
 	_update_pivot()
 
 	_refresh_visuals()
-	scale = Vector2(0.88, 0.88)
-	modulate.a = 0.0
-	var intro := create_tween().set_parallel(true)
-	intro.tween_property(self , "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	intro.tween_property(self , "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	if play_spawn_intro:
+		scale = Vector2(0.88, 0.88)
+		modulate.a = 0.0
+		var intro := create_tween().set_parallel(true)
+		intro.tween_property(self , "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		intro.tween_property(self , "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	else:
+		scale = Vector2.ONE
+		modulate.a = 1.0
 
 
 func _notification(what: int) -> void:
@@ -369,10 +379,24 @@ func toggle_connected() -> void:
 	emit_signal("connect_toggled", self )
 
 
+func set_demo_lit_override(active: bool, lit_value: bool = false) -> void:
+	demo_lit_override_active = active
+	demo_lit_override_lit = lit_value
+	_refresh_visuals()
+
+
+func clear_demo_lit_override() -> void:
+	demo_lit_override_active = false
+	_refresh_visuals()
+
+
 func _refresh_visuals() -> void:
 	if not is_inside_tree():
 		return
-	set_lit(connected, true)
+	if demo_lit_override_active:
+		set_lit(demo_lit_override_lit, true)
+	else:
+		set_lit(connected, true)
 
 	var readonly_prefix := "" if is_mutable else "只读 · "
 	_title_label.text = prompt_title
