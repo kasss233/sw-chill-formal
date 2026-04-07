@@ -25,7 +25,8 @@ enum ResponseType {
 	ACTION,          ## 演出动作（SSE action）
 	FUNCTION_RESULT, ## 函数调用结果
 	ERROR,           ## 错误
-	DONE             ## 完成标记
+	DONE,            ## 完成标记
+	LOADING_HINT,    ## SSE loading_hint（vision_understanding / thinking）
 }
 
 ## 响应类型
@@ -69,6 +70,9 @@ var error_code: int = 0
 var raw_data: Dictionary = {}
 ## 时间戳
 var timestamp: int = 0
+
+## LOADING_HINT：与后端约定 phase = vision_understanding | thinking
+var loading_hint_phase: String = ""
 
 
 ## 创建文本响应
@@ -135,5 +139,14 @@ static func error(message: String, code: int = 0) -> AIResponse:
 static func done() -> AIResponse:
 	var r = AIResponse.new()
 	r.type = ResponseType.DONE
+	r.timestamp = Time.get_unix_time_from_system()
+	return r
+
+
+## 创建加载阶段提示（与 chill-backend SSE event loading_hint 对齐）
+static func loading_hint(phase: String) -> AIResponse:
+	var r = AIResponse.new()
+	r.type = ResponseType.LOADING_HINT
+	r.loading_hint_phase = phase
 	r.timestamp = Time.get_unix_time_from_system()
 	return r

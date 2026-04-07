@@ -41,6 +41,9 @@ signal assistant_followup_segment_started()
 ## 响应错误
 signal response_error(message: String)
 
+## 加载阶段提示（vision_understanding=识图，thinking=主模型思考；供 DialogueBox 更新 loading 文案）
+signal loading_hint_phase_changed(phase: String)
+
 # ============ 函数调用信号（为 DialogueBox 扩展预留）============
 ## 函数调用开始
 signal function_call_started(call_id: String, name: String)
@@ -681,6 +684,14 @@ func start_response() -> void:
 	current_response_text = ""
 	set_status(Status.GENERATING)
 	response_started.emit()
+
+
+## 与后端 SSE loading_hint / 本地带图发送一致：phase 为 vision_understanding 或 thinking
+func set_loading_hint_phase(phase: String) -> void:
+	if phase.is_empty():
+		return
+	print("[ChatState] set_loading_hint_phase: %s" % phase)
+	loading_hint_phase_changed.emit(phase)
 
 
 func append_response_text(delta: String) -> void:

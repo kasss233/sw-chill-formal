@@ -23,6 +23,10 @@ var _anim_time: float = 0.0
 ## 卡片之间的展示用有向边，`from` / `to` 为 [member PromptMemoryNode.prompt_id]。仅绘制，不参与编辑。
 var _inter_node_edges: Array[Dictionary] = []
 
+## 供 [MemoryGraphData] 区分可编辑记忆与只读记忆存档槽位。
+func _get_memory_graph_slot() -> String:
+	return "editor"
+
 
 func _ready() -> void:
 	set_process(true)
@@ -62,8 +66,11 @@ func _build_ui() -> void:
 	_move_bounds = get_node_or_null(move_bounds_path) as Control
 	_agent_hub = get_node_or_null(agent_hub_path) as Control
 	_graph_overlay = _graph_layer.get_node_or_null("GraphOverlay") as Control
+	# 连线在最底层，AgentHub（圆环）叠在其上；记忆卡片由 add_child 追加在后，保证可点选。
+	if is_instance_valid(_graph_overlay) and _graph_overlay.get_parent() == _graph_layer:
+		_graph_layer.move_child(_graph_overlay, 0)
 	if is_instance_valid(_agent_hub) and _agent_hub.get_parent() == _graph_layer:
-		_graph_layer.move_child(_agent_hub, 0)
+		_graph_layer.move_child(_agent_hub, 1)
 
 	_add_button = get_node_or_null(add_button_path) as Button
 
@@ -95,25 +102,10 @@ func _layout_agent_hub() -> void:
 
 
 func _create_demo_nodes() -> void:
-	var r := apply_memory_graph_from_dict(_demo_memory_export_dict())
+	var r := apply_memory_graph_from_dict(MemoryGraphData.get_editor_graph())
 	if not r.get("ok", false):
 		push_warning("[Memory] 演示数据加载失败：%s" % str(r.get("error", "")))
 		return
-
-
-func _demo_memory_export_dict() -> Dictionary:
-	return {
-		"prompts": [
-			{"id": 1, "title": "角色语气", "body": "对话时语调柔和自然；涉及隐私或原则问题时需明确边界并简短说明原因。", "weight": 0.92, "connected": true, "mutable": true},
-			{"id": 2, "title": "先确认目标", "body": "在执行多步操作前，用一两句话复述或确认用户意图，避免跑偏。", "weight": 0.85, "connected": true, "mutable": true},
-			{"id": 3, "title": "回复风格：简洁", "body": "优先短句与要点，避免冗长套话。", "weight": 0.64, "connected": false, "mutable": true},
-			{"id": 4, "title": "架构：数据经 State", "body": "所有数据变更必须通过对应 XxxState 单例 API；UI 只响应信号刷新，禁止直接改数据字段。", "weight": 0.70, "connected": true, "mutable": true},
-			{"id": 5, "title": "【系统】只读展示", "body": "此条由系统注入，仅展示；用户不可在侧栏修改或删除。", "weight": 0.55, "connected": true, "mutable": false},
-			{"id": 6, "title": "【演出】流光 · 常亮", "body": "进入场景时即点亮，与未发光卡片对照。", "weight": 0.78, "connected": true, "mutable": true},
-			{"id": 7, "title": "【演出】流光 · 渐亮", "body": "约 0.85s 后淡入点亮，演示 set_lit(true) 过渡。", "weight": 0.72, "connected": true, "mutable": true},
-			{"id": 8, "title": "【演出】未点亮", "body": "默认不发光；可在侧栏选中后自行用代码 set_lit(true) 试验。", "weight": 0.66, "connected": false, "mutable": true}
-		]
-	}
 
 
 ## 演示用：在已成功导入的卡片中随机抽 2～4 张做流光（立即点亮或短时延迟点亮），其余保持未点亮。
@@ -176,6 +168,7 @@ func _create_prompt_node(
 
 	_prompt_nodes.append(node)
 	_select_node(node)
+	call_deferred("_persist_memory_graph_snapshot_deferred")
 
 
 func _compute_import_radial_position(index: int, total: int, node: Control) -> Vector2:
@@ -231,7 +224,8 @@ func _find_node_by_prompt_id(p_id: int) -> PromptMemoryNode:
 ## 根对象可为：`prompts`（推荐，可逐项含 `connected` / `mutable`）、`connected_prompts`（默认已连接、可变）。[br]
 ## 根为数组时视为整表条目列表（等价于仅含 connected_prompts）。[br]
 ## 条目字段：`id`、`title`、`body`、`prompt`、`weight`；可选 `connected`（默认 true）、`mutable`（默认 true）。[br]
-## 可选 `edges`：`[{"from": id, "to": id}, ...]` 或 `[[from, to], ...]`，表示记忆节点之间的展示关联（与 Agent 中心连线独立）。
+## 可选 `edges`：`[{"from": id, "to": id}, ...]` 或 `[[from, to], ...]`，表示记忆节点之间的展示关联（与 Agent 中心连线独立）。[br]
+## 可选 `position`：`{"x": float, "y": float}` 或 `[x, y]`；可选 `body_expanded`、`is_lit`（与 [member PromptMemoryNode.is_lit] 演出状态）。
 func apply_memory_graph_from_dict(data: Dictionary) -> Dictionary:
 	return apply_memory_graph_from_parsed(data)
 
@@ -250,6 +244,7 @@ func apply_memory_graph_from_parsed(parsed: Variant) -> Dictionary:
 		_inter_node_edges.clear()
 		_next_prompt_id = 1
 		queue_redraw()
+		call_deferred("_persist_memory_graph_snapshot_deferred")
 		return {"ok": true, "imported": 0}
 	for i in n:
 		var item: Dictionary = items[i]
@@ -276,6 +271,8 @@ func apply_memory_graph_from_parsed(parsed: Variant) -> Dictionary:
 		_next_prompt_id = maxi(_next_prompt_id, node.prompt_id + 1)
 	_parse_inter_node_edges_from_data(parsed)
 	queue_redraw()
+	# 子节点 _ready、正文折叠与 shrink_wrap 会改 size；须等布局稳定后再套用存档坐标，否则 clamp 会用错误尺寸把位置挤偏。
+	call_deferred("_reapply_saved_layout_after_nodes_ready", parsed.duplicate(true))
 	return {"ok": true, "imported": n}
 
 
@@ -296,6 +293,46 @@ func _extract_prompt_items_array(parsed: Variant) -> Dictionary:
 			return {"error": "connected_prompts 须为数组"}
 		return {"items": c}
 	return {"error": "缺少 prompts 或 connected_prompts 数组"}
+
+
+func _apply_saved_node_layout_from_entry(item: Dictionary, node: PromptMemoryNode) -> void:
+	if item.has("position"):
+		var pv: Variant = item["position"]
+		if typeof(pv) == TYPE_DICTIONARY:
+			var pd: Dictionary = pv
+			node.position = Vector2(float(pd.get("x", 0.0)), float(pd.get("y", 0.0)))
+		elif typeof(pv) == TYPE_ARRAY:
+			var pa: Array = pv
+			if pa.size() >= 2:
+				node.position = Vector2(float(pa[0]), float(pa[1]))
+		_clamp_node_to_graph(node)
+	if item.has("body_expanded"):
+		node.set_body_expanded(bool(item["body_expanded"]), false)
+	if item.has("is_lit"):
+		node.set_lit(bool(item["is_lit"]), false)
+
+
+## 在 PromptMemoryNode 完成 _ready / shrink 后再套用存档坐标，避免用错误 size 参与 clamp。
+func _reapply_saved_layout_after_nodes_ready(parsed_snapshot: Variant) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_inside_tree():
+		return
+	var items_res := _extract_prompt_items_array(parsed_snapshot)
+	if items_res.has("error"):
+		return
+	var items: Array = items_res["items"]
+	var n: int = mini(items.size(), _prompt_nodes.size())
+	for i in n:
+		var item: Dictionary = items[i]
+		_apply_saved_node_layout_from_entry(item, _prompt_nodes[i])
+	queue_redraw()
+	# 布局到位后再写回存档，避免把「未稳定」的坐标持久化
+	_persist_memory_graph_snapshot_deferred()
+
+
+func _persist_memory_graph_snapshot_deferred() -> void:
+	MemoryGraphData.sync_from_module(self)
 
 
 func _split_prompt_for_import(combined: String) -> Dictionary:
@@ -420,17 +457,20 @@ func _on_prompt_selected(node: PromptMemoryNode) -> void:
 	_select_node(node)
 
 
-func _on_prompt_moved(node: PromptMemoryNode) -> void:
-	_clamp_node_to_graph(node)
+func _on_prompt_moved(_node: PromptMemoryNode) -> void:
+	_clamp_node_to_graph(_node)
 	queue_redraw()
+	call_deferred("_persist_memory_graph_snapshot_deferred")
 
 
-func _on_prompt_connect_toggled(node: PromptMemoryNode) -> void:
+func _on_prompt_connect_toggled(_node: PromptMemoryNode) -> void:
 	queue_redraw()
+	call_deferred("_persist_memory_graph_snapshot_deferred")
 
 
 func _on_prompt_content_changed(_node: PromptMemoryNode) -> void:
 	queue_redraw()
+	call_deferred("_persist_memory_graph_snapshot_deferred")
 
 
 func _on_prompt_delete_requested(node: PromptMemoryNode) -> void:
@@ -440,6 +480,7 @@ func _on_prompt_delete_requested(node: PromptMemoryNode) -> void:
 		return
 	_remove_prompt_node(node)
 	queue_redraw()
+	call_deferred("_persist_memory_graph_snapshot_deferred")
 
 
 # API：仅返回已连接（生效）的提示词与权重
@@ -478,6 +519,27 @@ func _calc_memory_strength() -> float:
 	for item in active:
 		total += item.get("weight", 0.0)
 	return snappedf(total / active.size(), 0.01)
+
+
+## 导出完整记忆图（节点坐标、正文展开、[member PromptMemoryNode.is_lit]、边），供 [MemoryGraphData] 持久化。
+func export_memory_graph_to_dict() -> Dictionary:
+	var prompts: Array = []
+	for node in _prompt_nodes:
+		prompts.append({
+			"id": node.prompt_id,
+			"title": node.prompt_title,
+			"body": node.prompt_body,
+			"weight": node.weight,
+			"connected": node.connected,
+			"mutable": node.is_mutable,
+			"body_expanded": node.get_body_expanded(),
+			"position": {"x": node.position.x, "y": node.position.y},
+			"is_lit": node.is_lit
+		})
+	return {
+		"prompts": prompts,
+		"edges": _inter_node_edges.duplicate(true)
+	}
 
 
 ## 给 GraphOverlay 使用：返回当前连线绘制所需的快照数据。

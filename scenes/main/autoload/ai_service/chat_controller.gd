@@ -88,6 +88,8 @@ func _on_text_submitted(text: String, attachments: Array) -> void:
 		return
 	text_submitted.emit(text, attachments)
 	ChatState.start_response()
+	if not attachments.is_empty():
+		ChatState.set_loading_hint_phase("vision_understanding")
 	_send_via_adapter(text, attachments)
 
 
@@ -161,6 +163,8 @@ func _encode_image(path: String) -> String:
 
 func _on_adapter_stream_chunk(ai_response: AIResponse) -> void:
 	match ai_response.type:
+		AIResponse.ResponseType.LOADING_HINT:
+			ChatState.set_loading_hint_phase(ai_response.loading_hint_phase)
 		AIResponse.ResponseType.TEXT:
 			_handle_text_response(ai_response)
 		AIResponse.ResponseType.FUNCTION_CALL:
@@ -283,6 +287,8 @@ func _on_tts_finished() -> void:
 ## 发送 AI 消息
 func send_message(text: String, images: Array = []) -> bool:
 	ChatState.start_response()
+	if not images.is_empty():
+		ChatState.set_loading_hint_phase("vision_understanding")
 	_send_via_adapter(text, images)
 	return true
 
@@ -294,6 +300,8 @@ func send_message_extended(
 	include_context: bool = true
 ) -> bool:
 	ChatState.start_response()
+	if not images.is_empty():
+		ChatState.set_loading_hint_phase("vision_understanding")
 
 	var messages = [{"role": "user", "content": _build_user_content(text, images)}]
 	var context = context_collector.collect() if include_context and context_collector else {}

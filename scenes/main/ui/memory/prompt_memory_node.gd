@@ -213,6 +213,22 @@ func _on_body_toggle_pressed() -> void:
 		return
 	_body_expanded = not _body_expanded
 	_refresh_visuals()
+	emit_signal("content_changed", self)
+
+
+func get_body_expanded() -> bool:
+	return _body_expanded
+
+
+## 用于从存档恢复 UI；[param emit_change] 为 true 时会触发 [signal content_changed]（持久化用）。
+func set_body_expanded(value: bool, emit_change: bool = false) -> void:
+	var v := value
+	if _body_expanded == v:
+		return
+	_body_expanded = v
+	_refresh_visuals()
+	if emit_change:
+		emit_signal("content_changed", self)
 
 
 func _shrink_wrap_to_content() -> void:

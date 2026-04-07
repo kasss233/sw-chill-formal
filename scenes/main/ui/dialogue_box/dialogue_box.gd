@@ -224,6 +224,7 @@ func _ready() -> void:
 	ChatState.assistant_followup_segment_started.connect(_on_assistant_followup_segment_started)
 	ChatState.function_call_started.connect(_on_function_call_started)
 	ChatState.function_call_completed.connect(_on_function_call_completed)
+	ChatState.loading_hint_phase_changed.connect(_on_loading_hint_phase_changed)
 
 
 func _exit_tree() -> void:
@@ -245,6 +246,8 @@ func _exit_tree() -> void:
 		ChatState.function_call_started.disconnect(_on_function_call_started)
 	if ChatState.function_call_completed.is_connected(_on_function_call_completed):
 		ChatState.function_call_completed.disconnect(_on_function_call_completed)
+	if ChatState.loading_hint_phase_changed.is_connected(_on_loading_hint_phase_changed):
+		ChatState.loading_hint_phase_changed.disconnect(_on_loading_hint_phase_changed)
 
 
 # ============ 显示/隐藏 ============
@@ -713,3 +716,20 @@ func _on_func_min_display_timeout() -> void:
 	if _pending_func_complete:
 		_pending_func_complete = false
 		_set_display_state(DisplayState.LOADING)
+
+
+func _on_loading_hint_phase_changed(phase: String) -> void:
+	# 仅在等待模型/加载区展示时覆盖文案；工具执行态由 EXECUTING_FUNC 独占
+	if _display_state == DisplayState.EXECUTING_FUNC:
+		return
+	if _display_state != DisplayState.LOADING:
+		return
+	var label_text := "正在思考..."
+	if phase == "vision_understanding":
+		label_text = "正在理解图像..."
+	elif phase == "thinking":
+		label_text = "正在思考..."
+	if loading_container.visible:
+		loading_label.text = label_text
+	else:
+		_show_loading_area(label_text)

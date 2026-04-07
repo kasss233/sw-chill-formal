@@ -3,8 +3,8 @@ class_name CustomAPIAdapter extends AIAdapter
 ## 对接后端 AI 服务，支持 SSE 流式传输、Function Calling、TTS
 ##
 ## SSE 事件协议:
-##   event: text_delta / text_done / function_call / tts / error / done
-##   data: {json}
+##   event: session_start / loading_hint / text_delta / text_done / function_call / tts / error / done
+##   data: {json}（loading_hint: { "phase": "vision_understanding" | "thinking" }）
 ##
 ## 请求端点（相对 AuthState.get_base_url()，通常为 .../api/v1）:
 ##   POST /agent/chat/messages — 发送消息（SSE 流，chill-backend agent_api）
@@ -500,6 +500,11 @@ func _dispatch_event(event_type: String, data: Variant) -> void:
 	match event_type:
 		"session_start":
 			_session_id = data.get("session_id", _session_id)
+
+		"loading_hint":
+			var phase: String = str(data.get("phase", "thinking"))
+			var response_lh = AIResponse.loading_hint(phase)
+			call_deferred("_emit_stream_chunk", response_lh)
 
 		"text_delta":
 			var content = str(data.get("content", ""))
