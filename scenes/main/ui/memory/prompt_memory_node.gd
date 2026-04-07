@@ -158,7 +158,11 @@ static func create_from_content(
 	connected_value: bool = false,
 	mutable: bool = true
 ) -> PromptMemoryNode:
-	var packed := load("res://scenes/test/memory/prompt_memory_node.tscn") as PackedScene
+	var probe := PromptMemoryNode.new()
+	var script_path := (probe.get_script() as Script).resource_path
+	probe.free()
+	var scene_path := "%s.tscn" % script_path.get_basename()
+	var packed := load(scene_path) as PackedScene
 	var node := packed.instantiate() as PromptMemoryNode
 	node._configure_content(title.strip_edges(), body.strip_edges(), weight_value, connected_value)
 	node.is_mutable = mutable
@@ -203,6 +207,10 @@ func _configure_content(title: String, body: String, weight_value: float, connec
 
 
 func _on_body_toggle_pressed() -> void:
+	if prompt_body.strip_edges().is_empty():
+		if is_mutable:
+			_begin_body_edit()
+		return
 	_body_expanded = not _body_expanded
 	_refresh_visuals()
 
@@ -365,7 +373,7 @@ func _refresh_visuals() -> void:
 	if not has_body:
 		_body_expanded = false
 
-	_body_toggle_row.visible = has_body
+	_body_toggle_row.visible = has_body or is_mutable
 
 	var show_body := has_body and _body_expanded
 	_body_label.visible = show_body
@@ -378,6 +386,8 @@ func _refresh_visuals() -> void:
 	if has_body:
 		_body_toggle_button.text = "收起正文 ▲" if _body_expanded else "展开正文 ▼"
 		_body_label.modulate = Color(0.75, 0.82, 0.92, 1.0)
+	else:
+		_body_toggle_button.text = "编辑正文 +" if is_mutable else "暂无正文"
 
 	_title_edit.visible = _editing_title
 	_body_edit.visible = _editing_body
@@ -395,7 +405,8 @@ func _is_pointer_over_body() -> bool:
 	var mouse_pos := get_global_mouse_position()
 	var in_body := Rect2(_body_label.global_position, _body_label.size).has_point(mouse_pos)
 	var in_toggle := Rect2(_body_toggle_row.global_position, _body_toggle_row.size).has_point(mouse_pos)
-	return in_body or in_toggle
+	var in_state := Rect2(_state_label.global_position, _state_label.size).has_point(mouse_pos)
+	return in_body or in_toggle or in_state
 
 
 func _begin_title_edit() -> void:

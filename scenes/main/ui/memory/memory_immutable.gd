@@ -1,4 +1,4 @@
-extends "res://scenes/test/memory/memory.gd"
+extends MemoryModuleBase
 
 ## 只读记忆图：仅 **GraphLayer + AgentHub + 卡片**，无顶栏/侧栏；数据通过 [method apply_memory_graph_from_export_json] / [method apply_memory_graph_from_dict] 注入（可加 `edges`）。[br]
 ## 默认演示数据与 `agent/docs/CHARACTER.md` 中小晴长期记忆（履历 + 附录种子）对齐，供 RAG/角色长期记忆可视化参考。

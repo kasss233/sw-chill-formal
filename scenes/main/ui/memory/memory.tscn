@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://dnlhnkx8rysx6"]
 
-[ext_resource type="Script" uid="uid://gr28tcv8j1c4" path="res://scenes/test/memory/memory.gd" id="1_bqlyq"]
-[ext_resource type="Script" uid="uid://bgi44ftvo44t4" path="res://scenes/test/memory/memory_agent_hub.gd" id="2_hub"]
-[ext_resource type="Script" uid="uid://bsur8fjvk6rr2" path="res://scenes/test/memory/memory_graph_overlay.gd" id="6_overlay"]
+[ext_resource type="Script" uid="uid://gr28tcv8j1c4" path="res://scenes/main/ui/memory/memory.gd" id="1_bqlyq"]
+[ext_resource type="Script" uid="uid://bgi44ftvo44t4" path="res://scenes/main/ui/memory/memory_agent_hub.gd" id="2_hub"]
+[ext_resource type="Script" uid="uid://b4c4qoitosxfn" path="res://scenes/main/ui/components/button/MaterialButton.gd" id="5_nwwv3"]
+[ext_resource type="Script" uid="uid://bsur8fjvk6rr2" path="res://scenes/main/ui/memory/memory_graph_overlay.gd" id="6_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxPulseGlow"]
 bg_color = Color(0.3, 0.6, 1, 0.12)
@@ -31,6 +32,61 @@ corner_radius_top_left = 36
 corner_radius_top_right = 36
 corner_radius_bottom_right = 36
 corner_radius_bottom_left = 36
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4opok"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l8xl5"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f0ua6"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nwwv3"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oohbi"]
+content_margin_left = 14.0
+content_margin_top = 7.0
+content_margin_right = 14.0
+content_margin_bottom = 7.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [node name="Memory" type="Control" unique_id=568466571]
 layout_mode = 3
@@ -175,3 +231,27 @@ theme_override_font_sizes/font_size = 20
 text = "AGENT"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="AddButton" type="Button" parent="." unique_id=1132252371]
+clip_contents = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -92.0
+offset_bottom = 36.0
+grow_horizontal = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_4opok")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_l8xl5")
+theme_override_styles/hover = SubResource("StyleBoxFlat_f0ua6")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_nwwv3")
+theme_override_styles/focus = SubResource("StyleBoxFlat_oohbi")
+text = "插入节点"
+script = ExtResource("5_nwwv3")
+padding_horizontal = 14
+padding_vertical = 7
+metadata/_custom_type_script = "uid://b4c4qoitosxfn"
+
+[connection signal="pressed" from="AddButton" to="." method="_on_add_button_pressed"]

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cb2nkwirhlmus"]
 
-[ext_resource type="Script" uid="uid://dvt04vt0v4ic2" path="res://scenes/test/memory/prompt_memory_node.gd" id="1_nm1hx"]
-[ext_resource type="Shader" path="res://scenes/test/memory/prompt_memory_node_glow.gdshader" id="2_glow"]
+[ext_resource type="Script" uid="uid://dvt04vt0v4ic2" path="res://scenes/main/ui/memory/prompt_memory_node.gd" id="1_nm1hx"]
+[ext_resource type="Shader" uid="uid://dai2p5b7evgye" path="res://scenes/main/ui/memory/prompt_memory_node_glow.gdshader" id="2_glow"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_glow"]
 shader = ExtResource("2_glow")

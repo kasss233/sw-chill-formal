@@ -1,4 +1,5 @@
 extends Control
+class_name MemoryModuleBase
 
 const GRAPH_PADDING: float = 18.0
 
@@ -496,3 +497,7 @@ func get_graph_overlay_data() -> Dictionary:
 		"nodes": node_items,
 		"edges": _inter_node_edges.duplicate(true)
 	}
+
+
+func _on_add_button_pressed() -> void:
+	_on_add_prompt_pressed()

@@ -1,0 +1,201 @@
+[gd_scene format=3 uid="uid://nv44yj2fu2hp"]
+
+[ext_resource type="PackedScene" uid="uid://dnlhnkx8rysx6" path="res://scenes/main/ui/memory/memory.tscn" id="1_dpt44"]
+[ext_resource type="Script" uid="uid://ce0o6tclv8orj" path="res://scenes/main/ui/memory/memory_module.gd" id="1_qft7o"]
+[ext_resource type="PackedScene" uid="uid://g4fnc740yi0a" path="res://scenes/main/ui/memory/memory_immutable.tscn" id="2_18yt8"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="2_24uhx"]
+[ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="3_24uhx"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_qft7o"]
+[ext_resource type="Script" uid="uid://cqwct3c1jvph2" path="res://scenes/main/ui/components/toggle_button/MaterialToggleButton.gd" id="7_85blf"]
+[ext_resource type="Script" uid="uid://ci6k5wbbufnv3" path="res://scenes/main/ui/components/toggle_button/ToggleButtonState.gd" id="8_nne8r"]
+[ext_resource type="Texture2D" uid="uid://doqkweyl3uxcv" path="res://assets/ui/icons/memory_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png" id="9_fgjfq"]
+[ext_resource type="Script" uid="uid://bimelmc1ce1b2" path="res://addons/simple-gui-transitions/transition.gd" id="10_nne8r"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ollwg"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_s1ofn"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_ollwg")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cxltj"]
+shader = ExtResource("2_24uhx")
+shader_parameter/corner_radius = 21.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 6.0
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_s1ofn")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(524, 538)
+shader_parameter/shadow_padding = 12.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 4.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vuy7x"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bxoi1"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxrvq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.35, 0.35, 0.35, 0.14)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y70fn"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.4, 0.4, 0.4, 0.16)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vo8uf"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.2, 0.2, 0.2, 0.08)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7ggiy"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="Resource" id="Resource_qp1n8"]
+script = ExtResource("8_nne8r")
+icon = ExtResource("9_fgjfq")
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[sub_resource type="Resource" id="Resource_q0h2o"]
+script = ExtResource("8_nne8r")
+state_name = "2"
+icon = ExtResource("9_fgjfq")
+icon_color = Color(0, 0, 0, 1)
+background_color = Color(1, 1, 1, 0.7411765)
+metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
+
+[node name="MemoryModule" type="MarginContainer" unique_id=1769940406 node_paths=PackedStringArray("memory", "memory_immutable", "canvas_layer")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1104.0
+offset_bottom = -600.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qft7o")
+memory = NodePath("CanvasLayer/FrostedPanel/Memory")
+memory_immutable = NodePath("CanvasLayer/FrostedPanel/MemoryImmutable")
+canvas_layer = NodePath("CanvasLayer")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=508245683]
+
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=834414769]
+material = SubResource("ShaderMaterial_cxltj")
+offset_left = 319.0
+offset_top = 49.0
+offset_right = 843.0
+offset_bottom = 587.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_vuy7x")
+script = ExtResource("3_qft7o")
+noise_texture = SubResource("NoiseTexture2D_s1ofn")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="Memory" parent="CanvasLayer/FrostedPanel" unique_id=568466571 instance=ExtResource("1_dpt44")]
+layout_mode = 2
+
+[node name="MemoryImmutable" parent="CanvasLayer/FrostedPanel" unique_id=1644808425 instance=ExtResource("2_18yt8")]
+visible = false
+layout_mode = 2
+
+[node name="MaterialSegmentedButton" type="Control" parent="CanvasLayer/FrostedPanel" unique_id=525324177]
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 1
+script = ExtResource("3_24uhx")
+editor_segments = Array[String](["短期记忆", "长期记忆"])
+selected_index = 0
+metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
+
+[node name="MemoryButton" type="Button" parent="." unique_id=45811412]
+clip_contents = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_bxoi1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_mxrvq")
+theme_override_styles/hover = SubResource("StyleBoxFlat_y70fn")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_vo8uf")
+theme_override_styles/focus = SubResource("StyleBoxFlat_7ggiy")
+script = ExtResource("7_85blf")
+states = Array[ExtResource("8_nne8r")]([SubResource("Resource_qp1n8"), SubResource("Resource_q0h2o")])
+button_size = 3
+metadata/_custom_type_script = "uid://cqwct3c1jvph2"
+
+[node name="GuiTransition" type="Node" parent="." unique_id=268158749]
+script = ExtResource("10_nne8r")
+auto_start = 0
+animation_enter = 3
+animation_leave = 3
+duration = 0.4
+delay = 0.03
+transition_type = "BACK"
+layout = NodePath("../CanvasLayer/FrostedPanel")
+layout_id = "memory"
+metadata/_custom_type_script = "uid://bimelmc1ce1b2"
+
+[connection signal="segment_selected" from="CanvasLayer/FrostedPanel/MaterialSegmentedButton" to="." method="_on_material_segmented_button_segment_selected"]
+[connection signal="state_changed" from="MemoryButton" to="." method="_on_memory_button_state_changed"]
