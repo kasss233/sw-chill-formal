@@ -65,6 +65,11 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 
+[node name="TitleEdit" type="LineEdit" parent="Center/Margin/Layout"]
+visible = false
+layout_mode = 2
+placeholder_text = "输入标题后回车"
+
 [node name="StateLabel" type="Label" parent="Center/Margin/Layout" unique_id=1535032721]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -89,3 +94,16 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
 theme_override_colors/font_color = Color(0.75, 0.82, 0.92, 1)
+
+[node name="BodyEdit" type="TextEdit" parent="Center/Margin/Layout"]
+visible = false
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+placeholder_text = "Ctrl+Enter 确认，Esc 取消"
+wrap_mode = 1
+
+[node name="DeleteInlineButton" type="Button" parent="Center/Margin/Layout"]
+layout_mode = 2
+flat = true
+theme_override_font_sizes/font_size = 12
+text = "删除该记忆"

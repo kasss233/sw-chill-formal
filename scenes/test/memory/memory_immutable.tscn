@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://g4fnc740yi0a"]
+[gd_scene format=3 uid="uid://g4fnc740yi0a"]
 
-[ext_resource type="Script" path="res://scenes/test/memory/memory_immutable.gd" id="1_immut"]
-[ext_resource type="Script" path="res://scenes/test/memory/memory_agent_hub.gd" id="2_hub"]
+[ext_resource type="Script" uid="uid://cg50334sorywl" path="res://scenes/test/memory/memory_immutable.gd" id="1_immut"]
+[ext_resource type="Script" uid="uid://bgi44ftvo44t4" path="res://scenes/test/memory/memory_agent_hub.gd" id="2_hub"]
+[ext_resource type="Script" uid="uid://bsur8fjvk6rr2" path="res://scenes/test/memory/memory_graph_overlay.gd" id="5_rm6j6"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxPulseGlow"]
 bg_color = Color(0.3, 0.6, 1, 0.12)
@@ -31,7 +32,7 @@ corner_radius_top_right = 36
 corner_radius_bottom_right = 36
 corner_radius_bottom_left = 36
 
-[node name="MemoryImmutable" type="Control"]
+[node name="MemoryImmutable" type="Control" unique_id=1644808425]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -41,7 +42,7 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_immut")
 
-[node name="GraphLayer" type="Control" parent="."]
+[node name="GraphLayer" type="Control" parent="." unique_id=1569824789]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -50,13 +51,24 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="AgentHub" type="Control" parent="GraphLayer"]
+[node name="AgentHub" type="Control" parent="GraphLayer" unique_id=687297895]
 custom_minimum_size = Vector2(160, 160)
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -80.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("2_hub")
 
-[node name="PulseGlow" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="PulseGlow" type="Panel" parent="GraphLayer/AgentHub" unique_id=1429797221]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -67,10 +79,12 @@ offset_left = -78.0
 offset_top = -78.0
 offset_right = 78.0
 offset_bottom = 78.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxPulseGlow")
 
-[node name="RingOuter" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="RingOuter" type="Panel" parent="GraphLayer/AgentHub" unique_id=2003947997]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -81,10 +95,12 @@ offset_left = -58.0
 offset_top = -58.0
 offset_right = 58.0
 offset_bottom = 58.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxRingOuter")
 
-[node name="RingMid" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="RingMid" type="Panel" parent="GraphLayer/AgentHub" unique_id=599313102]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -95,10 +111,12 @@ offset_left = -54.0
 offset_top = -54.0
 offset_right = 54.0
 offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxRingMid")
 
-[node name="RingInner" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="RingInner" type="Panel" parent="GraphLayer/AgentHub" unique_id=2016736550]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -109,10 +127,12 @@ offset_left = -36.0
 offset_top = -36.0
 offset_right = 36.0
 offset_bottom = 36.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxRingInner")
 
-[node name="HubTitleLabel" type="Label" parent="GraphLayer/AgentHub"]
+[node name="HubTitleLabel" type="Label" parent="GraphLayer/AgentHub" unique_id=246295352]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -123,9 +143,38 @@ offset_left = -56.0
 offset_top = -16.0
 offset_right = 56.0
 offset_bottom = 16.0
-mouse_filter = 2
-theme_override_font_sizes/font_size = 20
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.0431373, 0.117647, 0.219608, 1)
+theme_override_font_sizes/font_size = 20
 text = "AGENT"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="GraphOverlay" type="Control" parent="GraphLayer" unique_id=933422368]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 29.5
+offset_top = 16.0
+offset_right = -32.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_rm6j6")
+memory_root_path = NodePath("../..")
+
+[node name="MoveBounds" type="Control" parent="GraphLayer" unique_id=195125139]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 20.0
+offset_right = -40.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

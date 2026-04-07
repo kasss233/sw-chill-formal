@@ -1,31 +1,24 @@
 extends Control
 
-const SIDE_PANEL_WIDTH: float = 360.0
-const TOP_BAR_HEIGHT: float = 78.0
 const GRAPH_PADDING: float = 18.0
 
-var _title_label: Label
+@export_group("节点引用")
+@export var graph_layer_path: NodePath = ^"GraphLayer"
+@export var move_bounds_path: NodePath = ^"GraphLayer/MoveBounds"
+@export var agent_hub_path: NodePath = ^"GraphLayer/AgentHub"
+@export var add_button_path: NodePath = ^"FrostedPanel/SidePanel/MarginContainer/VBoxContainer/TopBar/MarginContainer/HBoxContainer/AddButton"
+
 var _add_button: Button
-var _export_button: Button
 
 var _graph_layer: Control
+var _move_bounds: Control
 var _agent_hub: Control
-var _side_panel: PanelContainer
-var _prompt_edit: LineEdit
-var _prompt_body_edit: TextEdit
-var _weight_slider: HSlider
-var _weight_value_label: Label
-var _connected_button: CheckButton
-var _delete_button: Button
-var _api_output: RichTextLabel
-var _json_import_edit: TextEdit
-var _apply_json_button: Button
+var _graph_overlay: Control
 
 var _prompt_nodes: Array[PromptMemoryNode] = []
 var _selected_node: PromptMemoryNode
 var _next_prompt_id: int = 1
 var _anim_time: float = 0.0
-var _syncing_inspector: bool = false
 ## 卡片之间的展示用有向边，`from` / `to` 为 [member PromptMemoryNode.prompt_id]。仅绘制，不参与编辑。
 var _inter_node_edges: Array[Dictionary] = []
 
@@ -35,76 +28,56 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_build_ui()
 	_create_demo_nodes()
-	_update_inspector()
-	_update_api_output()
 
 
 func _process(delta: float) -> void:
 	_anim_time += delta
-	queue_redraw()
+	if not is_instance_valid(_graph_overlay):
+		queue_redraw()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_layout_ui()
 		_clamp_all_nodes_to_graph()
-		queue_redraw()
+		if not is_instance_valid(_graph_overlay):
+			queue_redraw()
 
 
 func _draw() -> void:
+	if is_instance_valid(_graph_overlay):
+		return
 	_draw_background()
 	_draw_graph_network()
 
 
 func _build_ui() -> void:
-	# 图心、顶栏、侧栏均在 memory.tscn 中搭建，此处只做引用与信号连接。
-	_graph_layer = $GraphLayer as Control
+	# 图层与按钮均在 memory.tscn 中搭建，此处只做引用与信号连接。
+	_graph_layer = get_node_or_null(graph_layer_path) as Control
+	if _graph_layer == null:
+		push_error("[Memory] 未绑定 GraphLayer 节点")
+		return
 	_graph_layer.mouse_filter = Control.MOUSE_FILTER_PASS
-	_agent_hub = $GraphLayer/AgentHub as Control
+	_move_bounds = get_node_or_null(move_bounds_path) as Control
+	_agent_hub = get_node_or_null(agent_hub_path) as Control
+	_graph_overlay = _graph_layer.get_node_or_null("GraphOverlay") as Control
 	if is_instance_valid(_agent_hub) and _agent_hub.get_parent() == _graph_layer:
 		_graph_layer.move_child(_agent_hub, 0)
 
-	_title_label = $TopBar/MarginContainer/HBoxContainer/MainTitleLabel
-	_add_button = $TopBar/MarginContainer/HBoxContainer/AddButton
-	_export_button = $TopBar/MarginContainer/HBoxContainer/ExportButton
-	_side_panel = $SidePanel
-	var vbox := $SidePanel/MarginContainer/VBoxContainer
-	_prompt_edit = vbox.get_node("PromptEdit") as LineEdit
-	_prompt_body_edit = vbox.get_node("PromptBodyEdit") as TextEdit
-	_weight_slider = vbox.get_node("WeightSlider") as HSlider
-	_weight_value_label = vbox.get_node("WeightValueLabel") as Label
-	_connected_button = vbox.get_node("ConnectedButton") as CheckButton
-	_delete_button = vbox.get_node("DeleteButton") as Button
-	_api_output = vbox.get_node("ApiOutput") as RichTextLabel
-	_json_import_edit = vbox.get_node("JsonImportEdit") as TextEdit
-	_apply_json_button = vbox.get_node("ApplyJsonButton") as Button
+	_add_button = get_node_or_null(add_button_path) as Button
+
+	if _add_button == null:
+		push_error("[Memory] AddButton 导出节点未正确绑定")
+		return
 
 	_add_button.pressed.connect(_on_add_prompt_pressed)
-	_export_button.pressed.connect(_on_export_pressed)
-	_delete_button.pressed.connect(_on_delete_pressed)
-	_prompt_edit.text_submitted.connect(_on_prompt_text_submitted)
-	_prompt_edit.text_changed.connect(_on_prompt_text_changed)
-	_prompt_body_edit.text_changed.connect(_on_prompt_body_changed)
-	_weight_slider.value_changed.connect(_on_weight_changed)
-	_connected_button.toggled.connect(_on_connected_toggled)
-	_apply_json_button.pressed.connect(_on_apply_json_pressed)
 
 	_layout_ui()
 
 
 func _layout_ui() -> void:
-	var viewport_size := size
 	if _graph_layer:
 		_graph_layer.position = Vector2.ZERO
-		_graph_layer.size = viewport_size
-	var top_bar := get_node_or_null("TopBar") as Control
-	if top_bar:
-		top_bar.position = Vector2.ZERO
-		top_bar.size = Vector2(viewport_size.x, TOP_BAR_HEIGHT)
-
-	if _side_panel:
-		_side_panel.position = Vector2(viewport_size.x - SIDE_PANEL_WIDTH, TOP_BAR_HEIGHT)
-		_side_panel.size = Vector2(SIDE_PANEL_WIDTH, viewport_size.y - TOP_BAR_HEIGHT)
 
 	_layout_agent_hub()
 
@@ -125,7 +98,6 @@ func _create_demo_nodes() -> void:
 	if not r.get("ok", false):
 		push_warning("[Memory] 演示数据加载失败：%s" % str(r.get("error", "")))
 		return
-	_apply_random_lit_demo_effects()
 
 
 func _demo_memory_export_dict() -> Dictionary:
@@ -160,7 +132,7 @@ func _apply_random_lit_demo_effects() -> void:
 			node.is_lit = false
 			var delay := randf_range(0.45, 1.15)
 			get_tree().create_timer(delay).timeout.connect(
-				func () -> void:
+				func() -> void:
 					if is_instance_valid(node):
 						node.set_lit(true, true)
 			)
@@ -178,22 +150,15 @@ func _create_prompt_node(
 	place_total: int = -1
 ) -> void:
 	var node := PromptMemoryNode.create_from_content(title, body, weight, connected, mutable)
-	if lit_delay_sec >= 0.0:
-		node.is_lit = false
-	else:
-		node.is_lit = lit
+	# 流光状态由 connected 决定；保留 lit 参数仅为兼容历史调用。
 	node.prompt_id = _next_prompt_id
 	_next_prompt_id += 1
 	node.selected.connect(_on_prompt_selected)
 	node.moved.connect(_on_prompt_moved)
 	node.connect_toggled.connect(_on_prompt_connect_toggled)
+	node.content_changed.connect(_on_prompt_content_changed)
+	node.delete_requested.connect(_on_prompt_delete_requested)
 	_graph_layer.add_child(node)
-	if lit_delay_sec >= 0.0:
-		get_tree().create_timer(lit_delay_sec).timeout.connect(
-			func () -> void:
-				if is_instance_valid(node):
-					node.set_lit(true)
-		)
 
 	if place_index >= 0 and place_total > 0:
 		node.position = _compute_import_radial_position(place_index, place_total, node)
@@ -261,21 +226,11 @@ func _find_node_by_prompt_id(p_id: int) -> PromptMemoryNode:
 	return null
 
 
-## 与 [method _update_api_output] / [method agent_get_short_term_memory] 导出结构互逆：[br]
+## 与 [method agent_get_short_term_memory] 导出结构互逆：[br]
 ## 根对象可为：`prompts`（推荐，可逐项含 `connected` / `mutable`）、`connected_prompts`（默认已连接、可变）。[br]
 ## 根为数组时视为整表条目列表（等价于仅含 connected_prompts）。[br]
 ## 条目字段：`id`、`title`、`body`、`prompt`、`weight`；可选 `connected`（默认 true）、`mutable`（默认 true）。[br]
 ## 可选 `edges`：`[{"from": id, "to": id}, ...]` 或 `[[from, to], ...]`，表示记忆节点之间的展示关联（与 Agent 中心连线独立）。
-func apply_memory_graph_from_export_json(json_text: String) -> Dictionary:
-	var stripped := json_text.strip_edges()
-	if stripped.is_empty():
-		return {"ok": false, "error": "JSON 为空"}
-	var parsed: Variant = JSON.parse_string(stripped)
-	if parsed == null:
-		return {"ok": false, "error": "JSON 解析失败"}
-	return apply_memory_graph_from_parsed(parsed)
-
-
 func apply_memory_graph_from_dict(data: Dictionary) -> Dictionary:
 	return apply_memory_graph_from_parsed(data)
 
@@ -293,8 +248,6 @@ func apply_memory_graph_from_parsed(parsed: Variant) -> Dictionary:
 	if n == 0:
 		_inter_node_edges.clear()
 		_next_prompt_id = 1
-		_update_inspector()
-		_update_api_output()
 		queue_redraw()
 		return {"ok": true, "imported": 0}
 	for i in n:
@@ -321,8 +274,6 @@ func apply_memory_graph_from_parsed(parsed: Variant) -> Dictionary:
 	for node in _prompt_nodes:
 		_next_prompt_id = maxi(_next_prompt_id, node.prompt_id + 1)
 	_parse_inter_node_edges_from_data(parsed)
-	_update_inspector()
-	_update_api_output()
 	queue_redraw()
 	return {"ok": true, "imported": n}
 
@@ -360,56 +311,24 @@ func _split_prompt_for_import(combined: String) -> Dictionary:
 	return {"title": t, "body": b}
 
 
-func _on_apply_json_pressed() -> void:
-	var result := apply_memory_graph_from_export_json(_json_import_edit.text)
-	if not result.get("ok", false):
-		push_warning("[Memory] JSON 导入失败：%s" % str(result.get("error", "未知错误")))
-		print("[Memory] JSON 导入失败：", result.get("error", ""))
-	else:
-		print("[Memory] JSON 导入成功，卡片数：", result.get("imported", 0))
-
-
 func _select_node(node: PromptMemoryNode) -> void:
 	_selected_node = node
 	if is_instance_valid(node) and node.get_parent() != null:
 		node.move_to_front()
-	_update_inspector()
 	queue_redraw()
 
 
 func _update_inspector() -> void:
-	var has_selection := _selected_node != null
-	var can_edit := has_selection and _selected_node.is_mutable
-	_prompt_edit.editable = can_edit
-	_prompt_body_edit.editable = can_edit
-	_weight_slider.editable = can_edit
-	_connected_button.disabled = not has_selection or not _selected_node.is_mutable
-	_delete_button.disabled = not has_selection or not _selected_node.is_mutable
-
-	if not has_selection:
-		_syncing_inspector = true
-		_prompt_edit.text = ""
-		_prompt_body_edit.text = ""
-		_syncing_inspector = false
-		_weight_slider.value = 0.0
-		_weight_value_label.text = "-"
-		_connected_button.button_pressed = false
-		return
-
-	_syncing_inspector = true
-	_prompt_edit.text = _selected_node.prompt_title
-	_prompt_body_edit.text = _selected_node.prompt_body
-	_syncing_inspector = false
-	_weight_slider.value = _selected_node.weight
-	_weight_value_label.text = "%.2f" % _selected_node.weight
-	_connected_button.button_pressed = _selected_node.connected
+	pass
 
 
 func _get_graph_rect() -> Rect2:
-	var width := size.x - SIDE_PANEL_WIDTH - GRAPH_PADDING * 2.0
-	var height := size.y - TOP_BAR_HEIGHT - GRAPH_PADDING * 2.0
+	if is_instance_valid(_move_bounds):
+		return Rect2(_move_bounds.position, _move_bounds.size)
+	var width := size.x - GRAPH_PADDING * 2.0
+	var height := size.y - GRAPH_PADDING * 2.0
 	return Rect2(
-		Vector2(GRAPH_PADDING, TOP_BAR_HEIGHT + GRAPH_PADDING),
+		Vector2(GRAPH_PADDING, GRAPH_PADDING),
 		Vector2(maxf(220.0, width), maxf(220.0, height))
 	)
 
@@ -489,26 +408,11 @@ func _remove_prompt_node(node: PromptMemoryNode) -> void:
 	node.queue_free()
 	if _selected_node == node:
 		_selected_node = null
-	_update_inspector()
-	_update_api_output()
 	queue_redraw()
 
 
 func _on_add_prompt_pressed() -> void:
 	_create_prompt_node("新记忆 %d" % _next_prompt_id, 0.50, false, true, "")
-	_update_api_output()
-
-
-func _on_export_pressed() -> void:
-	_update_api_output(true)
-
-
-func _on_delete_pressed() -> void:
-	if _selected_node == null:
-		return
-	if not _selected_node.is_mutable:
-		return
-	_remove_prompt_node(_selected_node)
 
 
 func _on_prompt_selected(node: PromptMemoryNode) -> void:
@@ -521,57 +425,20 @@ func _on_prompt_moved(node: PromptMemoryNode) -> void:
 
 
 func _on_prompt_connect_toggled(node: PromptMemoryNode) -> void:
-	if _selected_node == node:
-		_connected_button.button_pressed = node.connected
-	_update_api_output()
 	queue_redraw()
 
 
-func _on_prompt_text_changed(new_text: String) -> void:
-	if _syncing_inspector or _selected_node == null:
-		return
-	_selected_node.set_prompt_title(new_text)
-	_update_api_output()
-
-
-func _on_prompt_text_submitted(new_text: String) -> void:
-	_on_prompt_text_changed(new_text)
-
-
-func _on_prompt_body_changed() -> void:
-	if _syncing_inspector or _selected_node == null:
-		return
-	_selected_node.set_prompt_body(_prompt_body_edit.text)
-	_update_api_output()
-
-
-func _on_weight_changed(new_value: float) -> void:
-	_weight_value_label.text = "%.2f" % new_value
-	if _selected_node == null:
-		return
-	_selected_node.set_weight(new_value)
-	_update_api_output()
+func _on_prompt_content_changed(_node: PromptMemoryNode) -> void:
 	queue_redraw()
 
 
-func _on_connected_toggled(pressed: bool) -> void:
-	if _selected_node == null:
+func _on_prompt_delete_requested(node: PromptMemoryNode) -> void:
+	if not is_instance_valid(node):
 		return
-	_selected_node.set_connected(pressed)
-	_update_api_output()
+	if not node.is_mutable:
+		return
+	_remove_prompt_node(node)
 	queue_redraw()
-
-
-func _update_api_output(log_to_console: bool = false) -> void:
-	var data := {
-		"connected_prompts": api_get_connected_prompt_weights(),
-		"total_nodes": _prompt_nodes.size(),
-		"active_nodes": api_get_connected_prompt_weights().size()
-	}
-	var json := JSON.stringify(data, "\t")
-	_api_output.text = json
-	if log_to_console:
-		print("[Memory API] ", json)
 
 
 # API：仅返回已连接（生效）的提示词与权重
@@ -610,3 +477,22 @@ func _calc_memory_strength() -> float:
 	for item in active:
 		total += item.get("weight", 0.0)
 	return snappedf(total / active.size(), 0.01)
+
+
+## 给 GraphOverlay 使用：返回当前连线绘制所需的快照数据。
+func get_graph_overlay_data() -> Dictionary:
+	var node_items: Array[Dictionary] = []
+	for node in _prompt_nodes:
+		node_items.append({
+			"id": node.prompt_id,
+			"connected": node.connected,
+			"weight": node.weight,
+			"position": node.position,
+			"size": node.size
+		})
+	return {
+		"anim_time": _anim_time,
+		"center": _get_agent_center(),
+		"nodes": node_items,
+		"edges": _inter_node_edges.duplicate(true)
+	}

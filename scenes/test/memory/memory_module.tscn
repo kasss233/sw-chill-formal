@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://nv44yj2fu2hp"]
+
+[ext_resource type="PackedScene" uid="uid://dnlhnkx8rysx6" path="res://scenes/test/memory/memory.tscn" id="1_dpt44"]
+[ext_resource type="Script" uid="uid://ce0o6tclv8orj" path="res://scenes/test/memory/memory_module.gd" id="1_qft7o"]
+[ext_resource type="PackedScene" uid="uid://g4fnc740yi0a" path="res://scenes/test/memory/memory_immutable.tscn" id="2_18yt8"]
+[ext_resource type="Shader" uid="uid://iaxm6weda7tv" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gdshader" id="2_24uhx"]
+[ext_resource type="Script" uid="uid://dwqpo0nxatmi3" path="res://scenes/main/ui/components/segmented_button/MaterialSegmentedButton.gd" id="3_24uhx"]
+[ext_resource type="Script" uid="uid://d0g5ejinpbng4" path="res://scenes/main/ui/components/frosted_panel/frosted_panel.gd" id="3_qft7o"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ollwg"]
+frequency = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_s1ofn"]
+width = 64
+height = 64
+noise = SubResource("FastNoiseLite_ollwg")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_24uhx"]
+shader = ExtResource("2_24uhx")
+shader_parameter/corner_radius = 21.0
+shader_parameter/show_border = true
+shader_parameter/border_width = 1.0
+shader_parameter/border_color = Color(1, 1, 1, 0.2)
+shader_parameter/blur_amount = 6.0
+shader_parameter/saturation = 1.6
+shader_parameter/brightness = 1.1
+shader_parameter/tint_color = Color(0.4117647, 0.4117647, 0.4117647, 0.29411766)
+shader_parameter/noise_amount = 0.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_s1ofn")
+shader_parameter/show_shadow = true
+shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
+shader_parameter/shadow_size = 8.0
+shader_parameter/shadow_offset = Vector2(0, 4)
+shader_parameter/size = Vector2(635, 611)
+shader_parameter/shadow_padding = 12.0
+shader_parameter/glow_intensity = 0.0
+shader_parameter/glow_width = 4.0
+shader_parameter/glow_speed = 0.8
+shader_parameter/glow_softness = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qft7o"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="MemoryModule" type="MarginContainer" unique_id=1769940406 node_paths=PackedStringArray("memory", "memory_immutable")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qft7o")
+memory = NodePath("CanvasLayer/FrostedPanel/Memory")
+memory_immutable = NodePath("CanvasLayer/FrostedPanel/MemoryImmutable")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=508245683]
+
+[node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=834414769]
+material = SubResource("ShaderMaterial_24uhx")
+offset_right = 635.0
+offset_bottom = 611.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_qft7o")
+script = ExtResource("3_qft7o")
+noise_texture = SubResource("NoiseTexture2D_s1ofn")
+metadata/_custom_type_script = "uid://d0g5ejinpbng4"
+
+[node name="Memory" parent="CanvasLayer/FrostedPanel" unique_id=568466571 instance=ExtResource("1_dpt44")]
+layout_mode = 2
+
+[node name="MemoryImmutable" parent="CanvasLayer/FrostedPanel" unique_id=1644808425 instance=ExtResource("2_18yt8")]
+visible = false
+layout_mode = 2
+
+[node name="MaterialSegmentedButton" type="Control" parent="CanvasLayer" unique_id=525324177]
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 3
+anchors_preset = 0
+offset_left = 231.0
+offset_top = 11.0
+offset_right = 391.0
+offset_bottom = 51.0
+mouse_filter = 1
+script = ExtResource("3_24uhx")
+editor_segments = Array[String](["短期记忆", "长期记忆"])
+selected_index = 0
+metadata/_custom_type_script = "uid://dwqpo0nxatmi3"
+
+[connection signal="segment_selected" from="CanvasLayer/MaterialSegmentedButton" to="." method="_on_material_segmented_button_segment_selected"]

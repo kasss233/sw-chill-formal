@@ -11,23 +11,33 @@ func _ready() -> void:
 
 
 func _build_ui() -> void:
-	_graph_layer = $GraphLayer as Control
+	_graph_layer = get_node_or_null(graph_layer_path) as Control
+	if _graph_layer == null:
+		push_error("[MemoryImmutable] 未绑定 GraphLayer 节点")
+		return
 	_graph_layer.mouse_filter = Control.MOUSE_FILTER_PASS
-	_agent_hub = $GraphLayer/AgentHub as Control
+	_move_bounds = get_node_or_null(move_bounds_path) as Control
+	_graph_overlay = _graph_layer.get_node_or_null("GraphOverlay") as Control
+	_agent_hub = get_node_or_null(agent_hub_path) as Control
 	if is_instance_valid(_agent_hub) and _agent_hub.get_parent() == _graph_layer:
 		_graph_layer.move_child(_agent_hub, 0)
 	_layout_ui()
 
 
 func _layout_ui() -> void:
-	var viewport_size := size
 	if _graph_layer:
 		_graph_layer.position = Vector2.ZERO
-		_graph_layer.size = viewport_size
 	_layout_agent_hub()
 
 
+func _layout_agent_hub() -> void:
+	# 只读场景中 AgentHub 位置以 tscn 手工布局为准，不做运行时自动居中。
+	pass
+
+
 func _get_graph_rect() -> Rect2:
+	if is_instance_valid(_move_bounds):
+		return Rect2(_move_bounds.position, _move_bounds.size)
 	var width := size.x - GRAPH_PADDING * 2.0
 	var height := size.y - GRAPH_PADDING * 2.0
 	return Rect2(
@@ -56,7 +66,6 @@ func _create_demo_nodes() -> void:
 	if not r.get("ok", false):
 		push_warning("[MemoryImmutable] 演示数据加载失败：%s" % str(r.get("error", "")))
 		return
-	_apply_random_lit_demo_effects()
 
 
 func _immutable_demo_dict() -> Dictionary:

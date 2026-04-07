@@ -1,44 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://dnlhnkx8rysx6"]
+[gd_scene format=3 uid="uid://dnlhnkx8rysx6"]
 
 [ext_resource type="Script" uid="uid://gr28tcv8j1c4" path="res://scenes/test/memory/memory.gd" id="1_bqlyq"]
-[ext_resource type="Script" path="res://scenes/test/memory/memory_agent_hub.gd" id="2_hub"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxTopBar"]
-bg_color = Color(0.0588235, 0.0901961, 0.14902, 1)
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-border_width_bottom = 1
-border_color = Color(0.172549, 0.211765, 0.301961, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxSidePanel"]
-bg_color = Color(0.0666667, 0.101961, 0.172549, 1)
-corner_radius_top_left = 20
-border_width_left = 1
-border_color = Color(0.176471, 0.215686, 0.313726, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxActionBtnNormal"]
-bg_color = Color(0.121569, 0.207843, 0.34902, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-border_color = Color(0.309804, 0.54902, 1, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxActionBtnHover"]
-bg_color = Color(0.164706, 0.294118, 0.47451, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-border_color = Color(0.309804, 0.54902, 1, 1)
+[ext_resource type="Script" uid="uid://bgi44ftvo44t4" path="res://scenes/test/memory/memory_agent_hub.gd" id="2_hub"]
+[ext_resource type="Script" uid="uid://bsur8fjvk6rr2" path="res://scenes/test/memory/memory_graph_overlay.gd" id="6_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxPulseGlow"]
 bg_color = Color(0.3, 0.6, 1, 0.12)
@@ -68,7 +32,7 @@ corner_radius_top_right = 36
 corner_radius_bottom_right = 36
 corner_radius_bottom_left = 36
 
-[node name="Memory" type="Control"]
+[node name="Memory" type="Control" unique_id=568466571]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -77,7 +41,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_bqlyq")
 
-[node name="GraphLayer" type="Control" parent="."]
+[node name="GraphLayer" type="Control" parent="." unique_id=8246378]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -86,13 +50,50 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="AgentHub" type="Control" parent="GraphLayer"]
+[node name="GraphOverlay" type="Control" parent="GraphLayer" unique_id=1842080785]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.5
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_overlay")
+memory_root_path = NodePath("../..")
+
+[node name="MoveBounds" type="Control" parent="GraphLayer" unique_id=2081962300]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 20.0
+offset_right = -21.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="AgentHub" type="Control" parent="GraphLayer" unique_id=1626657595]
 custom_minimum_size = Vector2(160, 160)
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -80.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("2_hub")
 
-[node name="PulseGlow" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="PulseGlow" type="Panel" parent="GraphLayer/AgentHub" unique_id=1282620062]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -103,10 +104,12 @@ offset_left = -78.0
 offset_top = -78.0
 offset_right = 78.0
 offset_bottom = 78.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxPulseGlow")
 
-[node name="RingOuter" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="RingOuter" type="Panel" parent="GraphLayer/AgentHub" unique_id=712705843]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -117,10 +120,12 @@ offset_left = -58.0
 offset_top = -58.0
 offset_right = 58.0
 offset_bottom = 58.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxRingOuter")
 
-[node name="RingMid" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="RingMid" type="Panel" parent="GraphLayer/AgentHub" unique_id=1021313029]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -131,10 +136,12 @@ offset_left = -54.0
 offset_top = -54.0
 offset_right = 54.0
 offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxRingMid")
 
-[node name="RingInner" type="Panel" parent="GraphLayer/AgentHub"]
+[node name="RingInner" type="Panel" parent="GraphLayer/AgentHub" unique_id=1289514125]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -145,10 +152,12 @@ offset_left = -36.0
 offset_top = -36.0
 offset_right = 36.0
 offset_bottom = 36.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxRingInner")
 
-[node name="HubTitleLabel" type="Label" parent="GraphLayer/AgentHub"]
+[node name="HubTitleLabel" type="Label" parent="GraphLayer/AgentHub" unique_id=1290912412]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -159,164 +168,10 @@ offset_left = -56.0
 offset_top = -16.0
 offset_right = 56.0
 offset_bottom = 16.0
-mouse_filter = 2
-theme_override_font_sizes/font_size = 20
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(0.0431373, 0.117647, 0.219608, 1)
+theme_override_font_sizes/font_size = 20
 text = "AGENT"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="TopBar" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_right = 400.0
-offset_bottom = 78.0
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxTopBar")
-
-[node name="MarginContainer" type="MarginContainer" parent="TopBar"]
-layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 12
-
-[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="MainTitleLabel" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.862745, 0.909804, 1, 1)
-text = "Agent 短期记忆图"
-
-[node name="AddButton" type="Button" parent="TopBar/MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.909804, 0.94902, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxActionBtnNormal")
-theme_override_styles/hover = SubResource("StyleBoxActionBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxActionBtnHover")
-text = "+ 添加提示词"
-
-[node name="ExportButton" type="Button" parent="TopBar/MarginContainer/HBoxContainer"]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.909804, 0.94902, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxActionBtnNormal")
-theme_override_styles/hover = SubResource("StyleBoxActionBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxActionBtnHover")
-text = "导出 API"
-
-[node name="SidePanel" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_left = 400.0
-offset_top = 78.0
-offset_right = 760.0
-offset_bottom = 600.0
-mouse_filter = 0
-theme_override_styles/panel = SubResource("StyleBoxSidePanel")
-
-[node name="MarginContainer" type="MarginContainer" parent="SidePanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 18
-
-[node name="VBoxContainer" type="VBoxContainer" parent="SidePanel/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="PanelTitle" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.811765, 0.878431, 1, 1)
-text = "提示词控制台"
-
-[node name="TitleHint" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.619608, 0.717647, 0.847059, 1)
-text = "标题（卡片顶部）"
-
-[node name="PromptEdit" type="LineEdit" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-placeholder_text = "短标题，便于识别"
-
-[node name="BodyHint" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.619608, 0.717647, 0.847059, 1)
-text = "正文（状态行下方，注入 Agent）"
-
-[node name="PromptBodyEdit" type="TextEdit" parent="SidePanel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 96)
-layout_mode = 2
-placeholder_text = "详细说明、规则或示例……"
-wrap_mode = 1
-scroll_fit_content_height = false
-
-[node name="WeightTitle" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "权重 (0 ~ 1)"
-
-[node name="WeightSlider" type="HSlider" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-min_value = 0.0
-max_value = 1.0
-step = 0.01
-
-[node name="WeightValueLabel" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "0.50"
-
-[node name="ConnectedButton" type="CheckButton" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "连接到 Agent（勾选才生效）"
-
-[node name="DeleteButton" type="Button" parent="SidePanel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.909804, 0.94902, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxActionBtnNormal")
-theme_override_styles/hover = SubResource("StyleBoxActionBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxActionBtnHover")
-text = "删除当前提示词"
-
-[node name="HSeparator" type="HSeparator" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="ApiTitle" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.603922, 0.768627, 1, 1)
-text = "API 输出（仅连接节点）"
-
-[node name="ApiOutput" type="RichTextLabel" parent="SidePanel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 260)
-layout_mode = 2
-size_flags_vertical = 3
-bbcode_enabled = false
-fit_content = false
-scroll_following = true
-
-[node name="ImportHint" type="Label" parent="SidePanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.619608, 0.717647, 0.847059, 1)
-text = "JSON 导入：`prompts`（全量，可带 connected/mutable）或 `connected_prompts`（默认全部已连接）"
-
-[node name="JsonImportEdit" type="TextEdit" parent="SidePanel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 100)
-layout_mode = 2
-placeholder_text = "粘贴 JSON…"
-wrap_mode = 1
-scroll_fit_content_height = false
-
-[node name="ApplyJsonButton" type="Button" parent="SidePanel/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.909804, 0.94902, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxActionBtnNormal")
-theme_override_styles/hover = SubResource("StyleBoxActionBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxActionBtnHover")
-text = "应用 JSON 构建图"

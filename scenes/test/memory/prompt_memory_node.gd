@@ -4,6 +4,8 @@ class_name PromptMemoryNode
 signal selected(node: PromptMemoryNode)
 signal moved(node: PromptMemoryNode)
 signal connect_toggled(node: PromptMemoryNode)
+signal content_changed(node: PromptMemoryNode)
+signal delete_requested(node: PromptMemoryNode)
 
 ## 是否允许用户通过控制台等途径修改内容、权重、连接与删除（展示用记忆可关）。
 @export var is_mutable: bool = true
@@ -27,15 +29,23 @@ var _state_label: Label
 var _body_label: Label
 var _body_toggle_row: HBoxContainer
 var _body_toggle_button: Button
+var _title_edit: LineEdit
+var _body_edit: TextEdit
+var _delete_inline_button: Button
 var _dragging: bool = false
 var _drag_offset: Vector2 = Vector2.ZERO
 var _hover_tween: Tween
+var _editing_title: bool = false
+var _editing_body: bool = false
 
 @onready var _title_label_node: Label = $Center/Margin/Layout/TitleLabel
 @onready var _state_label_node: Label = $Center/Margin/Layout/StateLabel
 @onready var _body_toggle_row_node: HBoxContainer = $Center/Margin/Layout/BodyToggleRow
 @onready var _body_toggle_button_node: Button = $Center/Margin/Layout/BodyToggleRow/BodyToggleButton
 @onready var _body_label_node: Label = $Center/Margin/Layout/BodyLabel
+@onready var _title_edit_node: LineEdit = $Center/Margin/Layout/TitleEdit
+@onready var _body_edit_node: TextEdit = $Center/Margin/Layout/BodyEdit
+@onready var _delete_inline_button_node: Button = $Center/Margin/Layout/DeleteInlineButton
 @onready var _glow_overlay: ColorRect = $GlowOverlay
 
 var _glow_material: ShaderMaterial
@@ -51,7 +61,14 @@ func _ready() -> void:
 	_body_label = _body_label_node
 	_body_toggle_row = _body_toggle_row_node
 	_body_toggle_button = _body_toggle_button_node
+	_title_edit = _title_edit_node
+	_body_edit = _body_edit_node
+	_delete_inline_button = _delete_inline_button_node
 	_body_toggle_button.pressed.connect(_on_body_toggle_pressed)
+	_title_edit.text_submitted.connect(_on_title_edit_submitted)
+	_title_edit.focus_exited.connect(_commit_title_edit)
+	_body_edit.focus_exited.connect(_commit_body_edit)
+	_delete_inline_button.pressed.connect(_on_delete_inline_pressed)
 	_body_toggle_button.add_theme_color_override("font_color", Color("8eb6e8"))
 	_body_toggle_button.add_theme_color_override("font_hover_color", Color("b5d4ff"))
 	_body_toggle_button.add_theme_color_override("font_pressed_color", Color("6a9fd4"))
@@ -69,6 +86,9 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		_update_pivot()
 		_update_glow_size()
+	elif what == NOTIFICATION_VISIBILITY_CHANGED:
+		if visible:
+			call_deferred("_refresh_visuals")
 
 
 func _init_glow_overlay() -> void:
@@ -189,7 +209,7 @@ func _on_body_toggle_pressed() -> void:
 
 func _shrink_wrap_to_content() -> void:
 	## 在正文折叠后让 Panel 收回高度；Godot 的 Label 曾参与布局后易残留最小尺寸，需 reset + 清空文案配合。
-	if not is_instance_valid(self) or not is_inside_tree():
+	if not is_instance_valid(self ) or not is_inside_tree():
 		return
 	reset_size()
 	_update_pivot()
@@ -197,9 +217,20 @@ func _shrink_wrap_to_content() -> void:
 
 
 func _gui_input(event: InputEvent) -> void:
+	if _editing_title or _editing_body:
+		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
+				if event.double_click and is_mutable:
+					if _is_pointer_over_title():
+						_begin_title_edit()
+						accept_event()
+						return
+					if _is_pointer_over_body():
+						_begin_body_edit()
+						accept_event()
+						return
 				_dragging = true
 				_drag_offset = event.position
 				emit_signal("selected", self )
@@ -211,10 +242,39 @@ func _gui_input(event: InputEvent) -> void:
 			if is_mutable:
 				toggle_connected()
 			accept_event()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
+			if is_mutable:
+				set_weight(weight + 0.02)
+				emit_signal("content_changed", self )
+			accept_event()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
+			if is_mutable:
+				set_weight(weight - 0.02)
+				emit_signal("content_changed", self )
+			accept_event()
 	elif event is InputEventMouseMotion and _dragging:
 		position += event.position - _drag_offset
 		emit_signal("moved", self )
 		accept_event()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not (event is InputEventKey):
+		return
+	if not event.pressed:
+		return
+	if _editing_title and event.keycode == KEY_ESCAPE:
+		_cancel_title_edit()
+		accept_event()
+		return
+	if _editing_body:
+		if event.keycode == KEY_ESCAPE:
+			_cancel_body_edit()
+			accept_event()
+			return
+		if event.keycode == KEY_ENTER and event.ctrl_pressed:
+			_commit_body_edit()
+			accept_event()
 
 
 func _on_mouse_entered() -> void:
@@ -242,6 +302,7 @@ func set_prompt_title(value: String) -> void:
 	var v := value.strip_edges()
 	prompt_title = v if not v.is_empty() else "未命名标题"
 	_refresh_visuals()
+	emit_signal("content_changed", self )
 
 
 func set_prompt_body(value: String) -> void:
@@ -251,6 +312,7 @@ func set_prompt_body(value: String) -> void:
 	if prompt_body.is_empty():
 		_body_expanded = false
 	_refresh_visuals()
+	emit_signal("content_changed", self )
 
 
 ## 兼容旧调用：整段写入时视为仅更新标题（正文不变）。
@@ -263,6 +325,7 @@ func set_weight(value: float) -> void:
 		return
 	weight = clampf(value, 0.0, 1.0)
 	_refresh_visuals()
+	emit_signal("content_changed", self )
 
 
 func set_connected(value: bool) -> void:
@@ -270,6 +333,7 @@ func set_connected(value: bool) -> void:
 		return
 	connected = value
 	_refresh_visuals()
+	emit_signal("content_changed", self )
 
 
 func toggle_connected() -> void:
@@ -277,12 +341,14 @@ func toggle_connected() -> void:
 		return
 	connected = not connected
 	_refresh_visuals()
+	emit_signal("content_changed", self )
 	emit_signal("connect_toggled", self )
 
 
 func _refresh_visuals() -> void:
 	if not is_inside_tree():
 		return
+	set_lit(connected, true)
 
 	var readonly_prefix := "" if is_mutable else "只读 · "
 	_title_label.text = prompt_title
@@ -313,4 +379,76 @@ func _refresh_visuals() -> void:
 		_body_toggle_button.text = "收起正文 ▲" if _body_expanded else "展开正文 ▼"
 		_body_label.modulate = Color(0.75, 0.82, 0.92, 1.0)
 
+	_title_edit.visible = _editing_title
+	_body_edit.visible = _editing_body
+	_body_edit.custom_minimum_size = Vector2(0, 90) if _editing_body else Vector2.ZERO
+	_delete_inline_button.visible = is_mutable
+
 	call_deferred("_shrink_wrap_to_content")
+
+
+func _is_pointer_over_title() -> bool:
+	return Rect2(_title_label.global_position, _title_label.size).has_point(get_global_mouse_position())
+
+
+func _is_pointer_over_body() -> bool:
+	var mouse_pos := get_global_mouse_position()
+	var in_body := Rect2(_body_label.global_position, _body_label.size).has_point(mouse_pos)
+	var in_toggle := Rect2(_body_toggle_row.global_position, _body_toggle_row.size).has_point(mouse_pos)
+	return in_body or in_toggle
+
+
+func _begin_title_edit() -> void:
+	_editing_title = true
+	_title_edit.text = prompt_title
+	_refresh_visuals()
+	_title_edit.grab_focus()
+	_title_edit.select_all()
+
+
+func _begin_body_edit() -> void:
+	_editing_body = true
+	_body_expanded = true
+	_body_edit.text = prompt_body
+	_refresh_visuals()
+	_body_edit.grab_focus()
+
+
+func _on_title_edit_submitted(_new_text: String) -> void:
+	_commit_title_edit()
+
+
+func _commit_title_edit() -> void:
+	if not _editing_title:
+		return
+	_editing_title = false
+	set_prompt_title(_title_edit.text)
+	_refresh_visuals()
+
+
+func _cancel_title_edit() -> void:
+	if not _editing_title:
+		return
+	_editing_title = false
+	_refresh_visuals()
+
+
+func _commit_body_edit() -> void:
+	if not _editing_body:
+		return
+	_editing_body = false
+	set_prompt_body(_body_edit.text)
+	_refresh_visuals()
+
+
+func _cancel_body_edit() -> void:
+	if not _editing_body:
+		return
+	_editing_body = false
+	_refresh_visuals()
+
+
+func _on_delete_inline_pressed() -> void:
+	if not is_mutable:
+		return
+	emit_signal("delete_requested", self )
