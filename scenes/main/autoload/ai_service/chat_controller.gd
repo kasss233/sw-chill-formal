@@ -162,9 +162,10 @@ func _encode_image(path: String) -> String:
 # ============ 适配器信号回调 ============
 
 func _on_adapter_stream_chunk(ai_response: AIResponse) -> void:
+	if ai_response.is_loading_hint():
+		ChatState.set_loading_hint_phase(ai_response.loading_hint_phase)
+		return
 	match ai_response.type:
-		AIResponse.ResponseType.LOADING_HINT:
-			ChatState.set_loading_hint_phase(ai_response.loading_hint_phase)
 		AIResponse.ResponseType.TEXT:
 			_handle_text_response(ai_response)
 		AIResponse.ResponseType.FUNCTION_CALL:

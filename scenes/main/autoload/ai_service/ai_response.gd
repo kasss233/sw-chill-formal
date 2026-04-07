@@ -75,6 +75,11 @@ var timestamp: int = 0
 var loading_hint_phase: String = ""
 
 
+## 供外部脚本判断类型（避免跨文件访问 ResponseType.LOADING_HINT 时 LSP 解析失败）
+func is_loading_hint() -> bool:
+	return type == ResponseType.LOADING_HINT
+
+
 ## 创建文本响应
 static func text(content: String, delta: bool = false) -> AIResponse:
 	var r = AIResponse.new()
