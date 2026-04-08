@@ -1,0 +1,90 @@
+[
+  {
+    "type": "enter_dialogue_mode",
+    "delay": 0.0,
+    "record_restore": false
+  },
+  {
+    "type": "show_module",
+    "delay": 0.1,
+    "record_restore": false,
+    "args": {
+      "module_name": "memory"
+    }
+  },
+  {
+    "type": "show_function_call_start",
+    "delay": 0.2,
+    "record_restore": false,
+    "args": {
+      "name": "add_memory_node",
+      "call_id": "demo_memory_add_1"
+    }
+  },
+  {
+    "type": "add_memory_node",
+    "delay": 0.15,
+    "record_restore": false,
+    "args": {
+      "slot": "editor",
+      "title": "Demo记忆-目标",
+      "body": "每天晚间 22:00 前回顾当日任务，规划次日三件事。",
+      "weight": 0.78,
+      "connected": true,
+      "save_as": "mem_demo_goal"
+    }
+  },
+  {
+    "type": "add_memory_node",
+    "delay": 0.15,
+    "record_restore": false,
+    "args": {
+      "slot": "editor",
+      "title": "Demo记忆-偏好",
+      "body": "回复尽量先给执行步骤，再补充原因。",
+      "weight": 0.66,
+      "connected": false,
+      "save_as": "mem_demo_pref"
+    }
+  },
+  {
+    "type": "connect_memory_nodes",
+    "delay": 0.1,
+    "record_restore": false,
+    "args": {
+      "slot": "editor",
+      "from_ref": "mem_demo_goal",
+      "to_ref": "mem_demo_pref"
+    }
+  },
+  {
+    "type": "update_memory_node",
+    "delay": 0.1,
+    "record_restore": false,
+    "args": {
+      "slot": "editor",
+      "node_ref": "mem_demo_pref",
+      "connected": true,
+      "weight": 0.82
+    }
+  },
+  {
+    "type": "show_function_call_end",
+    "delay": 0.15,
+    "record_restore": false,
+    "args": {
+      "name": "add_memory_node",
+      "call_id": "demo_memory_add_1",
+      "success": true
+    }
+  },
+  {
+    "type": "show_response_text",
+    "delay": 0.2,
+    "record_restore": false,
+    "args": {
+      "text": "记忆节点演示已完成：新增2条、连接1条，并将偏好节点设为已连接。",
+      "append": false
+    }
+  }
+]

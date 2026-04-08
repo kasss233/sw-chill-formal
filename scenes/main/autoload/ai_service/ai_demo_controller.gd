@@ -8,11 +8,6 @@ const DEMO_RESPONSE_SPEED := 0.05
 const DEMO_DELAY_SCALE := 4
 var DEMO_STEPS: Array[Dictionary] = [
 		{
-			"type": "enter_dialogue_mode",
-			"delay": 0.0,
-			"record_restore": false
-		},
-		{
 			"type": "show_module",
 			"delay": 0.1,
 			"record_restore": false,
@@ -21,48 +16,70 @@ var DEMO_STEPS: Array[Dictionary] = [
 			}
 		},
 		{
-			"type": "show_function_call_start",
+			"type": "update_memory_node",
 			"delay": 0.2,
 			"record_restore": false,
 			"args": {
-				"name": "add_memory_node",
-				"call_id": "demo_memory_add_1"
-			}
-		},
-		{
-			"type": "add_memory_node",
-			"delay": 0.15,
-			"record_restore": false,
-			"args": {
 				"slot": "editor",
-				"title": "Demo记忆-目标",
-				"body": "每天晚间 22:00 前回顾当日任务，规划次日三件事。",
-				"weight": 0.78,
+				"node_id": "3",
 				"connected": true,
-				"save_as": "mem_demo_goal"
+				"weight": 0.82
 			}
 		},
 		{
-			"type": "add_memory_node",
-			"delay": 0.15,
+			"type": "hide_module",
+			"delay": 0.4,
+			"record_restore": false,
+			"args": {
+	  		"module_name": "memory"
+		}
+  		},
+		{
+		"type": "set_input_text",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"text": "你好"
+		}
+		},
+		{
+		"type": "clear_input",
+		"delay": 0.5,
+		"record_restore": false
+		},
+		{
+		"type": "enter_dialogue_mode",
+		"delay": 0,
+		"record_restore": false
+		},
+		{
+		"type": "show_response_text",
+		"delay": 0.25,
+		"record_restore": false,
+		"args": {
+			"text": "你好。",
+			"append": false,
+			"stream": false,
+			"chunk_delay": DEMO_RESPONSE_SPEED
+		}
+		},
+		{
+			"type": "show_module",
+			"delay": 0.2,
+			"record_restore": false,
+			"args": {
+				"module_name": "memory"
+			}
+		},
+		{
+			"type": "update_memory_node",
+			"delay": 0.2,
 			"record_restore": false,
 			"args": {
 				"slot": "editor",
-				"title": "Demo记忆-偏好",
-				"body": "回复尽量先给执行步骤，再补充原因。",
-				"weight": 0.66,
+				"node_id": "3",
 				"connected": false,
-				"save_as": "mem_demo_pref"
-			}
-		},
-		{
-			"type": "connect_memory_nodes",
-			"delay": 0.1,
-			"record_restore": false,
-			"args": {
-				"slot": "editor",
-				"from_ref": "mem_demo_goal",
-				"to_ref": "mem_demo_pref"
+				"weight": 0.82
 			}
 		},
 		{
@@ -71,30 +88,57 @@ var DEMO_STEPS: Array[Dictionary] = [
 			"record_restore": false,
 			"args": {
 				"slot": "editor",
-				"node_ref": "mem_demo_pref",
+				"node_id": "5",
 				"connected": true,
 				"weight": 0.82
 			}
 		},
 		{
-			"type": "show_function_call_end",
-			"delay": 0.15,
+			"type": "hide_module",
+			"delay": 0.4,
 			"record_restore": false,
 			"args": {
-				"name": "add_memory_node",
-				"call_id": "demo_memory_add_1",
-				"success": true
-			}
+	  		"module_name": "memory"
+		}
+  		},
+		{
+		"type": "set_input_text",
+		"delay": 0.2,
+		"record_restore": false,
+		"args": {
+			"text": "你好"
+		}
 		},
 		{
-			"type": "show_response_text",
-			"delay": 0.2,
-			"record_restore": false,
-			"args": {
-				"text": "记忆节点演示已完成：新增2条、连接1条，并将偏好节点设为已连接。",
-				"append": false
-			}
+		"type": "clear_input",
+		"delay": 0.5,
+		"record_restore": false
+		},
+		{
+		"type": "enter_dialogue_mode",
+		"delay": 0,
+		"record_restore": false
+		},
+		{
+		"type": "show_response_text",
+		"delay": 0.25,
+		"record_restore": false,
+		"args": {
+			"text": "嗨嗨嗨，你好呀，很高兴见到你！",
+			"append": false,
+			"stream": false,
+			"chunk_delay": DEMO_RESPONSE_SPEED
 		}
+		},
+		{
+		"type": "set_character_action",
+		"delay": 0,
+		"record_restore": false,
+		"args": {
+			"pose": "greet"
+		}
+		},
+		
 	]
 
 var is_demo_running: bool = false
@@ -202,6 +246,8 @@ func _execute_step(step: Dictionary, run_id: int) -> bool:
 			return true
 		"show_response_text":
 			return await _step_show_response_text(args, run_id)
+		"set_character_action":
+			return _step_set_character_action(args)
 		"show_function_call_start":
 			return _step_show_function_call_start(args)
 		"show_function_call_end":
@@ -281,6 +327,8 @@ func _describe_step(step: Dictionary) -> String:
 			return "%s(%s)" % [step_type, str(args.get("module_name", ""))]
 		"show_function_call_start", "show_function_call_end":
 			return "%s(%s)" % [step_type, str(args.get("name", ""))]
+		"set_character_action":
+			return "%s(pose=%s, emotion=%s)" % [step_type, str(args.get("pose", "")), str(args.get("emotion", ""))]
 		"add_task":
 			return "%s(%s)" % [step_type, str(args.get("title", ""))]
 		"create_note":
@@ -311,6 +359,22 @@ func _step_show_response_text(args: Dictionary, run_id: int) -> bool:
 	if run_id != current_demo_run_id:
 		return false
 	demo_response_requested.emit(text, append)
+	return true
+
+
+func _step_set_character_action(args: Dictionary) -> bool:
+	var payload: Dictionary = {}
+	if args.has("pose"):
+		var pose := str(args.get("pose", "")).strip_edges()
+		if not pose.is_empty():
+			payload["pose"] = pose
+	if args.has("emotion"):
+		var emotion := str(args.get("emotion", "")).strip_edges()
+		if not emotion.is_empty():
+			payload["emotion"] = emotion
+	if payload.is_empty():
+		return false
+	ChatState.notify_agent_action(payload)
 	return true
 
 
