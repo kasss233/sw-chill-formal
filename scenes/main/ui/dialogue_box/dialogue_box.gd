@@ -163,6 +163,8 @@ var _auto_hide_timer: Timer = null
 var _long_press_timer: Timer = null
 var _func_min_display_timer: Timer = null # 函数执行状态最小显示时间
 var _has_received_text: bool = false # 当前响应是否已收到文本
+var _dialogue_started_emitted: bool = false # 是否已发出 dialogue_started
+var _dialogue_full_text_emitted: bool = false # 是否已发出完整文本信号
 var _current_func_name: String = "" # 当前执行的函数名
 var _pending_func_complete: bool = false # 函数已完成但等待最小显示时间
 
@@ -418,6 +420,8 @@ func start_dialogue(text: String, speed_override: float = -1.0) -> void:
 	_full_text = text
 	_current_char_index = 0
 	_is_streaming = true
+	_dialogue_started_emitted = true
+	_dialogue_full_text_emitted = true
 
 	# 清空当前显示
 	rich_text_label.text = ""
@@ -468,6 +472,8 @@ func clear_dialogue() -> void:
 	_current_char_index = 0
 	rich_text_label.text = ""
 	_update_height()
+	_dialogue_started_emitted = false
+	_dialogue_full_text_emitted = false
 
 
 ## 追加文本（用于流式 API 响应）
@@ -524,7 +530,10 @@ func show_demo_response(text: String, append: bool = false) -> void:
 		clear_dialogue()
 		set_text(text)
 		# 演示模式下显示响应文本时发送信号
+		_dialogue_started_emitted = true
+		_dialogue_full_text_emitted = true
 		DialogueState.emit_dialogue_started(text)
+		DialogueState.emit_dialogue_full_text_received(text)
 	_set_display_state(DisplayState.SHOWING_TEXT)
 	_set_display_state(DisplayState.COMPLETED)
 
@@ -630,6 +639,8 @@ func _on_button_pressed(button_index: int) -> void:
 func _on_response_started() -> void:
 	print("[DialogueBox] _on_response_started")
 	_has_received_text = false
+	_dialogue_started_emitted = false
+	_dialogue_full_text_emitted = false
 	show_module()
 	clear_dialogue()
 	_set_display_state(DisplayState.LOADING)
@@ -641,7 +652,9 @@ func _on_response_text_delta(delta: String) -> void:
 		_has_received_text = true
 		_set_display_state(DisplayState.SHOWING_TEXT)
 		# 第一段文本到达时发送 dialogue_started 信号
-		DialogueState.emit_dialogue_started(delta)
+		if !_dialogue_started_emitted:
+			_dialogue_started_emitted = true
+			DialogueState.emit_dialogue_started(delta)
 	else:
 		append_text(delta)
 
@@ -652,16 +665,23 @@ func _on_response_text_set(text: String) -> void:
 		if !_has_received_text:
 			_has_received_text = true
 			_set_display_state(DisplayState.SHOWING_TEXT)
-			# 第一次收到文本时，发送 dialogue_started 信号（包含文本内容）
-			DialogueState.emit_dialogue_started(text)
 		elif _display_state == DisplayState.LOADING or _display_state == DisplayState.EXECUTING_FUNC:
 			# 编排模式若仍先发 text_delta 再工具：text_done 收束时应回到正文并收起加载区
 			_set_display_state(DisplayState.SHOWING_TEXT)
+		if !_dialogue_started_emitted:
+			_dialogue_started_emitted = true
+			DialogueState.emit_dialogue_started(text)
+		if !_dialogue_full_text_emitted:
+			_dialogue_full_text_emitted = true
+			DialogueState.emit_dialogue_full_text_received(text)
 	set_text(text)
 
 
 func _on_response_completed(response_text: String) -> void:
 	print("[DialogueBox] _on_response_completed len=%d" % response_text.length())
+	if !response_text.is_empty() and !_dialogue_full_text_emitted:
+		_dialogue_full_text_emitted = true
+		DialogueState.emit_dialogue_full_text_received(response_text)
 	if !_has_received_text and response_text.is_empty():
 		# 纯函数调用无回复文本 → 直接关闭
 		_set_display_state(DisplayState.HIDDEN)
@@ -687,6 +707,8 @@ func _on_response_cleared() -> void:
 func _on_assistant_followup_segment_started() -> void:
 	# 网关多轮：新一轮模型流式开始前清空当前气泡正文，避免拼在上一轮后面；首字 delta 再走 dialogue_started
 	_has_received_text = false
+	_dialogue_started_emitted = false
+	_dialogue_full_text_emitted = false
 	set_text("")
 	_set_display_state(DisplayState.LOADING)
 

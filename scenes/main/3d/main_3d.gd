@@ -20,22 +20,12 @@ extends Node3D
 @export var skybox: Node3D
 @export var on_desk: Node3D
 var _is_saying: bool = false
-## 对话开始时的表情 tween（需在流结束/错误时取消，避免与强制复位打架）
+var _dialogue_started_at_msec: int = 0
 var _dialogue_emotion_tween: Tween
-## SSE action 中循环姿态/持续表情超时拉回 idle（0 关闭）
-@export var agent_action_auto_reset_sec: float = 12.0
-var _action_reset_timer: Timer
-
 func _ready() -> void:
 	# 在编辑器模式下不初始化，避免信号连接错误
 	if Engine.is_editor_hint():
 		return
-
-	_action_reset_timer = Timer.new()
-	_action_reset_timer.one_shot = true
-	_action_reset_timer.timeout.connect(_on_action_idle_reset_timeout)
-	add_child(_action_reset_timer)
-
 	_connect_signals()
 	_init_time()
 	_init_weather()
@@ -60,7 +50,6 @@ func _input(event: InputEvent) -> void:
 	
 
 func _connect_signals() -> void:
-	# 从 State 单例连接信号，而不是从场景文件连接
 	if CharacterInteractorState and CharacterInteractorState.has_signal("character_interacted"):
 		if not CharacterInteractorState.character_interacted.is_connected(_on_character_interacted):
 			CharacterInteractorState.character_interacted.connect(_on_character_interacted)
@@ -78,13 +67,6 @@ func _connect_signals() -> void:
 	if SettingState and SettingState.has_signal("snow_changed"):
 		if not SettingState.snow_changed.is_connected(_on_snow_amount_changed):
 			SettingState.snow_changed.connect(_on_snow_amount_changed)
-	#if SettingState and SettingState.has_signal("outdoor_1_changed"):
-		#if not SettingState.outdoor_1_changed.is_connected(_on_out_door_1_button_state_changed):
-			#SettingState.outdoor_1_changed.connect(_on_out_door_1_button_state_changed)
-	#if SettingState and SettingState.has_signal("outdoor_2_changed"):
-		#if not SettingState.outdoor_2_changed.is_connected(_on_out_door_2_button_state_changed):
-			#SettingState.outdoor_2_changed.connect(_on_out_door_2_button_state_changed)
-	## fog
 	if SettingState and SettingState.has_signal("fog_changed"):
 		if not SettingState.fog_changed.is_connected(_on_fog_button_state_changed):
 			SettingState.fog_changed.connect(_on_fog_button_state_changed)
@@ -123,6 +105,9 @@ func _connect_signals() -> void:
 	if DialogueState and DialogueState.has_signal("dialogue_started"):
 		if not DialogueState.dialogue_started.is_connected(_on_dialogue_started):
 			DialogueState.dialogue_started.connect(_on_dialogue_started)
+	if DialogueState and DialogueState.has_signal("dialogue_full_text_received"):
+		if not DialogueState.dialogue_full_text_received.is_connected(_on_dialogue_full_text_received):
+			DialogueState.dialogue_full_text_received.connect(_on_dialogue_full_text_received)
 	if DialogueState and DialogueState.has_signal("dialogue_finished"):
 		if not DialogueState.dialogue_finished.is_connected(_on_dialogue_finished):
 			DialogueState.dialogue_finished.connect(_on_dialogue_finished)
@@ -135,12 +120,6 @@ func _connect_signals() -> void:
 	if ChatState and ChatState.has_signal("agent_action_received"):
 		if not ChatState.agent_action_received.is_connected(_on_agent_action_received):
 			ChatState.agent_action_received.connect(_on_agent_action_received)
-	if ChatState and ChatState.has_signal("response_completed"):
-		if not ChatState.response_completed.is_connected(_on_chat_response_completed):
-			ChatState.response_completed.connect(_on_chat_response_completed)
-	if ChatState and ChatState.has_signal("response_error"):
-		if not ChatState.response_error.is_connected(_on_chat_response_error):
-			ChatState.response_error.connect(_on_chat_response_error)
 func _init_weather():
 	set_env_weather_sunny()
 func _init_time():
@@ -251,16 +230,6 @@ func _on_rain_amount_changed(amount: int) -> void:
 	set_rain_amount(amount)
 func _on_snow_amount_changed(amount: int) -> void:
 	set_snow_amount(amount)
-#func _on_out_door_1_button_state_changed(state: int) -> void:
-	#if state == 0:
-		#cherry_blossom.visible = true
-	#elif state == 1:
-		#cherry_blossom.visible = false
-#func _on_out_door_2_button_state_changed(state: int) -> void:
-	#if state == 0:
-		#planet.visible = true
-	#elif state == 1:
-		#planet.visible = false
 func _on_fog_button_state_changed(state: int) -> void:
 	if state == 0:
 		sky3d.fog_enabled = true
@@ -321,103 +290,66 @@ func _on_room_decor_category_unselected(category: String) -> void:
 
 func _on_camera_changed(value: int) -> void:
 	## 输出调试信息
-	print("Cameramodechangedto: %d" % value)
+	print("[main3d]Camera mode changed to: %d" % value)
 	match value:
 		0:
 			side_camera.current = true
 		1:
 			central_camera.current = true
+
 func _on_dialogue_started(text: String) -> void:
 	print("[main3d]Dialoguestarted, textlength: %d" % text.length())
-	_cancel_dialogue_emotion_tween()
 	if character:
 		# 避免上一轮 typing/talk 与本轮表情叠加
-		character.set_idle_pose()
 		character.set_saying()
-	# 根据文本长度调整说话表情持续时间，最长不超过5秒
-	var duration = min(2.0 + text.length() * 0.03, 5.0)
+	_dialogue_started_at_msec = Time.get_ticks_msec()
+	if _dialogue_emotion_tween:
+		_dialogue_emotion_tween.kill()
+		_dialogue_emotion_tween = null
+
+
+func _on_dialogue_full_text_received(text: String) -> void:
+	print("[main3d]Dialogue full text received, textlength: %d" % text.length())
+	var total_duration: float = min(1.0 + text.length() * 0.2, 8.0)
+	var elapsed_seconds := 0.0
+	if _dialogue_started_at_msec > 0:
+		elapsed_seconds = float(Time.get_ticks_msec() - _dialogue_started_at_msec) / 1000.0
+	var remaining_duration: float = max(total_duration - elapsed_seconds, 0.0)
+	print("[main3d]Dialogue total=%.2f, elapsed=%.2f, remaining=%.2f" % [total_duration, elapsed_seconds, remaining_duration])
+	if not character:
+		return
+	if _dialogue_emotion_tween:
+		_dialogue_emotion_tween.kill()
+		_dialogue_emotion_tween = null
+	if remaining_duration <= 0.0:
+		character.set_neutral()
+		return
 	_dialogue_emotion_tween = create_tween()
-	_dialogue_emotion_tween.tween_interval(duration)
+	_dialogue_emotion_tween.tween_interval(remaining_duration)
 	_dialogue_emotion_tween.tween_callback(character.set_neutral)
 
 
 func _on_dialogue_finished() -> void:
 	print("[main3d]Dialoguefinished")
-	_cancel_action_reset_timer()
-	_reset_character_pose_emotion()
 
 
 func _on_function_executing(func_name: String, call_id: String) -> void:
-	print("[main3d]Functionexecuting: %s(id: %s)" % [func_name, call_id])
+	print("[main3d]Function executing: %s(id: %s)" % [func_name, call_id])
 	character.set_typing_pose()
 
 
 func _on_function_completed(func_name: String, call_id: String, success: bool) -> void:
-	print("[main3d]Functioncompleted: %s(id: %s, success: %s)" % [func_name, call_id, success])
+	print("[main3d]Function completed: %s(id: %s, success: %s)" % [func_name, call_id, success])
 	if character:
 		character.set_idle_pose()
-		character.set_neutral()
-
-
-func _cancel_dialogue_emotion_tween() -> void:
-	if _dialogue_emotion_tween != null and is_instance_valid(_dialogue_emotion_tween):
-		_dialogue_emotion_tween.kill()
-	_dialogue_emotion_tween = null
-
-
-func _cancel_action_reset_timer() -> void:
-	if _action_reset_timer != null and not _action_reset_timer.is_stopped():
-		_action_reset_timer.stop()
-
-
-func _reset_character_pose_emotion() -> void:
-	if not character:
-		return
-	character.set_idle_pose()
-	character.set_neutral()
-
-
-func _on_chat_response_completed(_full_text: String) -> void:
-	_cancel_dialogue_emotion_tween()
-	_cancel_action_reset_timer()
-	_reset_character_pose_emotion()
-
-
-func _on_chat_response_error(_message: String) -> void:
-	_cancel_dialogue_emotion_tween()
-	_cancel_action_reset_timer()
-	_reset_character_pose_emotion()
-
-
-func _on_action_idle_reset_timeout() -> void:
-	_reset_character_pose_emotion()
-
-
-func _maybe_schedule_action_idle_reset(payload: Dictionary) -> void:
-	if agent_action_auto_reset_sec <= 0.0:
-		return
-	# 已显式回到 idle 姿态则不再为表情单独开超时（避免 idle+happy 仍误开 timer）
-	if payload.has("pose") and str(payload["pose"]).strip_edges() == "idle":
-		return
-	var need := false
-	if payload.has("pose") and payload["pose"] != null:
-		var p := str(payload["pose"]).strip_edges()
-		if p == "typing" or p == "talk":
-			need = true
-	if payload.has("emotion") and payload["emotion"] != null:
-		var e := str(payload["emotion"]).strip_edges()
-		if e in ["happy", "sad", "surprised", "angry", "saying"]:
-			need = true
-	if not need:
-		return
-	_cancel_action_reset_timer()
-	_action_reset_timer.wait_time = agent_action_auto_reset_sec
-	_action_reset_timer.start()
 
 
 func _on_agent_action_received(payload: Dictionary) -> void:
+	if 1:
+		return
 	if not character:
 		return
+	print("[main3d]Agent_action_received: %s" % payload)
 	if payload.has("pose") and payload["pose"] != null:
 		var pose := str(payload["pose"]).strip_edges()
 		match pose:
@@ -462,9 +394,3 @@ func _on_agent_action_received(payload: Dictionary) -> void:
 				character.set_saying()
 			"blinking":
 				character.set_blinking()
-	# 显式 idle/neutral 时取消超时；循环姿态/持续表情则启动可取消的兜底计时
-	if payload.has("pose") and str(payload["pose"]).strip_edges() == "idle":
-		_cancel_action_reset_timer()
-	elif payload.has("emotion") and str(payload["emotion"]).strip_edges() == "neutral":
-		_cancel_action_reset_timer()
-	_maybe_schedule_action_idle_reset(payload)

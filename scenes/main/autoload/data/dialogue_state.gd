@@ -3,7 +3,8 @@ extends Node
 ## 发送对话框相关的信号，供 UI 模块监听
 
 # 对话状态信号
-signal dialogue_started # 对话开始时发出
+signal dialogue_started(text: String) # 对话开始时发出
+signal dialogue_full_text_received(text: String) # 对话完整文本到达时发出
 signal dialogue_finished # 对话完成时发出
 signal dialogue_stopped # 对话被停止时发出
 signal button_pressed(button_index: int) # 按钮被点击时发出signal function_executing(func_name: String, call_id: String) # 函数执行时发出
@@ -22,6 +23,12 @@ func _ready() -> void:
 ## @param text: 对话文本内容
 func emit_dialogue_started(text: String = "") -> void:
 	dialogue_started.emit(text)
+
+
+## 发出完整文本到达信号
+## @param text: 完整对话文本内容
+func emit_dialogue_full_text_received(text: String) -> void:
+	dialogue_full_text_received.emit(text)
 
 
 ## 发出对话完成信号
