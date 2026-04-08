@@ -7,201 +7,95 @@ signal demo_response_cleared
 const DEMO_RESPONSE_SPEED := 0.05
 const DEMO_DELAY_SCALE := 4
 var DEMO_STEPS: Array[Dictionary] = [
-  {
-	"type": "set_input_text",
-	"delay": 0.0,
-	"record_restore": false,
-	"args": {
-	  "text": "我工作日每天要进行2小时考研和1小时读书，周末想运动一下。帮我安排一下日常习惯吧。",
-	}
-  },
-  {
-	"type": "clear_input",
-	"delay": 0.5,
-	"record_restore": false
-  },
-  {
-	"type": "enter_dialogue_mode",
-	"delay": 0,
-	"record_restore": false
-  },
-  {
-	"type": "show_response_text",
-	"delay": 0.25,
-	"record_restore": false,
-	"args": {
-	  "text": "好的，我来为你安排习惯。",
-	  "append": false,
-	  "stream": false,
-	  "chunk_delay": 0.05
-	}
-  },
-  {
-	"type": "show_function_call_start",
-	"delay": 0.5,
-	"record_restore": false,
-	"args": {
-	  "name": "add_habit",
-	  "call_id": "demo_add_habit_1"
-	}
-  },
-  {
-	"type": "show_module",
-	"delay": 0.3,
-	"record_restore": false,
-	"args": {
-	  "module_name": "habit"
-	}
-  },
-  {
-	"type": "select_profile_tab",
-	"delay": 0.2,
-	"record_restore": false,
-	"args": {
-	  "tab_index": 2
-	}
-  },
-  {
-	"type": "add_habit",
-	"delay": 0.2,
-	"record_restore": true,
-	"args": {
-	  "name": "考研-上午",
-	  "minutes": 60,
-	  "start_time": "10:00",
-	  "end_time": "11:00",
-	  "selected_week_days": [0, 1, 2, 3, 4],
-	  "color": "#FF7043",
-	  "save_as": "yoga_habit"
-	}
-  },
-  {
-	"type": "add_habit",
-	"delay": 0.2,
-	"record_restore": true,
-	"args": {
-	  "name": "考研-下午",
-	  "minutes": 60,
-	  "start_time": "14:00",
-	  "end_time": "15:00",
-	  "selected_week_days": [0, 1, 2, 3, 4],
-	  "color": "#FF7043",
-	  "save_as": "yoga_habit"
-	}
-  },
-  {
-	"type": "add_habit",
-	"delay": 0.2,
-	"record_restore": true,
-	"args": {
-	  "name": "读书",
-	  "minutes": 60,
-	  "start_time": "19:00",
-	  "end_time": "20:00",
-	  "selected_week_days": [0, 1, 2, 3, 4],
-	  "color": "#88ff43",
-	  "save_as": "yoga_habit"
-	}
-  },
-  {
-	"type": "add_habit",
-	"delay": 0.2,
-	"record_restore": true,
-	"args": {
-	  "name": "运动",
-	  "minutes": 60,
-	  "start_time": "16:00",
-	  "end_time": "17:00",
-	  "selected_week_days": [5, 6],
-	  "color": "#4375ff",
-	  "save_as": "yoga_habit"
-	}
-  },
-  {
-	"type": "select_profile_tab",
-	"delay": 0.2,
-	"record_restore": false,
-	"args": {
-	  "tab_index": 3
-	}
-  },
-  {
-	"type": "show_function_call_end",
-	"delay": 0.3,
-	"record_restore": false,
-	"args": {
-	  "name": "add_habit",
-	  "call_id": "demo_add_habit_1",
-	  "success": true
-	}
-  },
-  {
-		"type": "hide_module",
-		"delay": 0.2,
-		"record_restore": false,
-		"args": {
-			"module_name": "habit"
+		{
+			"type": "enter_dialogue_mode",
+			"delay": 0.0,
+			"record_restore": false
+		},
+		{
+			"type": "show_module",
+			"delay": 0.1,
+			"record_restore": false,
+			"args": {
+				"module_name": "memory"
+			}
+		},
+		{
+			"type": "show_function_call_start",
+			"delay": 0.2,
+			"record_restore": false,
+			"args": {
+				"name": "add_memory_node",
+				"call_id": "demo_memory_add_1"
+			}
+		},
+		{
+			"type": "add_memory_node",
+			"delay": 0.15,
+			"record_restore": false,
+			"args": {
+				"slot": "editor",
+				"title": "Demo记忆-目标",
+				"body": "每天晚间 22:00 前回顾当日任务，规划次日三件事。",
+				"weight": 0.78,
+				"connected": true,
+				"save_as": "mem_demo_goal"
+			}
+		},
+		{
+			"type": "add_memory_node",
+			"delay": 0.15,
+			"record_restore": false,
+			"args": {
+				"slot": "editor",
+				"title": "Demo记忆-偏好",
+				"body": "回复尽量先给执行步骤，再补充原因。",
+				"weight": 0.66,
+				"connected": false,
+				"save_as": "mem_demo_pref"
+			}
+		},
+		{
+			"type": "connect_memory_nodes",
+			"delay": 0.1,
+			"record_restore": false,
+			"args": {
+				"slot": "editor",
+				"from_ref": "mem_demo_goal",
+				"to_ref": "mem_demo_pref"
+			}
+		},
+		{
+			"type": "update_memory_node",
+			"delay": 0.1,
+			"record_restore": false,
+			"args": {
+				"slot": "editor",
+				"node_ref": "mem_demo_pref",
+				"connected": true,
+				"weight": 0.82
+			}
+		},
+		{
+			"type": "show_function_call_end",
+			"delay": 0.15,
+			"record_restore": false,
+			"args": {
+				"name": "add_memory_node",
+				"call_id": "demo_memory_add_1",
+				"success": true
+			}
+		},
+		{
+			"type": "show_response_text",
+			"delay": 0.2,
+			"record_restore": false,
+			"args": {
+				"text": "记忆节点演示已完成：新增2条、连接1条，并将偏好节点设为已连接。",
+				"append": false
+			}
 		}
-	},
-  {
-	"type": "show_response_text",
-	"delay": 0.5,
-	"record_restore": false,
-	"args": {
-	  "text": "我已帮你安排好习惯，记得按时执行哦",
-	  "append": false,
-	  "stream": false,
-	  "chunk_delay": 0.05
-	}
-  },
-  {
-	"type": "wait",
-	"delay": 2.0,
-	"record_restore": false
-  },
-  {
-	"type": "generate_profile_demo_data",
-	"delay": 0.5,
-	"record_restore": true,
-	"args": {
-	  "days_back": 7
-	}
-  },
-  {
-	"type": "show_module",
-	"delay": 0.3,
-	"record_restore": false,
-	"args": {
-	  "module_name": "habit"
-	}
-  },
-  {
-	"type": "select_profile_tab",
-	"delay": 0.2,
-	"record_restore": false,
-	"args": {
-	  "tab_index": 0
-	}
-  },
-  {
-	"type": "wait",
-	"delay": 2.0,
-	"record_restore": false
-  },
-  {
-	"type": "select_profile_tab",
-	"delay": 0.5,
-	"record_restore": false,
-	"args": {
-	  "tab_index": 1
-	}
-  },
-  {
-	"type": "wait",
-	"delay": 3.0,
-	"record_restore": false
-  }
-]
+	]
 
 var is_demo_running: bool = false
 var is_restoring: bool = false
@@ -214,6 +108,10 @@ var _runtime_refs: Dictionary = {}
 var _active_function_calls: Dictionary = {}
 var _recorded_note_updates: Dictionary = {}
 var _opened_modules: Dictionary = {}
+
+
+func use_default_demo_steps() -> void:
+	demo_steps = DEMO_STEPS.duplicate(true)
 
 
 func can_start_demo() -> bool:
@@ -282,11 +180,11 @@ func _run_restore_async(run_id: int) -> void:
 	_force_finish_ui_effects()
 	await _restore_modules()
 	_restore_settings()
+	_restore_memory()
 	_restore_notes()
 	_restore_tasks()
 	_restore_habits()
 	_restore_pomodoro()
-	_restore_music()
 	_reset_runtime_state()
 	if run_id == current_demo_run_id:
 		is_restoring = false
@@ -358,6 +256,14 @@ func _execute_step(step: Dictionary, run_id: int) -> bool:
 			return _step_set_level_xp(args, should_record)
 		"set_daily_task_progress":
 			return _step_set_daily_task_progress(args, should_record)
+		"add_memory_node":
+			return _step_add_memory_node(args, should_record)
+		"update_memory_node":
+			return _step_update_memory_node(args, should_record)
+		"remove_memory_node":
+			return _step_remove_memory_node(args, should_record)
+		"connect_memory_nodes":
+			return _step_connect_memory_nodes(args, should_record)
 		"generate_profile_demo_data":
 			return _step_generate_profile_demo_data(args, should_record)
 		"wait":
@@ -381,6 +287,10 @@ func _describe_step(step: Dictionary) -> String:
 			return "%s(%s)" % [step_type, str(args.get("title", ""))]
 		"add_habit":
 			return "%s(%s)" % [step_type, str(args.get("name", ""))]
+		"add_memory_node", "update_memory_node", "remove_memory_node":
+			return "%s(slot=%s, id=%s)" % [step_type, str(args.get("slot", "editor")), str(args.get("node_id", args.get("node_ref", "")))]
+		"connect_memory_nodes":
+			return "%s(slot=%s, from=%s, to=%s)" % [step_type, str(args.get("slot", "editor")), str(args.get("from_id", args.get("from_ref", ""))), str(args.get("to_id", args.get("to_ref", "")))]
 		"generate_week_schedule":
 			var style := str(args.get("style", "relaxed"))
 			var style_name := "轻松版" if style == "relaxed" else "自律版"
@@ -427,6 +337,8 @@ func _step_show_module(args: Dictionary, should_record: bool) -> bool:
 	var module_name := str(args.get("module_name", ""))
 	if module_name.is_empty():
 		return false
+	if module_name == "memory":
+		_show_memory_module_fallback()
 	LayerManager.agent_show_module(module_name)
 	if should_record and not _opened_modules.has(module_name):
 		_opened_modules[module_name] = true
@@ -441,7 +353,121 @@ func _step_hide_module(args: Dictionary) -> bool:
 	var module_name := str(args.get("module_name", ""))
 	if module_name.is_empty():
 		return false
+	if module_name == "memory":
+		_hide_memory_module_fallback()
 	LayerManager.agent_hide_module(module_name)
+	return true
+
+
+func _show_memory_module_fallback() -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	var modules := tree.get_nodes_in_group("memory_module_shell")
+	for module in modules:
+		if module != null and module.has_method("show_module"):
+			module.call("show_module")
+			return
+
+
+func _hide_memory_module_fallback() -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	var modules := tree.get_nodes_in_group("memory_module_shell")
+	for module in modules:
+		if module != null and module.has_method("hide_module"):
+			module.call("hide_module")
+			return
+
+
+func _step_add_memory_node(args: Dictionary, _should_record: bool) -> bool:
+	var slot := str(args.get("slot", "editor"))
+	var node_data: Dictionary = {}
+	if args.has("id"):
+		node_data["id"] = int(args.get("id", 0))
+	node_data["title"] = str(args.get("title", ""))
+	node_data["body"] = str(args.get("body", ""))
+	node_data["weight"] = float(args.get("weight", 0.5))
+	node_data["connected"] = bool(args.get("connected", false))
+	node_data["mutable"] = bool(args.get("mutable", true))
+	if args.has("body_expanded"):
+		node_data["body_expanded"] = bool(args.get("body_expanded", false))
+	if args.has("is_lit"):
+		node_data["is_lit"] = bool(args.get("is_lit", false))
+	if args.has("position"):
+		node_data["position"] = args.get("position")
+	var result: Dictionary = MemoryState.agent_add_memory_node(slot, node_data)
+	if not bool(result.get("ok", false)):
+		print("[AIDemoController] add_memory_node 失败: %s" % str(result.get("error", "unknown")))
+		return false
+	var node: Dictionary = result.get("node", {})
+	var node_id := int(node.get("id", 0))
+	if node_id <= 0:
+		return false
+	var save_as := str(args.get("save_as", ""))
+	if not save_as.is_empty():
+		_runtime_refs[save_as] = node_id
+	return true
+
+
+func _step_update_memory_node(args: Dictionary, _should_record: bool) -> bool:
+	var slot := str(args.get("slot", "editor"))
+	var node_id := _resolve_memory_node_id(args, "node")
+	if node_id <= 0:
+		node_id = _resolve_memory_node_id(args, "memory_node")
+	if node_id <= 0:
+		return false
+	var patch: Dictionary = {}
+	if args.has("title"):
+		patch["title"] = str(args.get("title", ""))
+	if args.has("body"):
+		patch["body"] = str(args.get("body", ""))
+	if args.has("weight"):
+		patch["weight"] = float(args.get("weight", 0.5))
+	if args.has("connected"):
+		patch["connected"] = bool(args.get("connected", false))
+	if args.has("mutable"):
+		patch["mutable"] = bool(args.get("mutable", true))
+	if args.has("body_expanded"):
+		patch["body_expanded"] = bool(args.get("body_expanded", false))
+	if args.has("is_lit"):
+		patch["is_lit"] = bool(args.get("is_lit", false))
+	if args.has("position"):
+		patch["position"] = args.get("position")
+	if patch.is_empty():
+		return false
+	var result: Dictionary = MemoryState.agent_update_memory_node(slot, node_id, patch)
+	if not bool(result.get("ok", false)):
+		print("[AIDemoController] update_memory_node 失败: %s" % str(result.get("error", "unknown")))
+		return false
+	return true
+
+
+func _step_remove_memory_node(args: Dictionary, _should_record: bool) -> bool:
+	var slot := str(args.get("slot", "editor"))
+	var node_id := _resolve_memory_node_id(args, "node")
+	if node_id <= 0:
+		node_id = _resolve_memory_node_id(args, "memory_node")
+	if node_id <= 0:
+		return false
+	var result: Dictionary = MemoryState.agent_remove_memory_node(slot, node_id)
+	if not bool(result.get("ok", false)):
+		print("[AIDemoController] remove_memory_node 失败: %s" % str(result.get("error", "unknown")))
+		return false
+	return true
+
+
+func _step_connect_memory_nodes(args: Dictionary, _should_record: bool) -> bool:
+	var slot := str(args.get("slot", "editor"))
+	var from_id := _resolve_memory_endpoint_id(args, "from")
+	var to_id := _resolve_memory_endpoint_id(args, "to")
+	if from_id <= 0 or to_id <= 0:
+		return false
+	var result: Dictionary = MemoryState.agent_connect_memory_nodes(slot, from_id, to_id)
+	if not bool(result.get("ok", false)):
+		print("[AIDemoController] connect_memory_nodes 失败: %s" % str(result.get("error", "unknown")))
+		return false
 	return true
 
 
@@ -655,6 +681,13 @@ func _restore_settings() -> void:
 	SettingState.set_weather(int(settings.get("weather_mode", SettingState.get_weather_mode())))
 
 
+func _restore_memory() -> void:
+	var memory_data: Dictionary = snapshot.get("memory", {})
+	if memory_data.is_empty():
+		return
+	MemoryState.import_data(memory_data)
+
+
 func _restore_notes() -> void:
 	for i in range(applied_changes.size() - 1, -1, -1):
 		var change := applied_changes[i]
@@ -762,25 +795,6 @@ func _restore_pomodoro() -> void:
 	PomodoroState.agent_restore_snapshot(pomodoro_state)
 
 
-func _restore_music() -> void:
-	var music_state: Dictionary = snapshot.get("music", {})
-	if music_state.is_empty():
-		return
-	# 恢复播放列表
-	var playlist_name := str(music_state.get("current_playlist", ""))
-	if not playlist_name.is_empty():
-		MusicState.agent_set_playlist(playlist_name)
-	# 恢复播放模式
-	var play_mode := int(music_state.get("play_mode", 0))
-	MusicState.agent_set_play_mode(play_mode)
-	# 恢复曲目和播放状态
-	var track_name := str(music_state.get("current_track", ""))
-	var is_playing := bool(music_state.get("is_playing", false))
-	if not track_name.is_empty():
-		MusicState.set_track(track_name)
-	MusicState.agent_set_playing(is_playing)
-
-
 func _restore_habits() -> void:
 	for i in range(applied_changes.size() - 1, -1, -1):
 		var change := applied_changes[i]
@@ -828,7 +842,8 @@ func _capture_snapshot() -> Dictionary:
 			"is_playing": MusicState.is_playing,
 			"play_mode": MusicState.play_mode,
 			"current_playlist": MusicState.current_playlist
-		}
+		},
+		"memory": MemoryState.export_data()
 	}
 
 
@@ -837,6 +852,28 @@ func _resolve_ref_id(args: Dictionary, ref_prefix: String) -> int:
 	if args.has(direct_key):
 		return int(args.get(direct_key, 0))
 	var ref_key := "%s_ref" % ref_prefix
+	var ref_name := str(args.get(ref_key, ""))
+	if ref_name.is_empty():
+		return 0
+	return int(_runtime_refs.get(ref_name, 0))
+
+
+func _resolve_memory_node_id(args: Dictionary, key_prefix: String) -> int:
+	var direct_key := "%s_id" % key_prefix
+	if args.has(direct_key):
+		return int(args.get(direct_key, 0))
+	var ref_key := "%s_ref" % key_prefix
+	var ref_name := str(args.get(ref_key, ""))
+	if ref_name.is_empty():
+		return 0
+	return int(_runtime_refs.get(ref_name, 0))
+
+
+func _resolve_memory_endpoint_id(args: Dictionary, endpoint_key: String) -> int:
+	var id_key := "%s_id" % endpoint_key
+	if args.has(id_key):
+		return int(args.get(id_key, 0))
+	var ref_key := "%s_ref" % endpoint_key
 	var ref_name := str(args.get(ref_key, ""))
 	if ref_name.is_empty():
 		return 0
@@ -948,7 +985,7 @@ func _step_generate_profile_demo_data(args: Dictionary, should_record: bool) -> 
 
 	# 生成过去 N 天的数据
 	for i in range(days_back):
-		var offset := -(days_back - 1 - i)
+		var offset := - (days_back - 1 - i)
 		var date_key := DateUtil.offset_date(DateUtil.get_today_key(), offset)
 
 		# 每天 2-4 条专注记录
@@ -957,8 +994,8 @@ func _step_generate_profile_demo_data(args: Dictionary, should_record: bool) -> 
 			var hour := 9 + j * 3
 			var minute := randi() % 60
 			var start_time := "%02d:%02d" % [hour, minute]
-			var duration := (randi() % 46 + 15) * 60  # 15-60 分钟
-			var completed := randf() > 0.2  # 80% 完成率
+			var duration := (randi() % 46 + 15) * 60 # 15-60 分钟
+			var completed := randf() > 0.2 # 80% 完成率
 
 			StatsState.demo_add_focus_record(date_key, duration, start_time, completed, 0)
 

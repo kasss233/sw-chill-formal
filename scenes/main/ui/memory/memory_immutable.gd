@@ -1,8 +1,5 @@
 extends MemoryModuleBase
 
-## 只读记忆图：仅 **GraphLayer + AgentHub + 卡片**，无顶栏/侧栏；数据通过 [method apply_memory_graph_from_export_json] / [method apply_memory_graph_from_dict] 注入（可加 `edges`）。[br]
-## 默认数据来自 `MemoryGraphData`（与 `agent/docs/CHARACTER.md` 中小晴长期记忆对齐）；布局与展开状态可本地存档恢复。
-
 func _get_memory_graph_slot() -> String:
 	return "immutable"
 
@@ -11,6 +8,7 @@ func _ready() -> void:
 	set_process(true)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_build_ui()
+	_bind_memory_state_signal()
 	_create_demo_nodes()
 
 
@@ -69,7 +67,7 @@ func _select_node(node: PromptMemoryNode) -> void:
 
 
 func _create_demo_nodes() -> void:
-	var r := apply_memory_graph_from_dict(MemoryGraphData.get_immutable_graph())
+	var r := apply_memory_graph_from_dict(MemoryState.get_immutable_graph())
 	if not r.get("ok", false):
 		push_warning("[MemoryImmutable] 演示数据加载失败：%s" % str(r.get("error", "")))
 		return

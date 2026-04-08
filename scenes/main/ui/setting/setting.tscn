@@ -1446,6 +1446,7 @@ checked_icon = ExtResource("14_m4j3q")
 metadata/_custom_type_script = "uid://bkxpnxtj5fc1f"
 
 [node name="AuthPanel" parent="CanvasLayer/FrostedPanel/VBoxContainer/MarginContainer/SmoothScrollContainer/VBoxContainer" unique_id=659454606 instance=ExtResource("22_auth")]
+visible = false
 layout_mode = 2
 
 [node name="SettingButton" type="Button" parent="." unique_id=199275167]

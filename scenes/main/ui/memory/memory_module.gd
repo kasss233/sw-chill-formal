@@ -10,7 +10,7 @@ const GROUP_MEMORY_MODULE_SHELL := "memory_module_shell"
 @export var segmented_button: Control
 ## 供脚本侧开关面板时同步按钮态；建议绑定到 MemoryButton（MaterialToggleButton）。
 @export var memory_button: MaterialToggleButton
-
+@export var panel: FrostedPanel
 
 func _enter_tree() -> void:
 	add_to_group(GROUP_MEMORY_MODULE_SHELL)
@@ -34,20 +34,6 @@ func set_memory_tab(short_term: bool) -> void:
 			segmented_button.set("selected_index", 1)
 
 
-func open_memory_panel() -> void:
-	if is_instance_valid(canvas_layer):
-		LayerManager.bring_to_front(canvas_layer)
-	if is_instance_valid(memory_button):
-		memory_button.set_state_no_signal(1)
-	GuiTransitions.show("memory")
-
-
-func close_memory_panel() -> void:
-	if is_instance_valid(memory_button):
-		memory_button.set_state_no_signal(0)
-	GuiTransitions.hide("memory")
-
-
 func _on_material_segmented_button_segment_selected(index: int, _text: String) -> void:
 	match index:
 		0:
@@ -60,6 +46,16 @@ func _on_material_segmented_button_segment_selected(index: int, _text: String) -
 
 func _on_memory_button_state_changed(_old_state: int, new_state: int) -> void:
 	if new_state == 0:
-		close_memory_panel()
+		hide_module()
 	else:
-		open_memory_panel()
+		show_module()
+func show_module() -> void:
+	if not panel.visible:
+		LayerManager.bring_to_front(canvas_layer)
+		GuiTransitions.show("memory")
+		memory_button.set_state_no_signal(1)
+
+func hide_module() -> void:
+	if panel.visible:
+		GuiTransitions.hide("memory")
+		memory_button.set_state_no_signal(0)

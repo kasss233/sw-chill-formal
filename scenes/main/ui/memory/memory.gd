@@ -22,6 +22,10 @@ var _next_prompt_id: int = 1
 var _anim_time: float = 0.0
 ## 卡片之间的展示用有向边，`from` / `to` 为 [member PromptMemoryNode.prompt_id]。仅绘制，不参与编辑。
 var _inter_node_edges: Array[Dictionary] = []
+var _state_refresh_queued: bool = false
+var _state_refresh_slot: String = ""
+var _state_refresh_graph: Dictionary = {}
+var _skip_next_graph_state_sync_count: int = 0
 
 ## 供 [MemoryGraphData] 区分可编辑记忆与只读记忆存档槽位。
 func _get_memory_graph_slot() -> String:
@@ -32,7 +36,12 @@ func _ready() -> void:
 	set_process(true)
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	_build_ui()
+	_bind_memory_state_signal()
 	_create_demo_nodes()
+
+
+func _exit_tree() -> void:
+	_unbind_memory_state_signal()
 
 
 func _process(delta: float) -> void:
@@ -102,10 +111,229 @@ func _layout_agent_hub() -> void:
 
 
 func _create_demo_nodes() -> void:
-	var r := apply_memory_graph_from_dict(MemoryGraphData.get_editor_graph())
+	var r := apply_memory_graph_from_dict(MemoryState.get_editor_graph())
 	if not r.get("ok", false):
 		push_warning("[Memory] 演示数据加载失败：%s" % str(r.get("error", "")))
 		return
+
+
+func _bind_memory_state_signal() -> void:
+	if not MemoryState.memory_node_added.is_connected(_on_memory_node_added):
+		MemoryState.memory_node_added.connect(_on_memory_node_added)
+	if not MemoryState.memory_node_updated.is_connected(_on_memory_node_updated):
+		MemoryState.memory_node_updated.connect(_on_memory_node_updated)
+	if not MemoryState.memory_node_removed.is_connected(_on_memory_node_removed):
+		MemoryState.memory_node_removed.connect(_on_memory_node_removed)
+	if not MemoryState.memory_edge_connected.is_connected(_on_memory_edge_connected):
+		MemoryState.memory_edge_connected.connect(_on_memory_edge_connected)
+	if MemoryState.memory_graph_state_changed.is_connected(_on_memory_graph_state_changed):
+		return
+	MemoryState.memory_graph_state_changed.connect(_on_memory_graph_state_changed)
+
+
+func _unbind_memory_state_signal() -> void:
+	if MemoryState.memory_node_added.is_connected(_on_memory_node_added):
+		MemoryState.memory_node_added.disconnect(_on_memory_node_added)
+	if MemoryState.memory_node_updated.is_connected(_on_memory_node_updated):
+		MemoryState.memory_node_updated.disconnect(_on_memory_node_updated)
+	if MemoryState.memory_node_removed.is_connected(_on_memory_node_removed):
+		MemoryState.memory_node_removed.disconnect(_on_memory_node_removed)
+	if MemoryState.memory_edge_connected.is_connected(_on_memory_edge_connected):
+		MemoryState.memory_edge_connected.disconnect(_on_memory_edge_connected)
+	if MemoryState.memory_graph_state_changed.is_connected(_on_memory_graph_state_changed):
+		MemoryState.memory_graph_state_changed.disconnect(_on_memory_graph_state_changed)
+
+
+func _on_memory_graph_state_changed(slot: String, graph: Dictionary) -> void:
+	if slot == _get_memory_graph_slot() and _skip_next_graph_state_sync_count > 0:
+		_skip_next_graph_state_sync_count -= 1
+		return
+	_queue_state_graph_refresh(slot, graph)
+
+
+func _on_memory_node_added(slot: String, node_data: Dictionary) -> void:
+	if slot != _get_memory_graph_slot():
+		return
+	if _apply_memory_node_added_delta(node_data):
+		_skip_next_graph_state_sync_count += 1
+
+
+func _on_memory_node_updated(slot: String, node_data: Dictionary) -> void:
+	if slot != _get_memory_graph_slot():
+		return
+	if _apply_memory_node_updated_delta(node_data):
+		_skip_next_graph_state_sync_count += 1
+
+
+func _on_memory_node_removed(slot: String, node_id: int) -> void:
+	if slot != _get_memory_graph_slot():
+		return
+	if _apply_memory_node_removed_delta(node_id):
+		_skip_next_graph_state_sync_count += 1
+
+
+func _on_memory_edge_connected(slot: String, edge: Dictionary) -> void:
+	if slot != _get_memory_graph_slot():
+		return
+	if _apply_memory_edge_connected_delta(edge):
+		_skip_next_graph_state_sync_count += 1
+
+
+func _apply_memory_node_added_delta(node_data: Dictionary) -> bool:
+	if not is_instance_valid(_graph_layer):
+		return false
+	var node_id := int(node_data.get("id", -1))
+	if node_id <= 0:
+		return false
+	var exist := _find_node_by_prompt_id(node_id)
+	if exist != null:
+		_apply_node_data_to_ui(exist, node_data)
+		queue_redraw()
+		return true
+	var node := _create_prompt_node_for_state(node_data)
+	if node == null:
+		return false
+	_prompt_nodes.append(node)
+	_next_prompt_id = maxi(_next_prompt_id, node.prompt_id + 1)
+	queue_redraw()
+	return true
+
+
+func _apply_memory_node_updated_delta(node_data: Dictionary) -> bool:
+	var node_id := int(node_data.get("id", -1))
+	if node_id <= 0:
+		return false
+	var node := _find_node_by_prompt_id(node_id)
+	if node == null:
+		return _apply_memory_node_added_delta(node_data)
+	_apply_node_data_to_ui(node, node_data)
+	queue_redraw()
+	return true
+
+
+func _apply_memory_node_removed_delta(node_id: int) -> bool:
+	if node_id <= 0:
+		return false
+	var node := _find_node_by_prompt_id(node_id)
+	if node == null:
+		return false
+	_remove_prompt_node(node)
+	_inter_node_edges = _inter_node_edges.filter(
+		func(e: Dictionary) -> bool:
+			return int(e.get("from", -1)) != node_id and int(e.get("to", -1)) != node_id
+	)
+	queue_redraw()
+	return true
+
+
+func _apply_memory_edge_connected_delta(edge: Dictionary) -> bool:
+	var from_id := int(edge.get("from", -1))
+	var to_id := int(edge.get("to", -1))
+	if from_id <= 0 or to_id <= 0:
+		return false
+	for e in _inter_node_edges:
+		if int(e.get("from", -1)) == from_id and int(e.get("to", -1)) == to_id:
+			return false
+	_inter_node_edges.append({"from": from_id, "to": to_id})
+	queue_redraw()
+	return true
+
+
+func _create_prompt_node_for_state(data: Dictionary) -> PromptMemoryNode:
+	var title := str(data.get("title", "")).strip_edges()
+	if title.is_empty():
+		title = "未命名标题"
+	var body := str(data.get("body", "")).strip_edges()
+	var weight := clampf(float(data.get("weight", 0.5)), 0.0, 1.0)
+	var connected := bool(data.get("connected", false))
+	var mutable := bool(data.get("mutable", true))
+	var node := PromptMemoryNode.create_from_content(title, body, weight, connected, mutable)
+	node.prompt_id = int(data.get("id", _next_prompt_id))
+	node.selected.connect(_on_prompt_selected)
+	node.moved.connect(_on_prompt_moved)
+	node.connect_toggled.connect(_on_prompt_connect_toggled)
+	node.content_changed.connect(_on_prompt_content_changed)
+	node.delete_requested.connect(_on_prompt_delete_requested)
+	_graph_layer.add_child(node)
+	if data.has("position"):
+		_apply_saved_node_layout_from_entry(data, node)
+	else:
+		var center := _get_agent_center()
+		var placement_half := node.get_combined_minimum_size() * 0.5
+		if placement_half.x < 4.0 or placement_half.y < 4.0:
+			placement_half = Vector2(48, 40)
+		node.position = center - placement_half
+		_clamp_node_to_graph(node)
+	_apply_node_data_to_ui(node, data)
+	return node
+
+
+func _apply_node_data_to_ui(node: PromptMemoryNode, data: Dictionary) -> void:
+	if data.has("title"):
+		var t := str(data.get("title", "")).strip_edges()
+		node.prompt_title = t if not t.is_empty() else "未命名标题"
+	if data.has("body"):
+		node.prompt_body = str(data.get("body", "")).strip_edges()
+	if data.has("weight"):
+		node.weight = clampf(float(data.get("weight", node.weight)), 0.0, 1.0)
+	if data.has("connected"):
+		node.connected = bool(data.get("connected", node.connected))
+	if data.has("mutable"):
+		node.is_mutable = bool(data.get("mutable", node.is_mutable))
+	if data.has("position"):
+		var pv: Variant = data.get("position")
+		if typeof(pv) == TYPE_DICTIONARY:
+			var pd: Dictionary = pv
+			node.position = Vector2(float(pd.get("x", 0.0)), float(pd.get("y", 0.0)))
+		elif typeof(pv) == TYPE_ARRAY:
+			var pa: Array = pv
+			if pa.size() >= 2:
+				node.position = Vector2(float(pa[0]), float(pa[1]))
+		_clamp_node_to_graph(node)
+	if data.has("body_expanded"):
+		node.set_body_expanded(bool(data.get("body_expanded", false)), false)
+	if data.has("is_lit"):
+		node.set_lit(bool(data.get("is_lit", false)), false)
+	node.call_deferred("_refresh_visuals")
+
+
+func _queue_state_graph_refresh(slot: String, graph: Dictionary = {}) -> void:
+	if slot != _get_memory_graph_slot():
+		return
+	if not is_instance_valid(_graph_layer):
+		return
+	_state_refresh_slot = slot
+	if graph.is_empty():
+		_state_refresh_graph.clear()
+	else:
+		_state_refresh_graph = graph.duplicate(true)
+	if _state_refresh_queued:
+		return
+	_state_refresh_queued = true
+	call_deferred("_flush_state_graph_refresh")
+
+
+func _flush_state_graph_refresh() -> void:
+	_state_refresh_queued = false
+	if not is_instance_valid(_graph_layer):
+		return
+	if _state_refresh_slot != _get_memory_graph_slot():
+		return
+	var graph: Dictionary
+	if _state_refresh_graph.is_empty():
+		graph = _get_current_graph_by_slot(_state_refresh_slot)
+	else:
+		graph = _state_refresh_graph.duplicate(true)
+	_state_refresh_graph.clear()
+	var r := apply_memory_graph_from_dict(graph)
+	if not r.get("ok", false):
+		push_warning("[Memory] 状态同步失败：%s" % str(r.get("error", "")))
+
+
+func _get_current_graph_by_slot(slot: String) -> Dictionary:
+	if slot == "immutable":
+		return MemoryState.get_immutable_graph()
+	return MemoryState.get_editor_graph()
 
 
 ## 演示用：在已成功导入的卡片中随机抽 2～4 张做流光（立即点亮或短时延迟点亮），其余保持未点亮。
@@ -412,7 +640,7 @@ func _reapply_saved_layout_after_nodes_ready(parsed_snapshot: Variant) -> void:
 
 
 func _persist_memory_graph_snapshot_deferred() -> void:
-	MemoryGraphData.sync_from_module(self)
+	MemoryState.sync_from_module(self )
 
 
 func _split_prompt_for_import(combined: String) -> Dictionary:

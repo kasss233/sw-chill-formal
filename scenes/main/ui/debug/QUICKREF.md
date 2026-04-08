@@ -20,6 +20,12 @@ ui.hide_test_panel()    # 隐藏
   - 删除任务
   - 获取任务信息
   - 获取所有任务
+- ✅ Memory 调试
+  - 显示/隐藏 Memory 模块（LayerManager 路由）
+  - 添加/更新/删除节点（MemoryState Agent API）
+  - 连接节点（agent_connect_memory_nodes）
+  - 切换节点连 Hub 状态（connected 字段）
+  - 读取 editor/immutable 图数据
 
 ## 集成位置
 测试面板已集成到 `scenes/main/ui/ui.tscn` 中，默认隐藏。

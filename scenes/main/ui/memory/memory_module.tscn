@@ -20,7 +20,7 @@ width = 64
 height = 64
 noise = SubResource("FastNoiseLite_ollwg")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_cxltj"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vuy7x"]
 shader = ExtResource("2_24uhx")
 shader_parameter/corner_radius = 21.0
 shader_parameter/show_border = true
@@ -36,14 +36,14 @@ shader_parameter/show_shadow = true
 shader_parameter/shadow_color = Color(0.1, 0.1, 0.1, 0.3)
 shader_parameter/shadow_size = 8.0
 shader_parameter/shadow_offset = Vector2(0, 4)
-shader_parameter/size = Vector2(524, 538)
-shader_parameter/shadow_padding = 12.0
+shader_parameter/size = Vector2(0, 1.5258789e-05)
+shader_parameter/shadow_padding = 0.0
 shader_parameter/glow_intensity = 0.0
 shader_parameter/glow_width = 4.0
 shader_parameter/glow_speed = 0.8
 shader_parameter/glow_softness = 2.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vuy7x"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bxoi1"]
 content_margin_left = 12.0
 content_margin_top = 12.0
 content_margin_right = 12.0
@@ -55,7 +55,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bxoi1"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxrvq"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -66,7 +66,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxrvq"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y70fn"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -77,7 +77,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y70fn"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vo8uf"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -88,7 +88,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vo8uf"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7ggiy"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -99,7 +99,7 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7ggiy"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fg81d"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
@@ -123,7 +123,7 @@ icon_color = Color(0, 0, 0, 1)
 background_color = Color(1, 1, 1, 0.7411765)
 metadata/_custom_type_script = "uid://ci6k5wbbufnv3"
 
-[node name="MemoryModule" type="MarginContainer" unique_id=1769940406 node_paths=PackedStringArray("memory", "memory_immutable", "canvas_layer", "segmented_button", "memory_button")]
+[node name="MemoryModule" type="MarginContainer" unique_id=1769940406 node_paths=PackedStringArray("memory", "memory_immutable", "canvas_layer", "segmented_button", "memory_button", "panel")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -137,23 +137,24 @@ memory_immutable = NodePath("CanvasLayer/FrostedPanel/MemoryImmutable")
 canvas_layer = NodePath("CanvasLayer")
 segmented_button = NodePath("CanvasLayer/FrostedPanel/MaterialSegmentedButton")
 memory_button = NodePath("MemoryButton")
+panel = NodePath("CanvasLayer/FrostedPanel")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=508245683]
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=834414769]
-material = SubResource("ShaderMaterial_cxltj")
-anchors_preset = 15
+material = SubResource("ShaderMaterial_vuy7x")
+anchors_preset = -1
 anchor_left = 0.1
 anchor_top = 0.1
 anchor_right = 0.9
 anchor_bottom = 0.9
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
+offset_left = 136.79999
+offset_top = 0.19999695
+offset_right = -140.79987
+offset_bottom = 0.2000122
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_vuy7x")
+theme_override_styles/panel = SubResource("StyleBoxFlat_bxoi1")
 script = ExtResource("3_qft7o")
 noise_texture = SubResource("NoiseTexture2D_s1ofn")
 metadata/_custom_type_script = "uid://d0g5ejinpbng4"
@@ -185,11 +186,11 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_bxoi1")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_mxrvq")
-theme_override_styles/hover = SubResource("StyleBoxFlat_y70fn")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_vo8uf")
-theme_override_styles/focus = SubResource("StyleBoxFlat_7ggiy")
+theme_override_styles/normal = SubResource("StyleBoxFlat_mxrvq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_y70fn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vo8uf")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_7ggiy")
+theme_override_styles/focus = SubResource("StyleBoxFlat_fg81d")
 script = ExtResource("7_85blf")
 states = Array[ExtResource("8_nne8r")]([SubResource("Resource_qp1n8"), SubResource("Resource_q0h2o")])
 button_size = 3
@@ -207,8 +208,7 @@ layout = NodePath("../CanvasLayer/FrostedPanel")
 layout_id = "memory"
 metadata/_custom_type_script = "uid://bimelmc1ce1b2"
 
-[node name="MemoryDemo" parent="." instance=ExtResource("11_mdemo")]
-记忆模块节点路径 = NodePath("..")
+[node name="MemoryDemo" parent="." unique_id=1505415376 instance=ExtResource("11_mdemo")]
 
 [connection signal="segment_selected" from="CanvasLayer/FrostedPanel/MaterialSegmentedButton" to="." method="_on_material_segmented_button_segment_selected"]
 [connection signal="state_changed" from="MemoryButton" to="." method="_on_memory_button_state_changed"]

@@ -1,0 +1,135 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/main/ui/debug/memory_test_panel.gd" id="1_memory_test"]
+
+[node name="MemoryTestPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_memory_test")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="InputSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "输入参数:"
+theme_override_font_sizes/font_size = 16
+
+[node name="SlotInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "editor"
+placeholder_text = "槽位: editor / immutable"
+
+[node name="NodeIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "节点ID（更新/删除/切换connected）"
+
+[node name="TitleInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "节点标题"
+
+[node name="BodyInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "节点正文"
+
+[node name="WeightInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+text = "0.5"
+placeholder_text = "权重(0~1)"
+
+[node name="FromIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "连线起点ID(from)"
+
+[node name="ToIdInput" type="LineEdit" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/InputSection"]
+layout_mode = 2
+placeholder_text = "连线终点ID(to)"
+
+[node name="ModuleSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ModuleSection"]
+layout_mode = 2
+text = "模块显隐调试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="ShowModuleBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ModuleSection"]
+layout_mode = 2
+text = "显示 Memory 模块 (LayerManager.agent_show_module)"
+
+[node name="HideModuleBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/ModuleSection"]
+layout_mode = 2
+text = "隐藏 Memory 模块 (LayerManager.agent_hide_module)"
+
+[node name="AgentSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "MemoryState Agent API 调试:"
+theme_override_font_sizes/font_size = 16
+
+[node name="AddNodeBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "添加节点 (agent_add_memory_node)"
+
+[node name="UpdateNodeBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "更新节点 (agent_update_memory_node)"
+
+[node name="RemoveNodeBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "删除节点 (agent_remove_memory_node)"
+
+[node name="ConnectNodesBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "连接节点 (agent_connect_memory_nodes)"
+
+[node name="ToggleConnectedBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "切换节点连Hub状态 (connected)"
+
+[node name="GetGraphBtn" type="Button" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer/AgentSection"]
+layout_mode = 2
+text = "读取当前图 (get_editor_graph/get_immutable_graph)"
+
+[node name="InfoLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray]Memory 调试日志将显示在这里...[/color]"
+scroll_following = true

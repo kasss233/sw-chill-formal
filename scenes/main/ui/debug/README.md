@@ -67,6 +67,25 @@ scenes/main/ui/debug/
 - 点击"获取所有任务"按钮
 - 在日志区域查看所有任务列表
 
+## Memory 调试功能
+
+### 1. 模块显隐路由测试
+- 点击"显示 Memory 模块"/"隐藏 Memory 模块"按钮
+- 通过 `LayerManager.agent_show_module("memory")` 和 `LayerManager.agent_hide_module("memory")` 验证 UI 路由
+
+### 2. 记忆图 Agent API 测试
+- 添加节点：`agent_add_memory_node(slot, node_data)`
+- 更新节点：`agent_update_memory_node(slot, node_id, patch)`
+- 删除节点：`agent_remove_memory_node(slot, node_id)`
+- 连接节点：`agent_connect_memory_nodes(slot, from_id, to_id)`
+
+### 3. Hub 连接状态测试
+- 使用"切换节点连Hub状态"按钮翻转 `connected` 字段
+- 可直接验证节点到 AgentHub 连线显隐
+
+### 4. 图数据读取
+- 使用"读取当前图"按钮查看 `editor` / `immutable` 槽位完整图数据
+
 ## 架构设计
 
 ### 集成方式

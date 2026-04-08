@@ -99,6 +99,12 @@ const FUNC_DISPLAY_NAMES: Dictionary = {
 	"load_room_decor_from_resource": "正在加载装饰资源",
 	"get_all_room_decor": "正在获取装饰列表",
 	"get_available_room_decor": "正在获取可用装饰",
+	# 记忆图
+	"add_memory_node": "正在添加记忆节点",
+	"update_memory_node": "正在更新记忆节点",
+	"remove_memory_node": "正在删除记忆节点",
+	"connect_memory_nodes": "正在连接记忆节点",
+	"get_memory_graph": "正在读取记忆图",
 }
 
 # 信号

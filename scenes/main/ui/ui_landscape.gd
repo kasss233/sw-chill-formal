@@ -9,7 +9,7 @@ extends UI
 @onready var _env_setter = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/EnvSetter
 @onready var _dialogue_box = $VBoxContainer/DialogueBox
 @onready var _music_module = $MusicModule
-
+@onready var _memory_module = $TabPanel/FrostedPanel/MarginContainer/VBoxContainer/MemoryModule
 const _MIN_GLOW_SEC: float = 1.6
 const _MODULE_NAME_MAP: Dictionary = {
 	"task": "_task_module",
@@ -22,6 +22,7 @@ const _MODULE_NAME_MAP: Dictionary = {
 	"habit": "_profile_center_tab",
 	"setting": "_env_setter",
 	"music": "_music_module",
+	"memory": "_memory_module",
 }
 
 var _glow_start_times: Dictionary = {}
@@ -133,6 +134,8 @@ func _find_module_frosted_panel(module_key: String) -> FrostedPanel:
 			return _find_first_frosted_panel(_env_setter)
 		"music":
 			return _find_first_frosted_panel(_music_module)
+		"memory":
+			return _find_first_frosted_panel(_memory_module)
 		_:
 			return null
 
