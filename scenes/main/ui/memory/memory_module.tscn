@@ -142,15 +142,11 @@ panel = NodePath("CanvasLayer/FrostedPanel")
 
 [node name="FrostedPanel" type="PanelContainer" parent="CanvasLayer" unique_id=834414769]
 material = SubResource("ShaderMaterial_cxltj")
-anchors_preset = -1
-anchor_left = 0.1
-anchor_top = 0.1
-anchor_right = 0.9
-anchor_bottom = 0.9
-offset_left = 136.79999
-offset_top = 0.19999695
-offset_right = -140.79987
-offset_bottom = 0.2000122
+anchors_preset = 0
+offset_left = -257.6
+offset_top = -207.36
+offset_right = 257.6
+offset_bottom = 207.36
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_vuy7x")
